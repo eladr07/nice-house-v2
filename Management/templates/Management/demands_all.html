@@ -1,0 +1,98 @@
+﻿{% extends "./base.html" %}
+{% load management_extras %}
+{% block header %}
+{{ block.super }}
+<script>
+	$(document).ready(function() {
+		$("#locateDemandLgnd, #locateHouseLgnd").click(function (event) {
+			$(this).next().toggle();
+		});
+		$("#locateDemandLgnd, #locateHouseLgnd").next().hide();
+		$(".fancybox").fancybox();
+		$(".bigfancybox").fancybox({'frameWidth':800});	
+	});
+</script>
+{% endblock header %}
+{% block content %}
+<div class="title">
+	<div class="pageTitle">מעקב דרישות יזמים</div>
+</div>
+<div >
+	<fieldset id="locateHouse" class="cardFieldset">
+		<legend id="locateHouseLgnd" style="cursor: pointer;">איתור דירה</legend>
+		<form method="POST">
+				{{houseForm}}
+				<input type="submit" value="חפש" class="button"/>
+		</form>
+	</fieldset>
+	<fieldset id="locateDemand" class="cardFieldset" >
+		<legend id="locateDemandLgnd" style="cursor: pointer;">איתור דרישה (להדפסה)</legend>
+		<form method="POST">
+				{{demandForm}}
+				<input type="submit" value="חפש" class="button"/>
+		</form>
+	</fieldset>
+</div>
+<div class="clearBoth"></div>	
+<br>
+<table id="demandTable" class="dataTable" border="1">
+	<tr>
+		<th></th>
+		<th>פרוייקט</th>
+		<th>יזם</th>
+		<th>אנשי קשר</th>
+		<th>צ'קים וחשבוניות</th>
+		<th>שולמו בחסר\יתר</th>
+		<th>לא שולמו כלל</th>
+		<th>הוצאה חשבונית<br>
+		ולא התקבל צ'ק</th>
+		<th>התקבל צ'ק ולא<br>
+		הוצאה חשבונית</th>
+	</tr>
+    {% for p in projects %}
+    	<tr class="{% cycle 'row1' 'row2' %}" >			
+			<td><a href="/projects/{{p.id}}"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a></td>
+			<td>{{p.name}}</td>
+			<td>{{ p.initiator }}</td>
+			<td>
+				{% if p.demand_contact %}
+					תשלום :
+					<a href="/contact/{{p.demand_contact.id}}" class="fancybox">{{p.demand_contact}}</a><br>
+				{% endif %}
+				{% if p.payment_contact %}
+					צ'קים :
+					<a href="/contact/{{p.payment_contact.id}}" class="fancybox">{{p.payment_contact}}</a><br>
+				{% endif %}
+				{% if p.contacts.count %}
+					נוספים: 
+					{% for c in p.contacts.all %}
+						<a href="/contact/{{c.id}}" class="fancybox">{{c}}</a>{% if not forloop.last %} , {% endif %}
+					{% endfor %}
+				{% endif%}
+			</td>
+			<td>
+				<a href="/projects/{{p.id}}/addinvoice" style="text-decoration: underline; color: #D21515;">הזנת חשבונית לדרישה</a><br>
+				<a href="/projects/{{p.id}}/addpayment" style="text-decoration: underline; color: #0E9D22;">הזנת צ'ק מהיזם לדרישה</a><br>
+			</td>
+			<td><a href="/projects/{{p.id}}/demands/mispaid" class="bigfancybox">{{ p.demands_mispaid|length }}</a></td>
+			<td><a href="/projects/{{p.id}}/demands/unpaid" class="bigfancybox">{{ p.demands_unpaid|length }}</a></td>
+			<td><a href="/projects/{{p.id}}/demands/nopayment" class="bigfancybox">{{ p.demands.nopayment.count }}</a></td>
+			<td><a href="/projects/{{p.id}}/demands/noinvoice" class="bigfancybox">{{ p.demands.noinvoice.count }}</a></td>
+		</tr>
+	{% endfor %}
+	<tr class="rowSum">
+		<td colspan="5"></td>
+		<td>{{total_mispaid}}</td>
+		<td>{{total_unpaid}}</td>
+		<td>{{total_nopayment}}</td>
+		<td>{{total_noinvoice}}</td>
+	</tr>
+	<tr class="rowSum">
+		<td colspan="5"></td>
+		<td>{{amount_mispaid|commaise}}</td>
+		<td>{{amount_unpaid|commaise}}</td>
+		<td>{{amount_nopayment|commaise}}</td>
+		<td>{{amount_noinvoice|commaise}}</td>
+	</tr>
+</table>
+{% endblock content %}

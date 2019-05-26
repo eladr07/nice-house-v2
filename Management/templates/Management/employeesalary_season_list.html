@@ -1,0 +1,100 @@
+﻿{% extends "./base.html" %}
+{% load management_extras %}
+{% block content %}
+<div class="title">
+	<div class="pageTitle">ריכוז שכ"ע לפי תקופה<br><a href="{{employee.derived.get_absolute_url}}" target="_blank">{{employee}}</a></div>
+</div>
+<div class="clearBoth"></div>
+<form method="GET">
+	<table class="dataTable" style="width: 70%;" border="1">
+		<tr class="row1">
+			<td colspan={{filterForm.fields|length|add:"2"}} style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש</td>
+		</tr>
+		<tr class="row2">
+			{% for field in filterForm %}
+			<td>
+				{{ field.label_tag }} : 
+				{{ field }}
+			</td>
+			{% endfor %}
+			<td><input type="submit" value="חפש" class="button" name="list" /></td>
+			<td><input type="submit" value="PDF" class="button" name="pdf" /></td>
+		</tr>
+	</table>
+</form>
+<br>
+<div class="clearBoth"></div>
+<br>
+<table id="salaryTable" class="dataTable" border="1">
+<caption>מציג סה"כ {{salaries|length}} משכורות</caption>	
+	<tr>
+		<th colspan="2">כללי</th>
+		<th colspan="7">תשלום נטו</th>
+		<th colspan="3">שונות</th>
+		<th colspan="4">אישור ושליחה</th>
+	</tr>
+	<tr>
+		<th></th>
+		<th>סוג העסקה</th>
+		<th>שכר בסיס + עמלות</th>
+		<th>רשת בטחון</th>
+		<th>תוספת משתנה</th>
+		<th>קיזוז שכר</th>
+		<th>סה"כ שווי תלוש</th>
+		<th>החזר הלוואה</th>
+		<th>שווי צ'ק</th>
+		<th>ברוטו לחישוב</th>
+		<th>החזר הוצאות (בנפרד)</th>
+		<th>חופש ומחלה</th>
+		<th>הערות</th>
+		<th>ת.אישור</th>
+		<th>ת.שליחה להנה"ח</th>
+		<th>ת.שליחה לצ'קים</th>
+	</tr>
+	{% for s in salaries %}
+		{% if s.approved_date %}
+			<tr class="row5">
+		{% else %}
+			<tr class="{% cycle 'row1' 'row2' %}">
+		{% endif %}
+			<td>{{ s.month }}/{{ s.year }}</td>
+			<td>{{s.get_employee.employment_terms.hire_type}}</td>
+			<td style="color:#08A600;">
+				{{s.base|commaise}} + 
+				<a href="{{s.get_absolute_url}}/details" class="fancybox">{{s.commissions|commaise}}</a>
+			</td>
+			<td style="color:#08A600;">{{s.safety_net|default_if_none:""}}</td>
+			<td style="color:#08A600;">{% if s.var_pay %}{{s.var_pay|commaise}} - {{s.var_pay_type}} {% endif %}</td>
+			<td style="color:#D50808;">{% if s.deduction %}{{s.deduction|commaise}} - {{s.deduction_type}} {% endif %}</td>
+			<td><a href="{{s.get_absolute_url}}/totaldetails" class="fancybox">{{s.neto|default_if_none:""|commaise}}</a></td>
+			<td>
+				החזר - {{s.loan_pay|commaise}} ש"ח
+				<br>
+				{% if s.get_employee.loan_left %}
+				יתרה - {{s.employee.loan_left|commaise}} ש"ח
+				<br>
+				{% endif %}
+				{% if s.get_employee.loans_and_pays|length %}
+				<a href="{{s.get_employee.get_absolute_url}}/loans" class="fancybox">כרטיס הלוואות</a><br>
+				{% endif %}
+			</td>
+			<td><a href="{{s.get_absolute_url}}/checkdetails" class="fancybox">{{s.check_amount|default_if_none:""|commaise}}</a></td>
+			<td>{% if s.bruto %}<a href="{{s.expenses.get_absolute_url}}" class="fancybox">{{s.bruto|commaise}}</a>{% endif %}</td>
+			<td>{% if s.refund %}{{s.refund|commaise}} - {{s.refund_type}} {% endif %}</td>
+			<td></td>
+			<td>{{s.remarks|default_if_none:""}}</td>
+			<td>{{s.approved_date|default_if_none:""}}</td>
+			<td>{{s.sent_to_bookkeeping_date|default_if_none:""}}</td>
+			<td>{{s.sent_to_checks_date|default_if_none:""}}</td>
+		</tr>
+	{% endfor %}
+		<tr class="rowSum">
+			<td colspan="6"></td>
+			<td>{{total_neto|commaise}}</td>
+			<td>{{total_loan_pay|commaise}}</td>
+			<td>{{total_check_amount|commaise}}</td>
+			<td>{{total_bruto|commaise}}</td>
+			<td>{{total_refund|commaise}}</td>
+		</tr>
+</table>
+{% endblock content %}

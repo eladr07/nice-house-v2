@@ -1,0 +1,308 @@
+﻿{% extends "./base.html" %}
+{% load management_extras %}
+{% block header %}
+{{ block.super }}
+<script>
+	$(document).ready(function() {		
+		$("input[type!='submit']").attr("class", "inputText");
+	    $("a[id*='contact_delete']").click(function (event) { 
+				var answer = confirm("האם אתה בטוח שברצונך למחוק את איש הקשר שנבחר ?");
+				if (!answer)
+					event.preventDefault();
+			});
+	    $("a[id*='building_delete']").click(function (event) { 
+				var answer = confirm("האם אתה בטוח שברצונך למחוק את " + $(this).parent().text() + " ? כל הבתים בתוכו יימחקו גם הם.");
+				if (!answer)
+					event.preventdefault();
+			});
+		$("#url_go").click(function(event) {
+				$(this).attr("href", $("#id_url").val());
+			});
+		$("#add_commissionsBtn").click(function (event) {
+			$("#new_commissions").toggle();//show/hide new commission
+		});
+		$(".fancybox").fancybox();
+		$(".bigfancybox").fancybox({'frameWidth':800});
+	});
+</script>
+{% endblock header %}
+
+{% block content %}
+	<div class="title">
+		<div class="pageTitle">כרטיס פרוייקט : {{ form.instance.initiator }} - {{ form.instance.name }}</div>
+	</div>
+<form method="post" enctype="multipart/form-data">
+	<div style="float: right; width: 27%; margin-left: 10px;">
+		<fieldset class="cardFieldset">
+			<legend>פרטי משרד מכירות</legend>
+			<table cellspacing="2" cellpadding="2" class="formTable">
+				{% for field in form %}
+				<tr>
+					<th>{{field.label_tag}}</th>
+					<td>
+						{{field}}
+						{% if field.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{field.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+				{% endfor %}
+				<tr>
+					<td></td>
+					<td><input type="submit" value="אישור" class="button" /></td>
+				</tr>
+			</table>
+		</fieldset><br>
+	</div>
+	<div style="float: right; width:33%; margin-left: 10px;">
+	<fieldset class="cardFieldset">
+		<legend>נתוני פרוייקט</legend>
+		<table cellspacing="2" cellpadding="2" class="formTable" >
+			{% for field in detailsForm %}
+			<tr>
+				<th>{{field.label_tag}}</th>
+				<td>
+					{{field}}
+					{% if field.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{field.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			{% endfor %}
+			<tr>
+				<td></td>
+				<td><input type="submit" value="אישור" class="button" /></td>
+			</tr>
+		</table>
+	</fieldset>
+	<fieldset class="cardFieldset">
+		<legend>מנהל מכירות</legend>
+		<table style="font-size:12; font-family:tahoma;">
+		{% for e in project.employees.all %}
+			<tr>
+				<td>{{ e }}</td>
+				<td><a href="/employees/{{e.id}}"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a></td>
+			</tr>
+		{% endfor %}
+		</table>
+	</fieldset>
+	<fieldset class="cardFieldset">
+		<legend>אנשי קשר</legend>
+			<div>
+				<b>נציג לדרישות תשלום</b> : 
+				{{project.demand_contact|default_if_none:" --- "}} 
+				<a href="demandcontact" class="fancybox">הגדר</a>
+				{% if project.demand_contact %}
+					<a href="/contact/{{project.demand_contact.id}}" class="fancybox"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a>
+					<a href="contact/{{project.demand_contact.id}}/remove">מחיקה מהפרוייקט</a>
+					<a href="contact/{{project.demand_contact.id}}/delete">מחיקה מהמערכת</a>
+				{% endif %}
+				<br>
+				<b>נציג לצ'קים</b> : 
+				{{project.payment_contact|default_if_none:" --- "}} 
+				<a href="paymentcontact" class="fancybox">הגדר</a>
+				{% if project.payment_contact %}
+					<a href="/contact/{{project.payment_contact.id}}" class="fancybox"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a>
+					<a href="contact/{{project.payment_contact.id}}/remove">מחיקה מהפרוייקט</a>
+					<a href="contact/{{project.payment_contact.id}}/delete">מחיקה מהמערכת</a>
+				{% endif %}
+				<br>
+				<u>אנשי קשר נוספים:</u><br>
+				{% for c in project.contacts.all %}
+					{{c}} 
+					<a href="/contact/{{c.id}}" class="fancybox"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a>
+					<a href="contact/{{c.id}}/remove">מחיקה מהפרוייקט</a>
+					<a href="contact/{{c.id}}/delete">מחיקה מהמערכת</a>
+					<br>
+				{% endfor %}
+				<a href="addcontact" class="fancybox">הוסף איש קשר</a>
+			</div>
+	</fieldset>
+	</div>
+	<div style="float: right">	
+		<fieldset class="cardFieldset">
+			<legend>בניינים ומחירונים</legend>
+			סה"כ 
+			<b>{{project.non_deleted_buildings|length}}</b>
+			בניינים, ובהם בסה"כ - 
+			<b>{{project.houses|length}}</b>
+			דירות.<br>
+			<a href="buildings/add" class="fancybox">הוספת בניין ומחירון</a><br>
+			<a href="buildings" class="bigfancybox">פירוט בניינים ומחירונים</a>
+		</fieldset>
+		<fieldset class="cardFieldset">
+			<legend>הרשמות לדירות</legend>
+			סה"כ החודש
+			<b>{{project.signups.count}}</b>
+			הרשמות.<br>
+			<a href="signups/add" >הרשמה חדשה</a><br>
+			<a href="signups" >פירוט הרשמות</a>
+		</fieldset>
+		<fieldset class="cardFieldset">
+			<legend>תזכורות</legend>
+			קיימות <a id="list_reminders" href="reminders" class="fancybox"><b>{{project.get_open_reminders|length}}</b></a> תזכורות שטרם טופלו.<br>
+			<a id="add_reminder" href="addreminder" class="fancybox">תזכורת חדשה</a>
+		</fieldset>
+		<fieldset class="cardFieldset">
+			<legend>מסמכים מצורפים</legend>
+			<a id="list_attachments" href="attachments" class="bigfancybox">ארכיב מסמכים</a><br>
+			<a id="add_attachment" href="attachment/add" class="bigfancybox">צרף מסמך</a>
+		</fieldset>
+	{% if user.is_staff %}
+		<fieldset class="cardFieldset">
+			<legend>עמלות</legend>
+			{% with project.commissions as c %}
+			{% if c.c_var_precentage %}	
+				<div>		
+					<table class="formTable" style="text-align:center;">
+						<th>דירה</th>
+						<th>סכום</th>
+						{% for p in c.c_var_precentage.precentages.all %}
+							<tr>
+								<td>{{p.index}}</td>
+								<td>{{p.precentage}}%</td>
+							</tr>
+						{% endfor %}
+						<tr>
+							<td></td>
+							<td>
+								{% if c.c_var_precentage.is_retro %}
+									רטרואקטיבי מדירה {{c.c_var_precentage.start_retro}}
+								{% else %}
+									לא רטרואקטיבי
+								{% endif %}
+							</td>
+						</tr>
+					</table>
+					<a id="edit_cvp" href="cvp" class="fancybox"><img src="/site_media/images/edit_48.png" width="15" height="15" border="0" alt="עריכה" /></a>
+					<a href="cvp/del"><img src="/site_media/images/delete_48.png" width="15" height="15" border="0" alt="מחיקה" /></a>
+				</div>
+			{% endif %}
+			{% if c.c_var_precentage_fixed %}		
+				<div>
+					{{c.c_var_precentage_fixed.first_precentage}}%
+					עבור
+					{{c.c_var_precentage_fixed.first_count}}
+					דירות ראשונות.<br>
+					כל דירה נוספת, תוספת של
+					{{c.c_var_precentage_fixed.step}}%.<br>
+					{% if c.c_var_precentage_fixed.last_precentage %}
+						{{c.c_var_precentage_fixed.last_precentage}}%
+						עבור
+						{{c.c_var_precentage_fixed.last_count}}
+						דירות אחרונות.
+					{% endif %}
+					<a id="edit_cvpf" href="cvpf" class="fancybox"><img src="/site_media/images/edit_48.png" width="15" height="15" border="0" alt="עריכה" /></a>
+					<a href="cvpf/del"><img src="/site_media/images/delete_48.png" width="15" height="15" border="0" alt="מחיקה" /></a>
+				</div>
+			{% endif %}
+			{% if c.c_zilber %}		
+				<div>
+					עמלת בסיס 
+					{{c.c_zilber.base}}%.<br>
+					בונוס חסכון בהנחה 
+					{{c.c_zilber.b_discount}}%
+					מההפרש למחיר דוח אפס.<br>
+					בונוס קצב מכירות 
+					{{c.c_zilber.b_sale_rate}}% 
+					לכל דירה עד מקס' של 
+					{{c.c_zilber.b_sale_rate_max}}%.<br>
+					מדד בסיס 
+					{{c.c_zilber.base_madad}},
+					בתאריך 
+					{{c.c_zilber.third_start|date:"j/m/y"}}.
+					<a id="edit_cz" href="cz" class="fancybox"><img src="/site_media/images/edit_48.png" width="15" height="15" border="0" alt="עריכה" /></a>
+					<a href="cz/del"><img src="/site_media/images/delete_48.png" width="15" height="15" border="0" alt="מחיקה" /></a>
+				</div>
+			{% endif %}
+			{% if c.b_discount_save_precentage %}	
+				<div>
+					{{c.b_discount_save_precentage.precentage_bonus}}%
+					עבור כל 1%  חסכון בהנחה 
+					{% if c.b_discount_save_precentage.max_for_bonus %}
+						עד מקס' של
+						{{c.b_discount_save_precentage.max_for_bonus}}%
+					{% endif %}
+					<a id="edit_bdsp" href="bdsp" class="fancybox"><img src="/site_media/images/edit_48.png" width="15" height="15" border="0" alt="עריכה" /></a>
+					<a href="bdsp/del"><img src="/site_media/images/delete_48.png" width="15" height="15" border="0" alt="מחיקה" /></a>
+				</div>
+			{% endif %}
+			<div>
+				<button id="add_commissionsBtn" type="button" class="button">הוספה</button>
+			</div>
+			<div id="new_commissions">
+				{% if not c.c_var_precentage %}
+					עמלה משתנה (באחוזים)
+					<a id="add_cvp" href="cvp" class="fancybox"><img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" /></a> 
+				{% endif %}
+				{% if not c.c_var_precentage_fixed %}
+					<br>עמלה משתנה בקצב קבוע (באחוזים)
+					<a id="add_cvpf" href="cvpf" class="fancybox"><img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" /></a> 
+				{% endif %}
+				{% if not c.c_zilber %}
+					<br>עמלת זילברמינץ
+					<a id="add_cz" href="cz" class="fancybox"><img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" /></a> 
+				{% endif %}
+				{% if not c.b_discount_save_precentage %}
+					<br>בונוס חיסכון בהנחה (באחוזים)
+					<a id="add_bdsp" href="bdsp" class="fancybox"><img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" /></a> 
+				{% endif %}
+			</div>
+			{% if c.agreement %}
+				<a target="_blank" href="{{c.agreement.url}}">מסמך ההסכם</a>
+			{% endif %}
+			<br><br>
+			<table class="formTable">
+				<tr>
+					<th>מקס עמלה</th>
+					<td>{{c.max|default_if_none:""}}</td>
+				</tr>
+				<tr>
+					<th>סכום תוספת</th>
+					<td>{{c.add_amount|commaise|default_if_none:""}}</td>
+				</tr>
+				<tr>
+					<th>סוג תוספת</th>
+					<td>{{c.add_type|default_if_none:""}}</td>
+				</tr>
+				<tr>
+					<th>הוצאות רישום</th>
+					<td>{{c.registration_amount|default_if_none:""}}</td>
+				</tr>
+				<tr>
+					<th>קזז הוצאות רישום לאחר משפטיות</th>
+					<td>{{c.deduct_registration|yesno}}</td>
+				</tr>
+				<tr>
+					<th>כולל מע"מ לעמלה</th>
+					<td>
+					{% if c.include_tax != None %}
+						{{c.include_tax|yesno}}
+					{% else %}
+						לא ידוע
+					{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th>כולל עו"ד לעמלה</th>
+					<td>
+					{% if c.include_lawyer != None %}
+						{{c.include_lawyer|yesno}}
+					{% else %}
+						לא ידוע
+					{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th>עמלה לפי הרשמות</th>
+					<td>{{c.commission_by_signups|yesno}}</td>
+				</tr>
+				<tr>
+					<th>נקודות חשובות להסכם</th>
+					<td>{{c.remarks}}</td>
+				</tr>
+			</table>
+			<a href="/projectcommission/{{c.id}}" class="fancybox">שנה תנאים</a>
+		</fieldset>
+		{% endwith %}
+	{% endif %}
+	</div>
+	<div class="clearBoth"> </div>
+</form>
+{% endblock content %}

@@ -1,0 +1,111 @@
+﻿{% extends "./base.html" %}
+{% block header %}
+{{block.super}}
+<script>
+	$(document).ready(function() {		
+		$("input[type!='submit']").attr("class", "inputText");
+		$("input[type='submit']").click(function (event) {
+			parent.$("#fancy_close").click(function(event) {
+					parent.location.reload();
+				});	
+			});
+		$("#id_project, #id_year, #id_month").change(loadDetails);
+	});
+	function loadDetails()
+	{
+		var project = $("#id_project").val();
+		var year = $("#id_year").val();
+		var month = $("#id_month").val();
+		$("#leftSide").empty();
+		$.get("/demand_details/" + project + "/" + year + "/" + month, function(data){
+			$("#leftSide").append(data);
+		});
+		$.get("/invoice_details/" + project + "/" + year + "/" + month, function(data){
+			$("#leftSide").append(data);
+		});
+		$.get("/payment_details/" + project + "/" + year + "/" + month, function(data){
+			$("#leftSide").append(data);
+		});
+	}
+</script>
+{% endblock header %}
+{% block content %}
+	<div class="title">
+		<div class="pageTitle">חשבונית חדשה</div>
+	</div>
+	<div class="clearBoth"> </div>
+	<br /> 	
+	<div style="float:left; width:20%;">
+		<fieldset class="cardFieldset">
+			<ul>
+				<li><a href="/payments/add">הזנת צ'ק רגיל</a></li>
+				<li><a href="/splitpayment/add">הזנת צ'ק מפוצל</a></li>
+				<li><a href="invoices/offset" class="fancybox">הקלדת זיכוי לחשבונית</a></li>
+			</ul>
+		</fieldset>
+	</div>
+	<div id="rightSide">
+		<form method="POST">
+			<table class="formTable">
+				<tr>
+					<th>{{form.project.label_tag}}</th>
+					<td>
+						{{form.project}}
+						{% if form.project.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.project.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th>{{form.year.label_tag}}</th>
+					<td>
+						{{form.year}}
+						{% if form.year.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.year.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th>{{form.month.label_tag}}</th>
+					<td>
+						{{form.month}}
+						{% if form.month.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.month.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th>{{form.num.label_tag}}</th>
+					<td>
+						{{form.num}}
+						{% if form.num.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.num.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th>{{form.date.label_tag}}</th>
+					<td>
+						{{form.date}}
+						{% if form.date.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.date.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th>{{form.amount.label_tag}}</th>
+					<td>
+						{{form.amount}}
+						{% if form.amount.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.amount.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th>{{form.remarks.label_tag}}</th>
+					<td>
+						{{form.remarks}}
+						{% if form.remarks.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.remarks.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td>
+						<input type="submit" value="אישור" class="button"/>
+						<input name="addanother" type="submit" value="אישור והמשך הזנה" class="button"/>
+						<input name="addpayment" type="submit" value="אישור והזנת תשלום" class="button"/>
+					</td>
+				</tr>
+			</table>
+		</form>
+	</div>
+	<div class="clearBoth"></div>
+{% endblock content %}

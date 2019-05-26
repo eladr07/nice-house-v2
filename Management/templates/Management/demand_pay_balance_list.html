@@ -1,0 +1,228 @@
+﻿{% extends "./base.html" %}
+{% load management_extras %}
+{% load i18n %}
+{% block header %}
+{{ block.super }}
+<script>
+	var selectedID = 0;
+	var prev_class;
+	$(document).ready(function() {
+		$("#demandTable tr").click(function() { 
+			var tr = $(this);
+			if (selectedID > 0)
+				$("#demandTable tr[objid='"+selectedID+"']").attr("class", prev_class);
+			selectedID = tr.attr("objid");
+			if (!selectedID)
+				return;
+			prev_class = tr.attr("class");
+			tr.attr("class","selectedRow");
+			//sync links
+			if (selectedID > 0)
+				$("#demandEdit").attr("href", "/demands/" + selectedID);
+				$("#demandAdjust").attr("href", "/demands/" + selectedID + "/adddiffadjust");
+				$("#demandAdjust").attr("href", "/demands/" + selectedID + "/adddiffadjust");
+				$("#demandForceFullyPaid").attr("href", "/demands/" + selectedID + "/forcefullypaid");
+				$("#demandAddInvoice").attr("href", "/demands/" + selectedID + "/invoice/add");
+				$("#demandAddPayment").attr("href", "/demands/" + selectedID + "/payment/add");
+			});
+		$(".fancybox").fancybox();
+		$(".bigfancybox").fancybox({'frameWidth':800});	
+		$("#demandCalc").click(function(event) {
+			if (!confirm("האם אתה בטוח שברצונך לחשב את העמלות מחדש ?"))
+				event.preventDefault();
+		});		
+		$("#demandForceFullyPaid").click(function (event) {
+			event.preventDefault();
+			$.get($(this).attr("href"), function(data){
+				if (data == "ok")
+					location.reload(true);
+				});
+			});
+	});
+</script>
+{% endblock header %}
+{% block content %}
+<div class="title">
+	<div class="pageTitle">מצב תשלום דרישות יזמים</div>
+</div>
+<div class="clearBoth"></div>
+<div style="float:right;width:70%;">
+	<form method="GET">
+		<table class="dataTable">
+			<tr class="row1">
+				<td colspan="10" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש</td>
+			</tr>
+			<tr class="row2">
+				{% for field in filterForm %}
+				<td>
+					{{ field.label_tag }} : 
+					{{ field }}
+				</td>
+				{% endfor %}
+				<td><input type="submit" value="חפש" name="html" class="button"/></td>
+				<td><input type="submit" value="גרסה להדפסה" name="pdf" class="button"/></td>
+			</tr>
+		</table>
+	</form>
+</div>
+<div class="clearBoth"></div>
+<div class="someIcon" style="width:110px;">
+	<img src="/site_media/images/documentinfo-48.png" width="20" height="20"  alt="שינוי" /> 
+	<a href="{{project.get_absolute_url}}">כרטיס פרויקט</a>
+</div>
+<div class="someIcon" style="width:100px;">
+	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+	<a id="demandEdit">שינוי דרישה</a>
+</div>
+<div class="someIcon" style="width:100px;">
+	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+	<a class="fancybox" id="demandAdjust">התאמת דרישה</a>
+</div>
+<div class="someIcon" style="width:100px;">
+	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+	<a id="demandForceFullyPaid">התאמה כפויה</a>
+</div>
+<div class="someIcon" style="width:100px;">
+	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+	<a id="demandAddInvoice">הזנת חשבונית</a>
+</div>
+<div class="someIcon" style="width:100px;">
+	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+	<a id="demandAddPayment">הזנת תשלום</a>
+</div>
+<div class="someIcon"style="width:130px;">
+	<img src="/site_media/images/advanced-48.png" width="20" height="20"  alt="שליחה" /> 
+	<a id="demandCalc">חישוב עמלות מחדש</a>
+</div>
+<div class="clearBoth"></div>
+<br>
+<table id="demandTable" class="dataTable" border="1">
+<caption>מציג סה"כ {{project_demands|length}} פרוייקטים</caption>
+	<tr>
+		<th colspan="5">פרטי דרישה</th>
+		<th colspan="3">פרטי חשבונית</th>
+		<th colspan="2">פרטי צ'קים</th>
+		<th colspan="6">הפרשי דרישה</th>
+	</tr>
+	<tr>
+		<th>מס'</th>
+		<th>PDF</th>
+		<th>חודש</th>
+		<th>מס'<BR>מכירות</th>
+		<th>סכום דרישה</th>
+		<th>מס'<BR>חשבונית</th>
+		<th>סכום</th>
+		<th>תאריך</th>
+		<th>סכום</th>
+		<th>תאריך</th>
+		<th>דרישה<BR>לחשבונית</th>
+		<th>צ'ק<BR>לחשבונית</th>
+		<th>זיכוי<BR>חשבונית</th>
+		<th>התאמה</th>
+		<th>תיקונים</th>
+		<th>טיפול<BR>בדרישה</th>
+	</tr>
+	{% for project, demands in project_demands.items %}
+		<tr class="row1">
+			<td colspan="17" style="text-align:center;">
+				<a href="{{project.get_absolute_url}}">{{project}}</a>
+				{% if project.demand_contact %}
+				<br>
+				{% with project.demand_contact as contact %}
+					{{ contact }} ,{% trans "phone" %}: {{contact.phone}}, {% trans "fax" %}: {{ contact.fax }}, {% trans "mail" %}: {{contact.mail}}
+				{% endwith %}
+				{% endif %}
+				{% if project.payment_contact %}
+				<br>
+				{% with project.payment_contact as contact %}
+					{{ contact }} ,{% trans "phone" %}: {{contact.phone}}, {% trans "fax" %}: {{ contact.fax }}, {% trans "mail" %}: {{contact.mail}}
+				{% endwith %}
+				{% endif %}
+			</td>
+		</tr>
+		{% for d in demands %}
+			{% if d.is_fully_paid %}
+			<tr class="row5" objid={{d.id}}>
+			{% else %}
+			<tr class="{% cycle 'row1' 'row2' %}" objid={{d.id}}>
+			{% endif %}
+				<td><a href="/demands/{{d.id}}">{{d.id}}</a></td>
+				<td>
+					<a href="/reports/project_month/{{d.project.id}}/{{d.year}}/{{d.month}}">
+					<img src="/site_media/images/PDF-48.png" width="15" height="15"/>
+					</a>
+				</td>
+				<td>{{ d.month }}/{{d.year}}</td>
+				<td><a href="/demandsales/?demand_id={{d.id}}" class="bigfancybox">{{ d.get_sales.count|default:"אין מכירות" }}</a></td>
+				<td><b>{% if d.get_total_amount %} {{ d.get_total_amount|commaise }} ש"ח {% else %}----{% endif %}</b></td>
+				<td>
+					{% for i in d.invoices.all %}
+						{{i.num}}<br>
+					{% endfor %}
+				</td>
+				<td>
+					{% for i in d.invoices.all %}
+						<a href="/demandinvoice/{{i.id}}">{{i.amount|commaise}}</a><br>
+					{% endfor %}
+				</td>
+				<td>
+					{% for i in d.invoices.all %}
+						{{i.date|date:"j/m/y"}}<br>
+					{% endfor %}
+				</td>
+				<td>
+					{% for p in d.payments.all %}
+						<a href="/demandpayment/{{p.id}}">{{p.amount|commaise}}</a><br>
+					{% endfor %}
+				</td>
+				<td>
+					{% for p in d.payments.all %}
+						{{p.payment_date|date:"j/m/y"}}<br>
+					{% endfor %}
+				</td>
+				<td>{{d.diff_invoice|commaise}}</td>
+				<td>{{d.diff_invoice_payment|commaise}}</td>
+				<td>
+					{% for i in d.invoices.all %}
+						{% if i.offset %}
+							<a href="{{i.offset.get_absolute_url}}" class="fancybox">
+								{{i.offset.amount|commaise}}
+							</a>
+						{% endif %}
+					{% endfor %}
+				</td>
+				<td>
+					{% if d.adjust_diff %}
+						<a href="{{d.adjust_diff.get_absolute_url}}" class="fancybox"><img src="/site_media/images/edit_48.png" width="20" height="20" border="0" alt="עריכה" /></a>
+					{% endif %}
+				</td>
+				<td
+				{% if d.is_fixed %}<img src="/site_media/images/update_48.png" width="20" height="20"  alt="תיקון" />{% endif %}
+				</td>
+				<td>
+					{% for r in d.get_open_reminders %}
+						{{ r.content|truncatewords:5 }}
+						<a class="fancybox" href="{{r.get_absolute_url}}"><img src="/site_media/images/documentinfo-48.png" width="15" height="15" alt="פרטים" border="0" /></a>
+						<a href="{{r.get_absolute_url}}/do"><img src="/site_media/images/thumbs_up_48.png" width="15" height="15" alt="בצע" border="0" /></a>
+						<br>
+					{% endfor %}
+					<a href="/demands/{{d.id}}/addreminder" class="fancybox">
+						<img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" />
+					</a>
+				</td>
+			</tr>
+		{% endfor %}
+		<tr height="30px" class="rowSum">
+			<td colspan="4" align="center">סיכום</td>
+			<td>{{project.total_amount|commaise}} ש"ח</td>
+			<td></td>
+			<td>{{project.total_invoices|commaise}}</td>
+			<td></td>
+			<td>{{project.total_payments|commaise}}</td>
+			<td></td>
+			<td>{{project.total_diff_invoice|commaise}}</td>
+			<td>{{project.total_diff_invoice_payment|commaise}}</td>
+		</tr>
+	{% endfor %}
+</table>
+{% endblock content %}

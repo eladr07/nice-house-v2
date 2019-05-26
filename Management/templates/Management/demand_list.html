@@ -1,0 +1,225 @@
+﻿{% extends "./base.html" %}
+{% load management_extras %}
+{% block header %}
+{{ block.super }}
+<script>
+	var selectedID = 0;
+	var prev_class;
+	var filterIndex = 0;
+	$(document).ready(function() {
+		$("#demandTable tr").click(function() { 
+			var tr = $(this);
+			if (selectedID > 0)
+				$("#demandTable tr[objid='"+selectedID+"']").attr("class", prev_class);
+			selectedID = tr.attr("objid");
+			if (!selectedID)
+				return;
+			prev_class = tr.attr("class");
+			tr.attr("class","selectedRow");
+			//sync links
+			if (selectedID > 0)
+				$("#saleAdd").attr("href", "/demands/" + selectedID + "/sale/add");
+				$("#saleZero").attr("href", "/demands/" + selectedID + "/zero");
+				$("#demandClose").attr("href", selectedID + "/close");
+				$("#demandRemarks").attr("href", selectedID + "/remarks");
+				$("#demandSaleCount").attr("href", selectedID + "/salecount");
+			});
+		$(".fancybox").fancybox();
+		$(".bigfancybox").fancybox({'frameWidth':800});	
+		$("#demandCloseAll").click(function (event) {
+			if (!confirm("האם אתה בטוח שברצונך לאשר את כל הדרישות?"))
+				event.preventDefault();
+		});
+		//add filters
+		var filterSelect = $("#filterSelect");
+		$("#demandTable th").each(function (index, elem) {
+			filterSelect.append("<option value='" + index + "'>" + $(elem).text() + "</option>");
+		});
+		$("#filterSelect").change(function () {
+			filterIndex = $(this).val();
+		});
+		$("#filterBtn").click(function (event) {
+			$("#demandTable tr").each(function (index, elem) {
+				if ($("td", elem).length == 0)
+					return;
+				var cell = $("td", elem).get(filterIndex);
+				var content = $(cell).text();
+				var filterText = $("#filterText").val();
+				if (content.match(filterText))
+					$(elem).show();
+				else
+					$(elem).hide();
+			});
+		});
+		$("#filterClearBtn").click(function (event) {
+			$("#demandTable tr").each(function (index, elem) {
+				$(elem).show();
+			});
+		});
+
+	});
+</script>
+{% endblock header %}
+{% block content %}
+<div class="title">
+	<div class="pageTitle">ריכוז הזנת דרישות לתשלום לחודש {{month|date:"M Y"}}</div>
+</div>
+<div class="clearBoth"></div>
+<div style="float:right;width:30%;">
+	<form method="GET">
+		<table class="dataTable">
+			<tr class="row1">
+				<td colspan="3" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש דרישה</td>
+			</tr>
+			<tr class="row2">
+				{% for field in filterForm %}
+				<td>
+					{{ field.label_tag }} : 
+					{{ field }}
+				</td>
+				{% endfor %}
+				<td><input type="submit" value="חפש" class="button"/></td>
+			</tr>
+		</table>
+	</form>
+</div>
+<div style="float:left; width:60%">
+	<table id="filter" class="dataTable">
+		<tr class="row1">
+			<td colspan="4" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש שורות</td>
+		</tr>
+		<tr class="row2">
+			<td>
+				חיפוש לפי : 
+				<select id="filterSelect" style="width:100px;"></select>
+			</td>
+			<td>
+				ערך : 
+				<input id="filterText" type="text"/>
+			</td>
+			<td><button id="filterBtn" class="button">חפש</button></td>
+			<td><button id="filterClearBtn" class="button">הצג הכל</button></td>
+		</tr>
+	</table>
+</div>
+<div class="clearBoth"></div>
+<div class="someIcon" style="width:90px;">
+	<img src="/site_media/images/add_48.png" width="20" height="20"  alt="חדש" /> 
+	<a id="saleAdd">הזנת מכירות</a>
+</div>
+<div class="someIcon" style="width:90px;">
+	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="חדש" /> 
+	<a id="saleZero">אין מכירות</a>
+</div>
+<div class="someIcon" style="width:90px;">
+	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="חדש" /> 
+	<a id="demandSaleCount" class="fancybox">מס' מכירות</a>
+</div>
+<div class="someIcon" style="width:100px;">
+	<img src="/site_media/images/Note_48.png" width="20" height="20"  alt="שינוי" /> 
+	<a id="demandRemarks" class="fancybox">הערות לדרישה</a>
+</div>
+<div class="someIcon" style="width:90px;">
+	<img src="/site_media/images/thumbs_up_48.png" width="20" height="20"  alt="סגירה" /> 
+	<a id="demandClose" class="fancybox">אשר דרישה</a>
+</div>
+<div class="someIcon" style="width: 80px;">
+	<img src="/site_media/images/thumbs_up_48.png" width="20" height="20"  alt="סגירה" /> 
+	<a id="demandCloseAll" href="/demands/closeall">אשר הכל</a>
+</div>
+<div class="someIcon" style="width:100px; float:left;">
+	<img src="/site_media/images/Note_48.png" width="20" height="20"  alt="שינוי" /> 
+	<a href="/employee/remarks/{{month.year}}/{{month.month}}" class="fancybox">הערות לעובד</a>
+</div>
+<div class="someIcon" style="width:130px; float:left;">
+	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+	<a href="/employee/refund/{{month.year}}/{{month.month}}" class="fancybox">החזר הוצאות לעובד</a>
+</div>
+<div class="someIcon" style="width:140px; float:left;">
+	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+	<a href="#" >ימי חופש ומחלה לעובד</a>
+</div>
+<div class="clearBoth"></div>	
+<p>
+לתשומת לבך, ל-
+<u>{{unhandled_projects|length}}</u>
+פרוייקטים דרישה לא סופית ומאושרת בגין חודש זה : 
+{% for p in unhandled_projects %}
+{{p}} ,
+{% endfor %}
+</p>
+<br>
+<table id="demandTable" class="dataTable" style="text-align:center;" border="1">
+<caption>מציג סה"כ {{demands|length}} דרישות לתשלום</caption>
+	<tr>
+		<th>מס'</th>
+		<th>PDF</th>
+		<th>יזם</th>
+		<th>שם פרוייקט</th>
+		<th>עיר</th>
+		<th>מס' מכירות</th>
+		<th>מס' מכירות צפוי</th>
+		<th>מכירות כולל מע"מ</th>
+		<th>הערות</th>
+		<th>תזכורות לפרוייקט</th>
+		<th>נתוני שכר עובד</th>
+		<th>סטטוס דרישה</th>
+	</tr>
+    {% for d in demands %}
+	{% if not d.statuses.count %}
+    	<tr class="row3" objid={{d.id}}>
+	{% else %}
+		{% if d.statuses.latest.type.id != 1 %}
+			<tr class="row4" objid={{d.id}}>
+		{% else %}
+			<tr class="{% cycle 'row1' 'row2' %}" objid={{d.id}}>
+		{% endif %}
+	{% endif %}
+			<td>{{d.id}}</td>
+			<td>
+				<a href="/reports/project_month/{{d.project.id}}/{{d.year}}/{{d.month}}">
+				<img src="/site_media/images/PDF-48.png" width="15" height="15"/>
+				</a>
+			</td>
+			<td>{{ d.project.initiator }}</td>
+			<td><a href="/projects/{{d.project.id}}">{{ d.project.name }}</a></td>
+			<td>{{ d.project.city }}</td>
+			<td><a href="/demandsales/?demand_id={{d.id}}" class="bigfancybox">{{ d.get_sales.count }}</a></td>
+			<td><a href="{{d.get_absolute_url}}/salecount" class="fancybox">{{d.sale_count}}</a></td>
+			<td>{% if d.get_sales.total_price_final %}{{ d.get_sales.total_price_final|commaise }} ש"ח {% endif %}</td>
+			<td>{{ d.remarks|default_if_none:"" }}</td>
+			<td>
+			{% if d.get_open_reminders|length %}
+				<a href="{{d.get_absolute_url}}/reminders" class="fancybox">{{d.get_open_reminders|length}} תזכורות</a>
+			{% endif %}
+				<a href="{{d.get_absolute_url}}/addreminder" class="fancybox">
+					<img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" />
+				</a>
+			</td>
+			<td>
+			{% for s in d.get_salaries %}
+			{% if s.refund or s.remarks %}
+				<u>{{s.employee}}</u> : {% if s.refund %}{{s.refund}} - {{s.refund_type}}{%endif%}. {{s.remarks|default_if_none:""}}
+			{% endif %}
+			{% endfor %}
+			</td>
+			<td>
+				{% if d.statuses.count %}
+					{{ d.statuses.latest.type }}<br>
+					{% if d.statuses.latest.type.id == 1 %}
+						<a href="{{d.get_absolute_url}}/close" class="fancybox">אשר</a>
+					{% endif %}
+				{% else %}
+					<a href="{{d.get_absolute_url}}/close" class="fancybox">אשר</a>
+				{% endif %}
+			</td>
+		</tr>
+	{% endfor %}
+		<tr class="rowSum" height="30px">
+			<td colspan="5"></td>
+			<td>{{sales_count}} מכירות</td>
+			<td>{{expected_sales_count}} מכירות</td>
+			<td>{{sales_amount|commaise}} ש"ח</td>
+		</tr>
+</table>
+{% endblock content %}

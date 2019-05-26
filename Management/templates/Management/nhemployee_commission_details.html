@@ -1,0 +1,36 @@
+﻿{% extends "./template.html" %}
+{% load management_extras %}
+{% block page %}
+<div id="content">
+	<div class="title">
+		<div class="pageTitle">פירוט עמלות לעובד {{salary.nhemployee}} לחודש {{salary.month}}/{{salary.year}}</div>
+	</div>
+	<div class="clearBoth"></div>
+	<table id="sales_table" class="dataTable" border="1">
+		<th>סוג עמלה</th>
+		<th>שווי עמלה</th>
+		<th>מכירה</th>
+		{% with salary.nhsalecommissiondetail_set.all as details %}
+		{% for scd in details %}
+		<tr>
+			<td>
+				{% if scd.commission == "base" %}בסיס{% endif %}
+				{% if scd.commission == "nhcbase" %}ניהול בסיס{% endif %}
+				{% if scd.commission == "nhcbase_min" %}מינימום{% endif %}
+				{% if scd.commission == "nhcbranchincome" %}ניהול סניף{% endif %}
+				{% if scd.commission == "nhcbranchincome_min" %}מינימום{% endif %}
+			</td>
+			<td>
+				{{scd.amount|commaise}} 
+				{% if scd.precentage and scd.income %}
+					= {{scd.precentage}}% 
+					 * {{scd.income|commaise}}
+				{% endif %}
+			</td>
+			<td><a href="{{scd.nhsaleside.nhsale.get_absolute_url}}" target="_blank">{{scd.nhsaleside.nhsale.verbose_id}}</a></td>
+		</tr>
+		{% endfor %}
+		{% endwith %}
+	</table>
+</div>
+{% endblock page %}

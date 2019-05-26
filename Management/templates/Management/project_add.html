@@ -1,0 +1,116 @@
+﻿{% extends "./base.html" %}
+
+{% block header %}
+{{ block.super }}
+<script>
+	$(document).ready(function() {
+		$("input[type!='submit']").attr("class", "inputText");
+		$("select").attr("class", "inputText");
+		$("#contactTable").hide();//hides new commissions
+		$("#new_contact").click(function (event) {
+				event.preventDefault();
+				$("#contactTable").toggle();//show/hide new commission
+			});
+		});
+</script>
+{% endblock header %}
+{% block content %}	
+<div class="title">
+	<div class="pageTitle">הוספת פרוייקט</div>
+</div>
+<form method="POST">
+	<fieldset class="cardFieldset">
+		<legend>פרטי משרד מכירות</legend>
+		<table cellspacing="2" cellpadding="2" class="formTable">
+			<tr>
+				<td>{{ form.initiator.label_tag }}</td>
+				<td>
+					{{form.initiator}}
+					{% if form.initiator.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.initiator.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td>{{ form.name.label_tag }}</td>
+				<td>
+					{{form.name}}
+					{% if form.name.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.name.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td>{{ form.city.label_tag }}</td>
+				<td>
+					{{form.city}}
+					{% if form.city.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.city.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td>{{ form.hood.label_tag }}</td>
+				<td>
+					{{form.hood}}
+					{% if form.hood.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.hood.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td>{{ form.office_address.label_tag }}</td>
+				<td>
+					{{form.office_address}}
+					{% if form.office_address.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.office_address.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td>{{ form.phone.label_tag }}</td>
+				<td>
+					{{form.phone}}
+					{% if form.phone.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.phone.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td>{{ form.cell_phone.label_tag }}</td>
+				<td>
+					{{form.cell_phone}}
+					{% if form.cell_phone.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.cell_phone.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td>{{ form.fax.label_tag }}</td>
+				<td>
+					{{form.fax}}
+					{% if form.fax.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.fax.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td>{{ form.mail.label_tag }}</td>
+				<td>
+					{{form.mail}}
+					{% if form.mail.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.mail.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td>{{ form.start_date.label_tag }}</td>
+				<td>
+					{{form.start_date}}
+					{% if form.start_date.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.start_date.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+		</table>
+	</fieldset>
+	<fieldset class="cardFieldset">
+		<legend>נציג דרישות תשלום</legend>
+		הצב איש קשר קיים :
+		{{ecForm.contact}} {{ecForm.contact.errors|escape}}
+		<br><button id="new_contact" class="button">איש קשר חדש</button>
+		<table id="contactTable" cellspacing="2" cellpadding="2" class="formTable">
+			{% for field in contactForm %}
+			<tr>
+				<th>{{field.label_tag}}</th>
+				<td>
+					{{field}}
+					{% if field.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{field.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</fieldset>
+	<br><input type="submit" value="אישור" class="button" />
+</form>
+{% endblock content %}

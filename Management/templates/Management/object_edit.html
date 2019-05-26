@@ -1,0 +1,44 @@
+﻿{% extends "./template.html" %}
+{% block header %}
+<script>
+	$(document).ready(function() {		
+		$("input[type!='submit']").attr("class", "inputText");
+		$("input[type='submit']").click(function (event) {
+			parent.$("#fancy_close").click(function(event) {
+					parent.location.reload();
+				});	
+			});
+	});
+</script>
+{% endblock header %}
+{% block page %}
+<div id="content">	
+	{% if title %}
+	<div class="title">
+		<div class="pageTitle">{{title}}</div>
+	</div>
+	<div class="clearBoth"></div>
+	{% endif %}
+	<form method="POST" enctype="multipart/form-data">
+		<table class="formTable">
+			{% for field in form %}
+			<tr>
+				<th>{{field.label_tag}}</th>
+				<td>
+					{{field}}
+					{% if field.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{field.errors|join:""}}'/>{% endif %}
+				</td>
+				<td class="helpText">{% if field.help_text %}{{field.help_text}}{% endif %}</td>
+			</tr>
+			{% endfor %}
+			<tr>
+				<td></td>
+				<td>
+					<input type="submit" value="אישור" class="button"/>
+					<input name="addanother" type="submit" value="אישור והמשך הזנה" class="button"/>
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>
+{% endblock page %}

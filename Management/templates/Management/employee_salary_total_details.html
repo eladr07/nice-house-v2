@@ -1,0 +1,42 @@
+﻿{% extends "./template.html" %}
+{% load management_extras %}
+{% block page %}
+<div id="content">
+	<div class="title">
+		<div class="pageTitle">פירוט שווי תלוש לעובד {{salary.employee}} לחודש {{salary.month}}/{{salary.year}}</div>
+	</div>
+	<div class="clearBoth"></div>
+	<table id="sales_table" class="formTable">
+		<tr>
+			<th>בסיס</th>
+			<td>{{salary.base|commaise}}</td>
+		</tr>
+		<tr>
+			<th>עמלות</th>
+			<td>{{salary.commissions|commaise}}</td>
+		</tr>
+		{% if salary.admin_commission %}
+		<tr>
+			<th>עמלת ניהול</th>
+			<td>{{salary.admin_commission|commaise}}</td>
+		</tr>
+		{% endif %}
+		<tr>
+			<th>תוספת משתנה</th>
+			<td style="color:#08A600;">{{salary.var_pay|default_if_none:""}}</td>
+		</tr>
+		<tr>
+			<th>רשת בטחון</th>
+			<td style="color:#08A600;">{{salary.safety_net|default_if_none:""}}</td>
+		</tr>
+		<tr>
+			<th>קיזוז</th>
+			<td style="color:#D50808;">{{salary.deduction|default_if_none:""}}</td>
+		</tr>
+		<tr>
+			<th>סה"כ</th>
+			<td>{{salary.total_amount|commaise}}</td>
+		</tr>
+	</table>
+</div>
+{% endblock page %}

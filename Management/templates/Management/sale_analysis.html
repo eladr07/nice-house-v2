@@ -1,0 +1,92 @@
+﻿{% extends "./base.html" %}
+{% load management_extras %}
+{% block content %}
+<div class="title">
+	<div class="pageTitle">דו"ח ניתוח וריכוז מכירות לפי תקופה</div>
+</div>
+<div class="clearBoth"></div>
+<div style="float:right;width:70%;">
+	<form method="GET">
+		<table class="dataTable">
+			<tr class="row1">
+				<td colspan={{filterForm.fields|length|add:"2"}} style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש תקופה</td>
+			</tr>
+			<tr class="row2">
+				{% for field in filterForm %}
+				<td>
+					{{ field.label_tag }} : 
+					{{ field }}
+				</td>
+				{% endfor %}
+				<td><input type="submit" value="חפש" name="html" class="button"/></td>
+				<td><input type="submit" value="גרסה להדפסה" name="pdf" class="button"/></td>
+			</tr>
+		</table>
+	</form>
+</div>
+<div class="clearBoth"></div>
+<br>
+<table id="table" class="dataTable" border="1">
+<caption>מציג סה"כ {{total_sale_count}} מכירות</caption>
+	<tr>
+		<th></th>
+		<th>ת. חוזה</th>
+		{% if include_clients %}<th>שם הרוכשים</th>{% endif %}
+		<th>מס'<BR>בניין</th>
+		<th>מס'<BR>דירה</th>
+		<th>סוג<BR>דירה</th>
+		<th>מס'<BR>חדרים</th>
+		<th>מועד<BR>אכלוס</th>
+		<th>קומה</th>
+		<th>שטח<BR>דירה</th>
+		<th>שטח מרפסת<BR>גינה</th>
+		<th>שטח<BR>משוכלל</th>
+		<th>מחיר חוזה<BR>כולל מע"מ</th>
+		<th>מחיר<BR>למ"ר</th>
+		<th>% עליה<BR>במחיר</th>
+		<th>ממוצע<BR>מכירות<BR>לחודש</th>
+		<th>הערות</th>
+	</tr>
+    {% for sm in sale_months %}
+	<tr class="row1">
+		<td colspan="17" style="text-align:center;">
+			<a href="{{sm.sales.0.actual_demand.get_absolute_url}}">חודש {{sm.month}}/{{sm.year}}</a>
+		</td>
+	</tr>
+    {% for s in sm.sales %}
+		<tr class="{% cycle 'row1' 'row2'">
+			<td><a href="{{s.get_absolute_url}}" target="_blank"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a></td>
+			<td>{{s.sale_date|date:"j/m/y"}}</td>
+			{% if include_clients %}<td><a href="{{s.get_absolute_url}}" target="_blank">{{s.clients}}</a></td>{% endif %}
+			<td><a href="{{s.house.building.get_absolute_url}}/pricelist/type1" target="_blabk">{{s.house.building.num}}</a></td>
+			<td><a href="{{s.house.get_absolute_url}}/type1" target="_blabk">{{s.house.num}}</a></td>
+			<td>{{s.house.type}}</td>
+			<td>{{s.house.rooms}}</td>
+			<td>{{s.house.settle_date|date:"j/m/y"}}</td>
+			<td>{{s.house.floor}}</td>
+			<td>{{s.house.net_size}}</td>
+			<td>{{s.house.garden_size|default_if_none:""}}</td>
+			<td>{{s.house.perfect_size}}</td>
+			<td>{{s.price_taxed|commaise}}</td>
+			<td>{{s.price_taxed_for_perfect_size|commaise}}</td>
+			<td></td>
+			<td></td>
+			<td>{{s.remarks}}</td>
+		</tr>
+	{% endfor %}
+	<tr class="{% cycle 'rowSum' 'rowSumGreen' 'rowSumBlue' 'rowTeal' 'rowSumRed' %}">
+		<td colspan={%if include_clients%}"5"{%else%}"4"{%endif%}>
+			מס' מכירות : {{sm.sales|length}}
+		<td>ממוצע</td>
+		<td>{{sm.avg_rooms|floatformat:-2}}</td>
+		<td></td>
+		<td>{{sm.avg_floor|floatformat:-2}}</td>
+		<td>{{sm.avg_net_size|floatformat:-2}}</td>
+		<td>{{sm.avg_garden_size|floatformat:-2}}</td>
+		<td>{{sm.avg_perfect_size|floatformat:-2}}</td>
+		<td>{{sm.avg_price_taxed|commaise}}</td>
+		<td>{{sm.avg_price_taxed_for_perfect_size|commaise}} ({{sm.diff_avg_price_taxed_for_perfect_size|commaise}})</td>
+	</tr>
+	{% endfor %}
+</table>
+{% endblock content %}

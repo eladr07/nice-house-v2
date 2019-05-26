@@ -1,0 +1,111 @@
+﻿{% extends "./base.html" %}
+{% load management_extras %}
+{% block header %}
+{{ block.super }}
+<script>
+	var selectedID = 0;
+	var prev_class;
+	$(document).ready(function() {
+		$("#demandTable tr").click(function() { 
+			var tr = $(this);
+			if (selectedID > 0)
+				$("#demandTable tr[objid='"+selectedID+"']").attr("class", prev_class);
+			selectedID = tr.attr("objid");
+			if (!selectedID)
+				return;
+			prev_class = tr.attr("class");
+			tr.attr("class","selectedRow");
+			//sync links
+			if (selectedID > 0)
+				$("#demandEdit").attr("href", "/demands/" + selectedID);
+				$("#demandCalc").attr("href", "/demands/" + selectedID + "/calc");
+			});
+		$(".fancybox").fancybox();
+		$(".bigfancybox").fancybox({'frameWidth':800});	
+		$("#demandCalc").click(function(event) {
+			if (!confirm("האם אתה בטוח שברצונך לחשב את העמלות מחדש ?"))
+				event.preventDefault();
+		});
+	});
+</script>
+{% endblock header %}
+{% block content %}
+<div class="title">
+	<div class="pageTitle">ריכוז הכנסות מחודש {{start|date:"M Y"}} עד חודש {{end|date:"M Y"}}</div>
+</div>
+<div class="clearBoth"></div>
+<div style="float:right;width:70%;">
+	<form method="GET">
+		<table class="dataTable">
+			<tr class="row1">
+				<td colspan="5" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש תקופה</td>
+			</tr>
+			<tr class="row2">
+				{% for field in filterForm %}
+				<td>
+					{{ field.label_tag }} : 
+					{{ field }}
+				</td>
+				{% endfor %}
+				<td><input type="submit" value="חפש" class="button"/></td>
+			</tr>
+		</table>
+	</form>
+</div>
+<div class="clearBoth"></div>
+<div class="someIcon" style="width:100px;">
+	<img src="/site_media/images/print-48.png" width="20" height="20"  alt="הדפסה" /> 
+	<a href="#">גרסה להדפסה</a>
+</div>
+<div class="clearBoth"></div>
+<br>
+<table id="Table" class="dataTable" border="1">
+<caption>מציג סה"כ {{projects|length}} פרוייקטים</caption>
+	<tr>
+		<th></th>
+		<th>ריכוז</th>
+		<th>PDF</th>
+		<th>שם היזם</th>
+		<th>שם הפרוייקט</th>
+		<th>ת. סיום</th>
+		<th>מס' מכירות</th>
+		<th>ממוצע מכירות לחודש</th>
+		<th>סה"כ הכנסות<br>כולל מע"מ</th>
+		<th>סה"כ הכנסות<br>לא כולל מע"מ</th>
+	</tr>
+    {% for p in projects %}
+		<tr class="{% cycle 'row1' 'row2' %}" objid={{d.id}}>
+			<td><a href="{{p.get_absolute_url}}"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a></td>
+			<td>
+				<a target="_blank" href="/demandseason/?project={{p.id}}&from_year={{start.year}}&from_month={{start.month}}&to_year={{end.year}}&to_month={{end.month}}">
+					<img src="/site_media/images/viewmag-48.png" width="20" height="20"/>
+				</a>
+			</td>
+			<td>
+				<a href="/reports/project_season/{{p.id}}/{{start.year}}/{{start.month}}/{{end.year}}/{{end.month}}">
+				<img src="/site_media/images/PDF-48.png" width="15" height="15"/>
+				</a>
+			</td>
+			<td>{{ p.initiator }}</td>
+			<td>{{ p.name }}</td>
+			<td>{{ p.end_date|default_if_none:"" }}</td>
+			<td>{{ p.total_sale_count }}</td>
+			<td>{{ p.avg_sale_count|floatformat:-2 }}</td>
+			<td>{{p.total_amount|commaise}}</td>
+			<td style="color:A90000;">{{p.total_amount_notax|commaise}}</td>
+		</tr>
+	{% endfor %}
+	<tr height="30px" class="rowSum">
+		<td colspan="7" align="center">סיכום</td>
+		<td>{{total_sale_count}}</td>
+		<td>{{total_amount|commaise}} ש"ח</td>
+		<td>{{total_amount_notax|commaise}} ש"ח</td>
+	</tr>
+	<tr height="30px" class="rowSum">
+		<td colspan="7" align="center">ממוצע לחודש</td>
+		<td>{{avg_sale_count|floatformat:-2}}</td>
+		<td>{{avg_amount|commaise}} ש"ח</td>
+		<td>{{avg_amount_notax|commaise}} ש"ח</td>
+	</tr>
+</table>
+{% endblock content %}

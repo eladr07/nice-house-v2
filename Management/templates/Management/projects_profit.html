@@ -1,0 +1,126 @@
+﻿{% extends "./base.html" %}
+{% load management_extras %}
+{% block header %}
+{{ block.super }}
+<script>
+	var selectedID = 0;
+	var prev_class;
+	$(document).ready(function() {
+		$("#demandTable tr").click(function() { 
+			var tr = $(this);
+			if (selectedID > 0)
+				$("#demandTable tr[objid='"+selectedID+"']").attr("class", prev_class);
+			selectedID = tr.attr("objid");
+			if (!selectedID)
+				return;
+			prev_class = tr.attr("class");
+			tr.attr("class","selectedRow");
+			//sync links
+			if (selectedID > 0)
+				$("#demandEdit").attr("href", "/demands/" + selectedID);
+				$("#demandCalc").attr("href", "/demands/" + selectedID + "/calc");
+			});
+		$(".fancybox").fancybox();
+		$(".bigfancybox").fancybox({'frameWidth':800});	
+		$("#demandCalc").click(function(event) {
+			if (!confirm("האם אתה בטוח שברצונך לחשב את העמלות מחדש ?"))
+				event.preventDefault();
+		});
+	});
+</script>
+{% endblock header %}
+{% block content %}
+<div class="title">
+	<div class="pageTitle">דו"ח רווח והפסד</div>
+</div>
+<div class="clearBoth"></div>
+<div style="float:right;width:70%;">
+	<form method="GET">
+		<table class="dataTable">
+			<tr class="row1">
+				<td colspan="5" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש תקופה</td>
+			</tr>
+			<tr class="row2">
+				{% for field in filterForm %}
+				<td>
+					{{ field.label_tag }} : 
+					{{ field }}
+				</td>
+				{% endfor %}
+				<td><input type="submit" value="חפש" class="button"/></td>
+			</tr>
+		</table>
+	</form>
+</div>
+<div class="clearBoth"></div>
+<div class="someIcon" style="width:100px;">
+	<img src="/site_media/images/print-48.png" width="20" height="20"  alt="הדפסה" /> 
+	<a href="#">גרסה להדפסה</a>
+</div>
+<div class="clearBoth"></div>
+<br>
+<table id="Table" class="dataTable" border="1">
+<caption>מציג סה"כ {{projects|length}} פרוייקטים</caption>
+	<tr>
+		<th></th>
+		<th>שם היזם</th>
+		<th>שם הפרוייקט</th>
+		<th>מס' מכירות</th>
+		<th>סה"כ הכנסות<br>לא כולל מע"מ</th>
+		<th>% מסך <BR>המחזור</th>
+		<th>שם העובד</th>
+		<th>הוצאות שכר<BR>לא כולל מע"מ</th>
+		<th>% שכר<BR>מההכנסות</th>
+		<th>% שכר ממכירות<BR>ללא מע"מ</th>
+		<th>רווח</th>
+	</tr>
+    {% for p in projects %}
+		<tr class="{% cycle 'row1' 'row2' %}" objid={{d.id}}>
+			<td><a href="{{p.get_absolute_url}}"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a></td>
+			<td>{{ p.initiator }}</td>
+			<td>{{ p.name }}</td>
+			<td><a class="bigfancybox" href="/demandsales/?project_id={{p.id}}&from_year={{from_year}}&from_month={{from_month}}&to_year={{to_year}}&to_month={{to_month}}">
+				{{ p.sale_count }}</a></td>
+			<td>{{p.total_income|commaise}}</td>
+			<td>{{p.relative_income|floatformat:-2}}%</td>
+			<td>
+			{% for employee, commission in p.employee_expense.items %}
+				<a target="_blank" href="{{employee.get_absolute_url}}">{{employee}}</a><Br>
+			{% endfor %}
+			</td>
+			<td>
+			{% for employee, commission in p.employee_expense.items %}
+				<a target="_blank" href="employeesalaryseason/?employee={{employee.id}}&from_year={{from_year}}&from_month={{from_month}}&to_year={{to_year}}&to_month={{to_month}}">
+				{{commission|commaise}}</a><br>
+			{% endfor %}
+			</td>
+			<td>
+				{% if p.relative_expense_income %}
+					{{ p.relative_expense_income|floatformat:-2 }}%
+				{% else %}
+					{{ p.relative_expense_income_str }}
+				{% endif %}
+			</td>
+			<td>
+				{% if p.relative_sales_expense %}
+					{{ p.relative_sales_expense|floatformat:-2 }}%
+				{% else %}
+					{{ p.relative_sales_expense_str }}
+				{% endif %}
+			</td>
+			<td>{{ p.profit|commaise }}</td>
+		</tr>
+	{% endfor %}
+	<tr height="30px" class="rowSum">
+		<td colspan="3" align="center">סיכום</td>
+		<td>{{total_sale_count}}</td>
+		<td>{{total_income|commaise}} ש"ח</td>
+		<td></td>
+		<td></td>
+		<td>{{total_expense|commaise}} ש"ח</td>
+		<td>{{avg_relative_expense_income|floatformat:-2}}%</td>
+		<td>{{avg_relative_sales_expense|floatformat:-2}}%</td>
+		<td>{{total_profit|commaise}} ש"ח</td>
+	</tr>
+</table>
+{% endblock content %}

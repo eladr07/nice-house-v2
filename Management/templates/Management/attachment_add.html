@@ -1,0 +1,126 @@
+﻿{% extends "./template.html" %}
+{% block header %}
+<script>
+	$(document).ready(function() {		
+		$("input[type!='submit']").attr("class", "inputText");
+		$("input[type='submit']").click(function (event) {
+			parent.$("#fancy_close").click(function(event) {
+					parent.location.reload();
+				});	
+			});
+	});
+</script>
+{% endblock header %}
+{% block page %}
+<div id="content">
+{% if obj %}
+	<div class="title">
+		<div class="pageTitle">הוספת מסמך עבור - {{obj}}</div>
+	</div>
+{% endif %}
+	<form method="POST" enctype="multipart/form-data">
+		<table class="formTable">
+			<tr>
+				<th>{{form.file.label_tag}}</th>
+				<td>
+					{{form.file}}
+					{% if form.file.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.file.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{form.type.label_tag}}</th>
+				<td>
+					{{form.type}}
+					{% if form.type.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.type.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{form.sr_name.label_tag}}</th>
+				<td>
+					{{form.sr_name}}
+					{% if form.sr_name.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.sr_name.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			{% if user.is_staff %}
+			<tr>
+				<th>{{form.is_private.label_tag}}</th>
+				<td>
+					{{form.is_private}}
+					{% if form.is_private.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.is_private.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			{% endif %}
+			<tr>
+				<th>{{form.tags.label_tag}}</th>
+				<td>
+					{{form.tags}}
+					{% if form.tags.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.tags.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{form.tag_new.label_tag}}</th>
+				<td>
+					{{form.tag_new}}
+					{% if form.tag_new.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.tag_new.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{form.remarks.label_tag}}</th>
+				<td>
+					{{form.remarks}}
+					{% if form.remarks.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.remarks.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><input type="submit" value="אישור" class="button"/></td>
+			</tr>
+		</table>
+		{% if not obj %}
+		<div style="float:right; width:30%;">
+			<fieldset class="cardFieldset">
+				<legend>קישור לפרויקט</legend>
+				<table class="formTable">
+					{% with project_select_form as form %}
+						{% include "Management/form_fields.html" %}
+					{% endwith %}
+					<tr>
+						<td></td>
+						<td><input class="button" name="project" type="submit" value="אישור"/></td>
+					</tr>
+				</table>
+			</fieldset>
+		</div>
+		<div style="float:right; width:30%;">
+			<fieldset class="cardFieldset">
+				<legend>קישור לעובד</legend>
+				<table class="formTable">
+					{% with employee_select_form as form %}
+						{% include "Management/form_fields.html" %}
+					{% endwith %}
+					<tr>
+						<td></td>
+						<td><input class="button" name="employee" type="submit" value="אישור"/></td>
+					</tr>
+				</table>
+			</fieldset>
+		</div>
+		<div style="float:right; width:30%;">
+			<fieldset class="cardFieldset">
+				<legend>קישור לדרישה</legend>
+				<table class="formTable">
+					{% with demand_select_form as form %}
+						{% include "Management/form_fields.html" %}
+					{% endwith %}
+					<tr>
+						<td></td>
+						<td><input class="button" name="demand" type="submit" value="אישור"/></td>
+					</tr>
+				</table>
+			</fieldset>
+		</div>
+		<div class="clearBoth"></div>
+		{% endif %}
+	</form>
+</div>
+{% endblock page %}

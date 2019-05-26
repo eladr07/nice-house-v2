@@ -1,0 +1,50 @@
+﻿{% extends "./template.html" %}
+{% block header %}
+<script>
+	$(document).ready(function() {		
+		$("input[type!='submit']").attr("class", "inputText");
+		$("input[type='submit']").click(function (event) {
+			parent.$("#fancy_close").click(function(event) {
+					parent.location.reload();
+				});	
+			});
+	});
+</script>
+{% endblock header %}
+{% block page %}
+<div id="content">	
+	<div class="title">
+		<div class="pageTitle">אישור דרישה</div>
+	</div>
+	<div class="clearBoth"></div>
+	<form method="POST" enctype="multipart/form-data">
+		<table class="formTable">
+			<tr>
+				<th>פרוייקט</th>
+				<td>{{demand.project}}</td>
+			</tr>
+			<tr>
+				<th>חודש</th>
+				<td>{{demand.month}}/{{demand.year}}</td>
+			</tr>
+			<tr>
+				<th>מס' מכירות צפוי</th>
+				<td>{{demand.sale_count}}</td>
+			</tr>
+			<tr>
+				<th>מס' מכירות בפועל</th>
+				<td>{{demand.get_sales|length}}</td>
+			</tr>
+			{% if demand.sale_count != demand.get_sales|length %}
+			<tr>
+				<td colspan="2">לתשומת לבך, מס' המכירות הצפוי אינו תואם את מס' המכירות שהוזנו בפועל !</td>
+			</tr>
+			{% endif %}
+			<tr>
+				<td></td>
+				<td><input type="submit" value="אישור" class="button"/></td>
+			</tr>
+		</table>
+	</form>
+</div>
+{% endblock page %}

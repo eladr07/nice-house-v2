@@ -1,0 +1,126 @@
+﻿{% extends "./base.html" %}
+{% load management_extras %}
+{% block header %}
+{{ block.super }}
+<script>
+	var selectedID = 0;
+	var prev_class;
+	$(document).ready(function() {
+		$("tr").click(function() { 
+			var tr = $(this);
+			if (selectedID > 0)
+				$("tr[objid='"+selectedID+"']").attr("class", prev_class);
+			selectedID = tr.attr("objid");
+			if (!selectedID)
+				return;
+			prev_class = tr.attr("class");
+			tr.attr("class","selectedRow");
+			//sync links
+			if (selectedID > 0)
+			{
+				$("#objEdit").attr("href", selectedID);
+				$("#objDelete").attr("href", selectedID + "/del");
+			}
+		});
+		//add fancybox
+		$(".fancybox").fancybox();
+		$(".bigfancybox").fancybox({'frameWidth':800});
+	});
+</script>
+{% endblock header %}
+{% block content %}
+<div class="title">
+	<div class="pageTitle">פירוט צ'קים אחרים מחודש {{from_date|date:"M Y"}} עד חודש {{to_date|date:"M Y"}}</div>
+</div>
+<div class="someIcon">
+	<img src="/site_media/images/add_48.png" width="20" height="20"  alt="הוספה" /> 
+	<a href="add" class="bigfancybox" >חדש</a>
+</div>
+<div class="someIcon">
+	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="עריכה" /> 
+	<a id="checkEdit" class="bigfancybox" >שינוי</a>
+</div>
+<div class="someIcon">
+	<img src="/site_media/images/delete_48.png" width="20" height="20"  alt="מחיקה" /> 
+	<a id="checkDelete">מחיקה</a>
+</div>
+<div class="clearBoth"></div>
+<div style="float:right;width:70%;">
+	<form method="GET">
+		<table class="dataTable">
+			<tr class="row1">
+				<td colspan="8" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש תקופה</td>
+			</tr>
+			<tr class="row2">
+				{% for field in filterForm %}
+				<td>
+					{{ field.label_tag }} : 
+					{{ field }}
+				</td>
+				{% endfor %}
+				<td><input type="submit" value="חפש" class="button"/></td>
+			</tr>
+		</table>
+	</form>
+</div>
+<div class="clearBoth"></div>
+<table class="dataTable" border="1">	
+	<tr>
+		<th colspan="4">פרטים כלליים</th>
+		<th colspan="3">צ'ק שהוצא</th>
+		<th colspan="3">אסמכתא לצ'ק</th>
+		<th colspan="4">בקרה</th>
+	</tr>
+	<tr>
+		<th>מס"ד</th>
+		<th>חטיבה</th>
+		<th>סוג<br>הוצאה</th>
+		<th>שם הספק</th>
+		<th>מס'</th>
+		<th>ת. פרעון</th>
+		<th>סכום</th>
+		<th>סכום<br>חשבונית</th>
+		<th>נכוי מס<br>במקור</th>
+		<th>מס'<br>חשבונית</th>
+		<th>הפרש בין<br>חשבונית לצ'ק</th>
+		<th>מאשר<br>ההזמנה</th>
+		<th>מאשר<br>התשלום</th>
+		<th>הערות</th>
+	</tr>
+	{% regroup checks by division_type as division_list %}
+	{% for division in division_list %}
+		<tr>
+			<td colspan="10" style="text-align:center; background-color:#A9D0FF; font-weight:bold;">{{division.grouper}}</td>
+		</tr>
+		{% for c in division.list %}
+			<tr class="{% cycle 'row1' 'row2' %}" objid={{c.id}}>
+				<td><a class="fancybox" href="{{ c.get_absolute_url }}">{{ c.id }}</td>
+				<td>{{c.division_type}}</td>
+				<td>{{c.expense_type}}</td>
+				<td>{{c.supplier_type}}</td>
+				<td>{{c.num}}</td>
+				<td>{{c.pay_date|date:"j/m/y"}}</td>
+				<td>{{c.amount|commaise}}</td>
+				{% if c.invoice %}
+					<td>{{c.invoice.amount|commaise}}</td>
+					<td>{{c.tax_deduction_source|commaise}}</td>
+					<td>{{c.num}}</td>
+				{% else %}
+					<td colspan="3">{{c.type}}</td>
+				{% endif %}
+				<td>{{diff_amount_invoice|default_if_none:""|commaise}}</td>
+				<td>{{c.order_verifier}}</td>
+				<td>{{c.payment_verifier}}</td>
+				<td>{{c.remarks}}</td>
+			</tr>
+		{% endfor %}
+	{% endfor %}
+	<tr class="rowSum">
+		<td colspan="6"></td>
+		<td>{{sum_check_amount|commaise}}</td>
+		<td>{{sum_invoice_amount|commaise}}</td>
+		<td colspan="2"></td>
+		<td>{{sum_diff_check_invoice|commaise}}</td>
+	</tr>
+</table>
+{% endblock content %}

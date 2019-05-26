@@ -1,0 +1,89 @@
+﻿{% extends "./base.html" %}
+{% block header %}
+{{ block.super }}
+<script>
+	var selectedID = 0;
+	var prevClass;
+	$(document).ready(function() {		
+		$("input[value!='submit']").attr("class", "inputText");
+		//Add row selection
+		$("#taskTable tr").click(function() {
+			var tr = $(this);
+			if (selectedID > 0)
+				$("#taskTable tr[objid='"+selectedID+"']").attr("class", prevClass);
+			selectedID = tr.attr("objid");
+			if (!selectedID) return;
+			prevClass = tr.attr("class");
+			tr.attr("class","selectedRow");
+			if (selectedID > 0)
+			{//sync links
+				$("#taskDelete").attr("href", "/task/" + selectedID + "/del");
+				$("#taskDo").attr("href", "/task/" + selectedID + "/do");
+			}
+		});
+		//add fancybox
+		$(".fancybox").fancybox({'frameHeight':300, 'frameWidth' : 470});
+	});
+</script>
+{% endblock header %}
+{% block content %}
+<div id="content">
+	<div class="title">
+		<div class="pageTitle">ניהול משימות</div>
+	</div>
+	<form method="GET">
+		<table class="dataTable" style="width: 45%;" border="1">
+			<tr class="row1">
+				<td colspan="3" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">סינון</td>
+			</tr>
+			<tr class="row2">
+				{% for field in filterForm %}
+				<td>
+					{{ field.label_tag }} : 
+					{{ field }}
+				</td>
+				{% endfor %}
+				<td><input type="submit" value="סנן" class="button"/></td>
+			</tr>
+		</table>
+	</form>
+	<br /> 		
+	<div class="someIcon">
+		<img src="/site_media/images/add_48.png" width="20" height="20"  alt="חדש" /> 
+		<a href="/task/add" class="fancybox">חדש</a>
+	</div>
+	<div class="someIcon">
+		<img src="/site_media/images/delete_48.png" width="20" height="20"  alt="מחיקה" /> 
+		<a id="taskDelete">מחיקה</a>
+	</div>	
+	<div class="someIcon">
+		<img src="/site_media/images/thumbs_up_48.png" width="20" height="20"  alt="בצע" /> 
+		<a id="taskDo">בצע</a>
+	</div>
+	<div class="clearBoth"> </div>
+	<table id="taskTable" class="dataTable" border="1">
+		<tr>
+			<th>שולח</th>
+			<th>מבצע</th>
+			<th>תוכן</th>
+			<th>תאריך</th>
+			<th>בוצע?</th>
+			<th>זמן ביצוע</th>
+		</tr>
+		{% for t in tasks %}
+			<tr class="{% cycle 'row1' 'row2' %}" objid={{t.id}}>
+				<td>{{ t.sender }}</td>
+				<td>{{ t.user }}</td>
+				<td>{{ t.content }}</td>
+				<td>{{ t.time }}</td>
+				<td>
+					{% if t.is_done %}<img src="/site_media/images/apply.gif" alt="" />
+					{% else %} <img src="/site_media/images/delete.gif" alt="" />
+					{% endif %}
+				</td>
+				<td>{{ t.time_done|default_if_none:"-" }}</td>
+			</tr>
+		{% endfor %}
+	</table>
+</div>
+{% endblock content %}

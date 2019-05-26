@@ -1,0 +1,225 @@
+﻿{% extends "./base.html" %}
+{% load management_extras %}
+{% block header %}
+{{ block.super }}
+<script>
+	var selectedID = 0;
+	var prev_class;
+	$(document).ready(function() {
+		$("#salaryTable tr").click(function() { 
+			var tr = $(this);
+			if (selectedID > 0)
+				$("#salaryTable tr[employeeid='"+selectedID+"']").attr("class", prev_class);
+			selectedID = tr.attr("employeeid");
+			if (!selectedID)
+				return;
+			prev_class = tr.attr("class");
+			tr.attr("class","selectedRow");
+			//sync links
+			if (selectedID > 0)
+				$("#loanPay").attr("href", "/employees/" + selectedID + "/loanpay");
+				$("#loanAdd").attr("href", "/employees/" + selectedID + "/addloan");
+				$("#calcSalary").attr("href", "" + tr.attr("objid") + "/calc");
+				$("#deleteSalary").attr("href", "" + tr.attr("objid") + "/delete");
+				$("#approve").attr("href", "" + tr.attr("objid") + "/approve");
+				$("#edit").attr("href", tr.attr("objid"));
+				$("#expenses").attr("href", "/salary/" + tr.attr("objid") + "/expenses");
+			});
+		$(".fancybox").fancybox();
+		$("#loanPay, #loanAdd, #edit").click(function (event) {
+			if (!$(this).attr("href"))
+				alert("לא נבחר עובד");
+		});
+		$("#calcSalary").click(function(event) {
+			if (!confirm("האם אתה בטוח שברצונך לחשב את העמלות מחדש ?"))
+				event.preventDefault();
+		});
+		$("#deleteSalary").click(function(event) {
+			if (!confirm("האם אתה בטוח שברצונך למחוק את השכר ?"))
+				event.preventDefault();
+		});
+	});
+</script>
+{% endblock header %}
+{% block content %}
+<div class="title">
+	<div class="pageTitle">ריכוז שכר עובדים לחודש {{month|date:"M Y"}}</div>
+</div>
+<div class="clearBoth"></div>
+<form method="GET">
+	<table class="dataTable" style="width: 30%;" border="1">
+		<tr class="row1">
+			<td colspan="3" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש</td>
+		</tr>
+		<tr class="row2">
+			{% for field in filterForm %}
+			<td>
+				{{ field.label_tag }} : 
+				{{ field }}
+			</td>
+			{% endfor %}
+			<td><input type="submit" value="חפש" class="button"/></td>
+		</tr>
+	</table>
+</form>
+<br>
+<div class="someIcon" style="width:100px;">
+	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="החזר הלוואה" /> 
+	<a id="loanAdd" class="fancybox">הלוואה חדשה</a>
+</div>
+<div class="someIcon" style="width:100px;">
+	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="החזר הלוואה" /> 
+	<a id="loanPay" class="fancybox">קיזוז הלוואה</a>
+</div>
+<div class="someIcon" style="width:170px;">
+	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+	<a id="edit" class="fancybox">שינוי מרכיבי שכר - חד פעמי</a>
+</div>
+<div class="someIcon" style="width:100px;">
+	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="הוצאות שכר" /> 
+	<a id="expenses" class="fancybox">הוצאות שכר</a>
+</div>
+<div class="someIcon"style="width:130px;">
+	<img src="/site_media/images/advanced-48.png" width="20" height="20"  alt="חישוב עמלות מחדש" /> 
+	<a id="calcSalary">חישוב עמלות מחדש</a>
+</div>
+<div class="someIcon" style="width:120px;">
+	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="אישור שכר לתשלום" /> 
+	<a id="approve" >אישור שכר לתשלום</a>
+</div>
+<div class="someIcon" >
+	<img src="/site_media/images/delete_48.png" width="20" height="20"  alt="מחיקה" /> 
+	<a id="deleteSalary" >מחיקה</a>
+</div>
+<div class="someIcon" style="width:100px;">
+	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+	<a id="#" >תיק עובד</a>
+</div>
+<div class="someIcon" style="width:100px;">
+	<img src="/site_media/images/print-48.png" width="20" height="20"  alt="שלח להנהח" /> 
+	<a id="#" >שלח להנה"ח</a>
+</div>
+<div class="someIcon" style="width:100px;">
+	<img src="/site_media/images/print-48.png" width="20" height="20"  alt="שינוי" /> 
+	<a href="{{month.year}}/{{month.month}}/pdf" >גרסת הדפסה</a>
+</div>
+<div class="clearBoth"></div>
+<table id="salaryTable" class="dataTable" border="1">
+<caption>מציג סה"כ {{salaries|length}} עובדים</caption>
+	<tr>
+		<th colspan="5">כללי</th>
+		<th colspan="7">חישוב שכר נטו</th>
+		<th colspan="3">אסמכתאות</th>
+		<th colspan="2">נלווה לשכר</th>
+		<th colspan="4">הערות ושליחה</th>
+	</tr>
+	<tr>
+		<th></th>
+		<th>שם<br>העובד</th>
+		<th>פרוייקט</th>
+		<th>סוג<br>העסקה</th>
+		<th>מס'<br>עסקאות</th>
+		<th>שכר בסיס<br>+ עמלות</th>
+		<th>רשת<br>בטחון</th>
+		<th>תוספת<br>משתנה</th>
+		<th>קיזוז<br>שכר</th>
+		<th>סה"כ<br>שווי<br>תלוש</th>
+		<th>החזר<br>הלוואה</th>
+		<th>שווי<br>צ'ק</th>
+		<th>ברוטו<br>לחישוב</th>
+		<th>נכוי מס<br>במקור</th>
+		<th>שווי<br>חשבונית</th>
+		<th>החזר<br>הוצאות<br>(בנפרד)</th>
+		<th>חופש<br>ומחלה</th>
+		<th>הערות</th>
+		<th>ת.אישור</th>
+		<th>ת.שליחה<br>להנה"ח</th>
+		<th>ת.שליחה<br>לצ'קים</th>
+	</tr>
+	{% regroup salaries by employee.rank as rank_list %}
+	{% for rank in rank_list %}
+		<tr style="text-align:center; color:#4669D6; font-size:14px"><td colspan="15"><b>{{rank.grouper|default:"-- לא הוגדר דרג --"}}</b></td></tr>
+		{% for s in rank.list %}
+		{% if s.approved_date %}
+			<tr class="rowLightGreen" objid={{s.id}} employeeid={{s.employee.id}}>
+		{% else %}
+			<tr class="{% cycle 'row1' 'row2' %}" objid={{s.id}} employeeid={{s.employee.id}}>
+		{% endif %}
+			<td><a class="fancybox" href="{{s.id}}"><img src="/site_media/images/edit_48.png" width="20" height="20" alt="שינוי מרכיבי שכר" border="0" /></a></td>
+			<td><a href="{{s.employee.get_absolute_url}}">{{ s.employee }}</a></td>
+			<td>
+				{% for demand in s.demands %}
+				<a href="{{demand.project.get_absolute_url}}" target="_blank">{{demand.project}}</a>
+				<br>
+				<a href="/reports/project_month/{{demand.project_id}}/{{demand.year}}/{{demand.month}}">
+					<img src="/site_media/images/PDF-48.png" width="15" height="15"/>
+				</a>
+				<a href="{{demand.get_absolute_url}}">
+					<img src="/site_media/images/documentinfo-48.png" width="15" height="15"/>
+				</a>
+				<br>
+				{% endfor %}
+			</td>
+			<td>{{s.employee.employment_terms.hire_type}}</td>
+			<td><a class="fancybox" href="{{s.employee.get_absolute_url}}/sales/{{month.year}}/{{month.month}}">{{ s.sales_count }}</a></td>
+			<td style="color:#08A600;">
+				{{s.base|commaise}} + 
+				<a href="{{s.id}}/details" class="fancybox">{{s.commissions|default_if_none:"0"|commaise}}</a>
+			</td>
+			<td style="color:#08A600;">{{s.safety_net|default_if_none:""}}</td>
+			<td style="color:#08A600;">{% if s.var_pay %}{{s.var_pay|commaise}} - {{s.var_pay_type}} {% endif %}</td>
+			<td style="color:#D50808;">{% if s.deduction %}{{s.deduction|commaise}} - {{s.deduction_type}} {% endif %}</td>
+			<td><a href="{{s.id}}/totaldetails" class="fancybox">{{s.neto|default_if_none:""|commaise}}</a></td>
+			<td>
+				<span style="color:#BF0000;">{{s.loan_pay|commaise}}</span>
+				<br>
+				{% if s.employee.loan_left %}
+				יתרה - {{s.employee.loan_left|commaise}} ש"ח
+				<br>
+				{% endif %}
+				{% if s.employee.loans_and_pays|length %}
+				<a href="{{s.employee.get_absolute_url}}/loans" class="fancybox">כרטיס הלוואות</a><br>
+				{% endif %}
+			</td>
+			<td>
+				{% if s.employee.employment_terms.salary_net == None %}
+					הנהלת חשבונות
+				{% else %}
+					<a href="{{s.id}}/checkdetails" class="fancybox">{{s.check_amount|default_if_none:""|commaise}}</a>
+				{% endif %}
+			</td>
+			<td>{{s.bruto|default_if_none:""|commaise}}</td>
+			<td></td>
+			<td>{{s.invoice_amount|default_if_none:""|commaise}}</td>
+			<td>{% if s.refund %}{{s.refund}} - {{s.refund_type}} {% endif %}</td>
+			<td></td>
+			<td>{{s.remarks|default_if_none:""}}</td>
+			<td>
+			{% if s.approved_date %}
+				{{s.approved_date|date:"j/m/y"}}
+			{% else %}
+				<a href="{{s.id}}/approve">אשר</a>
+			{% endif %}
+			</td>
+			<td>{{s.sent_to_bookkeeping_date|default_if_none:""|date:"j/m/y"}}</td>
+			<td>{{s.sent_to_checks_date|default_if_none:""|date:"j/m/y"}}</td>
+		</tr>
+		{% endfor %}
+	{% endfor %}
+	<tr class="rowSum">
+		<td colspan="4" align="center">סיכום</td>
+		<td>{{salaries|attrsum:"sales_count"}}</td>
+		<td>{{salaries|attrsum:"base"|commaise}} + {{salaries|attrsum:"commissions"|commaise}} </td>
+		<td>{{salaries|attrsum:"safety_net"|commaise}}</td>
+		<td>{{salaries|attrsum:"var_pay"|commaise}}</td>
+		<td>{{salaries|attrsum:"deduction"|commaise}}</td>
+		<td>{{salaries|attrsum:"neto"|commaise}}</td>
+		<td></td>
+		<td>{{salaries|attrsum:"check_amount"|commaise}}</td>
+		<td>{{salaries|attrsum:"bruto"|commaise}}</td>
+		<td></td>
+		<td>{{salaries|attrsum:"invoice_amount"|commaise}}</td>
+		<td>{{salaries|attrsum:"refund"|commaise}}</td>
+	</tr>
+</table>
+{% endblock content %}

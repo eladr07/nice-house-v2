@@ -1,0 +1,153 @@
+﻿{% extends "./base.html" %}
+{% load management_extras %}
+{% block header %}
+{{ block.super }}
+<script>
+	var selectedID = 0;
+	var prev_class;
+	$(document).ready(function() {
+		$("#demandTable tr").click(function() { 
+			var tr = $(this);
+			if (selectedID > 0)
+				$("#demandTable tr[objid='"+selectedID+"']").attr("class", prev_class);
+			selectedID = tr.attr("objid");
+			if (!selectedID)
+				return;
+			prev_class = tr.attr("class");
+			tr.attr("class","selectedRow");
+			//sync links
+			if (selectedID > 0)
+				$("#demandEdit").attr("href", "/demands/" + selectedID);
+				$("#demandCalc").attr("href", "/demands/" + selectedID + "/calc");
+			});
+		$(".fancybox").fancybox();
+		$(".bigfancybox").fancybox({'frameWidth':800});	
+		$("#demandCalc").click(function(event) {
+			if (!confirm("האם אתה בטוח שברצונך לחשב את העמלות מחדש ?"))
+				event.preventDefault();
+		});
+		//add filters
+		var filterSelect = $("#filterSelect");
+		$("#demandTable th").each(function (index, elem) {
+			filterSelect.append("<option value='" + index + "'>" + $(elem).text() + "</option>");
+		});
+	});
+</script>
+{% endblock header %}
+{% block content %}
+<div class="title">
+	<div class="pageTitle">ריכוז דרישות לפי תקופה</div>
+</div>
+<div class="clearBoth"></div>
+<div style="float:right;width:70%;">
+	<form method="GET">
+		<table class="dataTable">
+			<tr class="row1">
+				<td colspan="6" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש תקופה</td>
+			</tr>
+			<tr class="row2">
+				{% for field in filterForm %}
+				<td>
+					{{ field.label_tag }} : 
+					{{ field }}
+				</td>
+				{% endfor %}
+				<td><input type="submit" value="חפש" class="button"/></td>
+			</tr>
+		</table>
+	</form>
+</div>
+<div class="clearBoth"></div>
+<div class="someIcon" style="width:100px;">
+	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+	<a id="demandEdit">שינוי דרישה</a>
+</div>
+<div class="someIcon"style="width:130px;">
+	<img src="/site_media/images/advanced-48.png" width="20" height="20"  alt="שליחה" /> 
+	<a id="demandCalc">חישוב עמלות מחדש</a>
+</div>
+<div class="someIcon" style="width:100px;">
+	<img src="/site_media/images/print-48.png" width="20" height="20"  alt="הדפסה" /> 
+	<a href="/reports/project_season/{{project.id}}/{{start.year}}/{{start.month}}/{{end.year}}/{{end.month}}">גרסה להדפסה</a>
+</div>
+<div class="clearBoth"></div>
+<br>
+<table id="demandTable" class="dataTable" border="1">
+<caption>מציג סה"כ {{demands|length}} דרישות לתשלום לפרוייקט {{project}}</caption>
+	<tr>
+		<th>מס'</th>
+		<th>PDF</th>
+		<th>חודש</th>
+		<th>מס' מכירות</th>
+		<th>מס' מכירות צפוי</th>
+		<th>סה"כ מכירות כולל מע"מ</th>
+		<th>עמלה מחושב בגין שיווק</th>
+		<th>תוספת קבועה</th>
+		<th>תוספת משתנה</th>
+		<th>בונוס</th>
+		<th>קיזוז</th>
+		<th>סה"כ תשלום לחברה</th>
+		<th>תיקון</th>
+		<th>תזכורות</th>
+		<th>הערות</th>
+	</tr>
+    {% for d in demands %}
+	{% if not d.statuses.count %}
+    	<tr class="row3" objid={{d.id}}>
+	{% else %}
+		{% if d.statuses.latest.type.id == 1 %}
+			<tr class="{% cycle 'row1' 'row2' %}" objid={{d.id}}>
+		{% endif %}
+		{% if d.statuses.latest.type.id == 2 %}
+			<tr class="row4" objid={{d.id}}>
+		{% endif %}
+		{% if d.statuses.latest.type.id == 3 %}
+			<tr class="row5" objid={{d.id}}>
+		{% endif %}
+		{% if d.statuses.latest.type.id == 4 %}
+			<tr class="row5" objid={{d.id}}>
+		{% endif %}
+	{% endif %}
+			<td><a href="/demands/{{d.id}}">{{d.id}}</a></td>
+			<td>
+				<a href="/reports/project_month/{{d.project.id}}/{{d.year}}/{{d.month}}">
+				<img src="/site_media/images/PDF-48.png" width="15" height="15"/>
+				</a>
+			</td>
+			<td>{{ d.month }}/{{d.year}}</td>
+			<td><a href="/demandsales/?demand_id={{d.id}}" class="bigfancybox">{{ d.get_sales.count|default:"אין מכירות" }}</a></td>
+			<td>{{d.sale_count}}</td>
+			<td>{% if d.get_sales.total_price_final %} {{ d.get_sales.total_price_final|commaise }} ש"ח {% else %}----{% endif %}</td>
+			<td>{% if d.sales_commission %} {{ d.sales_commission|commaise }} ש"ח {% else %}----{% endif %}</td>
+			<td style="color:#08A600;">{% if d.fixed_diff %} {{ d.fixed_diff.amount }} ש"ח {% endif %}</td>
+			<td style="color:#08A600;">{% if d.var_diff %} {{ d.var_diff.amount }} ש"ח - {{ d.var_diff.reason }} {% endif %}</td>
+			<td style="color:#08A600; width:150px;">{% if d.bonus_diff %} {{ d.bonus_diff.amount }} ש"ח - {{ d.bonus_diff.reason }} {% endif %}</td>
+			<td style="color:#D50808;">{% if d.fee_diff %} {{ d.fee_diff.amount }} ש"ח - {{ d.fee_diff.reason }} {% endif %}</td>
+			<td><b>{% if d.get_total_amount %} {{ d.get_total_amount|commaise }} ש"ח {% else %}----{% endif %}</b></td>
+			<td>
+			{% if d.is_fixed %}
+			<img src="/site_media/images/update_48.png" width="20" height="20"  alt="תיקון" />
+			{% endif %}
+			</td>
+			<td>
+			{% if d.get_open_reminders|length %}
+				<a href="/demands/{{d.id}}/reminders" class="fancybox">{{d.get_open_reminders|length}} תזכורות</a>
+			{% endif %}
+				<a href="/demands/{{d.id}}/addreminder" class="fancybox">
+					<img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" />
+				</a>
+			</td>
+			<td>{{ d.remarks|default_if_none:"" }}</td>
+		</tr>
+	{% endfor %}
+	<tr height="30px" class="rowSum">
+		<td colspan="3" align="center">סיכום</td>
+		<td>{{total_sales_count}} מכירות</td>
+		<td></td>
+		<td>{{total_sales_amount|commaise}} ש"ח</td>
+		<td>{{demands.total_sales_commission|commaise|commaise}} ש"ח</td>
+		<td colspan="4"></td>
+		<td>{{total_amount|commaise}} ש"ח</td>
+	</tr>
+</table>
+{% endblock content %}

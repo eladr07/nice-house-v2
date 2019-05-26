@@ -1,0 +1,37 @@
+{% extends "../template.html" %}
+
+{% block header %}
+<script>
+	$(document).ready(function() {
+			$("input[type!='submit']").attr("class", "inputText");
+		});
+</script>
+{% endblock header %}
+
+{% block page %}
+<div id="content" style="margin: auto; width: 290px; margin-top: 20px;"> 
+		<div class="title"> 
+			<div class="pageTitle">התחברות</div> 
+		</div> 
+		<br /> 
+		<form method="POST" class="formTable"> 
+			{% csrf_token %}
+			<table cellspacing="2" cellpadding="2" class="formTable"> 
+				<tr> 
+					<td>{{ form.username.label_tag }}</td> 
+					<td>{{ form.username }}</td> 
+				</tr> 
+				<tr> 
+					<td>{{ form.password.label_tag }}</td> 
+					<td>{{ form.password }}</td> 
+				</tr> 
+				<tr> 
+				<td></td><td><input type="submit" value="התחבר" class="button" /></td> 
+				<input type="hidden" name="next" value="{{ next }}" />
+			</table> 
+		</form> 
+		{% if form.errors %}
+		<p>פרטי ההתחברות לא נכונים. אנא נסה שנית.</p>
+		{% endif %}
+</div> 
+{% endblock page %}

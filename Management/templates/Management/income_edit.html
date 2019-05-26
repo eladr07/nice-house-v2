@@ -1,0 +1,91 @@
+﻿{% extends "./base.html" %}
+{% block header %}
+<script>
+	$(document).ready(function() {		
+		$("input[type!='submit']").attr("class", "inputText");
+		$("input[type='submit']").click(function (event) {
+			parent.$("#fancy_close").click(function(event) {
+					parent.location.reload();
+				});	
+			});
+	});
+</script>
+{% endblock header %}
+{% block page %}
+<div id="content">
+	<div class="title">
+		<div class="pageTitle">הכנסה אחרת</div>
+	</div>
+	<div class="clearBoth"></div>
+	<form method="POST">
+	<div id="rightSide">
+		<fieldset class="cardFieldset">
+			<table class="formTable">
+				<legend>פרטי הכנסה</legend>
+				{% for field in incomeForm %}
+				<tr>
+					<th>{{field.label_tag}}</th>
+					<td>
+						{{field}}
+						{% if field.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{field.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+				{% endfor %}
+			</table>
+		</fieldset>
+	</div>
+	<div id="leftSide">
+		<fieldset class="cardFieldset">
+			<table class="formTable">
+				<legend>פרטי תשלום</legend>
+				{% for field in paymentForm %}
+				<tr>
+					<th>{{field.label_tag}}</th>
+					<td>
+						{{field}}
+						{% if field.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{field.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+				{% endfor %}
+			</table>
+		</fieldset>
+	</div>
+	<div class="clearBoth"/>
+	<div id="rightSide">
+		<fieldset class="cardFieldset">
+			<table class="formTable">
+				<legend>פרטי חשבונית שלנו</legend>
+				{% for field in invoiceForm %}
+				<tr>
+					<th>{{field.label_tag}}</th>
+					<td>
+						{{field}}
+						{% if field.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{field.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+				{% endfor %}
+			</table>
+		</fieldset>
+	</div>
+	<div id="leftSide">
+		<fieldset class="cardFieldset">
+			<table class="formTable">
+				<legend>פרטי עסקה</legend>
+				{% for field in dealForm %}
+				<tr>
+					<th>{{field.label_tag}}</th>
+					<td>
+						{{field}}
+						{% if field.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{field.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+				{% endfor %}
+			</table>
+		</fieldset>
+	</div>
+	<div class="clearBoth"/>
+	<input name="addanother" type="submit" value="שמור והמשך בהזנה" class="button" />
+	<input name="tolist" type="submit" value="שמור וחזור לריכוז" class="button" />
+	</form>
+</div>
+{% endblock page %}

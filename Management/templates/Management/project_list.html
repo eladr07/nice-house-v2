@@ -1,0 +1,171 @@
+﻿{% extends "./base.html" %}
+{% block header %}
+{{ block.super }}
+<script>
+	var selectedID = 0;
+	var prev_class;
+	var filterIndex = 0;
+	$(document).ready(function() {
+		$("#projectTable tr").click(function() { 
+			var tr = $(this);
+			if (selectedID > 0)
+				$("#projectTable tr[objid='"+selectedID+"']").attr("class", prev_class);
+			selectedID = tr.attr("objid");
+			prev_class = tr.attr("class");
+			tr.attr("class","selectedRow");
+			//sync links
+			if (selectedID > 0)
+			{
+				$("#projectEdit").attr("href", selectedID);
+				$("#projectEnd").attr("href", "end/" + selectedID);
+			}
+			});
+			$(".fancybox").fancybox();
+			$(".bigfancybox").fancybox({'frameWidth':800});			
+			//add filters
+			var filterSelect = $("#filterSelect");
+			$("#projectTable th").each(function (index, elem) {
+				filterSelect.append("<option value='" + index + "'>" + $(elem).text() + "</option>");
+			});
+			$("#filterSelect").change(function () {
+				filterIndex = $(this).val();
+			});
+			$("#filterBtn").click(function (event) {
+				$("#projectTable tr").each(function (index, elem) {
+					if ($("td", elem).length == 0)
+						return;
+					var cell = $("td", elem).get(filterIndex);
+					var content = $(cell).text();
+					var filterText = $("#filterText").val();
+					if (content.match(filterText))
+						$(elem).show();
+					else
+						$(elem).hide();
+				});
+			});
+			$("#filterClearBtn").click(function (event) {
+				$("#projectTable tr").each(function (index, elem) {
+					$(elem).show();
+				});
+			});
+		});
+</script>
+{% endblock header %}
+{% block content %}
+	<div class="title">
+		<div class="pageTitle">מצבת פרוייקטים</div>
+	</div>
+	<div style="width: 60%;">
+		<table id="filter" class="dataTable">
+			<tr class="row1">
+				<td colspan="4" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש</td>
+			</tr>
+			<tr class="row2">
+				<td>
+					חיפוש לפי : 
+					<select id="filterSelect" style="width:100px;"></select>
+				</td>
+				<td>
+					ערך : 
+					<input id="filterText" type="text"/>
+				</td>
+				<td><button id="filterBtn" class="button">חפש</button></td>
+				<td><button id="filterClearBtn" class="button">הצג הכל</button></td>
+			</tr>
+		</table>
+	</div>
+	<div class="clearBoth"> </div>
+	<div class="someIcon" style="width:140px;">
+		<img src="/site_media/images/add_48.png" width="20" height="20"  alt="חדש" /> 
+		<a href="add">הוספת פרוייקט חדש</a>
+	</div>
+	<div class="someIcon" style="width:120px;">
+		<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+		<a id="projectEdit">לכרטיס פרוייקט</a>
+	</div>
+	<div class="someIcon" style="width:100px;">
+		<img src="/site_media/images/Briefcase_48.png" width="20" height="20"  alt="שינוי" /> 
+		<a id="projectEdit">תיק פרוייקט</a>
+	</div>
+	<div class="someIcon" style="width:100px">
+		<img src="/site_media/images/Archive-Add-48.png" width="20" height="20"  alt="מחיקה" /> 
+		<a id="projectEnd" class="fancybox">העבר לארכיון</a>
+	</div>
+	<div class="someIcon" style="width:120px">
+		<img src="/site_media/images/Archive-48.png" width="20" height="20"  alt="מחיקה" /> 
+		<a href="archive">ארכיון פרוייקטים</a>
+	</div>
+	<div class="someIcon" style="width:100px">
+		<img src="/site_media/images/print-48.png" width="20" height="20"  alt="מחיקה" /> 
+		<a href="pdf">גרסת הדפסה</a>
+	</div>
+	<div class="clearBoth"></div>
+	<br /> 
+	<table id="projectTable" class="dataTable" border="1">
+	<caption>מציג סה"כ {{projects|length}} פרוייקטים</caption>
+	<tr>
+		<th/>
+		<th>יזם</th>
+		<th>שם פרוייקט</th>
+		<th>עיר</th>
+		<th>מס' בניינים</th>
+		<th>מס' דירות</th>
+		<th>איש מכירות</th>
+		<th>אנשי קשר</th>
+		<th>דירות ומחירונים</th>
+		<th>ריכוז מכירות מתחילת חודש</th>
+		<th>אתר אינטרנט</th>
+	</tr>
+    {% for i in projects %}
+    	<tr class="{% cycle 'row1' 'row2' %}" objid={{i.id}}>
+			<td><a href="{{i.id}}"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a></td>
+			<td>{{ i.initiator }}</td>
+			<td>{{ i.name }}</td>
+			<td>{{ i.city }}</td>
+			<td>{{ i.details.buildings_num }}</td>
+			<td>{{ i.details.houses_num }}</td>
+			<td>
+				{% for e in i.employees.all %}
+					<a href="/employees/{{e.id}}">{{e}}</a><br>
+				{% endfor %}
+			</td>
+			<td>
+				{% if i.demand_contact %}
+					תשלום :
+					<a href="/contact/{{i.demand_contact.id}}" class="fancybox">{{i.demand_contact}}</a><br>
+				{% endif %}
+				{% if i.payment_contact %}
+					צ'קים :
+					<a href="/contact/{{i.payment_contact.id}}" class="fancybox">{{i.payment_contact}}</a><br>
+				{% endif %}
+				{% if i.contacts.count %}
+					נוספים: 
+					{% for c in i.contacts.all %}
+						<a href="/contact/{{c.id}}" class="fancybox">{{c}}</a>{% if not forloop.last %} , {% endif %}
+					{% endfor %}
+				{% endif%}
+			</td>
+			<td>
+				<a href="{{i.id}}/buildings/add" class="fancybox"><img src="/site_media/images/add_48.png" width="20" height="20" border="0" alt="חדש" /> </a>
+				{% if i.non_deleted_buildings|length %}
+					<a href="{{i.id}}/buildings" class="bigfancybox"><img src="/site_media/images/home-48.png" width="20" height="20" alt="פרטים" border="0" /></a>
+				{% endif %}
+			</td>
+			<td>
+				{% if i.current_demand %}
+					{{i.sales.count}}
+				{% else %}
+					0
+				{% endif %}
+				 חוזים<br>
+				{{i.signups|length}} הרשמות
+			</td>
+			<td style="text-align:center;">
+				{% if i.details.url %}
+					<a href="{{i.details.url}}" target="_blank"><img src="/site_media/images/network-48.png" width="20" height="20" alt="פרטים" border="0" /></a>
+				{% endif %}
+			</td>
+		</tr>
+	{% endfor %}
+</table>
+{% endblock content %}

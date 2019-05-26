@@ -1,0 +1,247 @@
+﻿{% extends "./base.html" %}
+{% load management_extras %}
+{% block header %}	
+{{ block.super }}
+<script>
+	$(document).ready(function() {
+		$("input[type!='submit']").attr("class", "inputText");
+		$(".fancybox").fancybox();
+		$(".bigfancybox").fancybox({'frameWidth':800});
+	});
+</script>
+{% endblock header %}
+{% block content %}	
+	<div class="title">
+		<div class="pageTitle">דו"ח פעילות לאתר</div>	
+	</div>
+	<div id="rightSide">
+		<fieldset class="cardFieldset">
+			<legend>פרטים כלליים</legend>
+			<table cellspacing="2" cellpadding="2" class="formTable">
+				<tr>
+					<th>פרוייקט</th>
+					<td>{{object.project}}</td>
+				</tr>
+				<tr>
+					<th>עובד</th>
+					<td>{{object.employee}}</td>
+				</tr>
+				<tr>
+					<th>מתאריך</th>
+					<td>{{object.from_date|date:"j/m/y"}}</td>
+				</tr>
+				<tr>
+					<th>עד תאריך</th>
+					<td>{{object.to_date|date:"j/m/y"}}</td>
+				</tr>
+				<tr>
+					<th>מס' פגישות במשרד</th>
+					<td>{{object.office_meetings_num}}</td>
+				</tr>
+				<tr>
+					<th>מס' פגישות חוזרות</th>
+					<td>{{object.recurring_meetings_num}}</td>
+				</tr>
+				<tr>
+					<th>מס' פגישות חדשות מתאום טלפוני</th>
+					<td>{{object.new_meetings_from_phone_num}}</td>
+				</tr>
+				<tr>
+					<th></th>
+					<td><a href="edit">ערוך</a></td>
+				</tr>
+			</table>
+		</fieldset>
+		<fieldset class="cardFieldset" style="float:right; width:45%">
+			<legend>כתובות מטלפנים</legend>
+			<table class="formTable">
+			{% for citycallers in object.citycallers_set.all %}
+				<tr>
+					<th>{{citycallers.city}}</th>
+					<td>{{citycallers.callers_num}}</td>
+					<td>
+						<a href="{{citycallers.get_absolute_url}}" class="fancybox">
+							<img src="/site_media/images/edit_48.png" width="15" height="15" border="0" alt="שינוי" />
+						</a>
+					</td>
+				</tr>
+			{% endfor %}
+			</table>
+			<a href="/activitybase/{{object.id}}/citycallers/add" class="fancybox"> 
+				<img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" />
+			</a>
+		</fieldset>
+		<fieldset class="cardFieldset" style="float:right; width:45%">
+			<legend>מדיה מפנה</legend>
+			<table class="formTable">
+			{% for mediareferrals in object.mediareferrals_set.all %}
+				<tr>
+					<th>{{mediareferrals.media}}</th>
+					<td>{{mediareferrals.referrals_num}}</td>
+					<td>
+						<a href="{{mediareferrals.get_absolute_url}}" class="fancybox">
+							<img src="/site_media/images/edit_48.png" width="15" height="15" border="0" alt="שינוי" />
+						</a>
+					</td>
+				</tr>
+			{% endfor %}
+			</table>
+			<a href="/activitybase/{{object.id}}/mediareferrals/add" class="fancybox"> 
+				<img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" />
+			</a>
+		</fieldset>
+	</div>
+	<div id="leftSide"> 
+		<fieldset class="cardFieldset">
+			<legend>הרשמות</legend>
+			<table class="formTable">
+				<tr>
+					<th></th>
+					<th>שם הלקוח</th>
+					<th>בניין ודירה</th>
+					<th>מחיר</th>
+					<th>ת. הרשמה</th>
+					<th>ת. חוזה צפוי</th>
+					<th></th>
+				</tr>
+			{% for signup in object.active_signups.all %}
+				<tr>
+					<th>
+						<a href="{{signup.get_absolute_url}}">
+							<img src="/site_media/images/edit_48.png" width="15" height="15" border="0" alt="פרטים" />
+						</a>
+					</th>
+					<th>{{signup.clients}}</th>
+					<td>{{signup.house}}/{{signup.house.building}}</td>
+					<td>{{signup.price|commaise}}</td>
+					<td>{{signup.date|date:"j/m/y"}}</td>
+					<td>{{signup.sale_date|date:"j/m/y"}}</td>
+					<td><a href="{{signup.get_absolute_url}}/cancel" class="fancybox">בטל</a></td>
+				</tr>
+			{% endfor %}
+			</table>
+			<a href="{{object.project.get_absolute_url}}/signups/add" > 
+				<img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" />
+			</a>
+		</fieldset>
+		<fieldset class="cardFieldset">
+			<legend>הרשמות שבוטלו</legend>
+			<table class="formTable">
+				<tr>
+					<th></th>
+					<th>שם הלקוח</th>
+					<th>בניין ודירה</th>
+					<th>ת. ביטול</th>
+					<th>סיבה</th>
+				</tr>
+			{% for signup in object.canceled_signups.all %}
+				<tr>
+					<th>
+						<a href="{{signup.cancel.get_absolute_url}}" class="fancybox">
+							<img src="/site_media/images/edit_48.png" width="15" height="15" border="0" alt="פרטים" />
+						</a>
+					</th>
+					<th>{{signup.clients}}</th>
+					<td>{{signup.house}}/{{signup.house.building}}</td>
+					<td>{{signup.price|commaise}}</td>
+					<td>{{signup.cancel.date|date:"j/m/y"}}</td>
+					<td>{{signup.cancel.reason}}</td>
+				</tr>
+			{% endfor %}
+			</table>
+		</fieldset>
+		<fieldset class="cardFieldset">
+			<legend>חוזים</legend>
+			<table class="formTable">
+				<tr>
+					<th></th>
+					<th>שם הלקוח</th>
+					<th>בניין ודירה</th>
+					<th>מחיר</th>
+					<th>ת. חוזה</th>
+				</tr>
+			{% for sale in object.sales.all %}
+				<tr>
+					<th>
+						<a href="{{sale.get_absolute_url}}">
+							<img src="/site_media/images/edit_48.png" width="15" height="15" border="0" alt="פרטים" />
+						</a>
+					</th>
+					<th>{{sale.clients}}</th>
+					<td>{{sale.house}}/{{signup.house.building}}</td>
+					<td>{{sale.price|commaise}}</td>
+					<td>{{sale.date|date:"j/m/y"}}</td>
+				</tr>
+			{% endfor %}
+			</table>
+			<a href="/sale"> 
+				<img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" />
+			</a>
+		</fieldset>
+		<fieldset class="cardFieldset">
+			<legend>רציניים בתהליך</legend>
+			<table class="formTable">
+				<tr>
+					<th></th>
+					<th>שם הלקוח</th>
+					<th>בניין ודירה</th>
+					<th>מחיר</th>
+					<th>התנגדויות</th>
+					<th>הערות</th>
+				</tr>
+			{% for saleprocess in object.saleprocess_set.all %}
+				<tr>
+					<th>
+						<a href="{{saleprocess.get_absolute_url}}" class="fancybox">
+							<img src="/site_media/images/edit_48.png" width="15" height="15" border="0" alt="פרטים" />
+						</a>
+					</th>
+					<th>{{saleprocess.clients}}</th>
+					<td>{{saleprocess.house}}/{{signup.house.building}}</td>
+					<td>{{saleprocess.price|commaise}}</td>
+					<td>{{saleprocess.objection}}</td>
+					<td>{{saleprocess.remarks}}</td>
+				</tr>
+			{% endfor %}
+			</table>
+			<a href="/activitybase/{{object.id}}/saleprocess/add" class="fancybox"> 
+				<img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" />
+			</a>
+		</fieldset>
+		<fieldset class="cardFieldset">
+			<legend>אירועים</legend>
+			<table class="formTable">
+				<tr>
+					<th></th>
+					<th>תאריך</th>
+					<th>יוזם</th>
+					<th>נוכחים</th>
+					<th>נושא</th>
+					<th>סיכום</th>
+					<th>נושאים לטיפול</th>
+					<th>הערות</th>
+				</tr>
+			{% for event in object.event_set.all %}
+				<tr>
+					<th>
+						<a href="{{event.get_absolute_url}}" class="fancybox">
+							<img src="/site_media/images/edit_48.png" width="15" height="15" border="0" alt="פרטים" />
+						</a>
+					</th>
+					<th>{{event.date|date:"j/m/y"}}</th>
+					<td>{{event.initiator}}</td>
+					<td>{{event.attendees}}</td>
+					<td>{{event.subject}}</td>
+					<td>{{event.summary}}</td>
+					<td>{{event.issues}}</td>
+					<td>{{event.remarks}}</td>
+				</tr>
+			{% endfor %}
+			</table>
+			<a href="/activitybase/{{object.id}}/event/add" class="fancybox"> 
+				<img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" />
+			</a>
+		</fieldset>
+	</div>
+	<div class="clearBoth"></div> 
+{% endblock content %}

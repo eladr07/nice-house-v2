@@ -1,0 +1,68 @@
+﻿{% extends "./base.html" %}
+{% load management_extras %}
+{% block header %}
+{{ block.super }}
+<script>
+	var selectedID = 0;
+	var prev_class;
+	$(document).ready(function() {
+		$("tr").click(function() { 
+			var tr = $(this);
+			if (selectedID > 0)
+				$("tr[objid='"+selectedID+"']").attr("class", prev_class);
+			selectedID = tr.attr("objid");
+			if (!selectedID)
+				return;
+			prev_class = tr.attr("class");
+			tr.attr("class","selectedRow");
+			//sync links
+			if (selectedID > 0)
+			{
+				$("#objEdit").attr("href", selectedID);
+				$("#objDelete").attr("href", selectedID + "/del");
+			}
+		});
+		//add fancybox
+		$(".fancybox").fancybox();
+	});
+</script>
+{% endblock header %}
+{% block content %}
+	<div class="title">
+		<div class="pageTitle">ריכוז עורכי דין</div>
+	</div>
+	<div class="someIcon">
+		<img src="/site_media/images/add_48.png" width="20" height="20"  alt="חדש" /> 
+		<a href="add" class="fancybox" >חדש</a>
+	</div>
+	<div class="someIcon">
+		<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+		<a id="objEdit" class="fancybox" >שינוי</a>
+	</div>
+	<div class="someIcon">
+		<img src="/site_media/images/delete_48.png" width="20" height="20"  alt="מחיקה" /> 
+		<a id="objDelete">מחיקה</a>
+	</div>
+	<div class="clearBoth"> </div>
+	<br /> 		
+	<table class="dataTable" border="1">
+		<th>שם פרטי</th>
+		<th>שם משפחה</th>
+		<th>טלפון</th>
+		<th>סלולרי</th>
+		<th>דוא"ל</th>
+		<th>כתובת</th>
+		<th>תפקיד</th>
+		{% for o in object_list %}
+		<tr class="{% cycle 'row1' 'row2' %}" objid={{o.id}}>
+			<td>{{o.first_name}}</td>
+			<td>{{o.last_name}}</td>
+			<td>{{o.phone}}</td>
+			<td>{{o.cell_phone}}</td>
+			<td>{{o.mail}}</td>
+			<td>{{o.address}}</td>
+			<td>{{o.role}}</td>
+		</tr>
+		{% endfor %}
+	</table>
+{% endblock content %}

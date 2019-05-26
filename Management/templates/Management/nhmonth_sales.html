@@ -1,0 +1,150 @@
+﻿{% extends "./base.html" %}
+{% load management_extras %}
+{% block header %}
+{{ block.super }}
+<script>
+var selectedID = 0;
+var prev_class;
+$(document).ready(function() {
+	$("#salesTable tr").click(function() { 
+		var tr = $(this);
+		if (selectedID > 0)
+			$("#salesTable tr[objid='"+selectedID+"']").attr("class", prev_class);
+		selectedID = tr.attr("objid");
+		if (!selectedID)
+			return;
+		prev_class = tr.attr("class");
+		tr.attr("class","selectedRow");
+		//sync links
+		if (selectedID > 0)
+			$("#saleMove").attr("href", "/nhsale/" + selectedID + "/move");
+		});
+	$(".fancybox").fancybox();
+	$("#monthClose").click(function(event) {
+		if (!confirm("האם אתה בטוח שברצונך לסגור את החודש ?"))
+			event.preventDefault();
+	});		
+});
+</script>
+{% endblock header %}
+{% block content %}
+<div class="title">
+	<div class="pageTitle">ריכוז עסקאות {{nhmonth.nhbranch}} לחודש {{nhmonth.month}}/{{nhmonth.year}}</div>
+</div>
+<div class="clearBoth"></div>
+<div style="float:right;width:30%;">
+	<form method="GET">
+		<table class="dataTable">
+			<tr class="row1">
+				<td colspan="3" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש חודש</td>
+			</tr>
+			<tr class="row2">
+				{% for field in filterForm %}
+				<td>
+					{{ field.label_tag }} : 
+					{{ field }}
+				</td>
+				{% endfor %}
+				<td><input type="submit" value="חפש" class="button"/></td>
+			</tr>
+		</table>
+	</form>
+</div>
+<div class="clearBoth"></div>
+<div class="someIcon" style="width:100px;">
+	<img src="/site_media/images/add_48.png" width="20" height="20"  alt="חדש" /> 
+	<a href="/nhbranch/{{nhmonth.nhbranch.id}}/nhsale/add">הזנת עסקאות</a>
+</div>
+<div class="someIcon" style="width:100px;">
+	<img src="/site_media/images/reload-48.png" width="20" height="20"  alt="חדש" /> 
+	<a id="saleMove" class="fancybox">העבר עסקה</a>
+</div>
+<div class="someIcon" style="width:100px">
+	<img src="/site_media/images/Archive-48.png" width="20" height="20"  alt="מחיקה" /> 
+	<a id="monthClose" href="/nhmonth/close?nhbranch={{nhmonth.nhbranch.id}}&year={{nhmonth.year}}&month={{nhmonth.month}}">סגור חודש</a>
+</div>
+<div class="clearBoth"></div>	
+<table id="salesTable" class="dataTable" style="text-align:center;" border="1">
+<caption>מציג סה"כ {{nhmonth.nhsales.count}} עסקאות</caption>
+	<tr>
+		<th></th>
+		<th>ת. עסקה</th>
+		<th>שמות הלקוחות</th>
+		<th>סוג פעולה</th>
+		<th>% עמלה<br>חתום</th>
+		<th>% עמלה<br>בפועל</th>
+		<th>סה"כ<br>עמלה</th>
+		<th>יועץ<br>מחתים</th>
+		<th>תשלום<br>לעו"ד</th>
+		<th>עמלה נטו</th>
+		<th>% מהכנסה<br>חודשי</th>
+		<th>מס' קבלה<br>זמנית</th>
+		<th>מס'<br>חשבונית</th>
+		{% for nhe in employees %}
+		<th>{{nhe}}</th>
+		{% endfor %}
+		<th>סיכום</th>
+	</tr>
+    {% for s in nhmonth.nhsales.all %}
+		<tr class= {% if nhmonth.is_closed %} "rowLightBlue" {% else %} "{% cycle 'row1' 'row2' %}" {% endif %} objid={{s.id}}>
+			<td><a href="/nhsale/{{s.id}}">{{s.nhmonth.nhbranch.prefix}}-{{s.id}}</a></td>
+			<td>{{s.sale_date|date:"j/m/y"}}</td>
+			{% for ss in s.nhsaleside_set.all %}
+				{% if not forloop.first %}
+					<tr class= {% if nhmonth.is_closed %} "rowLightBlue" {% else %} "{% cycle 'row1' 'row2' %}" {% endif %}>
+						<td></td>
+						<td></td>
+				{% endif %}
+				<td>{{ss.name1}} {{ss.name2|default_if_none:""}}</td>
+				<td>{{ss.sale_type}}</td>
+				<td>{{ss.signed_commission|floatformat:-2}}%</td>
+				<td>{{ss.actual_commission|floatformat:-2}}%</td>
+				<td>{{ss.income|commaise}}</td>
+				<td>{{ss.signing_advisor}}</td>
+				<td>
+					{% for p in ss.lawyer1_pays %}
+						<a href="{{p.lawyer.get_absolute_url}}" class="fancybox">{{p.lawyer}} - {{p.amount|commaise}}</a><br>
+					{% endfor %}
+					{% for p in ss.lawyer2_pays %}
+						<a href="{{p.lawyer.get_absolute_url}}" class="fancybox">{{p.lawyer}} - {{p.amount|commaise}}</a><br>
+					{% endfor %}
+				</td>
+				<td>{{ss.net_income|commaise}}</td>
+				<td></td>
+				<td>{{ss.temp_receipt_num}}</td>
+				<td>{{ss.invoices.all.0.num}}</td>
+				{% for nhe in employees %}
+				<td>
+					{% if nhe == ss.employee1 %}
+						{{ss.employee1_pay|commaise}}<br>{{ss.employee1_commission}}%
+					{% endif %}
+					{% if nhe == ss.employee2 %}
+						{{ss.employee2_pay|commaise}}<br>{{ss.employee2_commission}}%
+					{% endif %}
+					{% if nhe == ss.director %}
+						{{ss.director_pay|commaise}}<br>{{ss.director_commission}}%
+					{% endif %}
+				</td>
+				{% endfor %}
+				<td>
+					{{ss.all_employee_commission|commaise}}<br>{{ss.all_employee_commission_precentage}}%
+				</td>
+				{% if forloop.first %}
+					</tr>
+				{% endif %}
+			{% endfor %}
+		</tr>
+	{% endfor %}
+	<tr class="row3">
+		<td colspan="4"></td>
+		<td>{{nhmonth.avg_signed_commission|floatformat:-2}}</td>
+		<td>{{nhmonth.avg_actual_commission|floatformat:-2}}</td>
+		<td>{{nhmonth.total_net_income|commaise}}</td>
+		<td colspan="6"></td>
+		{% for e in employees %}
+			<td>{{e.month_total|commaise}}</td>
+		{% endfor %}
+		<td>{{nhmonth.total_commission|commaise}}</td>
+	</tr>
+</table>
+{% endblock content %}

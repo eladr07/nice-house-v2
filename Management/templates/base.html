@@ -1,0 +1,65 @@
+﻿{% extends "template.html" %}
+{% load management_extras %}
+{% block header %}
+{% load static %}
+<link rel="stylesheet" href="{% static "fancybox/fancy.css" %}" type="text/css" >
+<script type="text/javascript" src="{% static "fancybox/jquery.metadata.js" %}"></script> 
+<script type="text/javascript" src="{% static "fancybox/jquery.pngFix.js" %}"></script> 
+<script type="text/javascript" src="{% static "fancybox/jquery.fancybox.js" %}"></script> 
+<script>
+	$(document).ready(function() {
+		var linkSelect = $("#linkSelect");
+		$.getJSON("/json/links", function(data) {
+			for (i in data)
+			{
+				obj = data[i];
+				linkSelect.append(
+					"<option value='" + obj.fields['url'] + "'>" + obj.fields['name'] + "</option>");
+			}
+		});
+		linkSelect.change(function () {
+			var link = linkSelect.val();
+			if (link != "0")
+				window.open(link);
+		});
+	});
+</script>
+{% endblock header %}
+{% block page %}
+<div id="header">
+	<span id="Nice">נווה העיר  </span><span id="House">2007</span><br>
+	<span style="color: #0065BD;">{% now "d F Y l H:i" %}</span> 
+</div>
+
+<div id="menu">
+	<div id="nav">
+		<a href="/">דף הבית</a> /
+		<a href="/employees">מצבת עובדים</a> /
+		<a href="/projects">מצבת פרוייקטים</a> / 
+		שימושון נדל"ן : 
+		<select width="100px" id="linkSelect">
+			<option value="0">----</option>
+		</select>
+	</div>
+	<div id="user">
+		<span>שלום, 
+		{% if user.is_authenticated %}
+			{{ user.get_full_name }} !
+			<a href="/accounts/logout">התנתק</a> / <a href="/accounts/password_change">שנה סיסמא</a>
+		{% else %}
+			אורח !
+			<a href="/accounts/login">התחבר</a>
+		{% endif %}
+		</span>
+	</div>
+	<div class="clearBoth"> </div>
+</div>
+<div id="content">
+{% block content %}{% endblock content %}
+</div>
+<div id="footer" style="text-align:center;">
+<hr width=60%>
+<a href="#top">חזור לראש הדף</a><br><br>
+</div>
+<div id="error" style="display:none;">{{error|default_if_none:""}}</div>
+{% endblock page %}

@@ -1,0 +1,51 @@
+﻿{% extends "./template.html" %}
+{% block header %}
+<script>
+	$(document).ready(function() {		
+		$("input[type!='submit']").attr("class", "inputText");
+		$("input[type='submit']").click(function (event) {
+			parent.$("#fancy_close").click(function(event) {
+					parent.location.reload();
+				});	
+			});
+	});
+</script>
+{% endblock header %}
+{% block page %}
+<div id="content">
+	<div class="title">
+		<div class="pageTitle">עדכון שכר לעובד</div>
+	</div>
+	<div class="clearBoth"> </div>
+	<br /> 	
+	<form method="POST">
+		<table class="formTable">
+			<tr>
+				<th>שנה</th>
+				<td>{{form.instance.year}}
+			</tr>
+			<tr>
+				<th>חודש</th>
+				<td>{{form.instance.month}}
+			</tr>
+			<tr>
+				<th>עמלת ניהול</th>
+				<td>{{form.instance.admin_commission}}
+			</tr>
+			{% for field in form %}
+			<tr>
+				<th>{{field.label_tag}}</th>
+				<td>
+					{{field}}
+					{% if field.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{field.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			{% endfor %}
+			<tr>
+				<td></td>
+				<td><input type="submit" value="אישור" class="button"/></td>
+			</tr>
+		</table>
+	</form>
+</div>
+{% endblock page %}

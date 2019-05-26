@@ -1,0 +1,52 @@
+﻿{% load management_extras %}
+<table id="sales_table" class="dataTable" border="1">
+	<caption>	
+		סה"כ מכירות : 
+		<b>{{sales|length}}</b>
+		על סך כולל של 
+		<b>{{sales.total_price|commaise}}</b>
+		ש"ח
+	</caption>
+	<th></th>
+	<th>מס"ד</th>
+	{% if sales.0.contract_num %}<th>מס' חוזה ש"ע</th>{% endif %}
+	<th>ת. חוזה</th>
+	<th style="width:120px;">שם הרוכשים</th>
+	<th>מס' בניין</th>
+	<th>מס' דירה</th>
+	<th>סוכן מכירות</th>
+	<th>מחיר חוזה</th>
+	{% if sales.0.discount %}<th>% הנחה ניתן</th>{% endif %}
+	{% if sales.0.allowed_discount %}<th>% הנחה מותר</th>{% endif %}
+	{% for s in sales %}
+		<tr>
+			<td><a href="{{s.get_absolute_url}}"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a></td>
+			<td>{{s.id}}</td>
+			{% if s.contract_num %}<td>{{s.contract_num}}</td>{% endif%}
+			<td>{{s.sale_date|date:"j/m"}}</td>
+			<td>{{s.clients}}</td>
+			{% with s.house.building as b %}
+			<td><a href="/buildings/{{b.id}}/pricelist/type1">{{s.house.building.num}}</a></td>
+			<td><a href="/buildings/{{b.id}}/house/{{s.house.id}}/type1">{{s.house.num}}</a></td>
+			{% endwith %}
+			<td>
+				{% if s.employee %}
+					<a href="/employees/{{s.employee.id}}">{{s.employee}}</a>
+				{% else %}
+					{% for e in s.house.building.project.employees.all %}
+						<a href="/employees/{{e.id}}">{{e}}</a><br>
+					{% endfor %}
+				{% endif %}
+			</td>
+			<td>
+				{{s.price|commaise}}<br>
+				{{s.include_tax|yesno:"כולל מע\"מ, לא כולל מע\"מ"}}, 
+				{% if s.house.building.project.commissions.include_lawyer != None %}
+					{{s.price_include_lawyer|yesno:"כולל עו\"ד, לא כולל עו\"ד"}}
+				{% endif %}
+			</td>
+			{% if s.discount %}<td>{{s.discount}}%</td>{% endif %}
+			{% if s.allowed_discount %}<td>{{s.allowed_discount}}%</td>{% endif %}
+		</tr>
+	{% endfor %}
+</table>

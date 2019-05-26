@@ -1,0 +1,22 @@
+﻿{% load management_extras %}
+{% if payments %}
+<table class="formTable">
+	<caption>צ'קים שהוקלדו</caption>
+	<th>מס' צ'ק</th>
+	<th>מס' אסמכתא</th>
+	<th>סוג תשלום</th>
+	<th>ת. תשלום</th>
+	<th>סכום</th>
+	<th>הערות</th>
+	{% for p in payments %}
+	<tr>
+		<td>{{p.num}}</td>
+		<td>{{p.support_num}}</td>
+		<td>{{p.payment_type}}</td>
+		<td>{{p.payment_date}}</td>
+		<td>{{p.amount|commaise}} ש"ח</td>
+		<td>{{p.remarks|default_if_none:""}}</td>
+	</tr>
+	{% endfor %}
+</table>
+{% endif %}

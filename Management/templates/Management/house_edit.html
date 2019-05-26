@@ -1,0 +1,290 @@
+﻿{% extends "./base.html" %}
+{% block header %}
+{{ block.super }}
+<script>
+	$(document).ready(function() {		
+		$("input[type!='submit']").attr("class", "inputText");
+		$(".fancybox").fancybox();
+	});
+</script>
+{% endblock header %}
+{% block content %}
+<div class="title">
+{% if form.instance.id %}
+	<div class="pageTitle">כרטיס דירה - {{form.instance.num}}</div>
+{% else %}
+	<div class="pageTitle">הוספת דירה חדשה</div>
+{% endif %}
+</div>
+<table class="pageSubTitle" cellspacing="5" align="center">
+{% with form.instance.building as b %}
+	<tr>
+		<th>פרוייקט</th>
+		<td><a href="/projects/{{b.project.id}}">{{b.project.name}}</a></td>
+		<th>יזם</th>
+		<td>{{b.project.initiator}}</td>
+		<th>מס' בניין</th>
+		<td><a href="/buildings/{{b.id}}/pricelist/type{{type.id}}">{{b.num}}</a></td>
+		<th>מס' קומות</th>
+		<td>{{b.floors}}</td>
+	</tr>
+{% endwith %}
+</table>
+<form method="POST" class="formTable">
+	<div id="rightSide">
+		<fieldset class="cardFieldset">
+			<legend>פרטי דירה</legend>
+			<table class="formTable">
+				<tr>
+					<th>{{form.num.label_tag}}</th>
+					<td>
+						{{form.num}}
+						{% if form.num.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.num.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th>{{form.type.label_tag}}</th>
+					<td>
+						{{form.type}}
+						{% if form.type.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.type.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th>{{form.floor.label_tag}}</th>
+					<td>
+						{{form.floor}}
+						{% if form.floor.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.floor.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th>{{form.rooms.label_tag}}</th>
+					<td>
+						{{form.rooms}}
+						{% if form.rooms.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.rooms.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th>{{form.net_size.label_tag}}</th>
+					<td>
+						{{form.net_size}}
+						{% if form.net_size.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.net_size.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th>{{form.garden_size.label_tag}}</th>
+					<td>
+						{{form.garden_size}}
+						{% if form.garden_size.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.garden_size.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th>{{form.is_sold.label_tag}}</th>
+					<td>
+						{{form.is_sold}}
+						{% if form.is_sold.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.is_sold.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th>{{form.parking1.label_tag}}</th>
+					<td>
+						{{form.parking1}}
+						{% if form.parking1.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.parking1.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th>{{form.parking2.label_tag}}</th>
+					<td>
+						{{form.parking2}}
+						{% if form.parking2.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.parking2.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th>{{form.parking3.label_tag}}</th>
+					<td>
+						{{form.parking3}}
+						{% if form.parking3.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.parking3.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th>{{form.storage1.label_tag}}</th>
+					<td>
+						{{form.storage1}}
+						{% if form.storage1.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.storage1.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th>{{form.storage2.label_tag}}</th>
+					<td>
+						{{form.storage2}}
+						{% if form.storage2.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.storage2.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th>{{form.remarks.label_tag}}</th>
+					<td>
+						{{form.remarks}}
+						{% if form.remarks.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.remarks.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+			</table>
+		</fieldset>
+		<fieldset class="cardFieldset">
+			<legend>נכס מסחרי</legend>
+			<table class="formTable">
+				<tr>
+					<th>{{form.bruto_size.label_tag}}</th>
+					<td>
+						{{form.bruto_size}}
+						{% if form.bruto_size.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.bruto_size.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th>{{form.load_precentage.label_tag}}</th>
+					<td>
+						{{form.load_precentage}}
+						{% if form.load_precentage.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.load_precentage.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th>{{form.parking_size.label_tag}}</th>
+					<td>
+						{{form.parking_size}}
+						{% if form.parking_size.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.parking_size.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+			</table>
+		</fieldset>
+	</div>
+	<div id="leftSide">
+		<fieldset class="cardFieldset">
+			<legend>פרטים נוספים</legend>
+			<table class="formTable">
+				<tr>
+					<th>{{form.price.label_tag}}</th>
+					<td>
+						{{form.price}}
+						{% if form.price.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.price.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th>{{form.price_date.label_tag}}</th>
+					<td>
+						{{form.price_date}}
+						{% if form.price_date.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.price_date.errors|join:""}}'/>{% endif %}
+					</td>
+				</tr>
+			</table>
+		</fieldset>
+		{% with form.instance.get_signup as signup %}
+		{% if signup %}
+		<fieldset class="cardFieldset">
+			<legend>פרטי הרשמה</legend>
+			<table class="formTable">
+				<tr>
+					<th>סטטוס</th>
+					<td>
+						{% if signup.cancel %}
+							<span style="color:#D61616;font-weight:bold;">בוטלה</span>
+						{% else %}
+							<span style="color:#088B0B;font-weight:bold;">פעילה</span>
+						{% endif %}</td>
+				</tr>
+				<tr>
+					<th>שמות הרוכשים</th>
+					<td>{{signup.clients}}</td>
+				</tr>
+				<tr>
+					<th>טלפון הרוכשים</th>
+					<td>{{signup.clients_phone}}</td>
+				</tr>
+				<tr>
+					<th>תאריך הרשמה</th>
+					<td>{{signup.date|date:"j/m/Y"}}</td>
+				</tr>
+				<tr>
+					<th>מחיר הרשמה</th>
+					<td>{{signup.price}}</td>
+				</tr>
+				<tr>
+					<th>הערות</th>
+					<td>{{signup.remarks|default_if_none:""}}</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td><a href="{{signup.get_absolute_url}}">תיקון פרטים</a>
+				</tr>
+			</table>
+		</fieldset>
+		{% endif %}
+		{% endwith %}
+		{% for sale in form.instance.sales.all %}
+		<fieldset class="cardFieldset">
+			<legend>פרטי מכירה</legend>
+			<table class="formTable">
+				<tr>
+					<th>סטטוס</th>
+					<td>
+						{% if sale.salecancel %}
+							<span style="color:#D61616;font-weight:bold;">בוטלה</span>
+						{% else %}
+							<span style="color:#088B0B;font-weight:bold;">פעילה</span>
+						{% endif %}</td>
+				</tr>
+				<tr>
+					<th>שמות הרוכשים</th>
+					<td>{{sale.clients}}</td>
+				</tr>
+				<tr>
+					<th>טלפון הרוכשים</th>
+					<td>{{sale.clients_phone}}</td>
+				</tr>
+				<tr>
+					<th>תאריך חוזה</th>
+					<td>{{sale.sale_date|date:"j/m/Y"}}</td>
+				</tr>
+				<tr>
+					<th>מחיר חוזה</th>
+					<td>{{sale.price}} - {{sale.price_include_lawyer|yesno:"כולל עוד, לא כולל עוד"}}</td>
+				</tr>
+				<tr>
+					<th>הערות</th>
+					<td>{{sale.remarks}}</td>
+				</tr>
+				<tr>
+					<th>תיקונים</th>
+					<td>
+						{% if sale.salepricemod %}<a href="/salepricemod/{{sale.salepricemod.id}}">תיקון מחיר</a>{% endif %}
+						{% if sale.salehousemod %}<a href="/salehousemod/{{sale.salehousemod.id}}">תיקון דירה</a>{% endif %}
+						{% if sale.salepre %}<a href="/salepre/{{sale.salepre.id}}">הקדמת מכירה</a>{% endif %}
+						{% if sale.salereject %}<a href="/salereject/{{sale.salereject.id}}">דחיית מכירה</a>{% endif %}
+						{% if sale.salecancel %}<a href="/salecancel/{{sale.salecancel.id}}">ביטול מכירה</a>{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td><a href="{{sale.get_absolute_url}}">לפרטים מלאים</a>
+				</tr>
+			</table>
+		</fieldset>
+		{% if not sale.is_deleted %}
+		<fieldset class="cardFieldset">
+			<legend>פרטי עמלה</legend>
+			<table class="formTable">
+				<tr>
+					<th>חודש תשלום לעובד</th>
+					<td>{{sale.employee_pay_month}}/{{sale.employee_pay_year}}</td>
+				</tr>
+				<tr>
+					<th>חודש תשלום לחברה</th>
+					<td>{{sale.contractor_pay_month}}/{{sale.contractor_pay_year}}</td>
+				</tr>
+			</table>
+		</fieldset>
+		{% endif %}
+		{% endfor %}
+	</div>
+	<div class="clearBoth"/><br>
+	<input name="addanother" type="submit" value="שמירה והזנת דירה חדשה" class="button"/>
+	<input name="finish" type="submit" value="סיים הזנה" class="button"/>
+</form>
+{% endblock content%}

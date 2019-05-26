@@ -1,0 +1,73 @@
+﻿{% extends "./base.html" %}
+{% block header %}
+{{ block.super }}
+<script>
+	var selectedID = 0;
+	var prev_class;
+	$(document).ready(function() {
+		$("tr").click(function() { 
+			var tr = $(this);
+			if (selectedID > 0)
+				$("tr[objid='"+selectedID+"']").attr("class", prev_class);
+			selectedID = tr.attr("objid");
+			if (!selectedID)
+				return;
+			prev_class = tr.attr("class");
+			tr.attr("class","selectedRow");
+			//sync links
+			if (selectedID > 0)
+			{
+				$("#carEdit").attr("href", "/car/" + selectedID);
+				$("#carDelete").attr("href", "/car/" + selectedID + "/del");
+			}
+		});
+		//add fancybox
+		$(".fancybox").fancybox({'frameWidth':370, 'frameHeight':270});
+	});
+</script>
+{% endblock header %}
+{% block content %}
+<div id="content">
+	<div class="title">
+		<div class="pageTitle">ניהול מכוניות</div>
+	</div>
+	<div class="someIcon">
+		<img src="/site_media/images/add_48.png" width="20" height="20"  alt="הוספה" /> 
+		<a href="/car/add" class="fancybox" >הוספה</a>
+	</div>
+	<div class="someIcon">
+		<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="עריכה" /> 
+		<a id="carEdit" class="fancybox">עריכה</a>
+	</div>
+	<div class="someIcon">
+		<img src="/site_media/images/delete_48.png" width="20" height="20"  alt="מחיקה" /> 
+		<a id="carDelete">מחיקה</a>
+	</div>
+	<div class="clearBoth"> </div>
+	<br /> 		
+	<table class="dataTable" border="1">
+		<th>מס' רכב</th>
+		<th>בעל האוטו</th>
+		<th>ת. תפוגת ביטוח</th>
+		<th>סוכן ביטוח</th>
+		<th>טלפון סוכן ביטוח</th>
+		<th>חברת גרירה</th>
+		<th>טלפון גרר</th>
+		<th>עלות ביטוח חובה</th>
+		<th>עלות ביטוח מקיף</th>
+		{% for car in object_list %}
+			<tr class="{% cycle 'row1' 'row2' %}" objid={{car.id}}>
+				<td>{{ car.number }}</td>
+				<td>{{ car.owner }}</td>
+				<td>{{ car.insurance_expire_date }}</td>
+				<td>{{ car.insurance_man }}</td>
+				<td>{{ car.insurance_phone }}</td>
+				<td>{{ car.tow_phone }}</td>
+				<td>{{ car.tow_company }}</td>
+				<td>{{ car.compulsory_insurance_cost }}</td>
+				<td>{{ car.comprehensive_insurance_cost }}</td>
+			</tr>
+		{% endfor %}
+	</table>
+</div>
+{% endblock content %}

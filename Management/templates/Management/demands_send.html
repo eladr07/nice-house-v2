@@ -1,0 +1,96 @@
+﻿{% extends "./base.html" %}
+{% load management_extras %}
+{% block header %}
+{{ block.super }}
+<script>
+	$(document).ready(function() {
+		$(".fancybox").fancybox();
+		$(".bigfancybox").fancybox({'frameWidth':800});
+	});
+</script>
+{% endblock header %}
+{% block content %}
+	<div class="title">
+		<div class="pageTitle">אישור ושליחת דרישות במייל ובפקס לחודש {{month|date:"M Y"}}</div>
+	</div>
+<form method="GET">
+	<table class="dataTable" style="width: 30%;">
+		<tr class="row1">
+			<td colspan="3" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש</td>
+		</tr>
+		<tr class="row2">
+			{% for field in filterForm %}
+			<td>
+				{{ field.label_tag }} : 
+				{{ field }}
+			</td>
+			{% endfor %}
+			<td><input type="submit" value="חפש" class="button"/></td>
+		</tr>
+	</table>
+</form>
+<form method="post">
+	<table class="dataTable" border="1">
+		<th>מס'</th>
+		<th>PDF</th>
+		<th>שם הפרוייקט</th>
+		<th>חודש</th>
+		<th>מס' מכירות</th>
+		<th>סופית?</th>
+		<th>מייל?</th>
+		<th>כתובת מייל</th>
+		<th>פקס?</th>
+		<th>מס' פקס</th>
+		<th>סטטוס</th>
+		{% for f in forms %}
+		{% with f.instance as d %}
+			{% if not d.statuses.count %}
+				<tr class="row3" objid={{d.id}}>
+			{% else %}
+				{% if d.statuses.latest.type.id == 1 %}
+					<tr class="{% cycle 'row1' 'row2' %}" objid={{d.id}}>
+				{% endif %}
+				{% if d.statuses.latest.type.id == 2 %}
+					<tr class="row4" objid={{d.id}}>
+				{% endif %}
+				{% if d.statuses.latest.type.id == 3 %}
+					<tr class="row5" objid={{d.id}}>
+				{% endif %}
+				{% if d.statuses.latest.type.id == 4 %}
+					<tr class="row5" objid={{d.id}}>
+				{% endif %}
+			{% endif %}
+		{% endwith %}
+				<td>
+					<a href="{{f.instance.get_absolute_url}}" target="_blank">{{f.instance.id}}</a>
+				</td>
+				<td>
+					<a href="/reports/project_month/{{f.instance.project.id}}/{{f.instance.year}}/{{f.instance.month}}">
+					<img src="/site_media/images/PDF.png" width="15" height="15"/>
+					</a>
+				</td>
+				<td><a href="{{f.instance.project.get_absolute_url}}" target="_blank">{{ f.instance.project }}</a></td>
+				<td>{{ f.instance.month }}/{{f.instance.year}}</a></td>
+				<td><a href="/demandsales/?demand_id={{f.instance.id}}" class="bigfancybox">{{ f.instance.get_sales.count|default:"אין מכירות" }}</a></td>
+				<td>{{f.is_finished}}</td>
+				<td>{{f.by_mail}}</td>
+				<td>
+					{{f.mail}}
+					{% if f.mail.errors %}
+						<img src="/site_media/images/error-48.png" width="15" height="15"/> 
+					{% endif %}
+				</td>
+				<td>{{f.by_fax}}</td>
+				<td>
+					{{f.fax}}
+					{% if f.fax.errors %}
+						<img src="/site_media/images/error-48.png" width="15 height="15" /> 
+					{% endif %}
+				</td>
+				<td>{{f.instance.statuses.latest}}</td>
+			</tr>
+		{% endfor %}
+	</table>
+	<input type="submit" value="אישור" class="button"/>
+</form>
+{% endblock content %}

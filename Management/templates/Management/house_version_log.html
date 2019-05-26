@@ -1,0 +1,26 @@
+﻿{% extends "./template.html" %}
+{% load management_extras %}
+{% block page %}
+<div id="content">	
+	{% if title %}
+	<div class="title">
+		<div class="pageTitle">{{title}}</div>
+	</div>
+	<div class="clearBoth"></div>
+	{% endif %}
+	<table class="dataTable">
+		<th>תאריך</th>
+		<th>מחיר</th>
+		<th>סכום שינוי</th>
+		<th>אחוז שינוי</th>
+		{% for version in versions %}
+			<tr class="{% cycle 'row1' 'row2' %}">
+				<td>{{version.date|date:"j/m/y"}}</td>
+				<td>{{version.price|commaise}}</td>
+				<td>{{version.diff_amount|commaise}}</td>
+				<td>{% if version.diff_precentage %} {{version.diff_precentage|floatformat:-2}}% {% endif %}</td>
+			</tr>
+		{% endfor %}
+	</table>
+</div>
+{% endblock page %}

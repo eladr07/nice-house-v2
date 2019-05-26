@@ -1,0 +1,115 @@
+﻿{% extends "./base.html" %}
+{% load management_extras %}
+{% block header %}
+{{ block.super }}
+<script>
+	var selectedID = 0;
+	var prev_class;
+	$(document).ready(function() {
+		$("tr").click(function() { 
+			var tr = $(this);
+			if (selectedID > 0)
+				$("tr[objid='"+selectedID+"']").attr("class", prev_class);
+			selectedID = tr.attr("objid");
+			if (!selectedID)
+				return;
+			prev_class = tr.attr("class");
+			tr.attr("class","selectedRow");
+			//sync links
+			if (selectedID > 0)
+			{
+				$("#objEdit").attr("href", "/demandinvoice/" + selectedID);
+				$("#objOffset").attr("href", "/invoices/" + selectedID + "/offset");
+				$("#objDelete").attr("href", "/invoices/" + selectedID + "/del");
+			}
+		});
+		//add fancybox
+		$(".fancybox").fancybox();
+	});
+</script>
+{% endblock header %}
+{% block content %}
+	<div class="title">
+		<div class="pageTitle">ריכוז חשבוניות לדרישה</div>
+	</div>
+	<div class="clearBoth"></div>
+	<div style="float:right;width:70%;">
+		<form method="GET">
+			<table class="dataTable">
+				<tr class="row1">
+					<td colspan="6" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש תקופה</td>
+				</tr>
+				<tr class="row2">
+					{% for field in filterForm %}
+					<td>
+						{{ field.label_tag }} : 
+						{{ field }}
+					</td>
+					{% endfor %}
+					<td><input type="submit" value="חפש" class="button"/></td>
+				</tr>
+			</table>
+		</form>
+	</div>
+	<div class="clearBoth"></div>
+	<div class="someIcon">
+		<img src="/site_media/images/add_48.png" width="20" height="20"  alt="חדש" /> 
+		<a href="/invoices/add" >חדש</a>
+	</div>
+	<div class="someIcon">
+		<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+		<a id="objEdit" >שינוי</a>
+	</div>
+	<div class="someIcon">
+		<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="זיכוי" /> 
+		<a id="objOffset" class="fancybox">זיכוי</a>
+	</div>
+	<div class="someIcon">
+		<img src="/site_media/images/delete_48.png" width="20" height="20"  alt="מחיקה" /> 
+		<a id="objDelete">מחיקה</a>
+	</div>
+	<div class="clearBoth"> </div>
+	<br /> 		
+	<table class="dataTable" border="1">
+		<caption>
+		{% if page.has_previous %}
+		<a href="?page={{ page.previous_page_number }}" style="text-decoration:none;">
+			<img src="/site_media/images/1rightarrow-48.png" width="20" height="20" border="0" />
+		</a>
+		{% endif %}
+		מציג
+		{{page.start_index}} - {{page.end_index}}, 
+		עמוד
+		{{page.number}}
+		מתוך
+		{{page.paginator.num_pages}}
+		{% if page.has_next %}
+		<a href="?page={{ page.next_page_number }}" style="text-decoration:none;">
+			<img src="/site_media/images/1leftarrow-48.png" width="20" height="20" border="0" />
+		</a>
+		{% endif %}
+		</caption>
+		<th></th>
+		<th>שם היזם</th>
+		<th>פרויקט</th>
+		<th>חודש</th>
+		<th>שנה</th>
+		<th>מס' חשבונית</th>
+		<th>ת. חשבונית</th>
+		<th>סכום</th>
+		<th>הערות</th>
+		{% for i in page.object_list %}
+			<tr class="{% cycle 'row1' 'row2' %}" objid={{i.id}}>
+				<td><a href="{{i.demands.all.0.get_absolute_url}}"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a></td>
+				<td>{{ i.demands.all.0.project.initiator }}</td>
+				<td><a href="{{i.demands.0.project.get_absolute_url}}">{{ i.demands.all.0.project }}</td>
+				<td>{{ i.demands.all.0.month }}</td>
+				<td>{{ i.demands.all.0.year }}</td>
+				<td>{{ i.num }}</td>
+				<td>{{ i.date|date:"j/m/y" }}</td>
+				<td>{{ i.amount|commaise }} ש"ח</td>
+				<td>{{ i.remarks }}</td>
+			</tr>
+		{% endfor %}
+	</table>
+{% endblock content %}

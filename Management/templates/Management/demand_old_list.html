@@ -1,0 +1,235 @@
+﻿{% extends "./base.html" %}
+{% load management_extras %}
+{% block header %}
+{{ block.super }}
+<script>
+	var selectedID = 0;
+	var prev_class;
+	var filterIndex = 0;
+	$(document).ready(function() {
+		$("#demandTable tr").click(function() { 
+			var tr = $(this);
+			if (selectedID > 0)
+				$("#demandTable tr[objid='"+selectedID+"']").attr("class", prev_class);
+			selectedID = tr.attr("objid");
+			if (!selectedID)
+				return;
+			prev_class = tr.attr("class");
+			tr.attr("class","selectedRow");
+			//sync links
+			if (selectedID > 0)
+				$("#demandEdit").attr("href", "/demands/" + selectedID);
+				$("#demandCalc").attr("href", "/demands/" + selectedID + "/calc");
+				$("#demandReturnToCalc").attr("href", "/demands/" + selectedID + "/returntocalc");
+				$("#demandRemarks").attr("href", "/demands/" + selectedID + "/remarks");
+			});
+		$(".fancybox").fancybox();
+		$(".bigfancybox").fancybox({'frameWidth':800});	
+		$("#demandSend").click(function(event) {
+			event.preventDefault();
+			$("#demandTable input[type='checkbox'][checked]").each(function () {
+				if (!$(this).attr("checked"))
+					return;
+				var row = $(this).parent().parent();
+				$.get("demands/" + row.attr("objid") + "/send");
+			});
+			alert("הדרישות נשלחו ליזמים");
+		});
+
+		$("#demandCalc").click(function(event) {
+			if (!confirm("האם אתה בטוח שברצונך לחשב את העמלות מחדש ?"))
+				event.preventDefault();
+		});
+		$("#demandReturnToCalc").click(function(event) {
+			if (!confirm("האם אתה בטוח שברצונך להחזיר את הדרישה לחישוב עמלות ?"))
+				event.preventDefault();
+		});
+		//add filters
+		var filterSelect = $("#filterSelect");
+		$("#demandTable th").each(function (index, elem) {
+			filterSelect.append("<option value='" + index + "'>" + $(elem).text() + "</option>");
+		});
+		$("#filterSelect").change(function () {
+			filterIndex = $(this).val();
+		});
+		$("#filterBtn").click(function (event) {
+			$("#demandTable tr").each(function (index, elem) {
+				if ($("td", elem).length == 0)
+					return;
+				var cell = $("td", elem).get(filterIndex);
+				var content = $(cell).text();
+				var filterText = $("#filterText").val();
+				if (content.match(filterText))
+					$(elem).show();
+				else
+					$(elem).hide();
+			});
+		});
+		$("#filterClearBtn").click(function (event) {
+			$("#demandTable tr").each(function (index, elem) {
+				$(elem).show();
+			});
+		});
+	});
+</script>
+{% endblock header %}
+{% block content %}
+<div class="title">
+	<div class="pageTitle">ריכוז דרישות לתשלום לחודש {{month|date:"F Y"}}</div>
+</div>
+<div class="clearBoth"></div>
+<div style="float:right;width:30%;">
+	<form method="GET">
+		<table class="dataTable">
+			<tr class="row1">
+				<td colspan="3" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש דרישה</td>
+			</tr>
+			<tr class="row2">
+				{% for field in filterForm %}
+				<td>
+					{{ field.label_tag }} : 
+					{{ field }}
+				</td>
+				{% endfor %}
+				<td><input type="submit" value="חפש" class="button"/></td>
+			</tr>
+		</table>
+	</form>
+</div>
+<div style="float:left; width:60%">
+	<table id="filter" class="dataTable">
+		<tr class="row1">
+			<td colspan="4" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש שורות</td>
+		</tr>
+		<tr class="row2">
+			<td>
+				חיפוש לפי : 
+				<select id="filterSelect" style="width:100px;"></select>
+			</td>
+			<td>
+				ערך : 
+				<input id="filterText" type="text"/>
+			</td>
+			<td><button id="filterBtn" class="button">חפש</button></td>
+			<td><button id="filterClearBtn" class="button">הצג הכל</button></td>
+		</tr>
+	</table>
+</div>
+<div class="clearBoth"></div>
+<div class="someIcon" style="width:100px;">
+	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+	<a id="demandEdit">שינוי דרישה</a>
+</div>
+<div class="someIcon" style="width:100px;">
+	<img src="/site_media/images/Note_48.png" width="20" height="20"  alt="שינוי" /> 
+	<a id="demandRemarks" class="fancybox">הערות לדרישה</a>
+</div>
+<div class="someIcon"style="width:120px;">
+	<img src="/site_media/images/thumbs_up_48.png" width="20" height="20"  alt="שליחה" /> 
+	<a href="/demands/sendall">אשר ושלח דרישות</a>
+</div>
+<div class="someIcon"style="width:130px;">
+	<img src="/site_media/images/advanced-48.png" width="20" height="20"  /> 
+	<a id="demandReturnToCalc">החזר לחישוב עמלות</a>
+</div>
+<div class="someIcon"style="width:130px;">
+	<img src="/site_media/images/advanced-48.png" width="20" height="20" /> 
+	<a id="demandCalc">חישוב עמלות מחדש</a>
+</div>
+<div class="someIcon" style="width:100px;">
+	<img src="/site_media/images/print-48.png" width="20" height="20" /> 
+	<a href="#">שלח להנה"ח</a>
+</div>
+<div class="someIcon" style="width:100px;">
+	<img src="/site_media/images/print-48.png" width="20" height="20"  alt="הדפסה" /> 
+	<a href="/reports/projects_month/{{month.year}}/{{month.month}}">גרסה להדפסה</a>
+</div>
+<div class="clearBoth"></div>
+<p>
+לתשומת לבך, ל-
+<u>{{unhandled_projects|length}}</u>
+פרוייקטים לא הוצאה דרישה בגין חודש זה : 
+{% for p in unhandled_projects %}
+{{p}} ,
+{% endfor %}
+</p>
+<br>
+<table id="demandTable" class="dataTable" border="1">
+<caption>מציג סה"כ {{demands|length}} דרישות לתשלום</caption>
+	<tr>
+		<th>מס'</th>
+		<th>PDF</th>
+		<th>יזם</th>
+		<th>שם פרוייקט</th>
+		<th>מס' מכירות</th>
+		<th>מס' מכירות צפוי</th>
+		<th>סה"כ מכירות כולל מע"מ</th>
+		<th>עמלה מחושב בגין שיווק</th>
+		<th>תוספת קבועה</th>
+		<th>תוספת משתנה</th>
+		<th>בונוס</th>
+		<th>קיזוז</th>
+		<th>סה"כ תשלום לחברה</th>
+		<th>תיקון</th>
+		<th>תזכורות</th>
+		<th>הערות</th>
+	</tr>
+    {% for d in demands %}
+	{% if not d.statuses.count %}
+    	<tr class="row3" objid={{d.id}}>
+	{% else %}
+		{% if d.statuses.latest.type.id == 1 %}
+			<tr class="{% cycle 'row1' 'row2' %}" objid={{d.id}}>
+		{% endif %}
+		{% if d.statuses.latest.type.id == 2 %}
+			<tr class="row4" objid={{d.id}}>
+		{% endif %}
+		{% if d.statuses.latest.type.id == 3 %}
+			<tr class="row5" objid={{d.id}}>
+		{% endif %}
+		{% if d.statuses.latest.type.id == 4 %}
+			<tr class="row5" objid={{d.id}}>
+		{% endif %}
+	{% endif %}
+			<td><a href="/demands/{{d.id}}">{{d.id}}</a></td>
+			<td>
+				<a href="/reports/project_month/{{d.project.id}}/{{d.year}}/{{d.month}}">
+				<img src="/site_media/images/PDF-48.png" width="15" height="15"/>
+				</a>
+			</td>
+			<td>{{ d.project.initiator }}</td>
+			<td><a href="/projects/{{d.project.id}}">{{ d.project.name }}</a></td>
+			<td><a href="/demandsales/?demand_id={{d.id}}" class="bigfancybox">{{ d.get_sales.count|default:"אין מכירות" }}</a></td>
+			<td>{{d.sale_count}}</td>
+			<td>{% if d.get_sales.total_price_final %} {{ d.get_sales.total_price_final|commaise }} ש"ח {% else %}----{% endif %}</td>
+			<td>{% if d.sales_commission %} {{ d.sales_commission|commaise }} ש"ח {% else %}----{% endif %}</td>
+			<td style="color:#08A600;">{% if d.fixed_diff %} {{ d.fixed_diff.amount|commaise }} ש"ח {% endif %}</td>
+			<td style="color:#08A600;">{% if d.var_diff %} {{ d.var_diff.amount|commaise }} ש"ח - {{ d.var_diff.reason }} {% endif %}</td>
+			<td style="color:#08A600; width:150px;">{% if d.bonus_diff %} {{ d.bonus_diff.amount|commaise }} ש"ח - {{ d.bonus_diff.reason }} {% endif %}</td>
+			<td style="color:#D50808;">{% if d.fee_diff %} {{ d.fee_diff.amount|commaise }} ש"ח - {{ d.fee_diff.reason }} {% endif %}</td>
+			<td><b>{% if d.get_total_amount %} {{ d.get_total_amount|commaise }} ש"ח {% else %}----{% endif %}</b></td>
+			<td
+			{% if d.is_fixed %}<img src="/site_media/images/update_48.png" width="20" height="20"  alt="תיקון" />{% endif %}
+			</td>
+			<td>
+			{% if d.get_open_reminders|length %}
+				<a href="/demands/{{d.id}}/reminders" class="fancybox">{{d.get_open_reminders|length}} תזכורות</a>
+			{% endif %}
+				<a href="/demands/{{d.id}}/addreminder" class="fancybox">
+					<img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" />
+				</a>
+			</td>
+			<td>{{ d.remarks|default_if_none:"" }}</td>
+		</tr>
+	{% endfor %}
+	<tr class="rowSum" height="30px">
+		<td colspan="4" align="center"></td>
+		<td>{{total_sales_count}} מכירות</td>
+		<td>{{demands.total_sale_count}} מכירות</td>
+		<td>{{total_sales_amount|commaise}} ש"ח</td>
+		<td>{{demands.total_sales_commission|commaise}} ש"ח</td>
+		<td colspan="4"></td>
+		<td colspan="2">{{total_amount|commaise}} ש"ח</td>
+	</tr>
+</table>
+{% endblock content %}

@@ -1,0 +1,41 @@
+﻿{% extends "./template.html" %}
+{% block header %}
+<script>
+	$(document).ready(function() {		
+		$("input[type!='submit']").attr("class", "inputText");
+		$("input[type='submit']").click(function (event) {
+			parent.$("#fancy_close").click(function(event) {
+					parent.location.reload();
+				});	
+			});
+	});
+</script>
+{% endblock header %}
+{% block page %}
+<div id="content">
+	<form method="POST">
+		<table class="formTable">
+			<tr>
+				<th>איש קשר קיים</th>
+				<td>{{existForm.contact}}</td>
+				<td>{{existForm.contact.errors|join:" "}}</td>
+			</tr>
+			<tr>
+				<th>איש קשר חדש</th>
+				<td></td>
+			</tr>
+			{% for field in form %}
+			<tr>
+				<th>{{field.label_tag}}</th>
+				<td>{{field}}</td>
+				<td>{{field.errors|join:" "}}</td>
+			</tr>
+			{% endfor %}
+			<tr>
+				<td></td>
+				<td><input type="submit" value="אישור" class="button"/></td>
+			</tr>
+		</table>
+	</form>
+</div>
+{% endblock page %}

@@ -1,0 +1,62 @@
+﻿<table id="house_table" class="formTable">
+	<tr>
+		<th>סטטוס</th>
+		{% if house.get_sale %}
+			<td style="color:#C20606; font-weight:bold;">נמכרה - <a href="{{house.get_sale.get_absolute_url}}">פרטי המכירה</a></td>
+		{% else %}
+			<td style="color:#06C233; font-weight:bold;">פנויה</td>
+		{% endif %}
+	</tr>
+	<tr>
+		<th>מס'</th>
+		<td>{{house.num}}</td>
+	</tr>
+	<tr>
+		<th>סוג</th>
+		<td>{{house.type}}</td>
+	</tr>
+	<tr>
+		<th>קומה</th>
+		<td>{{house.floor}}</td>
+	</tr>
+	<tr>
+		<th>חדרים</th>
+		<td>{{house.rooms}}</td>
+	</tr>
+	<tr>
+		<th>שטח נטו</th>
+		<td>{{house.net_size}} מ"ר</td>
+	</td>
+	<tr>
+		<th>שטח גינה/מרפסת</th>
+		<td>{% if house.garden_size %}{{house.garden_size}} מ"ר{% endif %}</td>
+	</td>
+	<tr>
+		<th>חנייה</th>
+		<td>
+			{% for p in house.parkings.all %}
+				{{p}}<br>
+			{% endfor %}
+		</td>
+	</td>
+	<tr>
+		<th>מחסן</th>
+		<td>
+			{% for s in house.storages.all %}
+				{{s}}<br>
+			{% endfor %}
+		</td>
+	</td>
+	<tr>
+		<th>הערות</th>
+		<td>{{house.remarks}}</td>
+	</tr>
+	<tr>
+		<th>מחיר</th>
+		<td>{{house.versions.latest.price}}</td>
+	</tr>
+	<tr>
+		<th></th>
+		<td><a href="/buildings/{{house.building.id}}/house/{{house.id}}/type1">כרטיס הדירה</a></td>
+	</tr>
+</table>

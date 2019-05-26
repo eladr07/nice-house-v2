@@ -1,0 +1,97 @@
+﻿{% extends "./base.html" %}
+{% load management_extras %}
+{% block header %}
+{{ block.super }}
+<script>
+	var selectedID = 0;
+	var prev_class;
+	$(document).ready(function() {
+		$(".fancybox").fancybox();
+	});
+</script>
+{% endblock header %}
+{% block content %}
+<div class="title">
+	<div class="pageTitle">ריכוז שכר לעובדים כולל הוצאות מעביד תקופתי<br>{{start|date:"m/y"}} - {{end|date:"m/y"}}</div>
+</div>
+<div class="clearBoth"></div>
+<form method="GET">
+	<table class="dataTable" style="width: 70%;" border="1">
+		<tr class="row1">
+			<td colspan="6" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש</td>
+		</tr>
+		<tr class="row2">
+			{% for field in filterForm %}
+			<td>
+				{{ field.label_tag }} : 
+				{{ field }}
+			</td>
+			{% endfor %}
+			<td><input type="submit" value="חפש" class="button"/></td>
+		</tr>
+	</table>
+</form>
+<br>
+<div class="someIcon" style="width:100px;">
+	<img src="/site_media/images/print-48.png" width="20" height="20" /> 
+	<a href="#" >גרסת הדפסה</a>
+</div>
+<div class="clearBoth"></div>
+<br>
+<table id="salaryTable" class="dataTable" border="1">
+<caption>מציג סה"כ {{employees|length}} עובדים</caption>
+	<tr>
+		<th colspan="2">כללי</th>
+		<th colspan="3">תשלום נטו</th>
+		<th colspan="7">מיסי עובד לתשלום והפרשות</th>
+		<th colspan="4">הוצאות מעביד</th>
+		<th colspan="4">אסמכתאות ואישור</th>
+	</tr>
+	<tr>
+		<th>דו"ח</th>
+		<th>שם<BR>העובד</th>
+		<th>תלוש<BR>נטו</th>
+		<th>החזר<BR>הלוואה</th>
+		<th>שווי<BR>צ'ק</th>
+		<th>מס<BR>הכנסה</th>
+		<th>ביטוח<BR>לאומי</th>
+		<th>בריאות</th>
+		<th>ביטוח<BR>פנסיה</th>
+		<th>חופשה</th>
+		<th>דמי<BR>הבראה</th>
+		<th>סה"כ<BR>ברוטו<BR>לעובד</th>
+		<th>ביטוח<BR>לאומי<BR>מעביד</th>
+		<th>גמל<BR>מעביד</th>
+		<th>הפרשה<BR>לפיצויים</th>
+		<th>ברוטו<BR>כולל<BR>מעביד</th>
+		<th>נכוי מס<br>במקור</th>
+		<th>שווי<br>חשבונית</th>
+	</tr>
+	{% for employee in employees %}
+		<tr class="{% cycle 'row1' 'row2' %}" objid={{s.id}} employeeid={{employee.id}}>
+			<td>
+				<a href="/esseasonexpenses/?employee={{employee.id}}&from_year={{start.year}}&from_month={{start.month}}&to_year={{end.year}}&to_month={{end.month}}">
+					<img src="/site_media/images/viewmag-48.png" width="20" height="20"/>
+				</a>
+			</td>
+			<td><a href="{{employee.get_absolute_url}}" target="_blank">{{ employee }}</a></td>			
+			<td>{{ employee.total_neto|commaise }}</td>
+			<td>{{ employee.total_loan_pay|commaise }}</td>
+			<td>{{ employee.total_check_amount|commaise }}</td>
+			<td>{{ employee.total_income_tax|commaise }}</td>
+			<td>{{ employee.total_national_insurance|commaise }}</td>
+			<td>{{ employee.total_health|commaise }}</td>
+			<td>{{ employee.total_pension_insurance|commaise }}</td>
+			<td>{{ employee.total_vacation|commaise }}</td>
+			<td>{{ employee.total_convalescence_pay|commaise }}</td>
+			<td>{{ employee.total_bruto|commaise }}</td>
+			<td>{{ employee.total_employer_national_insurance|commaise }}</td>
+			<td>{{ employee.total_employer_benefit|commaise }}</td>
+			<td>{{ employee.total_compensation_allocation|commaise }}</td>
+			<td>{{ employee.total_bruto_with_employer|commaise }}</td>
+			<td></td>
+			<td></td>
+		</tr>
+	{% endfor %}
+</table>
+{% endblock content %}

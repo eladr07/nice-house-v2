@@ -1,0 +1,142 @@
+﻿{% extends "./base.html" %}
+{% block header %}
+<script>
+	var selectedID = 0;
+	var prev_class;
+	var filterIndex;
+	$(document).ready(function() {
+		$("tr").click(function() { 
+			var tr = $(this);
+			if (selectedID > 0)
+				$("tr[objid='"+selectedID+"']").attr("class", prev_class);
+			selectedID = tr.attr("objid");
+			prev_class = tr.attr("class");
+			tr.attr("class","selectedRow");
+			//sync links
+			if (selectedID > 0)
+			{
+				$("#employeeEdit").attr("href", "/employees/" + selectedID);
+				$("#employeeEnd").attr("href", "/employees/end/" + selectedID);
+			}
+		});
+		//add filters
+		var filterSelect = $("#filterSelect");
+		$("#employee_table th").each(function (index, elem) {
+			filterSelect.append("<option value='" + index + "'>" + $(elem).text() + "</option>");
+		});
+		$("#filterSelect").change(function () {
+			filterIndex = $(this).val();
+		});
+		$("#filterBtn").click(function (event) {
+			$("#employee_table tr").each(function (index, elem) {
+				if ($("td", elem).length == 0)
+					return;
+				var cell = $("td", elem).get(filterIndex);
+				var content = $(cell).text();
+				var filterText = $("#filterText").val();
+				if (content.match(filterText))
+					$(elem).show();
+				else
+					$(elem).hide();
+			});
+		});
+		$("#filterClearBtn").click(function (event) {
+			$("#employee_table tr").each(function (index, elem) {
+				$(elem).show();
+			});
+		});
+	});
+</script>
+{% endblock header %}
+
+{% block content %}
+	<div class="title">
+		<div class="pageTitle">ארכיון עובדים</div>
+	</div>
+	<div id="filter" style="width:70%;">
+		<fieldset class="cardFieldset">
+			<legend>חיפוש</legend>
+			חיפוש לפי : 
+			<select id="filterSelect" style="width:100px;"></select>
+			ערך : 
+			<input id="filterText" type="text"/>
+			<button id="filterBtn" class="button">חפש</button>
+			<button id="filterClearBtn" class="button">הצג הכל</button>
+		</fieldset>
+	</div>
+	<div class="someIcon" style="width:100px;">
+		<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+		<a id="employeeEdit">כרטיס עובד</a>
+	</div>
+	<div class="someIcon" style="width:80px;">
+		<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+		<a id="employeeBag">תיק עובד</a>
+	</div>
+	<div class="someIcon" style="width:100px;">
+		<img src="/site_media/images/print-48.png" width="20" height="20"  alt="הדפסה" /> 
+		<a id="print">גרסת הדפסה</a>
+	</div>
+	<div class="clearBoth"> </div>
+	<br />
+	<table id="employee_table" class="dataTable" border="1">
+		<caption>מציג סה"כ {{employee_list.count}} עובדים</caption>
+		<th/>
+		<th>מספר</th>
+		<th>שם פרטי</th>
+		<th>שם משפחה</th>
+		<th>טלפון</th>
+		<th>כתובת</th>
+		<th>תחילת העסקה</th>
+		<th>סיום העסקה</th>
+		<th>הערות</th>
+		{% regroup employee_list by rank as rank_list %}
+		{% for rank in rank_list %}
+			<tr style="text-align:center; color:#4669D6; font-size:14px"><td colspan="10"><b>{{rank.grouper|default:"-- לא הוגדר דרג --"}}</b></td></tr>
+			{% for e in rank.list %}
+				<tr class="{% cycle 'row1' 'row2' %}" objid={{e.id}}>
+					<td><a href="/employees/{{e.id}}"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a></td>
+					<td>{{ e.id }}</td>
+					<td>{{ e.first_name }}</td>
+					<td>{{ e.last_name }}</td>
+					<td>{{ e.phone }}</td>
+					<td>{{ e.address }}</td>
+					<td>{{ e.work_start|date:"j/m/y" }}</td>
+					<td>{{ e.work_end|date:"j/m/y" }}</td>
+					<td>{{ e.remarks }}</td>
+				</tr>
+			{% endfor %}
+		{% endfor %}
+	</table>
+	<br><br>
+	<table id="nhemployee_table" class="dataTable" border="1">
+		<caption>מציג סה"כ {{nhemployee_list.count}} עובדים בנייס האוס</caption>
+		<th/>
+		<th>מספר</th>
+		<th>שם פרטי</th>
+		<th>שם משפחה</th>
+		<th>טלפון</th>
+		<th>כתובת</th>
+		<th>תחילת העסקה</th>
+		<th>סוג העסקה</th>
+		<th>הערות</th>
+		{% for nhbranch in nhbranch_list %}
+			<tr style="text-align:center; color:#4669D6; font-size:14px"><td colspan="10"><b>{{nhbranch}}</b></td></tr>
+			{% for e in nhbranch.nhemployees_archive %}
+				<tr class="{% cycle 'row1' 'row2' %}" objid={{e.id}}>
+					<td><a href="/nhemployees/{{e.id}}"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a></td>
+					<td>{{ e.id }}</td>
+					<td>{{ e.first_name }}</td>
+					<td>{{ e.last_name }}</td>
+					<td>{{ e.phone }}</td>
+					<td>{{ e.address }}</td>
+					<td>{{ e.work_start }}</td>
+					<td {% if e.employment_terms.hire_type.id == 1 %}style="color:#1AA337;"{%endif%}>
+					{{e.employment_terms.hire_type}}
+					{% if e.employment_terms.hire_type.id == 2 %} - {{e.employment_terms.salary_net|yesno:"נטו, ברוטו"}} {%endif%}
+					</td>
+					<td>{{ e.remarks }}</td>
+				</tr>
+			{% endfor %}
+		{% endfor %}
+	</table>
+{% endblock content %}

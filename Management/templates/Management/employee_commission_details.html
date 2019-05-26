@@ -1,0 +1,46 @@
+﻿{% extends "./template.html" %}
+{% load management_extras %}
+{% block page %}
+<div id="content">
+	<div class="title">
+		<div class="pageTitle">פירוט עמלות לעובד {{salary.employee}} לחודש {{salary.month}}/{{salary.year}}</div>
+	</div>
+	<div class="clearBoth"></div>
+	<table id="sales_table" class="dataTable" border="1">
+		<th>סוג עמלה</th>
+		<th>שווי עמלה</th>
+		<th>פירוט מכירות</th>
+		{% regroup salary.commission_details.all by sale.house.building.project as project_list %}
+		{% for pl in project_list %}
+			<tr>
+				<td colspan="3" style="text-align:center; background-color:#A9D0FF; font-weight:bold;">{{pl.grouper}}</td>
+			</tr>
+			{% regroup pl.list by commission as commission_list %}
+			{% for cl in commission_list %}
+			<tr>
+				<td>
+				{% if cl.grouper == "c_var" %}עמלה משתנה{% endif %}
+				{% if cl.grouper == "c_var_precentage" %}עמלה משתנה באחוזים{% endif %}
+				{% if cl.grouper == "c_by_price" %}עמלה לפי מחיר דירה{% endif %}
+				{% if cl.grouper == "b_discount_save" %}בונוס חסכון בהנחה{% endif %}
+				{% if cl.grouper == "b_discount_save_precentage" %}בונוס חסכון בהנחה באחוזים{% endif %}
+				{% if cl.grouper == "b_house_type" %}בונוס לסוג דירה{% endif %}
+				{% if cl.grouper == "b_sale_rate" %}בונוס קצב מכירות{% endif %}
+				</td>
+			</tr>
+			{% regroup cl.list by value as value_list %}
+			{% for v in value_list %}
+			<tr>
+				<td></td>
+				<td>{{v.grouper|commaise}} * {{v.list|length}}</td>
+				<td>
+				{% for scd in v.list %}
+					<a href="{{scd.sale.get_absolute_url}}" target="_parent">{{scd.sale.house.building.num}}/{{scd.sale.house.num}}</a> ,
+				{% endfor %}
+				</td>
+			{% endfor %}
+			{% endfor %}
+		{% endfor %}
+	</table>
+</div>
+{% endblock page %}

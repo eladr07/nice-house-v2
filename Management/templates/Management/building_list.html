@@ -1,0 +1,106 @@
+﻿{% extends "./template.html" %}
+{% block header %}
+<script>
+	var selectedID = 0;
+	var prev_class;
+	$(document).ready(function() {
+		$("tr").click(function() { 
+			var tr = $(this);
+			if (selectedID > 0)
+				$("tr[objid='"+selectedID+"']").attr("class", prev_class);
+			selectedID = tr.attr("objid");
+			if (!selectedID)
+				return;
+			prev_class = tr.attr("class");
+			tr.attr("class","selectedRow");
+			//sync links
+			if (selectedID > 0)
+			{
+				$("#buildingEdit").attr("href", "/buildings/" + selectedID);
+				$("#buildingCopy").attr("href", "/buildings/" + selectedID + "/copy");
+				$("#buildingDelete").attr("href", "/buildings/" + selectedID + "/del");
+			}
+		});
+		
+		$("#buildingDelete").click(function (event) {
+			event.preventDefault();
+			$.get($(this).attr("href"), function(data){
+				if (data == "ok")
+					location.reload(true);
+					parent.$("#fancy_close").click(function(event) {
+						parent.location.reload();
+					});	
+				});
+			});
+	});
+</script>
+{% endblock header %}
+{% block page %}
+<div id="content">
+	<div class="title">
+		<div class="pageTitle">פירוט בניינים - {{project}}</div>
+	</div>
+	<div class="someIcon" style="width:120px;">
+		<img src="/site_media/images/add_48.png" width="20" height="20"  alt="חדש" /> 
+		<a href="buildings/add" class="fancybox" >הוספת בניין חדש</a>
+	</div>
+	<div class="someIcon" style="width:120px;">
+		<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+		<a id="buildingEdit" class="fancybox" >שינוי פרטי בניין</a>
+	</div>
+	<div class="someIcon">
+		<img src="/site_media/images/add_48.png" width="20" height="20"  alt="שכפול" /> 
+		<a id="buildingCopy" class="fancybox">שכפול</a>
+	</div>
+	<div class="someIcon">
+		<img src="/site_media/images/delete_48.png" width="20" height="20"  alt="מחיקה" /> 
+		<a id="buildingDelete">מחיקה</a>
+	</div>
+	<div class="clearBoth"> </div>
+	<br /> 		
+		<table class="dataTable" border="1">
+			<tr>
+				<th></th>
+				<th>מס'</th>
+				<th>סוג</th>
+				<th>מס'<br>קומות</th>
+				<th>מס'<br>דירות</th>
+				<th>מס'<br>דירות<br>בהרשמה</th>
+				<th>מס'<br>דירות<br>בחוזים</th>
+				<th>מס'<br>דירות<br>פנויות</th>
+				<th>שלב</th>
+				<th>הערות</th>
+				<th>מחירון מעודכן</th>
+			</tr>
+			{% for b in buildings %}
+				<tr class="{% cycle 'row1' 'row2' %}" objid={{b.id}}>
+					<td><a href="/buildings/{{b.id}}"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a></td>
+					<td>{{ b.num }}</td>
+					<td>{{ b.type }}</td>
+					<td>{{ b.floors }}</td>
+					<td>{{ b.house_count }}</td>
+					<td>{{ b.houses.signed|length }}</td>
+					<td>{{ b.houses.sold|length }}</td>
+					<td>{{ b.houses.avalible|length }}</td>
+					<td>{{ b.stage }}</td>
+					<td>{{ b.remarks }}</td>
+					<td>
+					{% for t in b.pricelist_types %}
+						<a target="_parent" href="/buildings/{{b.id}}/pricelist/type{{t.id}}">{{t}}</a><br>
+					{% empty %}
+						<a target="_parent" href="/buildings/{{b.id}}/pricelist/type1">מחירון חברה</a>
+					{% endfor %}
+					</td>
+				</tr>
+			{% endfor %}
+			<tr class="row1">
+				<td colspan="4"></td>
+				<td><b>{{total_houses}} סה"כ</b></td>
+				<td><b>{{total_signed_houses}} סה"כ</b></td>
+				<td><b>{{total_sold_houses}} סה"כ</b></td>
+				<td><b>{{total_avalible_houses}} סה"כ</b></td>
+				<td colspan="3"></td>
+			</tr>
+		</table>
+</div>
+{% endblock page %}

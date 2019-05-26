@@ -1,0 +1,204 @@
+﻿{% extends "./base.html" %}
+{% load management_extras %}
+{% block header %}
+{{ block.super }}
+<script>
+	var selectedID = 0;
+	var prev_class;
+	$(document).ready(function() {
+		$("#salaryTable tr").click(function() { 
+			var tr = $(this);
+			if (selectedID > 0)
+				$("#salaryTable tr[employeeid='"+selectedID+"']").attr("class", prev_class);
+			selectedID = tr.attr("employeeid");
+			if (!selectedID)
+				return;
+			prev_class = tr.attr("class");
+			tr.attr("class","selectedRow");
+			//sync links
+			if (selectedID > 0)
+				$("#loanPay").attr("href", "/employees/" + selectedID + "/loanpay");
+				$("#loanAdd").attr("href", "/employees/" + selectedID + "/addloan");
+				$("#calcSalary").attr("href", "/employeesalaries/" + tr.attr("objid") + "/calc");
+				$("#approve").attr("href", "/employeesalaries/" + tr.attr("objid") + "/approve");
+				$("#edit").attr("href",  "/employeesalaries/" + tr.attr("objid"));
+			});
+		$(".fancybox").fancybox();
+		$("#loanPay, #loanAdd, #edit").click(function (event) {
+			if (!$(this).attr("href"))
+				alert("לא נבחר עובד");
+		});
+		$("#approve").click(function (event) {
+			event.preventDefault();
+			if (!$(this).attr("href"))
+				alert("לא נבחר עובד");
+			$.get($(this).attr("href"), function (data) {
+				if (data == 'ok')
+					alert('השכר אושר !');
+			});
+		});
+		$("#calcSalary").click(function(event) {
+			if (!confirm("האם אתה בטוח שברצונך לחשב את העמלות מחדש ?"))
+				event.preventDefault();
+		});
+	});
+</script>
+{% endblock header %}
+{% block content %}
+<div class="title">
+	<div class="pageTitle">
+		{% if employee %}
+ריכוז שכר לעובד כולל הוצאות מעביד תקופתי<br><a href="{{employee.get_absolute_url}}">{{employee}}</a>
+		{% endif %}
+	</div>
+</div>
+<div class="clearBoth"></div>
+<form method="GET">
+	<table class="dataTable" style="width: 70%;" border="1">
+		<tr class="row1">
+			<td colspan="6" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש</td>
+		</tr>
+		<tr class="row2">
+			{% for field in filterForm %}
+			<td>
+				{{ field.label_tag }} : 
+				{{ field }}
+			</td>
+			{% endfor %}
+			<td><input type="submit" value="חפש" class="button"/></td>
+		</tr>
+	</table>
+</form>
+<br>
+<div class="someIcon" style="width:100px;">
+	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="החזר הלוואה" /> 
+	<a id="loanAdd" class="fancybox">הלוואה חדשה</a>
+</div>
+<div class="someIcon" style="width:120px;">
+	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="החזר הלוואה" /> 
+	<a id="loanPay" class="fancybox">עדכון החזר הלוואה</a>
+</div>
+<div class="someIcon" style="width:170px;">
+	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+	<a id="edit" class="fancybox">שינוי מרכיבי שכר - חד פעמי</a>
+</div>
+<div class="someIcon"style="width:130px;">
+	<img src="/site_media/images/advanced-48.png" width="20" height="20"  alt="שליחה" /> 
+	<a id="calcSalary">חישוב עמלות מחדש</a>
+</div>
+<div class="someIcon" style="width:120px;">
+	<img src="/site_media/images/edit_48.png" width="20" height="20" /> 
+	<a id="approve" >אישור שכר לתשלום</a>
+</div>
+<div class="someIcon" style="width:100px;">
+	<img src="/site_media/images/edit_48.png" width="20" height="20" /> 
+	<a id="#" >תיק עובד</a>
+</div>
+<div class="someIcon" style="width:100px;">
+	<img src="/site_media/images/print-48.png" width="20" height="20"/> 
+	<a id="#" >שלח להנה"ח</a>
+</div>
+<div class="someIcon" style="width:100px;">
+	<img src="/site_media/images/print-48.png" width="20" height="20" /> 
+	<a href="/reports/employeesalary_season/{{employee.id}}/{{start.year}}/{{start.month}}/{{end.year}}/{{end.month}}" >גרסת הדפסה</a>
+</div>
+<div class="clearBoth"></div>
+<br>
+{% if salaries %}
+<table id="salaryTable" class="dataTable" border="1">
+<caption>מציג סה"כ {{salaries|length}} משכורות לעובד {{employee}}</caption>
+	<tr>
+		<th colspan="4">כללי</th>
+		<th colspan="3">תשלום נטו</th>
+		<th colspan="7">מיסי עובד לתשלום והפרשות</th>
+		<th colspan="4">הוצאות מעביד</th>
+		<th colspan="4">אסמכתאות ואישור</th>
+	</tr>
+	<tr>
+		<th>חודש</th>
+		<th>סוג <BR>העסקה</th>
+		<th>פרוייקט</th>
+		<th>מס'<BR>עסקאות</th>
+		<th>תלוש<BR>נטו</th>
+		<th>החזר<BR>הלוואה</th>
+		<th>שווי<BR>צ'ק</th>
+		<th>מס<BR>הכנסה</th>
+		<th>ביטוח<BR>לאומי</th>
+		<th>בריאות</th>
+		<th>ביטוח<BR>פנסיה</th>
+		<th>חופשה</th>
+		<th>דמי<BR>הבראה</th>
+		<th>סה"כ<BR>ברוטו<BR>לעובד</th>
+		<th>ביטוח<BR>לאומי<BR>מעביד</th>
+		<th>גמל<BR>מעביד</th>
+		<th>הפרשה<BR>לפיצויים</th>
+		<th>ברוטו<BR>כולל<BR>מעביד</th>
+		<th>נכוי מס<br>במקור</th>
+		<th>שווי<br>חשבונית</th>
+		<th>אישור</th>
+	</tr>
+	{% for s in salaries %}
+		{% if s.approved_date %}
+			<tr class="row5" objid={{s.id}} employeeid={{s.employee.id}}>
+		{% else %}
+			<tr class="{% cycle 'row1' 'row2' %}" objid={{s.id}} employeeid={{s.employee.id}}>
+		{% endif %}
+			<td>{{ s.month }}/{{ s.year }}</td>
+			<td>{{s.employee.employment_terms.hire_type}}</td>
+			<td>
+				{% for p in s.sales %}
+					<a href="{{p.get_absolute_url}}" target="_blank">{{p}}</a>
+					<a href="/reports/project_month/{{p.id}}/{{s.year}}/{{s.month}}">
+						<img src="/site_media/images/PDF-48.png" width="15" height="15"/>
+					</a>
+					<br>
+				{% endfor %}
+			</td>
+			<td>
+				{% for p,sales in s.sales.items %}
+					{{p}} - {{sales|length}}<br>
+				{% endfor %}
+				{% if s.sales|length %}
+					<a class="fancybox" href="{{s.employee.get_absolute_url}}/sales/{{s.year}}/{{s.month}}">פירוט</a>
+				{% endif %}
+			</td>
+			<td><a href="{{s.get_absolute_url}}/totaldetails" class="fancybox">{{s.neto|default_if_none:""|commaise}}</a></td>
+			<td>{{s.loan_pay|commaise}}</td>
+			<td><a href="{{s.get_absolute_url}}/checkdetails" class="fancybox">{{s.check_amount|default_if_none:""|commaise}}</a></td>
+			{% with s.expenses as e %}
+				<td>{{e.income_tax}}</td>
+				<td>{{e.national_insurance}}</td>
+				<td>{{e.health}}</td>
+				<td>{{e.pension_insurance}}</td>
+				<td>{{e.vacation}}</td>
+				<td>{{e.convalescence_pay}}</td>
+				<td style="background-color:#2990FF;">{{s.bruto|commaise|default_if_none:""}}</td>
+				<td>{{e.employer_national_insurance}}</td>
+				<td>{{e.employer_benefit}}</td>
+				<td>{{e.compensation_allocation}}</td>
+				<td style="background-color:#2990FF;">{{s.bruto_with_employer|commaise}}</td>
+				<td></td>
+				<td></td>
+				<td>
+					{% if e.approved_date %}
+						{{e.approved_date}}
+					{% else %}
+						<a href="{{e.id}}/approve">אשר</a>
+					{% endif %}
+				</td>
+			{% endwith %}
+		</tr>
+	{% endfor %}
+		<tr class="rowSum" height="30px">
+			<td colspan="4"></td>
+			<td>{{total_neto|commaise}}</td>
+			<td>{{total_loan_pay|commaise}}</td>
+			<td>{{total_check_amount|commaise}}</td>
+			<td colspan="6"></td>
+			<td>{{total_bruto|commaise}}</td>
+			<td colspan="3"></td>
+			<td>{{total_bruto_employer|commaise}}</td>
+		</tr>
+</table>
+{% endif %}
+{% endblock content %}

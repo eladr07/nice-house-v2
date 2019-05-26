@@ -1,0 +1,87 @@
+﻿{% extends "./template.html" %}
+{% load management_extras %}
+{% block header %}
+{{ block.super }}
+<script>
+	$(document).ready(function() {
+		$("a[id*='reject']").click(function(event) {
+			if (!confirm("האם אתה בטוח שברצונך לדחות את המכירה ?"))
+				event.preventDefault();
+		});
+		$("a[id*='cancel']").click(function(event) {
+			if (!confirm("האם אתה בטוח שברצונך לבטל את המכירה ?"))
+				event.preventDefault();
+		});
+	});
+</script>
+{% endblock header %}
+{% block page %}
+<div id="content">
+	<div class="title">
+		<div class="pageTitle">{{title}}</div>
+	</div>
+	<div class="clearBoth"></div>
+	<table id="sales_table" class="dataTable" border="1">
+		<caption>מציג סה"כ {{sales|length}} עסקאות</caption>
+		<th></th>
+		<th>מס"ד</th>
+		{% if sales.0.contract_num %}<th>מס' חוזה ש"ע</th>{% endif %}
+		<th>ת. חוזה</th>
+		<th style="width:150px;">שם הרוכשים</th>
+		<th>מס' בניין</th>
+		<th>מס' דירה</th>
+		<th>מחיר חוזה</th>
+		{% if sales.0.discount %}<th>% הנחה ניתן</th>{% endif %}
+		{% if sales.0.allowed_discount %}<th>% הנחה מותר</th>{% endif %}
+		<th>תיקונים</th>
+		<th>דחייה</th>
+		<th>ביטול</th>
+		{% for s in sales %}
+			<tr>
+				<td><a target="_parent" href="{{s.get_absolute_url}}"><img src="/site_media/images/documentinfo-48.png" width="15" height="15" alt="פרטים" border="0" /></a></td>
+				<td>{{s.id}}</td>
+				{% if s.contract_num %}<td>{{s.contract_num}}</td>{% endif%}
+				<td>{{s.sale_date|date:"j/m/Y"}}</td>
+				<td>{{s.clients}}</td>
+				{% with s.house.building as b %}
+				<td><a target="_parent" href="/buildings/{{b.id}}/pricelist/type1">{{s.house.building.num}}</a></td>
+				<td><a target="_parent" href="/buildings/{{b.id}}/house/{{s.house.id}}/type1">{{s.house.num}}</a></td>
+				{% endwith %}
+				<td>
+					{{s.price|commaise}}<br>
+					{{s.include_tax|yesno:"כולל מע\"מ, לא כולל מע\"מ"}}, 
+					{% if s.house.building.project.commissions.include_lawyer != None %}
+						{{s.price_include_lawyer|yesno:"כולל עו\"ד, לא כולל עו\"ד"}}
+					{% endif %}
+				</td>
+				{% if s.discount %}<td>{{s.discount}}%</td>{% endif %}
+				{% if s.allowed_discount %}<td>{{s.allowed_discount}}%</td>{% endif %}
+				<td>
+					{% if s.salepricemod %}
+						<a href="/salepricemod/{{s.salepricemod.id}}" target="_parent"><img src="/site_media/images/money-48.png" width="15" height="15" /></a>
+					{% endif %}
+					{% if s.salehousemod %}
+						<a href="/salehousemod/{{s.salehousemod.id}}" target="_parent"><img src="/site_media/images/home-48.png" width="15" height="15" /></a>
+					{% endif %}
+					{% if s.salepre %}
+						<a href="/salepre/{{s.salepre.id}}" target="_parent"><img src="/site_media/images/agt_forward-48.png" width="15" height="15" /></a>
+					{% endif %}
+					{% if s.salereject %}
+						<a href="/salereject/{{s.salereject.id}}" target="_parent"><img src="/site_media/images/agt_back-48.png" width="15" height="15" /></a>
+					{% endif %}
+					{% if s.salecancel %}
+						<a href="/salecancel/{{s.salecancel.id}}" target="_parent"><img src="/site_media/images/delete_48.png" width="15" height="15" /></a>
+					{% endif %}
+				</td>
+				<td><a id="reject{{s.id}}" href="/demands/{{s.demand.id}}/sale/{{s.id}}/reject" target="_parent"><img src="/site_media/images/agt_back-48.png" width="15" height="15" alt="דחייה" border="0" /></a></td>
+				<td><a id="cancel{{s.id}}" href="/demands/{{s.demand.id}}/sale/{{s.id}}/cancel" target="_parent"><img src="/site_media/images/delete_48.png" width="15" height="15" alt="דחייה" border="0" /></a></td>
+			</tr>
+		{% endfor %}
+		<tr class="sumRow">
+			<td colspan="5"></td>
+			<td><b>סה"כ מכירות</b></td>
+			<td colspan="2"><b>{{sales_amount|commaise}}</b></td>
+		</tr>
+	</table>
+</div>
+{% endblock page %}

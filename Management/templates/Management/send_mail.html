@@ -1,0 +1,29 @@
+﻿{% extends "./base.html" %}
+{% block header %}
+<script>
+	$(document).ready(function() {		
+		$("input[type!='submit']").attr("class", "inputText");
+		$("input[type='submit']").click(function (event) {
+			parent.$("#fancy_close").click(function(event) {
+					parent.location.reload();
+				});	
+			});
+	});
+</script>
+{% endblock header %}
+{% block content %}
+	<div class="title">
+		<div class="pageTitle">שליחת דואר אלקטרוני</div>
+	</div>
+	<div class="clearBoth"></div>
+
+	<form method="POST" enctype="multipart/form-data">
+		<table class="formTable">
+			{% include "Management/form_fields.html" %}
+			<tr>
+				<td></td>
+				<td><input class="button" type="submit" value="אישור"/></td>
+			</tr>
+		</table>
+	</form>
+{% endblock content %}

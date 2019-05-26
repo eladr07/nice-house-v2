@@ -1,0 +1,45 @@
+﻿{% extends "./template.html" %}
+{% load management_extras %}
+{% block page %}
+<div id="content">
+	<div class="title">
+		<div class="pageTitle">פירוט הלוואות - {{employee}}</div>
+	</div>
+	<div class="clearBoth"> </div>
+	<br>
+	<form method="POST">
+		<table class="dataTable" border="1">
+			<th></th>
+			<th>תאריך</th>
+			<th>פעולה</th>
+			<th>סך הלוואה</th>
+			<th>סך החזר</th>
+			<th>יתרה</th>
+			<th>מקוזז<br>מהשכר</th>
+			<th>הערות</th>
+		{% for o in employee.loans_and_pays %}
+			<tr class={% if o.pay_num %}"row1"{% else %}"row2"{% endif %}>
+				<td><a href="{{o.get_absolute_url}}"><img src="/site_media/images/documentinfo-48.png" width="15" height="15" alt="פרטים" border="0" /></a></td>
+				<td>{{o.month}}/{{o.year}}</td>
+				{% if o.pay_num %}
+					<td>הלוואה</td>
+					<td>{{o.amount|commaise}}</td>
+					<td></td>
+				{% else %}
+					<td>קיזוז</td>
+					<td></td>
+					<td>{{o.amount|commaise}}</td>
+				{% endif %}
+				<td>{{o.left|commaise}} ש"ח</td>
+				<td>{% if o.deduct_from_salary %} {{o.deduct_from_salary|yesno}} {% endif %}</td>
+				<td>{{o.remarks|default_if_none:""}}</td>
+			</tr>
+		{% empty %}
+			<tr>
+				<td colspan="5">אין לעובד הלוואות</td>
+			</tr>
+		{% endfor %}
+		</table>
+	</form>
+</div>
+{% endblock page %}

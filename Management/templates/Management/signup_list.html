@@ -1,0 +1,93 @@
+﻿{% extends "./base.html" %}
+{% load management_extras %}
+{% block header %}
+{{ block.super }}
+<script>
+	var selectedID = 0;
+	var prev_class;
+	$(document).ready(function() {
+		$("#signupTable tr").click(function() { 
+			var tr = $(this);
+			if (selectedID > 0)
+				$("#signupTable tr[objid='"+selectedID+"']").attr("class", prev_class);
+			selectedID = tr.attr("objid");
+			prev_class = tr.attr("class");
+			tr.attr("class","selectedRow");
+			//sync links
+			if (selectedID > 0)
+			{
+				$("#signupEdit").attr("href", selectedID);
+				$("#signupCancel").attr("href", selectedID + "/cancel");
+			}
+		});
+		$(".fancybox").fancybox();
+	});
+</script>
+{% endblock header %}
+{% block content %}
+	<div class="title">
+		<div class="pageTitle">
+			ריכוז הרשמות לחודש {{ month|date:"M Y" }}<br>
+			{{project}}
+		</div>
+	</div>
+	<div class="someIcon" style="width:100px;">
+		<img src="/site_media/images/add_48.png" width="20" height="20"  alt="חדש" /> 
+		<a href="add">הרשמה חדשה</a>
+	</div>
+	<div class="someIcon" style="width:120px;">
+		<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+		<a id="signupEdit">שינוי פרטי הרשמה</a>
+	</div>
+	<div class="someIcon" style="width:90px;">
+		<img src="/site_media/images/delete_48.png" width="20" height="20"  alt="מחיקה" /> 
+		<a id="signupCancel" class="fancybox">ביטול הרשמה</a>
+	</div>
+	<div class="clearBoth"></div>	
+	<br>	
+	<form method="GET">
+		<table class="dataTable" style="width: 30%;" border="1">
+			<tr class="row1">
+				<td colspan="3" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש</td>
+			</tr>
+			<tr class="row2">
+				{% for field in filterForm %}
+				<td>
+					{{ field.label_tag }} : 
+					{{ field }}
+				</td>
+				{% endfor %}
+				<td><input type="submit" value="חפש" class="button"/></td>
+			</tr>
+		</table>
+	</form>	
+<table id="signupTable" class="dataTable" border="1">
+<caption>מציג סה"כ {{signups|length}} הרשמות</caption>
+	<tr>
+		<th></th>
+		<th>תאריך הרשמה</th>
+		<th>שם הרוכשים</th>
+		<th>בניין</th>
+		<th>דירה</th>
+		<th>מחיר</th>
+		<th>ת.חוזה צפוי</th>
+		<th>ת.חוזה בפועל</th>
+		<th>ת.ביטול</th>
+		<th>סיבת ביטול</th>
+	</tr>
+    {% for s in signups %}
+    	<tr class="{% cycle 'row1' 'row2' %}" objid={{s.id}}>			
+			<td><a href="{{s.id}}"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a></td>
+			<td>{{ s.date }}</td>
+			<td>{{ s.clients }}</td>
+			<td>{{ s.house.building.num }}</td>
+			<td>{{ s.house.num }}</td>
+			<td>{{ s.price|commaise }}</td>
+			<td>{{ s.sale_date }}</td>
+			<td>{{ s.house.get_sale.sale_date }}</td>
+			<td>{{ s.cancel.date }}</td>
+			<td>{{ s.cancel.reason }}</td>
+		</tr>
+	{% endfor %}
+</table>
+{% endblock content %}

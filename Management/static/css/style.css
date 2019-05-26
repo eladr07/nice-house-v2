@@ -1,0 +1,445 @@
+BODY {
+	margin: 0;
+	padding: 0;
+	direction: rtl;
+	text-align: center;
+	font-size: 12px;
+	font-family: Arial;
+}
+
+.clearBoth {
+	clear: both;
+}
+
+.helpText {
+	color: #0344D4;
+	font-family: Tahoma; 
+	font-size: 11px; 	
+}
+
+.cardFieldset {
+	border: 1px solid #708090;
+	font-family: Tahoma; 
+	font-size: 12px; 
+	padding: 7px;
+	margin: 3px;
+}
+
+.cardFieldset legend {
+	font-weight: bold; 
+	font-family: Tahoma; 
+	font-size: 12px; 
+	color: #4682B4;
+}
+
+/*	
+	thePage class is the Div that contains all the body inside.
+	The menu, the content, the footer.. every thing.
+	It's good to use this kind of container cuz it's much easier to define the
+	the width of all the design, the white space of the side and etc.
+*/
+
+#thePage {
+	width: 95%;
+	margin: auto; /* centrilize the element.. in this case, all the child elements in the middle to0 */
+	height: 90%;
+	direction: rtl;
+	text-align: right;
+}
+
+#header {
+	border-bottom: 1px solid #D4D4D4; /* I added a bottom border to the element. */
+	text-align: left;
+}
+
+
+#header #Nice {
+	font-family: Tahoma;
+	color: #0065BD;
+	cursor: pointer; /* Defines the Cursor type when the mouse is over the object of that class.. in out design it's the NiceHouse title.. */
+	margin-bottom: 0px; /* I defined that the space between the bottom border and the element is zero pixels. */
+	font-size: 34px;
+}
+
+
+#header #House {
+	font-family: Tahoma;
+	color: #AFAFAF;
+	cursor: pointer; /* Defines the Cursor type when the mouse is over the object of that class.. in out design it's the NiceHouse title.. */
+	margin-bottom: 0px; /* I defined that the space between the bottom border and the element is zero pixels. */
+	font-size: 34px;
+}
+
+
+#menu {
+	background-color: #EFEFEF;
+	height: 21px;
+	border-bottom: 1px solid #D4D4D4;
+}
+
+
+#menu span {
+	color: #4F4F4F;
+}
+
+#menu #user {
+	float: left;
+	padding: 2px 0px 0px 8px;
+	font-size: 12px;
+	font-family: Tahoma;
+}
+
+#menu #nav {
+	padding: 2px 8px 0px 0px;
+	font-size: 12px;
+	font-family: Tahoma;
+	float: right;
+}
+
+#menu a, .dataTable a {
+	text-decoration: none;
+	font-size: 12px;
+	color: #0065BD;
+}
+
+
+#menu a:hover, .dataTable a:hover {
+	color: #AF0007;
+}
+
+
+#content {
+	border: 1px solid #D4D4D4;
+	background-color: #F5F5F5;
+	font-family: Tahoma;
+	font-size: 12px;
+	padding: 4px 4px 4px 4px;
+	direction: rtl;
+	text-align: right;
+}
+
+#content a {
+	color: #0065BD;
+}
+
+#content img {
+	border: 0;
+}
+
+#content li {
+	list-style-type	: circle;
+}
+
+#content ul {
+	margin-top : 1px;
+	margin-bottom : 1px;
+}
+
+#content a:hover {
+	color: #AF0007;
+}
+
+#content .inputText {
+	border: 1px solid #D4D4D4;
+	font-size: 12px;
+	font-family: Arial;
+}
+
+#content .button {
+	border: 1px solid #D4D4D4;
+	font-size: 12px;
+	font-family: Arial;
+	font-weight: bold;
+	color: #FF6633;
+	margin: 3px;
+}
+
+#content .button:hover {
+	border: 1px solid #0065BD;
+	color: #0065BD;
+}
+
+
+#content .title {
+	width: 100%;
+	height: 40px;
+	text-align: center
+}
+
+#content .titleIcon {
+	width: 48px; 
+	height: 48px; 
+	float: right;
+	padding-right: 10px;
+}
+
+#content .pageTitle {
+	float: right;
+	width: 100%;
+	font-size: 26px;
+	font-family: Tahoma;
+	padding-top: 2px;
+	padding-right: 10px;
+	color: #AF0007;
+}
+
+#content .subTitle {
+	width: 70%;
+	border: 1px solid #ADADAD;
+	border-bottom: 2px solid #ADADAD;
+	border-right: 2px solid #ADADAD;
+	font-size: 14px;
+	font-weight: bold;
+	background-color: #EFEFEF;
+	padding-right: 2px;	
+	color: #AF0007;
+}
+
+#content .listTitle {
+	width: 60%;
+	border: 1px solid #ADADAD;
+	border-bottom: 2px solid #ADADAD;
+	border-right: 2px solid #ADADAD;
+	cursor: pointer;
+	font-size: 12px;
+	font-weight: bold;
+	background-color: #C8D4F2;
+	padding-right: 2px;
+	margin : 2px;
+}
+
+#rightSide {
+	float: right;
+	width: 48%;
+}
+
+
+#leftSide {
+	float: left;
+	width: 48%;
+}
+
+.reportTable {
+	font-size: 12px;
+	padding: 4px 4px 4px 4px;
+	font-family: Tahoma;
+	border: 1px solid #000000;
+	border-collapse: collapse;
+	margin-right: 10px;
+	text-align: center;
+	width: 98%;
+}
+
+.reportTable th {
+	height: 21px;
+	font-size: 12px;
+	font-family: Arial;
+	border-bottom: 1px solid #000000;
+}
+
+.formTable {
+	font-size: 12px;
+	padding: 4px 4px 4px 4px;
+	font-family: Arial;
+}
+.formTable caption {
+	padding: 4px 4px 4px 4px;
+	font-size: 12px;
+	font-family: Arial;
+	font-weight: bold;
+}
+
+.dataTable {
+	font-size: 12px;
+	padding: 4px 4px 4px 4px;
+	font-family: Arial;
+	border: 1px solid #D4D4D4;
+	border-collapse: collapse;
+	margin-right: 10px;
+	width: 98%;
+}
+
+.dataTable caption {
+	color: #FFFFFF;
+	padding: 4px 4px 4px 4px;
+	background-color: #6696D5;
+	font-size: 14px;
+	font-family: Arial;
+	font-weight: bold;
+}
+
+.dataTable th {
+	height: 21px;
+	background: url(../images/gradiant.gif) repeat-x;
+	color: #FFFFFF;
+	font-size: 12px;
+	font-family: Arial;
+	border-bottom: 1px solid #9F9F9F;
+}
+
+
+.dataTable .rowSum td {
+	color: #CF2222;
+	font-size: 12px;
+	font-weight: bold;
+	font-family: Arial;
+	padding: 4px 4px 4px 4px;
+}
+
+.dataTable .rowSumGreen td {
+	color: #039E33;
+	font-size: 12px;
+	font-weight: bold;
+	font-family: Arial;
+	padding: 4px 4px 4px 4px;
+}
+.dataTable .rowSumBlue td {
+	color: #3C79FF;
+	font-size: 12px;
+	font-weight: bold;
+	font-family: Arial;
+	padding: 4px 4px 4px 4px;
+}
+.dataTable .rowSumRed td {
+	color: #FF3C3C;
+	font-size: 12px;
+	font-weight: bold;
+	font-family: Arial;
+	padding: 4px 4px 4px 4px;
+}
+.dataTable .rowTeal td {
+	color: #1C9AAD;
+	font-size: 12px;
+	font-weight: bold;
+	font-family: Arial;
+	padding: 4px 4px 4px 4px;
+}
+
+.dataTable .row1 td {
+	background-color: #EFEFEF;
+	color: #000;
+	font-size: 12px;
+	font-family: Arial;
+	padding: 4px 4px 4px 4px;
+}
+
+.dataTable .row2 td {
+	background-color: #FFFFFF;
+	color: #000;
+	font-size: 12px;
+	font-family: Arial;
+	padding: 4px 4px 4px 4px;
+}
+
+.dataTable .row3 td {
+	background-color: #F7E1AF;
+	color: #000;
+	font-size: 12px;
+	font-family: Arial;
+	padding: 4px 4px 4px 4px;
+}
+
+.dataTable .row4 td {
+	background-color: #B1CDFF;
+	color: #000;
+	font-size: 12px;
+	font-family: Arial;
+	padding: 4px 4px 4px 4px;
+}
+.dataTable .row5 td {
+	background-color: #9EE9C3;
+	color: #000;
+	font-size: 12px;
+	font-family: Arial;
+	padding: 4px 4px 4px 4px;
+}
+.dataTable .rowLightGreen td {
+	background-color: #98FFCE;
+	color: #000;
+	font-size: 12px;
+	font-family: Arial;
+	padding: 4px 4px 4px 4px;
+}
+.dataTable .rowLightBlue td {
+	background-color: #BED1F3;
+	color: #000;
+	font-size: 12px;
+	font-family: Arial;
+	padding: 4px 4px 4px 4px;
+}
+.dataTable .rowMediumBlue td {
+	background-color: #A5BEEC;
+	color: #000;
+	font-size: 12px;
+	font-family: Arial;
+	padding: 4px 4px 4px 4px;
+}
+.dataTable .rowBlue td {
+	background-color: #739DE6;
+	color: #000;
+	font-size: 12px;
+	font-family: Arial;
+	padding: 4px 4px 4px 4px;
+}
+
+.dataTable .selectedRow td {
+	background-color: #BCD9FF;
+	color: #000;
+	font-size: 12px;
+	font-family: Arial;
+	padding: 4px 4px 4px 4px;
+}
+
+.dataTable .deletedRow td {
+	background-color: #FAA99E;
+	color: #000;
+	font-size: 12px;
+	font-family: Arial;
+	padding: 4px 4px 4px 4px;
+}
+
+.someIcon {
+	background-color: #FAFAFA;
+	float: right;
+	border: 1px solid #ACACAC;
+	border-right: 2px solid #ACACAC;
+	border-bottom: 2px solid #ACACAC;
+	width: 65px;
+	margin-right: 10px;
+	cursor: pointer;
+	font-weight: bold;
+	font-size: 12px;
+	color: #708090;
+	font-family: Arial;
+}
+
+.someIcon a {
+	font-size: 12px;
+	color: #708090;
+	font-family: Arial;
+	text-decoration: none;
+}
+
+.someIcon a:hover {
+	color: #0065BD;
+	text-decoration: none;
+}
+
+.someIcon:hover {
+	color: #0065BD;
+	border: 1px solid #0065BD;
+	border-right: 2px solid #0065BD;
+	border-bottom: 2px solid #0065BD;
+}
+
+.someIcon img {
+	vertical-align: middle;
+}
+
+.someIcon span {
+	font-weight: bold;
+	font-size: 12px;
+	color: #708090;
+	font-family: Arial;
+}
+

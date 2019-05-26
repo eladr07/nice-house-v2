@@ -1,0 +1,79 @@
+﻿{% extends "./template.html" %}
+
+{% block header %}
+<script>
+	var selectedID = 0;
+	var prevClass;
+	$(document).ready(function () {
+		$("#remindersTable tr").click(function() {
+			var tr = $(this);
+			if (selectedID > 0)
+				$("#remindersTable > tr[objid='"+selectedID+"']").attr("class", prevClass);
+			selectedID = tr.attr("objid");
+			if (!selectedID) return;
+			prevClass = tr.attr("class");
+			tr.attr("class","selectedRow");
+			if (selectedID > 0)
+			{//sync links
+				$("#reminderEdit").attr("href", "reminder/" + selectedID);
+				$("#reminderDelete").attr("href", "/reminder/" + selectedID + "/del");
+				$("#reminderDo").attr("href", "/reminder/" + selectedID + "/do");
+			}
+		});
+		
+		$("#reminderDelete, #reminderDo").click(function (event) {
+			event.preventDefault();
+			$.get($(this).attr("href"), function(data){
+				if (data == "ok")
+					location.reload(true);
+					parent.$("#fancy_close").click(function(event) {
+						parent.location.reload();
+					});	
+				});
+			});
+		$("#reminderAdd").fancybox();
+	});
+</script>
+{% endblock header %}
+
+{% block page %}
+<div id="content">
+	<div class="title">
+		<div class="pageTitle">ניהול תזכורות</div>
+	</div>
+	<br /> 
+	<div class="someIcon">
+		<img src="/site_media/images/add_48.png" width="20" height="20"  alt="הוספה" /> 
+		<a id="reminderAdd" href="addreminder">הוספה</a>
+	</div>
+	<div class="someIcon">
+		<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="עריכה" /> 
+		<a id="reminderEdit">עריכה</a>
+	</div>
+	<div class="someIcon">
+		<img src="/site_media/images/delete_48.png" width="20" height="20"  alt="מחיקה" /> 
+		<a id="reminderDelete">מחיקה</a>
+	</div>	
+	<div class="someIcon">
+		<img src="/site_media/images/thumbs_up_48.png" width="20" height="20"  alt="בצע" /> 
+		<a id="reminderDo">בצע</a>
+	</div>
+	<div class="clearBoth"> </div>
+	<table id="remindersTable" class="dataTable" border="1">
+		<tr>
+			<th>מס"ד</th>
+			<th>תוכן</th>
+			<th>תאריך</th>
+			<th>סטטוס</th>
+		</tr>
+		{% for r in reminders.all %}
+			<tr class="{% cycle 'row1' 'row2' %}" objid={{r.id}}>
+				<td>{{ r.id }}</td>
+				<td>{{ r.content }}</td>
+				<td>{{ r.statuses.all.0.time }}</td>
+				<td>{{ r.statuses.latest }}</td>
+			</tr>
+		{% endfor %}
+	</table>
+</div>
+{% endblock page %}

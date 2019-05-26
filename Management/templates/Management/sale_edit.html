@@ -1,0 +1,403 @@
+﻿{% extends "./base.html" %}
+{% load management_extras %}
+{% block header %}
+{{ block.super }}
+<script>
+	var projectSelect;
+	var buildingSelect;
+	var houseSelect;
+	var employeeSelect;
+	var priceInput;
+	var priceIncludeLawyerChk;
+	var priceNoLawyerInput;
+	$(document).ready(function() {
+		$("input[type!='submit']").attr("class", "inputText");
+		$("select").attr("class", "inputText");
+		
+		projectSelect = $("#id_project");
+		buildingSelect = $("#id_building");
+		houseSelect = $("#id_house");
+		employeeSelect = $("#id_employee");
+		priceInput = $("#id_price");
+		priceIncludeLawyerChk = $("#id_price_include_lawyer");
+		priceNoLawyerInput = $("#id_price_no_lawyer");
+		
+		//add click event to projects select : use ajax to get related buildings and employees
+		projectSelect.change(onChangeProject);
+		//add click event to buildings select : use ajax to get related houses.
+		buildingSelect.change(onChangeBuilding);
+		houseSelect.change(showHouseDetails);
+		// add price manipulation events
+		priceInput.change(fillPriceNoLawyer);
+		priceIncludeLawyerChk.change(fillPriceNoLawyer);
+		
+		var selectedProject = projectSelect.val();
+		var selectedBuilding = buildingSelect.val();
+		$("#projectCard").attr("href", "/projects/" + selectedProject);
+		$("#buildingCard").attr("href", "/buildings/" + selectedBuilding + "/pricelist/type1");
+		showMonthSales();
+		showHouseDetails();
+	});
+	
+	function onChangeBuilding()
+	{
+		$("option[value!='']", houseSelect).remove();
+		var selectedBuilding = buildingSelect.val();
+		$("#buildingCard").attr("href", "/buildings/" + selectedBuilding + "/pricelist/type1");
+		$.getJSON("/xml/houses/" + selectedBuilding, onHouseDataArrived);
+	}
+	
+	function onChangeProject()
+	{
+		$("option[value!='']", buildingSelect).remove();
+		$("option[value!='']", houseSelect).remove();
+		$("option", employeeSelect).remove();
+		var selectedProject = projectSelect.val();
+		$("#projectCard").attr("href", "/projects/" + selectedProject);
+		$.getJSON("/xml/buildings/" + selectedProject, onBuildingDataArrived);
+		$.getJSON("/xml/employees/" + selectedProject, onEmployeeDataArrived);
+		showMonthSales();
+	}
+	
+	function onHouseDataArrived(data)
+	{				
+		for (i in data)
+		{
+			obj = data[i];
+			houseSelect.append("<option value='" + obj.pk + "'>" + obj.fields['num'] + "</option>");
+		}
+	}
+	
+	function onBuildingDataArrived(data)
+	{
+		for (i in data)
+		{
+			obj = data[i];
+			buildingSelect.append("<option value='" + obj.pk + "'>" + obj.fields['num'] + "</option>");
+		}
+		onChangeBuilding();
+	}
+	
+	function onEmployeeDataArrived(data)
+	{
+		for (i in data)
+		{
+			obj = data[i];
+			text = obj.fields['pid'] + " : " + obj.fields['first_name'] + " " + obj.fields['last_name'];
+			employeeSelect.append("<option value='" + obj.pk + "'>" + text + "</option>");
+		}
+		if (data.length == 1)
+			employeeSelect.attr("value", data[0].pk);	
+	}
+	
+	function showMonthSales()
+	{
+		var selectedProject = projectSelect.val();
+		$("#sales").empty();
+		$.get("/demand_sales/" + selectedProject + "/{{year}}/{{month}}", function(data){
+			$("#sales").append(data);
+		});
+	}
+	
+	function showHouseDetails()
+	{
+		$("#houseDetails").empty();
+		var selectedHouse = houseSelect.val();
+		$.get("/house_details/" + selectedHouse, function(data){
+			$("#houseDetails").append(data);
+		});
+	}
+	
+	function fillPriceNoLawyer()
+	{
+		var p = priceInput.val();
+		var include = priceIncludeLawyerChk.val();
+		
+		if (include == "True")
+			priceNoLawyerInput.attr("value", Math.round(p / 1.015));
+		else
+			priceNoLawyerInput.attr("value", p);
+	}
+</script>
+{% endblock header %}
+{% block content %}
+	<div class="title">
+		<div class="pageTitle">
+			{% if form.instance.id %}
+				עדכון מכירה מס' 
+				{{form.instance.id}} 
+				לחודש 
+				{{form.instance.demand.month}}/{{form.instance.demand.year}}
+			{% else %}
+				מכירה חדשה
+			{% endif %}
+		</div>
+		{% if form.instance.demand.was_sent %}
+		<i>לתשומת לבך, הדרישה כבר נשלחה ליזם! עדכון הבניין\הדירה\מחיר המכירה יוזן כתיקון דרישה</i>
+		{% endif %}
+	</div>
+	<br>
+	<div id="rightSide">
+		<form method="POST">
+		<table cellspacing="2" cellpadding="2" class="formTable">
+			<tr>
+				<th></th>
+				<td>{{form.id}}</td>
+			</tr>
+			<tr>
+				<th>{{ form.project.label_tag }}</th>
+				<td>
+					{{ form.project }}
+					{% if form.project.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.project.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+			<tr>
+				<th>{{ form.building.label_tag }}</th>
+				<td>
+					{{ form.building }}
+					{% if form.building.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.building.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{ form.house.label_tag }}</th>
+				<td>
+					{{ form.house }}
+					{% if form.house.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.house.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{ form.employee.label_tag }}</th>
+				<td>
+					{{ form.employee }}
+					{% if form.employee.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.employee.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{ form.joined_sale.label_tag }}</th>
+				<td>
+					{{ form.joined_sale }}
+					{% if form.joined_sale.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.joined_sale.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><u><b>נתוני מכירה</b></u></td>
+			</tr>
+			<tr>
+				<th>{{ form.clients.label_tag }}</th>
+				<td>
+					{{ form.clients }}
+					{% if form.clients.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.clients.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{ form.clients_phone.label_tag }}</th>
+				<td>
+					{{ form.clients_phone }}
+					{% if form.clients_phone.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.clients_phone.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{ form.sale_date.label_tag }}</th>
+				<td>
+					{{ form.sale_date }}
+					{% if form.sale_date.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.sale_date.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{ form.price.label_tag }}</th>
+				<td>
+					{{ form.price }}
+					{% if form.price.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.price.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{ form.min_price.label_tag }}</th>
+				<td>
+					{{ form.min_price }}
+					{% if form.min_price.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.min_price.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{ form.price_include_lawyer.label_tag }}</th>
+				<td>
+					{{ form.price_include_lawyer }}
+					{% if form.price_include_lawyer.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.price_include_lawyer.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{ form.price_no_lawyer.label_tag }}</th>
+				<td>
+					{{ form.price_no_lawyer }}
+					{% if form.price_no_lawyer.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.price_no_lawyer.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{ form.include_tax.label_tag }}</th>
+				<td>
+					{{ form.include_tax }}
+					{% if form.include_tax.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.include_tax.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><u><b>נתוני שיכון עובדים</b></u></td>
+			</tr>
+			<tr>
+				<th>{{ form.contract_num.label_tag }}</th>
+				<td>
+					{{ form.contract_num }}
+					{% if form.contract_num.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.contract_num.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{ form.discount.label_tag }}</th>
+				<td>
+					{{ form.discount }}
+					{% if form.discount.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.discount.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{ form.allowed_discount.label_tag }}</th>
+				<td>
+					{{ form.allowed_discount }}
+					{% if form.allowed_discount.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.allowed_discount.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><u><b>נתוני זילברמינץ</b></u></td>
+			</tr>
+			<tr>
+				<th>{{ form.company_price.label_tag }}</th>
+				<td>
+					{{ form.company_price }}
+					{% if form.company_price.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.company_price.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{ form.commission_madad_bi.label_tag }}</th>
+				<td>
+					{{ form.commission_madad_bi }}
+					{% if form.commission_madad_bi.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.commission_madad_bi.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{ form.include_registration.label_tag }}</th>
+				<td>
+					{{ form.include_registration }}
+					{% if form.include_registration.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.include_registration.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{ form.specification_expense.label_tag }}</th>
+				<td>
+					{{ form.specification_expense }}
+					{% if form.specification_expense.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.specification_expense.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{ form.other_expense.label_tag }}</th>
+				<td>
+					{{ form.other_expense }}
+					{% if form.other_expense.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.other_expense.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><u><b>נתוני מרום השרון</b></u></td>
+			</tr>
+			<tr>
+				<th>{{ form.signup_date.label_tag }}</th>
+				<td>
+					{{ form.signup_date }}
+					{% if form.signup_date.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.signup_date.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><u><b>נתונים נוספים</b></u></td>
+			</tr>
+			<tr>
+				<th>{{ form.remarks.label_tag }}</th>
+				<td>
+					{{ form.remarks }}
+					{% if form.remarks.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.remarks.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{ form.commission_include.label_tag }}</th>
+				<td>
+					{{ form.commission_include }}
+					{% if form.commission_include.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.commission_include.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+		</table>
+		<input name="addanother" type="submit" value="שמור והמשך בהזנה" class="button" />
+		<input name="todemand" type="submit" value="שמור וחזור לכרטיס הדרישה" class="button" />
+		</form>
+	</div>
+	<div id="leftSide">
+	{% if form.instance.id %}
+		{% with form.instance as s %}
+		<fieldset class="cardFieldset">
+		<legend>תיקונים למכירה</legend>
+			<ul>
+				{% if s.salepricemod %}
+					<li>המחיר שונה מ- 
+					{{s.salepricemod.old_price|commaise}} 
+					ל - 
+					<b>{{s.price|commaise}}</b>. 
+					<a href="{{ s.salepricemod.get_absolute_url }}">פרטים</a>
+					</li>
+				{% endif %}
+				{% if s.salehousemod %}
+					<li>הדירה  שונתה מבניין
+					<a href="/buildings/{{s.salehousemod.old_house.building.id}}/pricelist/type1">{{s.salehousemod.old_house.building.num}}</a>
+					 דירה 
+					<a href="/buildings/{{s.salehousemod.old_house.building.id}}/house/{{s.salehousemod.old_house.id}}/type1">{{s.salehousemod.old_house.num}}</a>			
+					 לבניין 
+					<a href="/buildings/{{s.house.building.id}}/pricelist/type1"><b>{{s.house.building.num}}</b></a>
+					 דירה 
+					<a href="/buildings/{{s.house.building.id}}/house/{{s.house.id}}/type1"><b>{{s.house.num}}</b></a>. 
+					<a href="{{ s.salehousemod.get_absolute_url }}">פרטים</a>
+					</li>
+				{% endif %}
+				{% if s.salepre %}
+					<li>המכירה הוקדמה לחודש זה. העובד יקבל תשלום בחודש
+					<b>{{s.salepre.employee_pay_month}}/{{s.salepre.employee_pay_year}}</b>. 
+					<a href="{{ s.salepre.get_absolute_url }}">פרטים</a>
+					</li>
+				{% endif %}
+				{% if s.salereject %}
+					<li>המכירה נדחתה לחודש
+					<b>{{s.salereject.to_month_month}}/{{s.salereject.to_month_year}}</b>
+					העובד יקבל תשלום בחודש
+					<b>{{s.salereject.employee_pay_month}}/{{s.salereject.employee_pay_year}}</b>. 
+					<a href="{{ s.salereject.get_absolute_url }}">פרטים</a>
+					</li>			
+				{% endif %}
+				{% if s.salecancel %}
+					<li>המכירה בוטלה. הקיזוז מהדרישה - 
+					<b>{{s.cancel.fee|commaise}}</b>
+					<a href="{{ s.salecancel.get_absolute_url }}">פרטים</a>
+					</li>			
+				{% endif %}
+			</ul>
+		</fieldset>
+		<br>
+		{% endwith %}
+	{% endif %}
+		<fieldset class="cardFieldset">
+		<legend>פרטי דירה</legend>
+			<div id="houseDetails"></div>
+		</fieldset>
+		<br>
+		<fieldset class="cardFieldset">
+		<legend>עסקאות לדרישה לתשלום לחודש {{month}}/{{year}}</legend>
+			<div id="sales"></div>
+		</fieldset>
+	</div>
+	<div class="clearBoth"></div> 
+{% endblock content %}

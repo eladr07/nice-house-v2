@@ -1,0 +1,95 @@
+﻿{% extends "./base.html" %}
+{% load management_extras %}
+{% block content %}
+<div class="title">
+	<div class="pageTitle">דוח רווח והפסד לחטיבה ללא מע"מ</div>
+</div>
+<div class="clearBoth"></div>
+<div style="float:right;width:70%;">
+	<form method="GET">
+		<table class="dataTable">
+			<tr class="row1">
+				<td colspan="6" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש תקופה</td>
+			</tr>
+			<tr class="row2">
+				{% for field in filterForm %}
+				<td>
+					{{ field.label_tag }} : 
+					{{ field }}
+				</td>
+				{% endfor %}
+				<td><input type="submit" value="חפש" class="button"/></td>
+			</tr>
+		</table>
+	</form>
+</div>
+<div class="clearBoth"></div>
+<div class="someIcon" style="width:100px;">
+	<img src="/site_media/images/print-48.png" width="20" height="20"  alt="הדפסה" /> 
+	<a href="#">גרסה להדפסה</a>
+</div>
+<div class="clearBoth"></div>
+<br>
+	{% for row in data %}
+		<h3 style="text-align:center; background-color:#FBFFD1;">{{row.division}}</h3>
+		<div style="float:right; width:45%;">
+			<table class="dataTable" border="1">
+				<caption>הכנסות</caption>
+				<th></th>
+				<th>פרוייקט</th>
+				<th>סכום</th>
+				<th>% מההכנסות</th>
+				{% for incomeRow in row.incomes %}
+					<tr class="{% cycle 'row1' 'row2' %}">
+						<td>
+							{% if incomeRow.details_link %} 
+								<a href={{incomeRow.details_link}} target="_blank"><img src="/site_media/images/viewmag-48.png" width="20" height="20"/></a> 
+							{%endif%}
+						</td>
+						<td>{{ incomeRow.name }}</td>
+						<td>{{ incomeRow.amount|commaise }}</td>
+						<td>{{ incomeRow.relative|floatformat:-2 }}</td>
+					</tr>
+				{% endfor %}
+			</table>
+		</div>
+		<div style="float:left; width:45%;">
+			<table class="dataTable" border="1">
+				<caption>הוצאות</caption>
+				<th></th>
+				<th>סוג הוצאה</th>
+				<th>סכום</th>
+				<th>% מההוצאות</th>
+				{% for lossRow in row.losses %}
+					<tr class="{% cycle 'row1' 'row2' %}">
+						<td>
+							{% if lossRow.details_link %} 
+								<a href={{lossRow.details_link}} target="_blank"><img src="/site_media/images/viewmag-48.png" width="20" height="20"/></a> 
+							{%endif%}
+						</td>
+						<td>{{ lossRow.name }}</td>
+						<td>{{ lossRow.amount|commaise }}</td>
+						<td>{{ lossRow.relative|floatformat:-2 }}</td>
+					</tr>
+				{% endfor %}
+			</table>
+		</div>
+		<div class="clearBoth"></div>
+		<h4 style="text-align:center; background-color:#96F2A4;">רווח - {{row.profit|commaise}} ש"ח</h4>
+		<br>
+	{% endfor %}
+	<table class="formTable" border="1">
+		<tr>
+			<th>סה"כ הכנסות</th>
+			<td>{{global_income|commaise}}</td>
+		</tr>
+		<tr>
+			<th>סה"כ הוצאות</th>
+			<td>{{global_loss|commaise}}</td>
+		</tr>
+		<tr>
+			<th>סה"כ רווח</th>
+			<td>{{global_profit|commaise}}</td>
+		</tr>
+	</table>
+{% endblock content %}

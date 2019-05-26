@@ -1,0 +1,238 @@
+﻿{% extends "./base.html" %}
+{% load management_extras %}
+{% block header %}
+{{ block.super }}
+<script>
+	$(document).ready(function() {		
+		$("input[type!='submit']").attr("class", "inputText");
+		$(".fancybox").fancybox();
+		$(".bigfancybox").fancybox({'frameWidth':800});
+	});
+</script>
+{% endblock header %}
+{% block content %}
+	<div class="title">
+		<div class="pageTitle">פרטי עסקת נייס האוס {{nhs.nhmonth.nhbranch.prefix}}-{{nhs.id}}</div>
+	</div>
+	<div style="float: right; width: 27%; margin-left: 10px;">
+		<fieldset class="cardFieldset">
+			<legend>פרטים כלליים</legend>
+			<table cellspacing="2" cellpadding="2" class="formTable">
+				<tr>
+					<th>סניף</th>
+					<td>{{nhs.nhmonth.nhbranch}}</td>
+				</tr>
+				<tr>
+					<th>חודש</th>
+					<td>{{nhs.nhmonth.month}}/{{nhs.nhmonth.year}}</td>
+				</tr>
+				<tr>
+					<th>מס' עסקה</th>
+					<td>{{nhs.num}}</td>
+				</tr>
+				<tr>
+					<th>כתובת</th>
+					<td>{{nhs.address}}</td>
+				</tr>
+				<tr>
+					<th>שכונה</th>
+					<td>{{nhs.hood}}</td>
+				</tr>
+				<tr>
+					<th>מס' חדרים</th>
+					<td>{{nhs.rooms}}</td>
+				</tr>
+				<tr>
+					<th>קומה</th>
+					<td>{{nhs.floor}}</td>
+				</tr>
+				<tr>
+					<th>סוג דירה</th>
+					<td>{{nhs.type}}</td>
+				</tr>
+				<tr>
+					<th>ת. מכירה</th>
+					<td>{{nhs.sale_date}}</td>
+				</tr>
+				<tr>
+					<th>מחיר</th>
+					<td>{{nhs.price|commaise}} ש"ח</td>
+				</tr>
+				<tr>
+					<th>הערות</th>
+					<td>{{nhs.remarks}}</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td><a href="edit" class="fancybox">עדכן</a></td>
+				</tr>
+			</table>
+		</fieldset><br>
+	</div>
+	{% for side in nhs.nhsaleside_set.all %}
+	<div style="float: right; width:33%; margin-left: 10px;">
+	<fieldset class="cardFieldset">
+		<legend>{% if forloop.first %}בעל הנכס\משכיר{% else%}רוכש\שוכר{% endif %}</legend>
+		<table cellspacing="2" cellpadding="2" class="formTable" >
+			<tr>
+				<th>סוג פעולה</th>
+				<td>{{side.sale_type}}</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><u><b>נתוני רוכשים</b></u></td>
+			</tr>
+			<tr>
+				<th>שם</th>
+				<td>{{side.name1}}</td>
+			</tr>
+			<tr>
+				<th>שם</th>
+				<td>{{side.name2}}</td>
+			</tr>
+			<tr>
+				<th>טלפון</th>
+				<td>{{side.phone1}}</td>
+			</tr>
+			<tr>
+				<th>טלפון</th>
+				<td>{{side.phone2}}</td>
+			</tr>
+			<tr>
+				<th>כתובת</th>
+				<td>{{side.address}}</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><u><b>נתוני חוזה</b></u></td>
+			</tr>
+			<tr>
+				<th>% עמלה חתום</th>
+				<td>{{side.signed_commission|floatformat:-2}}</td>
+			</tr>
+			<tr>
+				<th>% עמלה בפועל</th>
+				<td>{{side.actual_commission|floatformat:-2}}</td>
+			</tr>
+			<tr>
+				<th>עמלה</th>
+				<td>{{side.income|commaise}} ש"ח</td>
+			</tr>
+			<tr>
+				<th>עמלה נטו</th>
+				<td>{{side.net_income|commaise}} ש"ח</td>
+			</tr>
+			<tr>
+				<th>מס' הזמנת שרותי תיווך</th>
+				<td>{{side.voucher_num}}</td>
+			</tr>
+			<tr>
+				<th>ת. הוצאת הזמנה</th>
+				<td>{{side.voucher_date}}</td>
+			</tr>
+			<tr>
+				<th>מס' קבלה זמנית</th>
+				<td>{{side.temp_receipt_num}}</td>
+			</tr>
+			<tr>
+				<th>הערות עובדים</th>
+				<td>{{side.employee_remarks|default_if_none:""}}</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><u><b>נתוני עמלה עו"ד</b></u></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><u><b>נתוני עמלה לעובדים</b></u></td>
+			</tr>
+			<tr>
+				<th>עובד 1</th>
+				<td>
+					{{side.employee1}} - 
+					{{side.employee1_commission}}% - 
+					{{side.employee1_pay|commaise}} ש"ח
+				</td>
+			</tr>
+			<tr>
+				<th>עובד 2</th>
+				<td>
+					{% if side.employee2 %}
+						{{side.employee2}} - 
+						{{side.employee2_commission}}% - 
+						{{side.employee2_pay|commaise}} ש"ח
+					{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>עובד 3</th>
+				<td>
+					{% if side.employee3 %}
+						{{side.employee3}} - 
+						{{side.employee3_commission}}% - 
+						{{side.employee3_pay|commaise}} ש"ח
+					{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>גורם מפנה</th>
+				<td>
+					{% if side.director %}
+						{{side.director}} - 
+						{{side.director_commission}}% - 
+						{{side.director_pay|commaise}} ש"ח
+					{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>יועץ מחתים</th>
+				<td>
+					{% if side.signing_advisor %}
+						{{side.signing_advisor}}
+					{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>הערות</th>
+				<td>{{side.remarks}}</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><a href="/nhsaleside/{{side.id}}" class="fancybox">עדכן</a></td>
+			</tr>
+			<tr>
+				<th>חשבונית</th>
+				<td>
+				{% for i in side.invoices.all %}
+					{{i.num}} - {{i.amount|commaise}} ש"ח
+					<a href="/invoices/{{i.id}}">עדכן</a>
+					<br>
+				{% empty %}
+					לא הוזנה חשבונית<br>
+				{% endfor %}
+				<a href="/nhsaleside/{{side.id}}/invoice/add" class="fancybox">הזנת חשבונית</a>
+				</td>
+			</tr>
+			<tr>
+				<th>
+					{{side.payments.count}} 
+					תשלומים
+				</th>
+				<td></td>
+			</tr>
+			{% for p in side.payments.all %}
+				<tr>
+					<td>{{p.payment_date|date:"j/m/y"}} - {{p.amount|commaise}} ש"ח</td>
+					<td><a href="/payments/{{p.id}}">עדכן תשלום</a></td>
+				</tr>
+			{% endfor %}
+			<tr>
+				<td></td>
+				<td><a href="/nhsaleside/{{side.id}}/payment/add" class="fancybox">הוסף תשלום</a></td>
+			</tr>
+		</table>
+	</fieldset>
+	</div>
+	{% endfor %}
+	<div class="clearBoth"> </div>
+{% endblock content %}

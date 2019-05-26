@@ -1,0 +1,66 @@
+﻿{% extends "./base.html" %}
+{% block content %}
+	<div class="title">
+		<div class="pageTitle">
+			תיקון דרישה - מכירה מס' {{form.instance.sale.id}}
+		</div>
+	</div>
+	<div id="rightSide">
+		<fieldset class="cardFieldset">
+			<legend>פרטי מכירה</legend>
+			<table class="formTable">
+			{% with form.instance.sale as sale %}
+				<tr>
+					<th>דרישה מקורית</th>
+					<td><a href="{{sale.demand.get_absolute_url}}">{{sale.demand.id}}</a> - ({{sale.demand.month}} / {{sale.demand.year}})</td>
+				</tr>
+				<tr>
+					<th>שמות הרוכשים</th>
+					<td>{{sale.clients}}</td>
+				</tr>
+				<tr>
+					<th>טלפון הרוכשים</th>
+					<td>{{sale.clients_phone}}</td>
+				</tr>
+				<tr>
+					<th>תאריך חוזה</th>
+					<td>{{sale.sale_date|date:"j/m/Y"}}</td>
+				</tr>
+				<tr>
+					<th>מחיר חוזה</th>
+					<td>{{sale.price}} - {{sale.price_include_lawyer|yesno:"כולל עוד, לא כולל עוד"}}</td>
+				</tr>
+				<tr>
+					<th>הערות</th>
+					<td>{{sale.remarks}}</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td><a href="/sale/{{sale.id}}">לפרטים מלאים</a>
+				</tr>
+			{% endwith %}
+			</table>
+		</fieldset>
+		<fieldset class="cardFieldset">
+			<legend>פרטי השינוי</legend>
+			<table class="formTable">
+			<form method="POST">
+				{{form}}
+				<tr>
+					<td></td>
+					<td><input type="submit" value="אישור" class="button"/></td>
+				</tr>
+			</form>
+			</table>
+		</fieldset>
+	</div>
+	<div id="leftSide">
+		<fieldset class="cardFieldset">
+		<legend>פרטי דירה</legend>
+		{% with form.instance.sale.house as house %}
+			{% include "Management/house_details.html" %}
+		{% endwith %}
+		</fieldset>
+	</div>
+	<div class="clearBoth"></div> 
+{% endblock content %}

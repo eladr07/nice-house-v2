@@ -1,0 +1,206 @@
+﻿{% extends "./base.html" %}
+{% block header %}
+{{ block.super }}
+<script>
+	var projectSelect;
+	var buildingSelect;
+	var houseSelect;
+	var employeeSelect;
+	
+	$(document).ready(function() {
+		$("input[type!='submit']").attr("class", "inputText");
+		$("select").attr("class", "inputText");
+		
+		projectSelect = $("#id_project");
+		buildingSelect = $("#id_building");
+		houseSelect = $("#id_house");
+		employeeSelect = $("#id_employee");
+		
+		//add click event to projects select : use ajax to get related buildings and employees
+		projectSelect.change(onChangeProject);
+		//add click event to buildings select : use ajax to get related houses.
+		buildingSelect.change(onChangeBuilding);
+		houseSelect.change(showHouseDetails);;
+		
+		showHouseDetails();
+	});
+	
+	function onChangeBuilding()
+	{
+		$("option[value!='']", houseSelect).remove();
+		var selectedBuilding = buildingSelect.val();
+		$("#buildingCard").attr("href", "/buildings/" + selectedBuilding + "/pricelist/type1");
+		$.getJSON("/xml/houses/" + selectedBuilding, onHouseDataArrived);
+	}
+	
+	function onChangeProject()
+	{
+		$("option[value!='']", buildingSelect).remove();
+		$("option[value!='']", houseSelect).remove();
+		$("option", employeeSelect).remove();
+		var selectedProject = projectSelect.val();
+		$("#projectCard").attr("href", "/projects/" + selectedProject);
+		$.getJSON("/xml/buildings/" + selectedProject, onBuildingDataArrived);
+		$.getJSON("/xml/employees/" + selectedProject, onEmployeeDataArrived);
+	}
+	
+	function onHouseDataArrived(data)
+	{				
+		for (i in data)
+		{
+			obj = data[i];
+			houseSelect.append("<option value='" + obj.pk + "'>" + obj.fields['num'] + "</option>");
+		}
+	}
+	
+	function onBuildingDataArrived(data)
+	{
+		for (i in data)
+		{
+			obj = data[i];
+			buildingSelect.append("<option value='" + obj.pk + "'>" + obj.fields['num'] + "</option>");
+		}
+		onChangeBuilding();
+	}
+	
+	function onEmployeeDataArrived(data)
+	{
+		for (i in data)
+		{
+			obj = data[i];
+			text = obj.fields['pid'] + " : " + obj.fields['first_name'] + " " + obj.fields['last_name'];
+			employeeSelect.append("<option value='" + obj.pk + "'>" + text + "</option>");
+		}
+		if (data.length == 1)
+			employeeSelect.attr("value", data[0].pk);	
+	}
+	
+	function showHouseDetails()
+	{
+		$("#houseDetails").empty();
+		var selectedHouse = houseSelect.val();
+		$.get("/house_details/" + selectedHouse, function(data){
+			$("#houseDetails").append(data);
+		});
+	}
+</script>
+{% endblock header %}
+{% block content %}
+	<div class="title">
+		<div class="pageTitle">
+		{% if form.instance.id %}
+			שינוי פרטי הרשמה לדירה
+		{% else %}
+			הזנת הרשמה לדירה
+		{% endif %}
+		</div>
+	</div>
+	<div id="rightSide">
+		<form method="POST">
+		<table cellspacing="2" cellpadding="2" class="formTable">
+			<tr>
+				<th>{{ form.id.label_tag }}</th>
+				<td>
+					{{ form.id }}
+					{% if form.id.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.id.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{ form.project.label_tag }}</th>
+				<td>
+					{{ form.project }}
+					{% if form.project.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.project.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{ form.building.label_tag }}</th>
+				<td>
+					{{ form.building }}
+					{% if form.building.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.building.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{ form.house.label_tag }}</th>
+				<td>
+					{{ form.house }}
+					{% if form.house.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.house.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{ form.clients.label_tag }}</th>
+				<td>
+					{{ form.clients }}
+					{% if form.clients.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.clients.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{ form.clients_phone.label_tag }}</th>
+				<td>
+					{{ form.clients_phone }}
+					{% if form.clients_phone.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.clients_phone.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{ form.clients_address.label_tag }}</th>
+				<td>
+					{{ form.clients_address }}
+					{% if form.clients_address.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.clients_address.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{ form.date.label_tag }}</th>
+				<td>
+					{{ form.date }}
+					{% if form.date.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.date.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{ form.sale_date.label_tag }}</th>
+				<td>
+					{{ form.sale_date }}
+					{% if form.sale_date.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.sale_date.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{ form.price.label_tag }}</th>
+				<td>
+					{{ form.price }}
+					{% if form.price.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.price.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{ form.include_lawyer.label_tag }}</th>
+				<td>
+					{{ form.include_lawyer }}
+					{% if form.include_lawyer.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.include_lawyer.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{ form.remarks.label_tag }}</th>
+				<td>
+					{{ form.remarks }}
+					{% if form.remarks.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.remarks.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+		</table>
+		<input name="addanother" type="submit" value="שמור והמשך בהזנה" class="button" />
+		</form>
+	</div>
+	<div id="leftSide">
+		{% if form.instance.cancel %}
+			<fieldset class="cardFieldset">
+				<legend>פרטי ביטול הרשמה</legend>
+				ההרשמה בוטלה בתאריך
+				{{form.intance.cancel.date}}
+				עם הסיבה
+				{{form.intance.cancel.reason}}<br>
+				<a href="{{form.instance.id}}/cancel">פרטי ביטול הרשמה</a>
+			</fieldset>
+		{% endif %}
+		<fieldset class="cardFieldset">
+			<legend>פרטי דירה</legend>
+			<div id="houseDetails"></div>
+		</fieldset>
+	</div>
+	<div class="clearBoth"></div> 
+{% endblock content %}

@@ -1,0 +1,83 @@
+﻿{% extends "./base.html" %}
+{% load management_extras %}
+{% block header %}
+{{ block.super }}
+<script>
+	$(document).ready(function() {
+		$("#all-checkboxes").change(function() {
+			var value = $(this).attr("checked");
+			$("input[name^='salary-']").each(function (index, elem) {
+				$(elem).attr("checked", value);
+			});
+		});
+	});
+</script>
+{% endblock header %}
+{% block content %}
+<div class="title">
+	<div class="pageTitle">שכר להעברה בנקאית לחודש {{month|date:"M Y"}}</div>
+</div>
+<div class="clearBoth"></div>
+<form method="POST">
+	<table class="dataTable" style="width: 30%;" border="1">
+		<tr class="row1">
+			<td colspan="3" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש</td>
+		</tr>
+		<tr class="row2">
+			{% for field in filterForm %}
+			<td>
+				{{ field.label_tag }} : 
+				{{ field }}
+			</td>
+			{% endfor %}
+			<td><input type="submit" value="חפש" class="button" name="filter"/></td>
+		</tr>
+	</table>
+	<br>
+	<div class="clearBoth"></div>
+	<table id="salaryTable" class="dataTable" border="1">
+	<caption>מציג סה"כ {{salaries|length}} עובדים</caption>
+		<tr>
+			<th><input type="checkbox" id="all-checkboxes"/></th>
+			<th></th>
+			<th>מס<BR>העובד</th>
+			<th>שם<br>פרטי</th>
+			<th>שם<BR>משפחה</th>
+			<th>ת.ז</th>
+			<th>שם<br>המוטב</th>
+			<th>סכום<br>להעברה</th>
+			<th>מספר<br>חשבון</th>
+			<th>בנק</th>
+			<th>כתובת<br>סניף</th>
+			<th>מס'<br>סניף</th>
+			<th>הערות</th>
+		</tr>
+		{% regroup salaries by division as division_list %}
+		{% for division in division_list %}
+			<tr style="text-align:center; color:#4669D6; font-size:14px"><td colspan="10"><b>{{division.grouper}}</b></td></tr>
+			{% for salary in division.list %}
+				<tr class="{% cycle 'row1' 'row2' %}">
+				{% with salary.get_employee as e %}
+				{% with e.account as account %}
+					<td><input type="checkbox" name="salary-{{salary.id}}"/></td>
+					<td><a href="{{e.get_absolute_url}}"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a></td>
+					<td>{{ e.id }}</td>
+					<td>{{ e.first_name }}</td>
+					<td>{{ e.last_name }}</td>
+					<td>{{e.pid}}</td>
+					<td>{{e.payee}}</td>
+					<td>{{salary.neto|default_if_none:""|commaise}}</td>
+					<td>{{account.num}}</td>
+					<td>{{account.bank}}</td>
+					<td>{{account.branch}}</td>
+					<td>{{account.branch_num}}</td>
+					<td></td>
+				{% endwith %}
+				{% endwith %}
+				</tr>
+			{% endfor %}
+		{% endfor %}
+	</table>
+	<input type="submit" name="pdf" class="button" value="גרסת הדפסה">
+</form>
+{% endblock content %}

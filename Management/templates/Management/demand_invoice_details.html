@@ -1,0 +1,18 @@
+﻿{% load management_extras %}
+{% if invoices %}
+<table class="formTable">
+	<caption>חשבוניות שהוקלדו</caption>
+	<th>מס' חשבונית</th>
+	<th>ת. תשלום</th>
+	<th>סכום</th>
+	<th>הערות</th>
+	{% for i in invoices %}
+	<tr>
+		<td>{{i.num}}</td>
+		<td>{{i.date}}</td>
+		<td>{{i.amount|commaise}} ש"ח</td>
+		<td>{{i.remarks|default_if_none:""}}</td>
+	</tr>
+	{% endfor %}
+</table>
+{% endif %}

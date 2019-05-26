@@ -1,0 +1,132 @@
+﻿{% extends "./base.html" %}
+{% load management_extras %}
+{% block header %}
+{{ block.super }}
+<script>
+	$(document).ready(function() {
+		$("#monthClose").click(function(event) {
+			if (!confirm("האם אתה בטוח שברצונך לסגור את החודש ?"))
+				event.preventDefault();
+		});		
+	});
+</script>
+{% endblock header %}
+{% block content %}
+<div class="title">
+	<div class="pageTitle">דו"ח ריכוז הכנסות תקופתי<br>{{nhbranch}}</div>
+</div>
+<div class="clearBoth"></div>
+<div style="float:right;width:30%;">
+	<form method="GET">
+		<table class="dataTable">
+			<tr class="row1">
+				<td colspan="6" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש תקופה</td>
+			</tr>
+			<tr class="row2">
+				{% for field in filterForm %}
+				<td>
+					{{ field.label_tag }} : 
+					{{ field }}
+				</td>
+				{% endfor %}
+				<td><input type="submit" value="חפש" class="button"/></td>
+			</tr>
+		</table>
+	</form>
+</div>
+<div class="clearBoth"></div>
+<div class="someIcon" style="width:100px">
+	<img src="/site_media/images/print-48.png" width="20" height="20"  alt="הדפסה" /> 
+	<a href="#">גרסת הדפסה</a>
+</div>
+<div class="clearBoth"></div>	
+<table id="salesTable" class="dataTable" style="text-align:center;" border="1">
+<caption>מציג סה"כ {{nhmonths|length}} חודשים</caption>
+	<tr>
+		<th>חודש</th>
+		<th>PDF</th>
+		<th>מספר<br>עסקאות</th>
+		<th>% עמלה<br>חתום</th>
+		<th>% עמלה<br>בפועל</th>
+		<th>סה"כ<br>הכנסה</th>
+		<th>תשלום<br>לעו"ד</th>
+		<th>הכנסה<BR>נטו</th>
+		{% for nhe in employees %}
+		<th>{{nhe}}</th>
+		{% endfor %}
+		<th>סה"כ עמלות<br>סוכנים</th>
+		<th>הכנסה נטו בניכוי<br>עמלות סוכנים</th>
+	</tr>
+    {% for nhm in nhmonths %}
+		<tr class= {% if nhm.is_closed %} "rowLightBlue" {% else %} "{% cycle 'row1' 'row2' %}" {% endif %} objid={{s.id}}>
+			<td>{{nhm.month}}/{{nhm.year}}</a></td>
+			<td></td>
+			<td><a href="/nhbranch/{{nhm.nhbranch.id}}/sales/?year={{nhm.year}}&month={{nhm.month}}" target="_blank">{{nhm.nhsales.count}}</td>
+			<td>{{nhm.avg_signed_commission|floatformat:-2}}</td>
+			<td>{{nhm.avg_actual_commission|floatformat:-2}}</td>
+			<td>{{nhm.total_income|commaise}}</td>
+			<td>{{nhm.total_lawyer_pay|commaise}}</td>
+			<td>{{nhm.total_net_income|commaise}}</td>
+			{% for nhe in nhm.employees %}
+			<td>{{nhe.month_total|commaise}}</td>
+			{% endfor %}
+			<td>{{nhm.total_commission|commaise}} ({{nhm.commission_to_net_income_precentage|floatformat:-2}}%)</td>
+			<td>{{nhm.net_income_no_commission|commaise}}</td>
+		</tr>
+	{% endfor %}
+	<tr class="rowSumGreen">
+		<td colspan="2">סה"כ כולל מע"מ</td>
+		<td>{{totals.sale_count}}</td>
+		<td>{{avg.signed_commission|floatformat:-2}}</td>
+		<td>{{avg.actual_commission|floatformat:-2}}</td>
+		<td>{{totals.income|commaise}}</td>
+		<td></td>
+		<td>{{totals.net_income|commaise}}</td>
+		{% for nhe in employees %}
+		<td>{{nhe.season_total|commaise}}</td>
+		{% endfor %}
+		<td></td>
+		<td>{{totals.net_income_no_commission|commaise}}</td>
+	</tr>
+	<tr class="rowSum">
+		<td colspan="5">סה"כ ללא מע"מ</td>
+		<td>{{totals_notax.income|commaise}}</td>
+		<td></td>
+		<td>{{totals_notax.net_income|commaise}}</td>
+		{% for nhe in employees %}
+		<td>{{nhe.season_total_notax|commaise}}</td>
+		{% endfor %}
+		<td></td>
+		<td>{{totals_notax.net_income_no_commission|commaise}}</td>
+	</tr>
+	<tr class="rowSum">
+		<td colspan="5">סה"כ ללא מע"מ (ממוצע)</td>
+		<td>{{avg_notax.income|commaise}}</td>
+		<td></td>
+		<td>{{avg_notax.net_income|commaise}}</td>
+		{% for nhe in employees %}
+		<td>{{nhe.season_avg_notax|commaise}}</td>
+		{% endfor %}	
+		<td></td>
+		<td>{{avg_notax.net_income_no_commission|commaise}}</td>
+	</tr>
+	<tr class="rowSumGreen">
+		<td colspan="8">סה"כ יצור הכנסה לפי סוכן לסניף ממוכרים ללא מע"מ</td>
+		{% for nhe in employees %}
+		<td>{{nhe.season_branch_income_sellers_notax|commaise}} ({{nhe.season_branch_income_sellers_ratio_notax|floatformat:-2}}%)</td>
+		{% endfor %}		
+	</tr>
+	<tr class="rowSumGreen">
+		<td colspan="8">סה"כ יצור הכנסה לפי סוכן לסניף מקונים ללא מע"מ</td>
+		{% for nhe in employees %}
+		<td>{{nhe.season_branch_income_buyers_notax|commaise}} ({{nhe.season_branch_income_buyers_ratio_notax|floatformat:-2}}%)</td>
+		{% endfor %}		
+	</tr>
+	<tr class="rowSumGreen">
+		<td colspan="8">סה"כ יצור הכנסה לפי סוכן לסניף ללא מע"מ</td>
+		{% for nhe in employees %}
+		<td>{{nhe.season_branch_income_notax|commaise}} ({{nhe.season_branch_income_ratio_notax|floatformat:-2}}%)</td>
+		{% endfor %}		
+	</tr>
+</table>
+{% endblock content %}

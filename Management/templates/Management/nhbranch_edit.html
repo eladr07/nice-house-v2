@@ -1,0 +1,55 @@
+﻿{% extends "./base.html" %}
+{% block header %}
+{{ block.super }}
+<script>
+	$(document).ready(function() {		
+		$("input[type!='submit']").attr("class", "inputText");
+		//add fancybox
+		$(".fancybox").fancybox();
+	});
+</script>
+{% endblock header %}
+{% block content %}
+<div class="title">
+{% if form.instance.id %}
+	<div class="pageTitle">{{form.instance.name}}</div>
+{% else %}
+	<div class="pageTitle">פתיחת סניף נייס האוס</div>
+{% endif %}
+</div>
+<div class="clearBoth"></div>
+<div id="rightSide">
+	<form method="POST">
+		<table class="formTable" cellspacing="5" align="center">
+		{% for field in form %}
+		<tr>
+			<th>{{field.label_tag}}</th>
+			<td>
+				{{field}}
+				{% if field.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{field.errors|join:""}}'/>{% endif %}
+			</td>
+		</tr>
+		{% endfor %}
+		<tr>
+			<td></td>
+			<td><input name="finish" type="submit" value="אישור" class="button"/></td>
+		</tr>
+		</table>
+	</form>
+</div>
+<div id="leftSide">
+	<fieldset class="cardFieldset">
+		<legend>יועצי נדל"ן</legend>
+		<table style="width:90%;">
+			{% for nhbe in form.instance.active_nhbranchemployees %}
+			<tr>
+				<td><a href="{{nhbe.nhemployee.get_absolute_url}}">{{nhbe.nhemployee}}</a></td>
+				<td><a href="{{nhbe.get_absolute_url}}" class="fancybox">סיים העסקה בסניף</a></td>
+			</tr>
+		{% endfor %}
+		</table>
+		<a href="addnhemployee" class="fancybox">הוסף עובד לסניף</a>
+	</fieldset>
+</div>
+<div class="clearBoth"></div>
+{% endblock content%}

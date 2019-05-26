@@ -1,0 +1,116 @@
+﻿{% extends "./base.html" %}
+
+{% block header %}
+<script>
+var selectedID = 0;
+var prevClass;
+$(document).ready(function () {
+	$("#attachmentTable tr").click(function() {
+		var tr = $(this);
+		if (selectedID > 0)
+			$("#attachmentTable tr[objid='"+selectedID+"']").attr("class", prevClass);
+		selectedID = tr.attr("objid");
+		if (!selectedID) return;
+		prevClass = tr.attr("class");
+		tr.attr("class","selectedRow");
+		if (selectedID > 0)
+		{//sync links
+			$("#attachmentEdit").attr("href", "/attachment/" + selectedID);
+			$("#attachmentDelete").attr("href", "/attachment/" + selectedID + "/del");
+		}
+	});
+});
+</script>
+{% endblock header %}
+{% block content %}
+	<div class="title">
+		<div class="pageTitle">ארכיב מסמכים</div>
+	</div>
+	<div class="someIcon">
+		<img src="/site_media/images/add_48.png" width="20" height="20"  alt="חדש" /> 
+		<a href="/attachment/add">חדש</a>
+	</div>
+	<div class="someIcon">
+		<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+		<a id="attachmentEdit" class="fancybox" >שינוי</a>
+	</div>
+	<div class="someIcon">
+		<img src="/site_media/images/delete_48.png" width="20" height="20"  alt="מחיקה" /> 
+		<a id="attachmentDelete">מחיקה</a>
+	</div>
+	<div class="clearBoth"> </div>
+	<br>
+<div style="float:right;width:27%;">
+	<form method="GET">
+		<table class="dataTable">
+			<tr class="row1">
+				<td colspan="{{project_select_form.fields|length|add:'1'}}" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש לפי פרוייקט</td>
+			</tr>
+			<tr class="row2">
+				{% with project_select_form as form %}
+					{% include "Management/filter_form_fields.html" %}
+				{% endwith %}
+				<td><input name="project" type="submit" value="חפש" class="button"/></td>
+			</tr>
+		</table>
+	</form>
+</div>
+<div style="float:right;width:27%;">
+	<form method="GET">
+		<table class="dataTable">
+			<tr class="row1">
+				<td colspan="{{employee_select_form.fields|length|add:'1'}}" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש לפי עובד</td>
+			</tr>
+			<tr class="row2">
+				{% with employee_select_form as form %}
+					{% include "Management/filter_form_fields.html" %}
+				{% endwith %}
+				<td><input name="employee" type="submit" value="חפש" class="button"/></td>
+			</tr>
+		</table>
+	</form>
+</div>
+<div style="float:right;width:27%;">
+	<form method="GET">
+		<table class="dataTable">
+			<tr class="row1">
+				<td colspan="{{demand_select_form.fields|length|add:'1'}}" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש לפי דרישה</td>
+			</tr>
+			<tr class="row2">
+				{% with demand_select_form as form %}
+					{% include "Management/filter_form_fields.html" %}
+				{% endwith %}
+				<td><input name="demand" type="submit" value="חפש" class="button"/></td>
+			</tr>
+		</table>
+	</form>
+</div>
+	<div class="clearBoth"> </div>
+<br>
+	<table id="attachmentTable" class="dataTable" border="1">
+		<tr>
+			<th></th>
+			<th>תאריך הוספה</th>
+			<th>משתמש מוסיף</th>
+			<th>שם</th>
+			<th>גודל</th>
+			<th>תגיות</th>
+			<th>מצורף ל-</th>
+		</tr>
+		{% for a in attachments %}
+			<tr class="{% cycle 'row1' 'row2' %}" objid={{a.id}}>
+				<td><a href="{{a.id}}"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a></td>
+				<td>{{ a.add_time }}</td>
+				<td>{{ a.user_added }}</td>
+				<td><a href="{{a.file.url}}" target="_blank">{{ a.file.name }}</a></td>
+				<td>{{a.file.size|filesizeformat}}</td>
+				<td>{{a.tags.all|join:", "}}</td>
+				<td>
+					{% with a.get_related_object as related_object %}
+						<a href="{{related_object.get_absolute_url}}" target="_blank">{{related_object}}</a>
+					{% endwith %}
+				</td>
+			</tr>
+		{% endfor %}
+	</table>
+{% endblock content %}

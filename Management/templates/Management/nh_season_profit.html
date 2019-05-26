@@ -1,0 +1,89 @@
+﻿{% extends "./base.html" %}
+{% load management_extras %}
+{% block header %}
+{{ block.super }}
+<script>
+	$(document).ready(function() {
+		$("#monthClose").click(function(event) {
+			if (!confirm("האם אתה בטוח שברצונך לסגור את החודש ?"))
+				event.preventDefault();
+		});		
+	});
+</script>
+{% endblock header %}
+{% block content %}
+<div class="title">
+	<div class="pageTitle">דו"ח רווח והפסד {{nhbranch}} : {{from_month}}/{{from_year}} - {{to_month}}/{{to_year}}</div>
+</div>
+<div class="clearBoth"></div>
+<div style="float:right;width:30%;">
+	<form method="GET">
+		<table class="dataTable">
+			<tr class="row1">
+				<td colspan="6" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש תקופה</td>
+			</tr>
+			<tr class="row2">
+				{% for field in filterForm %}
+				<td>
+					{{ field.label_tag }} : 
+					{{ field }}
+				</td>
+				{% endfor %}
+				<td><input type="submit" value="חפש" class="button"/></td>
+			</tr>
+		</table>
+	</form>
+</div>
+<div class="clearBoth"></div>
+<div class="someIcon" style="width:100px">
+	<img src="/site_media/images/print-48.png" width="20" height="20"  alt="הדפסה" /> 
+	<a href="#">גרסת הדפסה</a>
+</div>
+<div class="clearBoth"></div>	
+<table id="salesTable" class="dataTable" style="text-align:center;" border="1">
+<caption>מציג סה"כ {{months|length}} חודשים</caption>
+	<tr>
+		<th>חודש</th>
+		<th>שם הסניף</th>
+		<th>מספר<br>עסקאות</th>
+		<th>שווי מכירות<br>ללא מע"מ</th>
+		<th>סה"כ הכנסות<br>ללא מע"מ</th>
+		<th>הוצאות<br>עו"ד</th>
+		<th>סה"כ הכנסה<br>נטו</th>
+		<th>% ממחזור<br>לתקופה</th>
+		<th>הוצאות<br>שכר</th>
+		<th>הוצאות<br>אחרות</th>
+		<th>רווח<br>לחודש</th>
+		<th>% רווח<br>לתקופה</th>
+		<th>הערות</th>
+	</tr>
+    {% for month in months %}
+		<tr class="{% cycle 'row1' 'row2' %}">
+			<td>{{month.nhmonth.month}}/{{month.nhmonth.year}}</a></td>
+			<td>{{month.nhmonth.nhbranch}}</td>
+			<td><a target="_blank" href="/nhbranch/{{month.nhmonth.nhbranch.id}}/sales/?year={{month.nhmonth.year}}&month={{month.nhmonth.month}}">{{month.sales_count}}</a></td>
+			<td>{{month.sales_worth_no_tax|commaise}}</td>
+			<td>{{month.income_no_tax|commaise}}</td>
+			<td>{{month.lawyers_pay|commaise}}</td>
+			<td>{{month.net_income_no_tax|commaise}}</td>
+			<td>{{month.relative_net_income|floatformat:-2}}</td>
+			<td><a target="_blank" href="/nhemployeesalaries/?year={{month.nhmonth.year}}&month={{month.nhmonth.month}}">{{month.salary_expenses|commaise}}</a></td>
+			<td></td>
+			<td>{{month.profit|commaise}}</td>
+			<td>{{month.relative_profit|floatformat:-2}}</td>
+			<td></td>
+		</tr>
+	{% endfor %}
+	<tr class="rowSum">
+		<td colspan="3">סה"כ</td>
+		<td>{{totals.sales_worth_no_tax|commaise}}</td>
+		<td>{{totals.income_no_tax|commaise}}</td>
+		<td>{{totals.lawyers_pay|commaise}}</td>
+		<td>{{totals.net_income_no_tax|commaise}}</td>
+		<td></td>
+		<td>{{totals.salary_expenses|commaise}}</td>
+		<td></td>
+		<td>{{totals.profit|commaise}}</td>
+	</tr>
+</table>
+{% endblock content %}

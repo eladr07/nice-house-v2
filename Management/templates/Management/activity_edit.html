@@ -1,0 +1,64 @@
+﻿{% extends "./base.html" %}
+{% load management_extras %}
+{% block header %}	
+{{ block.super }}
+<script>
+	var projectSelect;
+	var employeeSelect;
+	$(document).ready(function() {
+		$("input[type!='submit']").attr("class", "inputText");
+		$("select").attr("class", "inputText");
+		
+		projectSelect = $("#id_project");
+		employeeSelect = $("#id_employee");
+		
+		//add click event to projects select : use ajax to get related buildings and employees
+		projectSelect.change(onChangeProject);
+	});
+		
+	function onChangeProject()
+	{
+		$("option", employeeSelect).remove();
+		var selectedProject = projectSelect.val();
+
+		$.getJSON("/xml/employees/" + selectedProject, onEmployeeDataArrived);
+	}
+	
+	function onEmployeeDataArrived(data)
+	{
+		for (i in data)
+		{
+			obj = data[i];
+			text = obj.fields['pid'] + " : " + obj.fields['first_name'] + " " + obj.fields['last_name'];
+			employeeSelect.append("<option value='" + obj.pk + "'>" + text + "</option>");
+		}
+		if (data.length == 1)
+			employeeSelect.attr("value", data[0].pk);
+	}
+</script>
+{% endblock header %}
+{% block content %}	
+<div class="title">
+	<div class="pageTitle">דו"ח פעילות לאתר</div>	
+</div>
+<form method="POST">
+	<table cellspacing="2" cellpadding="2" class="formTable">
+	{% for field in form %}
+		<tr>
+			<th>{{ field.label_tag }}</th>
+			<td>
+				{{field}}
+				{% if field.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{field.errors|join:""}}'/>{% endif %}
+			</td>
+		</tr>
+	{% endfor %}
+	<tr>
+		<td></td>
+		<td>
+			<input type="submit" value="אישור" class="button"/>
+			<input name="addanother" type="submit" value="אישור והמשך הזנה" class="button"/>
+		</td>
+	</tr>
+</table>
+</form>
+{% endblock content %}

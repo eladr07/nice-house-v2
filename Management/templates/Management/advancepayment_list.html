@@ -1,0 +1,64 @@
+﻿{% extends "./base.html" %}
+{% block header %}
+{{ block.super }}
+<script>
+	var selectedID = 0;
+	var prev_class;
+	$(document).ready(function() {
+		$("tr").click(function() { 
+			var tr = $(this);
+			if (selectedID > 0)
+				$("tr[objid='"+selectedID+"']").attr("class", prev_class);
+			selectedID = tr.attr("objid");
+			if (!selectedID)
+				return;
+			prev_class = tr.attr("class");
+			tr.attr("class","selectedRow");
+			//sync links
+			if (selectedID > 0)
+			{
+				$("#apEdit").attr("href", "/advancepayments/" + selectedID);
+				$("#apToLoan").attr("href", "/advancepayments/" + selectedID + "/toloan");
+				$("#apDelete").attr("href", "/advancepayments/" + selectedID + "/del");
+			}
+		});
+		//add fancybox
+		$(".fancybox").fancybox();
+	});
+</script>
+{% endblock header %}
+{% block content %}
+	<div class="title">
+		<div class="pageTitle">ריכוז מקדמות שלא שולמו לעובדים</div>
+	</div>
+	<div class="someIcon">
+		<img src="/site_media/images/add_48.png" width="20" height="20"  alt="חדש" /> 
+		<a href="/advancepayments/add" class="fancybox" >חדש</a>
+	</div>
+	<div class="someIcon">
+		<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+		<a id="apEdit" class="fancybox" >שינוי</a>
+	</div>
+	<div class="someIcon" style="width:95px;">
+		<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="הפוך להלוואה" /> 
+		<a id="apToLoan" class="fancybox">הפוך להלוואה</a>
+	</div>
+	<div class="someIcon">
+		<img src="/site_media/images/delete_48.png" width="20" height="20"  alt="מחיקה" /> 
+		<a id="apDelete">מחיקה</a>
+	</div>
+	<div class="clearBoth"> </div>
+	<br /> 		
+	<table class="dataTable" border="1">
+		<th>שם העובד</th>
+		<th>תאריך המקדמה</th>
+		<th>סכום המקדמה</th>
+		{% for ap in object_list %}
+			<tr class="{% cycle 'row1' 'row2' %}" objid={{ap.id}}>
+				<td><a href="/employees/{{ ap.employee.id }}">{{ ap.employee }}</td>
+				<td>{{ap.date}}</td>
+				<td>{{ap.amount}}</td>
+			</tr>
+		{% endfor %}
+	</table>
+{% endblock content %}

@@ -1,0 +1,172 @@
+﻿{% extends "./template.html" %}
+{% block header %}
+<script>
+	$(document).ready(function() {		
+		$("input[type!='submit']").attr("class", "inputText");
+		$("input[type='submit']").click(function (event) {
+			parent.$("#fancy_close").click(function(event) {
+					parent.location.reload();
+				});	
+			});
+		var neto = {{neto}};
+		var fields1 = new Array("income_tax","national_insurance","health"," pension_insurance","vacation","convalescence_pay");
+		var fields2 = new Array("income_tax","national_insurance","health"," pension_insurance","vacation","convalescence_pay",
+			"employer_national_insurance","employer_benefit","compensation_allocation");
+		var fields3 = new Array("income_tax","national_insurance","health"," pension_insurance");
+		for (var i=0;i<fields1.length; i++)
+		{
+			id = "#id_" + fields1[i];
+			$(id).change(function () {
+				var amount = neto;
+				for (var j=0; j<fields1.length; j++)
+				{
+					var id2 = "#id_" + fields1[j];
+					var val = parseInt($(id2).val());
+					if (val)
+						amount += val;
+				}
+				$("#bruto").text(amount);
+			});
+		}
+		for (var i=0;i<fields2.length; i++)
+		{
+			id = "#id_" + fields2[i];
+			$(id).change(function () {
+				var amount = neto;
+				for (var j=0; j<fields2.length; j++)
+				{
+					var id2 = "#id_" + fields2[j];
+					var val = parseInt($(id2).val());
+					if (val)
+						amount += val;
+				}
+				$("#bruto_with_employer").text(amount);
+			});
+		}
+		for (var i=0;i<fields3.length; i++)
+		{
+			id = "#id_" + fields3[i];
+			$(id).change(function () {
+				var amount = neto;
+				for (var j=0; j<fields3.length; j++)
+				{
+					var id2 = "#id_" + fields3[j];
+					var val = parseInt($(id2).val());
+					if (val)
+						amount += val;
+				}
+				amount = parseInt(amount * (8 + 1/3) / 100);
+				$("#id_compensation_allocation").attr("value", amount);
+			});
+		}
+	});
+</script>
+{% endblock header %}
+{% block page %}
+<div id="content">	
+	<div class="title">
+		<div class="pageTitle">{% if form.instance.id %}עדכון הוצאות שכר{% else %}הזנת הוצאות שכר{% endif %}</div>
+	</div>
+	<div class="clearBoth"></div>
+	<form method="POST" enctype="multipart/form-data">
+		<table class="formTable">
+			<tr>
+				<th>{{form.employee.label_tag}}</th>
+				<td>
+					{{form.employee}}
+					{% if form.employee.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.employee.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{form.month.label_tag}}</th>
+				<td>
+					{{form.month}}
+					{% if form.month.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.month.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{form.year.label_tag}}</th>
+				<td>
+					{{form.year}}
+					{% if form.year.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.year.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{form.income_tax.label_tag}}</th>
+				<td>
+					{{form.income_tax}}
+					{% if form.income_tax.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.income_tax.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{form.national_insurance.label_tag}}</th>
+				<td>
+					{{form.national_insurance}}
+					{% if form.national_insurance.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.national_insurance.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{form.health.label_tag}}</th>
+				<td>
+					{{form.health}}
+					{% if form.health.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.health.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{form.pension_insurance.label_tag}}</th>
+				<td>
+					{{form.pension_insurance}}
+					{% if form.pension_insurance.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.pension_insurance.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{form.vacation.label_tag}}</th>
+				<td>
+					{{form.vacation}}
+					{% if form.vacation.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.vacation.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{form.convalescence_pay.label_tag}}</th>
+				<td>
+					{{form.convalescence_pay}}
+					{% if form.convalescence_pay.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.convalescence_pay.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>סה"כ ברוטו לעובד</th>
+				<td id="bruto"></td>
+			</tr>
+			<tr>
+				<th>{{form.employer_national_insurance.label_tag}}</th>
+				<td>
+					{{form.employer_national_insurance}}
+					{% if form.employer_national_insurance.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.employer_national_insurance.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{form.employer_benefit.label_tag}}</th>
+				<td>
+					{{form.employer_benefit}}
+					{% if form.employer_benefit.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.employer_benefit.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>{{form.compensation_allocation.label_tag}}</th>
+				<td>
+					{{form.compensation_allocation}}
+					{% if form.compensation_allocation.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.compensation_allocation.errors|join:""}}'/>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th>סה"כ ברוטו כולל מעביד</th>
+				<td id="bruto_with_employer"></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><input type="submit" value="אישור" class="button"/></td>
+			</tr>
+		</table>
+	</form>
+</div>
+{% endblock page %}
