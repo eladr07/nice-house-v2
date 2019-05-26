@@ -13,22 +13,17 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
+from django.contrib import admin, auth
 from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]
 
 from Management.models import *
 from Management.views import *
 import Management.forms
-
-urlpatterns = [
-    path('accounts/login/', django.contrib.auth.views.login),
-    path('accounts/logout/', django.contrib.auth.views.logout),
-    path('accounts/password_change/', django.contrib.auth.views.password_change),
-]
 
 urlpatterns += [
     path('', index),
@@ -409,7 +404,7 @@ urlpatterns += [
     path('nhsaleside/<int:object_id>/payment/add', nhsaleside_payment_add),
     path('nhsaleside/<int:object_id>/invoice/add', nhsaleside_invoice_add),
     
-    (r'^mail', send_mail),
+    path('mail', send_mail),
 ]
 
 urlpatterns += [
