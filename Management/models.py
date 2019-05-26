@@ -62,7 +62,7 @@ class Attachment(models.Model):
      
     add_time = models.DateTimeField(auto_now_add=True, editable=False)
     user_added = models.ForeignKey(User, on_delete=models.PROTECT, related_name = 'attachments', editable=False, verbose_name=ugettext('user'))
-    tags = models.ManyToManyField('Tag', related_name = 'attachments',null=True, blank=True, verbose_name = ugettext('tags'))
+    tags = models.ManyToManyField('Tag', related_name = 'attachments', blank=True, verbose_name = ugettext('tags'))
     file = models.FileField(ugettext('filename'), upload_to='files')
 
     type = models.SmallIntegerField(ugettext('attachment_type'), choices = Attachment_types)
@@ -176,8 +176,8 @@ class Project(models.Model):
     remarks = models.TextField(ugettext('special_data'), null=True, blank=True)
     demand_contact = models.ForeignKey('Contact', on_delete=models.PROTECT, editable=False, related_name='projects_demand', blank=True, null=True)
     payment_contact = models.ForeignKey('Contact', on_delete=models.PROTECT, editable=False, related_name='projects_payment', blank=True, null=True)
-    contacts = models.ManyToManyField('Contact', related_name='projects', null=True, editable=False)
-    reminders = models.ManyToManyField('Reminder', null=True, editable=False)
+    contacts = models.ManyToManyField('Contact', related_name='projects', editable=False)
+    reminders = models.ManyToManyField('Reminder', editable=False)
 
     objects = ProjectManager()
     
@@ -498,7 +498,7 @@ class EmployeeBase(Person):
     work_end = models.DateField(ugettext('work end'), null=True, blank=True)
     
     remarks = models.TextField(ugettext('remarks'), null=True, blank=True)    
-    reminders = models.ManyToManyField('Reminder', null=True, editable=False)
+    reminders = models.ManyToManyField('Reminder', editable=False)
     account = models.ForeignKey('Account', on_delete=models.PROTECT, related_name='%(class)s',editable=False, null=True, blank=True)
     employment_terms = models.ForeignKey('EmploymentTerms', on_delete=models.PROTECT,editable=False, related_name='%(class)s', null=True, blank=True)
         
@@ -522,7 +522,7 @@ class EmployeeBase(Person):
 class Employee(EmployeeBase):
     rank = models.ForeignKey('RankType', on_delete=models.PROTECT, verbose_name=ugettext('rank'))
     projects = models.ManyToManyField('Project', verbose_name=ugettext('projects'), related_name='employees', 
-                                      null=True, blank=True, editable=False)
+                                      blank=True, editable=False)
     main_project = models.ForeignKey('Project', on_delete=models.PROTECT, verbose_name=ugettext('main_project'), null=True, blank=True)
     objects = EmployeeManager()
     
@@ -1934,14 +1934,14 @@ class Demand(models.Model):
     sale_count = models.PositiveSmallIntegerField(ugettext('sale_count'), default=0)
     remarks = models.TextField(ugettext('remarks'), null=True,blank=True)
     is_finished = models.BooleanField(default=False, editable=False)
-    reminders = models.ManyToManyField('Reminder', null=True, editable=False)
+    reminders = models.ManyToManyField('Reminder', editable=False)
     force_fully_paid = models.BooleanField(editable=False, default=False)
     sales_commission = models.IntegerField(editable=False, default=0)
 
     invoices = models.ManyToManyField('Invoice',  related_name = 'demands', 
-                                      editable=False, null=True, blank=True)
+                                      editable=False, blank=True)
     payments = models.ManyToManyField('Payment',  related_name = 'demands', 
-                                      editable=False, null=True, blank=True)
+                                      editable=False, blank=True)
 
     objects = DemandManager()
     
@@ -2293,8 +2293,8 @@ class NHSaleSide(models.Model):
     temp_receipt_num = models.IntegerField(ugettext('temp_receipt_num'))
     employee_remarks = models.TextField(ugettext('employee_remarks'), null=True, blank=True)
     remarks = models.TextField(ugettext('remarks'), null=True, blank=True)
-    invoices = models.ManyToManyField('Invoice', null=True, editable=False)
-    payments = models.ManyToManyField('Payment', null=True, editable=False)
+    invoices = models.ManyToManyField('Invoice', editable=False)
+    payments = models.ManyToManyField('Payment', editable=False)
     def __init__(self, *args, **kw):
         models.Model.__init__(self, *args, **kw)
         self.include_tax = True
