@@ -24,7 +24,7 @@ from Management.pdf.writers import MonthDemandWriter, MultipleDemandWriter, Empl
 from Management.pdf.writers import PricelistWriter, BuildingClientsWriter, EmployeeSalariesBookKeepingWriter, SalariesBankWriter, DemandFollowupWriter
 from Management.pdf.writers import EmployeeSalesWriter, SaleAnalysisWriter, DemandPayBalanceWriter
 
-from mail import mail
+#from mail import mail
 
 def object_edit_core(request, form_class, instance,
                      template_name = 'Management/object_edit.html', 
