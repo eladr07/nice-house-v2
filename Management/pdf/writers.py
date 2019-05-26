@@ -148,24 +148,24 @@ class ProjectListWriter(DocumentBase):
 
             employees = ''
             for employee in project.employees.all():
-                employee_str = unicode(employee)
+                employee_str = str(employee)
                 if employee.cell_phone:
                     employee_str += ' - ' + employee.cell_phone
                 employees += log2vis(employee_str) + '<br/>'
                     
             contacts = ''
             if project.demand_contact:
-                contact_str = u'תשלום: ' + unicode(project.demand_contact)
+                contact_str = u'תשלום: ' + str(project.demand_contact)
                 if project.demand_contact.phone:
                     contact_str += ' - ' + project.demand_contact.phone
                 contacts += log2vis(contact_str) + '<br/>'
             if project.payment_contact:
-                contact_str = u"צ'קים: " + unicode(project.payment_contact)
+                contact_str = u"צ'קים: " + str(project.payment_contact)
                 if project.payment_contact.phone:
                     contact_str += ' - ' + project.payment_contact.phone
                 contacts += log2vis(contact_str) + '<br/>'                
             for contact in project.contacts.all():
-                contact_str = unicode(contact)
+                contact_str = str(contact)
                 if contact.phone:
                     contact_str += ' - ' + contact.phone
                 contacts += log2vis(contact_str) + '<br/>' 
@@ -232,14 +232,14 @@ class EmployeeListWriter(DocumentBase):
         rank = None
         for e in self.employees:
             if rank != e.rank:
-                row = [log2vis(unicode(e.rank)),None,None,None,None]
+                row = [log2vis(str(e.rank)),None,None,None,None]
                 row.reverse()
                 rows.append(row)
                 rank = e.rank
             
             row=[e.id, log2vis(e.first_name), log2vis(e.last_name), Paragraph(get_phones(e), styleRow9), 
                  log2vis(e.mail), Paragraph(log2vis(e.address), styleRow9), log2vis(e.work_start.strftime('%d/%m/%Y')),
-                 log2vis(unicode(e.employment_terms and e.employment_terms.hire_type or '---')),
+                 log2vis(str(e.employment_terms and e.employment_terms.hire_type or '---')),
                  Paragraph(get_account_str(e), styleRow9),
                  Paragraph('<br/>'.join([log2vis(p.name) for p in e.projects.all()]), styleRow9)]
 
@@ -266,14 +266,14 @@ class EmployeeListWriter(DocumentBase):
         nhbranch = None
         for e in self.nhemployees:
             if nhbranch in e.current_nhbranches:
-                row = [log2vis(unicode(e.nhbranch)), None,None,None,None]
+                row = [log2vis(str(e.nhbranch)), None,None,None,None]
                 row.reverse()
                 rows.append(row)
                 nhbranch = e.nhbranch
 
             row=[e.id, log2vis(e.first_name), log2vis(e.last_name), Paragraph(get_phones(e), styleRow9),
                  log2vis(e.mail), Paragraph(log2vis(e.address), styleRow9), log2vis(e.work_start.strftime('%d/%m/%Y')),
-                 log2vis(unicode(e.employment_terms and e.employment_terms.hire_type or '')),
+                 log2vis(str(e.employment_terms and e.employment_terms.hire_type or '')),
                  Paragraph(get_account_str(e), styleRow9)]
             row.reverse()
             rows.append(row)
@@ -305,7 +305,7 @@ class MonthDemandWriter(DocumentBase):
             s = log2vis(u'בס"ד') + '<br/><br/>'
             s += '<u>%s</u><br/>' % log2vis(u'לכבוד')
             s += '<b>' + log2vis(u'חברת %s' % contact.company) + '<br/>'
-            s += log2vis(u'לידי %s' % unicode(contact)) + '<br/>'
+            s += log2vis(u'לידי %s' % str(contact)) + '<br/>'
             s += log2vis(u'תפקיד : %s</b>' % contact.role) + '<br/></b>'
             s += log2vis(u'א.ג.נ')
         else:
@@ -394,7 +394,7 @@ class MonthDemandWriter(DocumentBase):
                     logger.warning('sale #%(sale_id)s has no commission details', {'sale_id': s.id})
                     latest_doh0price, memudad, current_madad, price_memduad_diff = 0,0,0,0
                 
-                row.extend([log2vis(s.clients), '%s/%s' % (unicode(s.house.building), unicode(s.house)), 
+                row.extend([log2vis(s.clients), '%s/%s' % (str(s.house.building), str(s.house)), 
                             s.sale_date.strftime('%d/%m/%y'), commaise(s.price_final), commaise(latest_doh0price), 
                             current_madad, commaise(memudad), commaise(price_memduad_diff), commaise(s.zdb)])
 
@@ -466,7 +466,7 @@ class MonthDemandWriter(DocumentBase):
             sale_add = diff_pc_base * s.price_final / 100
             
             row = [log2vis('%s/%s' % (s.actual_demand.month, s.actual_demand.year)), clientsPara(s.clients), 
-                   '%s/%s' % (unicode(s.house.building), unicode(s.house)), s.sale_date.strftime('%d/%m/%y'), 
+                   '%s/%s' % (str(s.house.building), str(s.house)), s.sale_date.strftime('%d/%m/%y'), 
                    commaise(s.price), commaise(s.price_final), orig_pc_base, current_pc_base, diff_pc_base, commaise(sale_add)]
 
             row.reverse()
@@ -502,7 +502,7 @@ class MonthDemandWriter(DocumentBase):
             for s in subSales.all():
                 singup = s.house.get_signup() 
                 row = [singup.date.strftime('%d/%m/%y'), '%s/%s' % (s.contractor_pay_month, s.contractor_pay_year), 
-                       clientsPara(s.clients), '%s/%s' % (unicode(s.house.building), unicode(s.house)), 
+                       clientsPara(s.clients), '%s/%s' % (str(s.house.building), str(s.house)), 
                        s.sale_date.strftime('%d/%m/%y'), commaise(s.price)]
                 s.restore_date = self.demand.get_previous_demand().finish_date
                 c_final_old = s.c_final
@@ -584,7 +584,7 @@ class MonthDemandWriter(DocumentBase):
             if self.signup_adds:
                 signup = s.house.get_signup()
                 row.append(signup and signup.date.strftime('%d/%m/%y') or '')
-            row.extend([clientsPara(s.clients), '%s/%s' % (unicode(s.house.building), unicode(s.house)), 
+            row.extend([clientsPara(s.clients), '%s/%s' % (str(s.house.building), str(s.house)), 
                         s.sale_date.strftime('%d/%m/%y'), commaise(s.price)])
             if zilber:
                 if commissions.deduct_registration and s.include_registration:
@@ -736,12 +736,12 @@ class EmployeeSalariesBookKeepingWriter(DocumentBase):
                 payments = side.payments.all()
                 row = [s.num, Paragraph(clients, styleRow9), commaise(side.net_income), side.voucher_num, 
                        invoice_para, side.temp_receipt_num, 
-                       Paragraph('<br/>'.join([log2vis(unicode(p.payment_type)) for p in payments]), styleRow9),
-                       Paragraph('<br/>'.join([unicode(p.num) for p in payments]), styleRow9),
+                       Paragraph('<br/>'.join([log2vis(str(p.payment_type)) for p in payments]), styleRow9),
+                       Paragraph('<br/>'.join([str(p.num) for p in payments]), styleRow9),
                        Paragraph('<br/>'.join([log2vis(p.bank) for p in payments]), styleRow9),
-                       log2vis(unicode(side.signing_advisor)),
+                       log2vis(str(side.signing_advisor)),
                        Paragraph('<br/>'.join([p.payment_date.strftime('%d/%m/%y') for p in payments]), styleRow9),
-                       Paragraph('<br/>'.join([unicode(p.branch_num) for p in payments]), styleRow9),
+                       Paragraph('<br/>'.join([str(p.branch_num) for p in payments]), styleRow9),
                        side.remarks and '*']
                 row.reverse()
                 rows.append(row)
@@ -776,18 +776,18 @@ class EmployeeSalariesBookKeepingWriter(DocumentBase):
         for es in self.salaries:
             employee = es.get_employee()
             terms = employee.employment_terms
-            hire_type = terms and unicode(terms.hire_type) or ''
+            hire_type = terms and str(terms.hire_type) or ''
             if terms and not terms.salary_net and terms.hire_type.id == models.HireType.Salaried:
                 hire_type += u' - ברוטו'
             
             check_amount = terms.salary_net == False and Paragraph(break_to_lines(u"הנהלת חשבונות"), styleRow9) or commaise(es.check_amount)
-            row = [es.id, Paragraph(break_to_lines(unicode(employee)), styleRow9), '', check_amount, commaise(es.refund),
+            row = [es.id, Paragraph(break_to_lines(str(employee)), styleRow9), '', check_amount, commaise(es.refund),
                    commaise(es.bruto),commaise(es.invoice_amount),None,commaise(es.loan_pay), commaise(es.neto), es.pdf_remarks and '*' or '']
             row.reverse()
             rows.append(row)
             
             if es.pdf_remarks:
-                remarks_str += '<u><b>' + log2vis(unicode(employee) + '</b></u>' + ' ' + (es.pdf_remarks)) + '<br/>'
+                remarks_str += '<u><b>' + log2vis(str(employee) + '</b></u>' + ' ' + (es.pdf_remarks)) + '<br/>'
         
         sum_row = [None, None, None, 
                    commaise(sum([s.check_amount or 0 for s in self.salaries])),
@@ -854,7 +854,7 @@ class EmployeeSalariesWriter:
             terms = employee.employment_terms
             row = []
             if self.show_employee:
-                row.append(log2vis(unicode(employee)))
+                row.append(log2vis(str(employee)))
             if self.show_month:
                 row.append('%s/%s' % (es.month, es.year))
             row.extend([log2vis(u'%s - %s' % (terms.hire_type.name, terms.salary_net and u'נטו' or u'ברוטו'))])
@@ -992,9 +992,9 @@ class PricelistWriter:
         rows = []
         i = 0
         for h in self.houses:
-            parkings = '<br/>'.join([log2vis(unicode(p.num)) for p in h.parkings.all()])
-            storages = '<br/>'.join([log2vis(unicode(s.num)) for s in h.storages.all()])
-            row = [h.num, h.floor,  log2vis(unicode(h.type)), h.rooms, h.net_size, h.garden_size, 
+            parkings = '<br/>'.join([log2vis(str(p.num)) for p in h.parkings.all()])
+            storages = '<br/>'.join([log2vis(str(s.num)) for s in h.storages.all()])
+            row = [h.num, h.floor,  log2vis(str(h.type)), h.rooms, h.net_size, h.garden_size, 
                    h.price and commaise(h.price) or '-', Paragraph(parkings, styleRow), Paragraph(storages, styleRow), 
                    log2vis(h.remarks[:15] + (len(h.remarks)>15 and ' ...' or ''))]
             row.reverse()
@@ -1072,8 +1072,8 @@ class BuildingClientsWriter:
         total_sale_price = 0
         i = 0
         for h in self.houses:
-            parkings = '<br/>'.join([log2vis(unicode(p.num)) for p in h.parkings.all()])
-            storages = '<br/>'.join([log2vis(unicode(s.num)) for s in h.storages.all()])
+            parkings = '<br/>'.join([log2vis(str(p.num)) for p in h.parkings.all()])
+            storages = '<br/>'.join([log2vis(str(s.num)) for s in h.storages.all()])
             sale = h.get_sale()
             signup = h.get_signup()
             if sale:
@@ -1082,7 +1082,7 @@ class BuildingClientsWriter:
                 total_sale_price += sale.price
             else:
                 clients_name, clients_address, clients_phone, sale_price = '','','',''
-            row = [h.num, log2vis(unicode(h.type)), h.net_size, h.floor, clients_name, '', clients_address, clients_phone, 
+            row = [h.num, log2vis(str(h.type)), h.net_size, h.floor, clients_name, '', clients_address, clients_phone, 
                    '', signup and signup.date.strftime('%d/%m/%Y'), sale and sale.sale_date.strftime('%d/%m/%Y') or '',
                    h.price and commaise(h.price) or '-', commaise(sale_price), Paragraph(parkings, styleRow), Paragraph(storages, styleRow), 
                    '','']
@@ -1157,7 +1157,7 @@ class EmployeeSalesWriter(DocumentBase):
         return flows
         
     def get_story(self):
-        title_str = u'דו"ח מכירות לסוכן - ' + unicode(self.project)
+        title_str = u'דו"ח מכירות לסוכן - ' + str(self.project)
         subtitle_str = u"%s/%s - %s/%s" %(self.from_month, self.from_year, self.to_month, self.to_year)
         story = [titlePara(title_str), titlePara(subtitle_str), Spacer(0,20)]
         story.extend(self.get_flows())
@@ -1178,7 +1178,7 @@ class DemandPayBalanceWriter(DocumentBase):
         
         for project, demands in self.project_demands.items():
             projectFlow = []
-            projectFlow.append(titlePara(unicode(project)))
+            projectFlow.append(titlePara(str(project)))
             projectFlow.append(Spacer(0, 10))
             
             for attr in ['demand_contact', 'payment_contact']:
@@ -1186,7 +1186,7 @@ class DemandPayBalanceWriter(DocumentBase):
                 # skip if the project does not have some contact person
                 if not contact:
                     continue
-                contact_str = unicode(contact) + ", " + ugettext('phone') + ": " + contact.phone + ", " + ugettext('fax') + ": " + \
+                contact_str = str(contact) + ", " + ugettext('phone') + ": " + contact.phone + ", " + ugettext('fax') + ": " + \
                     contact.fax + ", " + ugettext('mail') + ": " + contact.mail
                 style = ParagraphStyle('contact_para', fontName='David',fontSize=12, alignment=TA_CENTER)
                 paragraph = Paragraph(log2vis(contact_str), style)
@@ -1272,7 +1272,7 @@ class SaleAnalysisWriter(DocumentBase):
         return flows
     
     def get_story(self):
-        title_str = u'דו"ח ניתוח וריכוז מכירות - ' + unicode(self.project)
+        title_str = u'דו"ח ניתוח וריכוז מכירות - ' + str(self.project)
         subtitle_str = u"%s/%s - %s/%s" %(self.from_month, self.from_year, self.to_month, self.to_year)
         story = [titlePara(title_str), titlePara(subtitle_str), Spacer(0,20)]
         story.extend(self.get_flows())
@@ -1298,7 +1298,7 @@ class DemandFollowupWriter(DocumentBase):
         
         for demand in self.demands:
             invoices = demand.invoices.all()
-            invoice_num_str = '<br/>'.join([unicode(invoice.num) for invoice in invoices])
+            invoice_num_str = '<br/>'.join([str(invoice.num) for invoice in invoices])
             invoice_amount_str = '<br/>'.join([commaise(invoice.amount) for invoice in invoices])
             invoice_date_str = '<br/>'.join([invoice.date.strftime('%d/%m/%Y') for invoice in invoices])
 
@@ -1326,7 +1326,7 @@ class DemandFollowupWriter(DocumentBase):
             total_diff_invoice += demand.diff_invoice
             total_diff_invoice_payment += demand.diff_invoice_payment
         
-        sumRow = [None, None, Paragraph(unicode(total_sales_count), styleSumRow), Paragraph(commaise(total_amount), styleSumRow), 
+        sumRow = [None, None, Paragraph(str(total_sales_count), styleSumRow), Paragraph(commaise(total_amount), styleSumRow), 
                   None, Paragraph(commaise(total_invoices), styleSumRow), 
                   None, Paragraph(commaise(total_payments), styleSumRow), None, Paragraph(commaise(total_diff_invoice), styleSumRow), 
                   Paragraph(commaise(total_diff_invoice_payment), styleSumRow), None]
@@ -1340,7 +1340,7 @@ class DemandFollowupWriter(DocumentBase):
         return [table]
         
     def get_story(self):
-        title_str = u"מעקב דרישות לתקופה - " + unicode(self.project)
+        title_str = u"מעקב דרישות לתקופה - " + str(self.project)
         subtitle_str = u"%s/%s - %s/%s" %(self.from_month, self.from_year, self.to_month, self.to_year)
         story = [titlePara(title_str), titlePara(subtitle_str), Spacer(0,20)]
         story.extend(self.demandFlows())

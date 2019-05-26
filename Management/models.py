@@ -49,8 +49,8 @@ RoomsChoices.insert(0, ('',u'----'))
 class Tag(models.Model):
     name = models.CharField(unique = True, max_length=20)
     is_deleted = models.BooleanField(editable=False, default=False)
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
     class Meta:
         db_table = 'Tag'
         ordering = ['name']
@@ -114,8 +114,8 @@ class Task(models.Model):
 class ReminderStatusType(models.Model):
     Added, Done, Deleted = 1,2,3
     name = models.CharField(max_length=20, unique=True)
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
     class Meta:
         db_table='ReminderStatusType'
         
@@ -123,8 +123,8 @@ class ReminderStatus(models.Model):
     reminder = models.ForeignKey('Reminder', on_delete=models.PROTECT, related_name='statuses')
     type = models.ForeignKey('ReminderStatusType', on_delete=models.PROTECT)
     time = models.DateTimeField(auto_now_add=True)
-    def __unicode__(self):
-        return unicode(self.type) + ' - ' + unicode(self.time)
+    def __str__(self):
+        return str(self.type) + ' - ' + str(self.time)
     class Meta:
         db_table='ReminderStatus'
         ordering = ['-time']
@@ -209,7 +209,7 @@ class Project(models.Model):
         return Signup.objects.filter(house__building__project = self, date__year = current.year, date__month= current.month)
     def end(self):
         self.end_date = datetime.now()
-    def __unicode__(self):
+    def __str__(self):
         return u"%s - %s" % (self.initiator, self.name)
     def houses(self):
         return House.objects.filter(building__project = self, building__is_deleted = False)
@@ -239,16 +239,16 @@ class Project(models.Model):
 
 class ParkingType(models.Model):
     name = models.CharField(ugettext('name'), max_length=20, unique=True)
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
     class Meta:
         db_table='ParkingType'
       
 class PricelistType(models.Model):
     Company, Doh0 = 1, 2
     name = models.CharField(ugettext('name'), max_length=20, unique=True)
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
     class Meta:
         db_table='PricelistType'
 
@@ -258,7 +258,7 @@ class Parking(models.Model):
     num = models.PositiveSmallIntegerField(ugettext('parking_num'))
     type = models.ForeignKey('ParkingType', on_delete=models.PROTECT, verbose_name=ugettext('parking_type'))
     remarks = models.TextField(ugettext('remarks'), null=True, blank=True)
-    def __unicode__(self):
+    def __str__(self):
         return u'מס\' %s - %s' % (self.num, self.type)
     class Meta:
         db_table='Parking'
@@ -271,7 +271,7 @@ class Storage(models.Model):
     num = models.PositiveSmallIntegerField(ugettext('storage_num'))
     size = models.FloatField(ugettext('size'), null=True, blank=True)
     remarks = models.TextField(ugettext('remarks'), null=True, blank=True)
-    def __unicode__(self):
+    def __str__(self):
         return self.size and u'מס\' %s - %s מ"ר' % (self.num, self.size) or u'מס\' %s' % self.num 
     class Meta:
         db_table='Storage'
@@ -326,8 +326,8 @@ class House(models.Model):
         if len(self.num) < 5:#patch to make house ordering work. because it is char field, '2' > '19'
             self.num = self.num.ljust(5, ' ')
         models.Model.save(self, *args, **kw)
-    def __unicode__(self):
-        return unicode(self.num).strip()
+    def __str__(self):
+        return str(self.num).strip()
     def get_absolute_url(self):
         return self.building.get_absolute_url() + '/house/%s' % self.id
     class Meta:
@@ -338,16 +338,16 @@ class House(models.Model):
 class BuildingType(models.Model):
     Cottage = 3
     name = models.CharField(max_length=20, unique=True)
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
     class Meta:
         db_table = 'BuildingType'
 
 class HouseType(models.Model):
     Cottage = 2
     name = models.CharField(max_length=20, unique=True)
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
     class Meta:
         db_table = 'HouseType'
 
@@ -356,8 +356,8 @@ class HireType(models.Model):
     name = models.CharField(max_length=20, unique=True)
     salary_net = models.NullBooleanField()
     include_tax = models.BooleanField()
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
     class Meta:
         db_table = 'HireType'
         
@@ -378,8 +378,8 @@ class HouseVersion(models.Model):
 class RankType(models.Model):
     RegionalSaleManager = 8
     name = models.CharField(ugettext('rank'), max_length=20, unique=True)
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
     class Meta:
         db_table = 'RankType'
         ordering = ['name']
@@ -438,8 +438,8 @@ class Building(models.Model):
             pl.save()
             self.pricelist = pl
         models.Model.save(self, *args, **kw)
-    def __unicode__(self):
-        return unicode(self.num)
+    def __str__(self):
+        return str(self.num)
     def get_absolute_url(self):
         return '/buildings/%s' % self.id
     class Meta:
@@ -455,7 +455,7 @@ class Person(models.Model):
     mail = models.EmailField(ugettext('mail'), null=True, blank=True)
     address = models.CharField(ugettext('address'), max_length=40, null=True, blank=True)
     role = models.CharField(ugettext('role'), max_length= 20, null=True, blank=True)
-    def __unicode__(self):
+    def __str__(self):
         return u'%s %s' % (self.first_name, self.last_name)
     class Meta:
         abstract = True
@@ -514,7 +514,7 @@ class EmployeeBase(Person):
     
     @property
     def payee(self):
-        return self.account and self.account.payee or unicode(self)
+        return self.account and self.account.payee or str(self)
     
     class Meta:
         db_table='EmployeeBase'
@@ -566,32 +566,32 @@ class Employee(EmployeeBase):
 class NHSaleFilter(models.Model):
     His, NotHis, All = 1,2,3
     name = models.CharField(max_length = 20, unique=True)
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
     class Meta:
         db_table = 'NHSaleFilter'
 
 class NHIncomeType(models.Model):
     Relative, Total = 1,2
     name = models.CharField(max_length = 20, unique=True)
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
     class Meta:
         db_table = 'NHIncomeType'
 
 class Operator(models.Model):
     gt, lt, eq, neq = 1,2,3,4
     name = models.CharField(max_length = 20, unique=True)
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
     class Meta:
         db_table = 'Operator'
 
 class AmountType(models.Model):
     Amount, Precentage = 1,2
     name = models.CharField(max_length = 20, unique=True)
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
     class Meta:
         db_table = 'AmountType'
 
@@ -731,8 +731,8 @@ class NHBranch(models.Model):
     def prefix(self):
         return self.name.replace(u'נייס האוס ','') \
                [0]
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
     class Meta:
         db_table='NHBranch'
         permissions = (('nhbranch_1', 'NHBranch Shoham'),('nhbranch_2', 'NHBranch Modiin'),('nhbranch_3', 'NHBranch Nes Ziona'))
@@ -835,7 +835,7 @@ class SaleCommissionDetail(models.Model):
     value = models.FloatField(null=True)
     sale = models.ForeignKey('Sale', on_delete=models.PROTECT, null=True, related_name='commission_details')
     
-    def __unicode__(self):
+    def __str__(self):
         return u'%s - %s' % (self.commission, self.value)
     
     class Meta:
@@ -845,8 +845,8 @@ class SaleCommissionDetail(models.Model):
 class EmployeeSalaryBaseStatusType(models.Model):
     Approved, SentBookkeeping, SentChecks = 1, 2, 3
     name = models.CharField(max_length=20)
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
     class Meta:
         db_table='EmployeeSalaryBaseStatusType'
         
@@ -1844,7 +1844,7 @@ class Invoice(models.Model):
     
     objects = InvoiceManager()
     
-    def __unicode__(self):
+    def __str__(self):
         return u'חשבונית על סך %s ש"ח בתאריך %s' % (commaise(self.amount), self.date.strftime('%d/%m/%Y'))
     class Meta:
         db_table = 'Invoice'
@@ -1864,8 +1864,8 @@ class InvoiceOffset(models.Model):
 class PaymentType(models.Model):
     Cash, Check, BankTransfer, Other = 1,2,3,4
     name = models.CharField(max_length=20)
-    def __unicode__(self):
-        return unicode(self.name)  
+    def __str__(self):
+        return str(self.name)  
     class Meta:
         db_table = 'PaymentType'
 
@@ -1882,7 +1882,7 @@ class Payment(models.Model):
     
     objects = PaymentManager()
     
-    def __unicode__(self):
+    def __str__(self):
         return u'תשלום על סך %s ש"ח בתאריך %s' % (commaise(self.amount), self.payment_date.strftime('%d/%m/%Y'))
     def is_split(self):
         return self.demands.count() > 1
@@ -1896,8 +1896,8 @@ class DemandStatusType(models.Model):
     Feed, Closed, Sent, Finished = range(1,5)
     
     name = models.CharField(max_length=20)
-    def __unicode__(self):
-        return unicode(self.name)  
+    def __str__(self):
+        return str(self.name)  
     class Meta:
         db_table = 'DemandStatusType'
 
@@ -1905,7 +1905,7 @@ class DemandStatus(models.Model):
     demand = models.ForeignKey('Demand', on_delete=models.PROTECT, related_name='statuses')
     date = models.DateTimeField(auto_now_add=True)
     type = models.ForeignKey('DemandStatusType', on_delete=models.PROTECT)
-    def __unicode__(self):
+    def __str__(self):
         return u'%s - %s' % (self.type, self.date.strftime('%d/%m/%Y %H:%M'))
     class Meta:
         db_table = 'DemandStatus'
@@ -1919,7 +1919,7 @@ class DemandDiff(models.Model):
     
     objects = DemandDiffManager()
     
-    def __unicode__(self):
+    def __str__(self):
         return u'תוספת מסוג %s על סך %s ש"ח - %s' % (self.type, self.amount, self.reason)
     def get_absolute_url(self):
         return '/demanddiff/%s' % self.id
@@ -2143,7 +2143,7 @@ class Demand(models.Model):
         self.statuses.create(type= DemandStatusType.objects.get(pk=DemandStatusType.Finished)).save()
         self.is_finished = True
         self.save()
-    def __unicode__(self):
+    def __str__(self):
         return u'דרישה לתשלום לפרוייקט %s בגיו חודש %s' % (self.project, '%s-%s' % (self.month, self.year))
     class Meta:
         db_table='Demand'
@@ -2256,8 +2256,8 @@ class Lawyer(Person):
 class SaleType(models.Model):
     SaleSeller, SaleBuyer, RentRenter, RentRentee = range(1,5)
     name = models.CharField(max_length=20, unique=True)
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
     class Meta:
         db_table='SaleType'
 
@@ -2796,7 +2796,7 @@ class Sale(models.Model):
     @property
     def is_cp_ok(self):
         return self.contractor_pay_year == self.demand.year and self.contractor_pay_month == self.demand.month 
-    def __unicode__(self):
+    def __str__(self):
         return u'בניין %s דירה %s ל%s' % (self.house.building.num, self.house.num, self.clients)
     def get_absolute_url(self):
         return '/sale/%s' % self.id
@@ -2820,8 +2820,8 @@ class Account(models.Model):
 class CheckBaseType(models.Model):
     WithInvoice, NoInvoice = 1, 2
     name = models.CharField(ugettext('name'), max_length=20, unique=True)
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
     class Meta:
         db_table = 'CheckBaseType'    
 
@@ -2878,23 +2878,23 @@ class PaymentCheck(CheckBase):
 
 class SupplierType(models.Model):
     name = models.CharField(ugettext('name'), max_length=20, unique=True)
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
     class Meta:
         db_table = 'SupplierType'
 
 class ExpenseType(models.Model):
     name = models.CharField(ugettext('name'), max_length=20, unique=True)
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
     class Meta:
         db_table = 'ExpenseType'
 
 class PurposeType(models.Model):
     Salary, AdvancePayment, Loan = 1,2,3
     name = models.CharField(ugettext('name'), max_length=20, unique=True)
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
     class Meta:
         db_table = 'PurposeType'
 
@@ -2907,37 +2907,37 @@ class DivisionType(models.Model):
     @property
     def is_nicehouse(self):
         return self.id in (2,3,4)
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
     class Meta:
         db_table = 'DivisionType'
         permissions = (('global_profit_lost','Global profit & loss'),)
 
 class IncomeType(models.Model):
     name = models.CharField(ugettext('name'), max_length=40, unique=True)
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
     class Meta:
         db_table = 'IncomeType'
         
 class IncomeProducerType(models.Model):
     name = models.CharField(ugettext('name'), max_length=20, unique=True)
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
     class Meta:
         db_table = 'IncomeProducerType'
 
 class ClientType(models.Model):
     name = models.CharField(ugettext('name'), max_length=20, unique=True)
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
     class Meta:
         db_table = 'ClientType'
 
 class ClientStatusType(models.Model):
     name = models.CharField(ugettext('name'), max_length=20, unique=True)
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
     class Meta:
         db_table = 'ClientStatusType'
 
@@ -2985,15 +2985,15 @@ class Deal(models.Model):
 
 class Media(models.Model):
     name = models.CharField(ugettext('name'), max_length=20, unique=True)
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
     class Meta:
         db_table = 'Media'
         
 class City(models.Model):
     name = models.CharField(ugettext('name'), max_length=20, unique=True)
-    def __unicode__(self):
-        return unicode(self.name)
+    def __str__(self):
+        return str(self.name)
     class Meta:
         db_table = 'City'
         

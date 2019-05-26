@@ -238,7 +238,7 @@ class SaleEmployeeNameField(TableField):
     def __init__(self):
         return super(SaleEmployeeNameField, self).__init__(ugettext('employee_name'), 75)
     def format(self, item):
-        return log2vis(unicode(item.employee or ''))
+        return log2vis(str(item.employee or ''))
     
     class Meta:
         models = (models.Sale,)
@@ -319,7 +319,7 @@ class HouseTypeField(TableField):
     def __init__(self):
         return super(HouseTypeField, self).__init__(ugettext('house_type'),55)
     def format(self, item):
-        return log2vis(unicode(item.type))
+        return log2vis(str(item.type))
     
     class Meta:
         models = (models.House,)

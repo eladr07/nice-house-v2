@@ -860,7 +860,7 @@ def salaries_bank(request):
         if isinstance(employee, Employee):
             salary.division = u'נווה העיר'
         elif isinstance(employee, NHEmployee):
-            salary.division = unicode(salary.nhemployeesalary.nhbranch)
+            salary.division = str(salary.nhemployeesalary.nhbranch)
     
     salaries = list(salaries)
     salaries.sort(key = lambda salary: salary.division)
@@ -2116,9 +2116,9 @@ def building_pricelist_pdf(request, object_id, type_id):
     response = HttpResponse(mimetype='application/pdf')
     response['Content-Disposition'] = 'attachment; filename=' + filename
 
-    title = u'מחירון לפרוייקט %s' % unicode(b.project)
+    title = u'מחירון לפרוייקט %s' % str(b.project)
     subtitle = u'בניין %s' % b.num
-    subtitle += ' - %s' % unicode(pricelist_type)
+    subtitle += ' - %s' % str(pricelist_type)
     q = HouseVersion.objects.filter(house__building = b, type=pricelist_type)
     if q.count() > 0:
         subtitle += u' לתאריך ' + q.latest().date.strftime('%d/%m/%Y')
@@ -2159,7 +2159,7 @@ def building_clients_pdf(request, object_id):
     response = HttpResponse(mimetype='application/pdf')
     response['Content-Disposition'] = 'attachment; filename=' + filename
 
-    title = u'מצבת רוכשים לפרוייקט %s' % unicode(b.project)
+    title = u'מצבת רוכשים לפרוייקט %s' % str(b.project)
     subtitle = u'בניין %s' % b.num
     BuildingClientsWriter(houses, title, subtitle).build(filename)
     p = open(filename,'r')
@@ -3006,7 +3006,7 @@ def json_house(request, house_id):
     for field in ['id', 'num', 'floor', 'rooms', 'allowed_discount', 'parking', 'warehouse', 'remarks']:
         fields[field] = 1 and getattr(house, field) or ''
     fields['price'] = house.prices.latest().price
-    a = '[' + unicode({'pk':house.id, 'model':'Management.house', 'fields':fields}) + ']'
+    a = '[' + str({'pk':house.id, 'model':'Management.house', 'fields':fields}) + ']'
     return HttpResponse(a)
   
 @login_required
@@ -3265,7 +3265,7 @@ def demand_sale_list(request):
         d = Demand.objects.get(pk=demand_id)
         sales = d.get_sales()
         sales_amount = d.get_sales().total_price()
-        title = u'ריכוז מכירות לפרוייקט %s לחודש %s/%s' % (unicode(d.project), d.month, d.year)
+        title = u'ריכוז מכירות לפרוייקט %s לחודש %s/%s' % (str(d.project), d.month, d.year)
     elif project_id:
         sales = []
         sales_amount = 0
@@ -3276,7 +3276,7 @@ def demand_sale_list(request):
             sales.extend(demand.get_sales())
             sales_amount += demand.get_sales().total_price()
 
-        title = u'ריכוז מכירות לפרוייקט %s מחודש %s/%s עד חודש %s/%s' % (unicode(project), from_month, from_year,
+        title = u'ריכוז מכירות לפרוייקט %s מחודש %s/%s עד חודש %s/%s' % (str(project), from_month, from_year,
                                                                          to_month, to_year)
     else:
         raise ValueError

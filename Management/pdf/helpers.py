@@ -110,7 +110,7 @@ class Builder(object):
                 avg = sum(col_values, 0.0) / len(col_values)
                 avg = avg > 1000 and commaise(avg) or round(avg, 2)
                 decimal.Decimal()
-                cell_value = Paragraph(unicode(avg), styleBoldGreenRow)
+                cell_value = Paragraph(str(avg), styleBoldGreenRow)
             else:
                 cell_value = ''
 
@@ -128,7 +128,7 @@ class Builder(object):
         
         table = Table(cols = cols)
         
-        title_row = Row([unicode(field.title) for field in self.fields])
+        title_row = Row([str(field.title) for field in self.fields])
         
         table.rows.append(title_row)
             

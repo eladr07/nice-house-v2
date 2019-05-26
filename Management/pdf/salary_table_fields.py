@@ -18,7 +18,7 @@ class EmployeeHireTypeField(TableField):
         item is of type EmployeeBase
         '''
         terms = item.employment_terms
-        return unicode(terms.hire_type)
+        return str(terms.hire_type)
     class Meta:
         models = (models.EmployeeBase,)
         
