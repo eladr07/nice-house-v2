@@ -1195,7 +1195,7 @@ class DemandPayBalanceWriter(DocumentBase):
             if self.demand_pay_balance.id == 'un-paid':
                 field = DemandTotalAmountField()
                 field.title = ugettext('amount_yet_paid')
-		field.name += "2"
+                field.name += "2"
                 fields.append(field)
             elif self.demand_pay_balance.id == 'mis-paid':
                 fields.append(DemandDiffInvoiceField())
