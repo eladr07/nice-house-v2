@@ -2,7 +2,6 @@
 
 import itertools
 import logging
-import reversion
 import Management.common as common
 
 from datetime import datetime, date
@@ -59,10 +58,10 @@ class Tag(models.Model):
 class Attachment(models.Model):
     object_id = models.TextField(null = True, editable = False)
     
-    content_type = models.ForeignKey('ContentType', on_delete=models.PROTECT, null = True, editable = False)
+    content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT, null = True, editable = False)
      
     add_time = models.DateTimeField(auto_now_add=True, editable=False)
-    user_added = models.ForeignKey('User', on_delete=models.PROTECT, related_name = 'attachments', editable=False, verbose_name=ugettext('user'))
+    user_added = models.ForeignKey(User, on_delete=models.PROTECT, related_name = 'attachments', editable=False, verbose_name=ugettext('user'))
     tags = models.ManyToManyField('Tag', related_name = 'attachments',null=True, blank=True, verbose_name = ugettext('tags'))
     file = models.FileField(ugettext('filename'), upload_to='files')
 
@@ -93,8 +92,8 @@ class Car(models.Model):
         db_table = 'Car'
 
 class Task(models.Model):
-    sender = models.ForeignKey('User', on_delete=models.PROTECT, related_name='task_requests', editable=False)
-    user = models.ForeignKey('User', on_delete=models.PROTECT, related_name='tasks', verbose_name=ugettext('user'))
+    sender = models.ForeignKey(User, on_delete=models.PROTECT, related_name='task_requests', editable=False)
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name='tasks', verbose_name=ugettext('user'))
     content = models.TextField(ugettext('content'))
     time = models.DateTimeField(auto_now_add=True, editable=False)
     is_done = models.BooleanField(default=False, editable=False)
@@ -2113,7 +2112,8 @@ class Demand(models.Model):
         
         self.save()
 
-        reversion.create_revision()
+        from reversion import create_revision
+        create_revision()
 
         return self.sales_commission
     def get_total_amount(self):
@@ -3120,13 +3120,17 @@ class NHActivity(ActivityBase):
         db_table = 'NHActivity'
 
 class RevisionExt(models.Model):
-    revision = models.ForeignKey('reversion.Revision', on_delete=models.PROTECT)
+    from reversion.models import Revision
+    revision = models.ForeignKey(Revision, on_delete=models.PROTECT)
     date = models.DateTimeField()
     
     class Meta:
         db_table = 'RevisionExt'
 
 #register models with reversion
+
+import reversion
+
 reversion.register(HouseTypeBonus)
 reversion.register(CPrecentage)
 reversion.register(CPriceAmount)
