@@ -2083,7 +2083,7 @@ class Demand(models.Model):
         if self.project.commissions.commission_by_signups:
             query = query.order_by('house__signups__date')
         return query
-    @reversion.revision.create_on_success
+        
     def calc_sales_commission(self):
         logger = logging.getLogger('commission')
         logger.info('calculaion commissions for demand #%(demand_id)s - project_id:%(project_id),month:%(month)s,year:%(year)s',
@@ -2110,7 +2110,11 @@ class Demand(models.Model):
         # calling all to create new (not-cached) queryset
         for sale in self.get_sales().all():
             self.sales_commission += sale.c_final_worth
+        
         self.save()
+
+        reversion.create_revision()
+
         return self.sales_commission
     def get_total_amount(self):
         return self.sales_commission + self.diffs.total_amount()
