@@ -9,7 +9,7 @@ from datetime import datetime, date
 from decimal import InvalidOperation
 
 from django.db import models
-from django.db.backends.dummy.base import IntegrityError
+from django.db import IntegrityError
 from django.utils.translation import ugettext
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
