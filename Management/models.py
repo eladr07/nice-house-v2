@@ -14,9 +14,9 @@ from django.utils.translation import ugettext
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 
-from templatetags.management_extras import *
-from decorators import cache_method
-from managers import *
+from Management.templatetags.management_extras import *
+from Management.decorators import cache_method
+from Management.managers import *
 
 Salary_Types = (
                 (None, u'לא ידוע'),
