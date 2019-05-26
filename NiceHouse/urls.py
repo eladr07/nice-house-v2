@@ -309,7 +309,7 @@ urlpatterns += [
     path('checks/add', check_add),
     path('checks/<int:id>', check_edit),
     path('checks/<int:id>/del', limited_delete_object,
-     {'model':Check, 'post_delete_redirect':'/checks'}),
+     {'model':PaymentCheck, 'post_delete_redirect':'/checks'}),
         
     path('advancepayments', limited_object_list,
      {'queryset': AdvancePayment.objects.filter(is_paid=None)}),
