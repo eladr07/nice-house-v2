@@ -1,11 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import logging, itertools
+import os,logging, itertools
 from datetime import datetime, date
-
-from NiceHouse.settings import STATIC_URL
-import Management.models
-from Management.templatetags.management_extras import commaise
 
 import reportlab.rl_config
 reportlab.rl_config.warnOnMissingFontGlyphs = 0
@@ -22,13 +18,18 @@ from reportlab.lib.styles import ParagraphStyle
 
 from django.utils.translation import ugettext
 
+import Management.models
+from Management.templatetags.management_extras import commaise
+
 from Management.pdf.helpers import Builder, MassBuilder
 from Management.pdf.table_fields import *
 from Management.pdf.salary_table_fields import *
 from Management.pdf.styles import *
 
 #register Hebrew fonts
-import os
+
+STATIC_URL = 'Management/pdf/'
+
 pdfmetrics.registerFont(TTFont('David', os.path.join(STATIC_URL, 'fonts/DavidCLM-Medium.ttf')))
 pdfmetrics.registerFont(TTFont('David-Bold', os.path.join(STATIC_URL, 'fonts/DavidCLM-Bold.ttf')))
 
