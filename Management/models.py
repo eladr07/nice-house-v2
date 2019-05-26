@@ -59,10 +59,10 @@ class Tag(models.Model):
 class Attachment(models.Model):
     object_id = models.TextField(null = True, editable = False)
     
-    content_type = models.ForeignKey(ContentType, null = True, editable = False)
+    content_type = models.ForeignKey('ContentType', on_delete=models.PROTECT, null = True, editable = False)
      
     add_time = models.DateTimeField(auto_now_add=True, editable=False)
-    user_added = models.ForeignKey(User, related_name = 'attachments', editable=False, verbose_name=ugettext('user'))
+    user_added = models.ForeignKey('User', on_delete=models.PROTECT, related_name = 'attachments', editable=False, verbose_name=ugettext('user'))
     tags = models.ManyToManyField('Tag', related_name = 'attachments',null=True, blank=True, verbose_name = ugettext('tags'))
     file = models.FileField(ugettext('filename'), upload_to='files')
 
@@ -93,8 +93,8 @@ class Car(models.Model):
         db_table = 'Car'
 
 class Task(models.Model):
-    sender = models.ForeignKey(User, related_name='task_requests', editable=False)
-    user = models.ForeignKey(User, related_name='tasks', verbose_name=ugettext('user'))
+    sender = models.ForeignKey('User', on_delete=models.PROTECT, related_name='task_requests', editable=False)
+    user = models.ForeignKey('User', on_delete=models.PROTECT, related_name='tasks', verbose_name=ugettext('user'))
     content = models.TextField(ugettext('content'))
     time = models.DateTimeField(auto_now_add=True, editable=False)
     is_done = models.BooleanField(default=False, editable=False)
@@ -121,8 +121,8 @@ class ReminderStatusType(models.Model):
         db_table='ReminderStatusType'
         
 class ReminderStatus(models.Model):
-    reminder = models.ForeignKey('Reminder', related_name='statuses')
-    type = models.ForeignKey('ReminderStatusType')
+    reminder = models.ForeignKey('Reminder', on_delete=models.PROTECT, related_name='statuses')
+    type = models.ForeignKey('ReminderStatusType', on_delete=models.PROTECT)
     time = models.DateTimeField(auto_now_add=True)
     def __unicode__(self):
         return unicode(self.type) + ' - ' + unicode(self.time)
@@ -161,7 +161,7 @@ class ProjectDetails(models.Model):
         db_table = 'ProjectDetails'
 
 class Project(models.Model):
-    details = models.OneToOneField('ProjectDetails', editable=False, null=True)
+    details = models.ForeignKey('ProjectDetails', on_delete=models.PROTECT, editable=False, null=True)
     initiator = models.CharField(ugettext('initiator'), max_length=30)
     name = models.CharField(ugettext('project name'), max_length=30)
     city = models.CharField(ugettext('city'), max_length=30)
@@ -175,8 +175,8 @@ class Project(models.Model):
     start_date = models.DateField(ugettext('startdate'))
     end_date = models.DateField(ugettext('enddate'), null=True, blank=True)
     remarks = models.TextField(ugettext('special_data'), null=True, blank=True)
-    demand_contact = models.ForeignKey('Contact', editable=False, related_name='projects_demand', blank=True, null=True)
-    payment_contact = models.ForeignKey('Contact', editable=False, related_name='projects_payment', blank=True, null=True)
+    demand_contact = models.ForeignKey('Contact', on_delete=models.PROTECT, editable=False, related_name='projects_demand', blank=True, null=True)
+    payment_contact = models.ForeignKey('Contact', on_delete=models.PROTECT, editable=False, related_name='projects_payment', blank=True, null=True)
     contacts = models.ManyToManyField('Contact', related_name='projects', null=True, editable=False)
     reminders = models.ManyToManyField('Reminder', null=True, editable=False)
 
@@ -254,10 +254,10 @@ class PricelistType(models.Model):
         db_table='PricelistType'
 
 class Parking(models.Model):
-    building = models.ForeignKey('Building', verbose_name=ugettext('building'), related_name='parkings')
-    house = models.ForeignKey('House', null=True, blank=True, related_name='parkings', verbose_name=ugettext('house'))
+    building = models.ForeignKey('Building', on_delete=models.PROTECT, verbose_name=ugettext('building'), related_name='parkings')
+    house = models.ForeignKey('House', on_delete=models.PROTECT, null=True, blank=True, related_name='parkings', verbose_name=ugettext('house'))
     num = models.PositiveSmallIntegerField(ugettext('parking_num'))
-    type = models.ForeignKey('ParkingType', verbose_name=ugettext('parking_type'))
+    type = models.ForeignKey('ParkingType', on_delete=models.PROTECT, verbose_name=ugettext('parking_type'))
     remarks = models.TextField(ugettext('remarks'), null=True, blank=True)
     def __unicode__(self):
         return u'מס\' %s - %s' % (self.num, self.type)
@@ -267,8 +267,8 @@ class Parking(models.Model):
         ordering = ['num']
         
 class Storage(models.Model):
-    building = models.ForeignKey('Building', verbose_name=ugettext('building'), related_name='storages')
-    house = models.ForeignKey('House', null=True, blank=True, related_name='storages', verbose_name=ugettext('house'))
+    building = models.ForeignKey('Building', on_delete=models.PROTECT, verbose_name=ugettext('building'), related_name='storages')
+    house = models.ForeignKey('House', on_delete=models.PROTECT, null=True, blank=True, related_name='storages', verbose_name=ugettext('house'))
     num = models.PositiveSmallIntegerField(ugettext('storage_num'))
     size = models.FloatField(ugettext('size'), null=True, blank=True)
     remarks = models.TextField(ugettext('remarks'), null=True, blank=True)
@@ -280,8 +280,8 @@ class Storage(models.Model):
         ordering = ['num']
 
 class House(models.Model):
-    building = models.ForeignKey('Building', related_name='houses',verbose_name = ugettext('building'), editable=False)
-    type = models.ForeignKey('HouseType', verbose_name=ugettext('asset_type'))
+    building = models.ForeignKey('Building', on_delete=models.PROTECT, related_name='houses',verbose_name = ugettext('building'), editable=False)
+    type = models.ForeignKey('HouseType', on_delete=models.PROTECT, verbose_name=ugettext('asset_type'))
     num = models.CharField(ugettext('house_num'), max_length=5)
     floor = models.PositiveSmallIntegerField(ugettext('floor'))
     rooms = models.FloatField(ugettext('rooms'))
@@ -363,8 +363,8 @@ class HireType(models.Model):
         db_table = 'HireType'
         
 class HouseVersion(models.Model):
-    house = models.ForeignKey('House', related_name = 'versions', editable=False)
-    type = models.ForeignKey('PricelistType', verbose_name = ugettext('pricelist_type'), editable=False)
+    house = models.ForeignKey('House', on_delete=models.PROTECT, related_name = 'versions', editable=False)
+    type = models.ForeignKey('PricelistType', on_delete=models.PROTECT, verbose_name = ugettext('pricelist_type'), editable=False)
     date = models.DateTimeField()
     insert_date = models.DateTimeField(auto_now_add = True)
     price = models.IntegerField(ugettext('price'))
@@ -386,8 +386,8 @@ class RankType(models.Model):
         ordering = ['name']
         
 class ParkingCost(models.Model):
-    pricelist = models.ForeignKey('Pricelist', related_name='parking_costs')
-    type = models.ForeignKey('ParkingType', verbose_name = ugettext('parking_type'))
+    pricelist = models.ForeignKey('Pricelist', on_delete=models.PROTECT, related_name='parking_costs')
+    type = models.ForeignKey('ParkingType', on_delete=models.PROTECT, verbose_name = ugettext('parking_type'))
     cost = models.FloatField(ugettext('cost'))
     class Meta:
         db_table='ParkingCost'
@@ -413,11 +413,11 @@ class Pricelist(models.Model):
         db_table = 'Pricelist'
 
 class Building(models.Model):
-    pricelist = models.OneToOneField('Pricelist', editable=False, related_name='building')
-    project = models.ForeignKey('Project', related_name = 'buildings', verbose_name=ugettext('project'))
+    pricelist = models.ForeignKey('Pricelist', on_delete=models.PROTECT, editable=False, related_name='building')
+    project = models.ForeignKey('Project', on_delete=models.PROTECT, related_name = 'buildings', verbose_name=ugettext('project'))
     num = models.CharField(ugettext('building_num'), max_length = 4)
     name = models.CharField(ugettext('name'), max_length=10, null=True, blank=True)
-    type = models.ForeignKey('BuildingType', verbose_name=ugettext('building_types'))
+    type = models.ForeignKey('BuildingType', on_delete=models.PROTECT, verbose_name=ugettext('building_types'))
     floors = models.PositiveSmallIntegerField(ugettext('floors'))
     house_count = models.PositiveSmallIntegerField(ugettext('houses_num'))
     stage = models.CharField(ugettext('stage'), max_length = 1, null=True, blank=True)
@@ -476,7 +476,7 @@ class EmploymentTerms(models.Model):
     salary_base = models.PositiveIntegerField(ugettext('salary base'))
     salary_net = models.NullBooleanField(ugettext('salary net'), choices= Salary_Types)
     safety = models.PositiveIntegerField(ugettext('safety'))
-    hire_type = models.ForeignKey('HireType', verbose_name=ugettext('hire_type'), help_text = ugettext('hire_type_help'))
+    hire_type = models.ForeignKey('HireType', on_delete=models.PROTECT, verbose_name=ugettext('hire_type'), help_text = ugettext('hire_type_help'))
     include_tax = models.BooleanField(ugettext('commission_include_tax'), blank=True)
     include_lawyer = models.BooleanField(ugettext('commission_include_lawyer'), blank=True)
     tax_deduction_source = models.NullBooleanField(ugettext('tax_deduction_source'), choices = TaxDeductionTypes)
@@ -500,8 +500,8 @@ class EmployeeBase(Person):
     
     remarks = models.TextField(ugettext('remarks'), null=True, blank=True)    
     reminders = models.ManyToManyField('Reminder', null=True, editable=False)
-    account = models.OneToOneField('Account', related_name='%(class)s',editable=False, null=True, blank=True)
-    employment_terms = models.OneToOneField('EmploymentTerms',editable=False, related_name='%(class)s', null=True, blank=True)
+    account = models.ForeignKey('Account', on_delete=models.PROTECT, related_name='%(class)s',editable=False, null=True, blank=True)
+    employment_terms = models.ForeignKey('EmploymentTerms', on_delete=models.PROTECT,editable=False, related_name='%(class)s', null=True, blank=True)
         
     objects = EmployeeManager()
     
@@ -521,10 +521,10 @@ class EmployeeBase(Person):
         db_table='EmployeeBase'
 
 class Employee(EmployeeBase):
-    rank = models.ForeignKey('RankType', verbose_name=ugettext('rank'))
+    rank = models.ForeignKey('RankType', on_delete=models.PROTECT, verbose_name=ugettext('rank'))
     projects = models.ManyToManyField('Project', verbose_name=ugettext('projects'), related_name='employees', 
                                       null=True, blank=True, editable=False)
-    main_project = models.ForeignKey('Project', verbose_name=ugettext('main_project'), null=True, blank=True)
+    main_project = models.ForeignKey('Project', on_delete=models.PROTECT, verbose_name=ugettext('main_project'), null=True, blank=True)
     objects = EmployeeManager()
     
     def get_open_reminders(self):
@@ -600,22 +600,22 @@ class CommissionException(Exception):
     pass
 
 class NHCommission(models.Model):
-    nhbranch = models.ForeignKey('NHBranch', verbose_name = ugettext('nhbranch'))
-    nhemployee = models.ForeignKey('NHEmployee', verbose_name = ugettext('nhemployee'))
+    nhbranch = models.ForeignKey('NHBranch', on_delete=models.PROTECT, verbose_name = ugettext('nhbranch'))
+    nhemployee = models.ForeignKey('NHEmployee', on_delete=models.PROTECT, verbose_name = ugettext('nhemployee'))
     name = models.CharField(ugettext('name'), max_length=30)
     
-    left_filter = models.ForeignKey('NHSaleFilter', verbose_name=ugettext('filter'), related_name='left_nhcommission_set', 
+    left_filter = models.ForeignKey('NHSaleFilter', on_delete=models.PROTECT, verbose_name=ugettext('filter'), related_name='left_nhcommission_set', 
                                     null=True, blank=True)
-    left_income_type = models.ForeignKey('NHIncomeType', verbose_name=ugettext('income_type') , null=True, blank=True, 
+    left_income_type = models.ForeignKey('NHIncomeType', on_delete=models.PROTECT, verbose_name=ugettext('income_type') , null=True, blank=True, 
                                          related_name='left_nhcommission_set')
-    operator = models.ForeignKey('Operator', verbose_name=ugettext('operator'), null=True, blank=True)
+    operator = models.ForeignKey('Operator', on_delete=models.PROTECT, verbose_name=ugettext('operator'), null=True, blank=True)
     left_amount = models.FloatField(ugettext('value'), null=True, blank=True)
     
-    right_filter = models.ForeignKey('NHSaleFilter', verbose_name=ugettext('filter'), related_name='right_nhcommission_set', null=True, blank=True)
-    right_income_type = models.ForeignKey('NHIncomeType', verbose_name=ugettext('income_type'), 
+    right_filter = models.ForeignKey('NHSaleFilter', on_delete=models.PROTECT, verbose_name=ugettext('filter'), related_name='right_nhcommission_set', null=True, blank=True)
+    right_income_type = models.ForeignKey('NHIncomeType', on_delete=models.PROTECT, verbose_name=ugettext('income_type'), 
                                           related_name='right_nhcommission_set', null=True, blank=True)
     right_amount = models.FloatField(ugettext('value'))
-    right_amount_type = models.ForeignKey('AmountType', verbose_name=ugettext('value_type'))
+    right_amount_type = models.ForeignKey('AmountType', on_delete=models.PROTECT, verbose_name=ugettext('value_type'))
     
     def calc(self, year, month, ratio = 1):
         scds = []
@@ -686,8 +686,8 @@ class NHCommission(models.Model):
         db_table = 'NHCommission'
 
 class NHBranchEmployee(models.Model):
-    nhbranch = models.ForeignKey('NHBranch', verbose_name = ugettext('nhbranch'))
-    nhemployee = models.ForeignKey('NHEmployee', verbose_name = ugettext('nhemployee'))
+    nhbranch = models.ForeignKey('NHBranch', on_delete=models.PROTECT, verbose_name = ugettext('nhbranch'))
+    nhemployee = models.ForeignKey('NHEmployee', on_delete=models.PROTECT, verbose_name = ugettext('nhemployee'))
     is_manager = models.BooleanField(ugettext('is_manager'))
     start_date = models.DateField(ugettext('start_date'))
     end_date = models.DateField(ugettext('end_date'), null = True, blank = True)
@@ -776,8 +776,8 @@ class NHEmployee(EmployeeBase):
         ordering = ['-work_start']
 
 class NHSaleCommissionDetail(models.Model):
-    nhemployeesalary = models.ForeignKey('NHEmployeeSalary')
-    nhsaleside = models.ForeignKey('NHSaleSide', null=True)
+    nhemployeesalary = models.ForeignKey('NHEmployeeSalary', on_delete=models.PROTECT)
+    nhsaleside = models.ForeignKey('NHSaleSide', on_delete=models.PROTECT, null=True)
     commission = models.CharField(max_length=30)
     income = models.IntegerField(null=True)
     precentage = models.FloatField(null=True)
@@ -786,7 +786,7 @@ class NHSaleCommissionDetail(models.Model):
         db_table = 'NHSaleCommissionDetail'
         
 class AdvancePayment(models.Model):
-    employee = models.ForeignKey('EmployeeBase', related_name = 'advance_payments', verbose_name=ugettext('employee'))
+    employee = models.ForeignKey('EmployeeBase', on_delete=models.PROTECT, related_name = 'advance_payments', verbose_name=ugettext('employee'))
     month = models.PositiveSmallIntegerField(ugettext('month'), choices=common.get_month_choices())
     year = models.PositiveSmallIntegerField(ugettext('year'), choices=common.get_year_choices())
     amount = models.IntegerField(ugettext('amount'))
@@ -804,7 +804,7 @@ class AdvancePayment(models.Model):
         ordering = ['year', 'month']
         
 class Loan(models.Model):
-    employee = models.ForeignKey('EmployeeBase', related_name = 'loans', verbose_name=ugettext('employee'))
+    employee = models.ForeignKey('EmployeeBase', on_delete=models.PROTECT, related_name = 'loans', verbose_name=ugettext('employee'))
     amount = models.IntegerField(ugettext('amount'))
     month = models.PositiveSmallIntegerField(ugettext('month'), choices=common.get_month_choices())
     year = models.PositiveSmallIntegerField(ugettext('year'), choices=common.get_year_choices())
@@ -818,7 +818,7 @@ class Loan(models.Model):
         permissions = (('list_loan', 'Loans list'), )
 
 class LoanPay(models.Model):
-    employee = models.ForeignKey('EmployeeBase', related_name='loan_pays', verbose_name=ugettext('employee'))
+    employee = models.ForeignKey('EmployeeBase', on_delete=models.PROTECT, related_name='loan_pays', verbose_name=ugettext('employee'))
     month = models.PositiveSmallIntegerField(ugettext('month'), choices=common.get_month_choices())
     year = models.PositiveSmallIntegerField(ugettext('year'), choices=common.get_year_choices())
     amount = models.FloatField(ugettext('amount'))
@@ -831,10 +831,10 @@ class LoanPay(models.Model):
         db_table = 'LoanPay'
     
 class SaleCommissionDetail(models.Model):
-    employee_salary = models.ForeignKey('EmployeeSalary', related_name='commission_details', null=True)
+    employee_salary = models.ForeignKey('EmployeeSalary', on_delete=models.PROTECT, related_name='commission_details', null=True)
     commission = models.CharField(max_length=30)
     value = models.FloatField(null=True)
-    sale = models.ForeignKey('Sale', null=True, related_name='commission_details')
+    sale = models.ForeignKey('Sale', on_delete=models.PROTECT, null=True, related_name='commission_details')
     
     def __unicode__(self):
         return u'%s - %s' % (self.commission, self.value)
@@ -852,8 +852,8 @@ class EmployeeSalaryBaseStatusType(models.Model):
         db_table='EmployeeSalaryBaseStatusType'
         
 class EmployeeSalaryBaseStatus(models.Model):
-    employeesalarybase = models.ForeignKey('EmployeeSalaryBase', related_name='statuses')
-    type = models.ForeignKey('EmployeeSalaryBaseStatusType')
+    employeesalarybase = models.ForeignKey('EmployeeSalaryBase', on_delete=models.PROTECT, related_name='statuses')
+    type = models.ForeignKey('EmployeeSalaryBaseStatusType', on_delete=models.PROTECT)
     date = models.DateTimeField(auto_now_add=True)
     class Meta:
         db_table='EmployeeSalaryBaseStatus'
@@ -861,7 +861,7 @@ class EmployeeSalaryBaseStatus(models.Model):
         get_latest_by = 'date'
 
 class SalaryExpenses(models.Model):
-    employee = models.ForeignKey('EmployeeBase', verbose_name=ugettext('employee'))
+    employee = models.ForeignKey('EmployeeBase', on_delete=models.PROTECT, verbose_name=ugettext('employee'))
     month = models.PositiveSmallIntegerField(ugettext('month'), choices=common.get_month_choices())
     year = models.PositiveSmallIntegerField(ugettext('year'), choices=common.get_year_choices())
     income_tax = models.FloatField(ugettext('income_tax'))
@@ -1014,8 +1014,8 @@ class EmployeeSalaryBase(models.Model):
         permissions = (('salaries_bank', 'Salaries for bank'), ('employee_salary_delete', 'Delete salary'))
 
 class NHEmployeeSalary(EmployeeSalaryBase):
-    nhemployee = models.ForeignKey('NHEmployee', verbose_name=ugettext('nhemployee'), related_name='salaries')
-    nhbranch = models.ForeignKey('NHBranch', verbose_name=ugettext('nhbranch'), null=True)
+    nhemployee = models.ForeignKey('NHEmployee', on_delete=models.PROTECT, verbose_name=ugettext('nhemployee'), related_name='salaries')
+    nhbranch = models.ForeignKey('NHBranch', on_delete=models.PROTECT, verbose_name=ugettext('nhbranch'), null=True)
     admin_commission = models.IntegerField(editable=False, null=True)
     
     objects = EmployeeSalaryBaseManager()
@@ -1091,7 +1091,7 @@ class NHEmployeeSalary(EmployeeSalaryBase):
         db_table='NHEmployeeSalary'
         
 class EmployeeSalary(EmployeeSalaryBase):
-    employee = models.ForeignKey('Employee', verbose_name=ugettext('employee'), related_name='salaries')
+    employee = models.ForeignKey('Employee', on_delete=models.PROTECT, verbose_name=ugettext('employee'), related_name='salaries')
     
     objects = EmployeeSalaryBaseManager()
     
@@ -1217,18 +1217,18 @@ class EmployeeSalary(EmployeeSalaryBase):
         permissions = (('season_employeesalary','Season employee salary'),)
 
 class EPCommission(models.Model):
-    employee = models.ForeignKey('Employee', related_name='commissions', editable=False)
-    project = models.ForeignKey('Project', related_name= 'epcommission', editable=False)
+    employee = models.ForeignKey('Employee', on_delete=models.PROTECT, related_name='commissions', editable=False)
+    project = models.ForeignKey('Project', on_delete=models.PROTECT, related_name= 'epcommission', editable=False)
     start_date = models.DateField(ugettext('start_date'))
     end_date = models.DateField(ugettext('end_date'), null=True, blank=True)
     max = models.FloatField(ugettext('max_commission'), null=True, blank=True)
-    c_var = models.OneToOneField('CVar', null=True, editable=False)
-    c_var_precentage = models.OneToOneField('CVarPrecentage', null=True, editable=False)
-    c_by_price = models.OneToOneField('CByPrice', null= True, editable=False)
-    b_house_type = models.OneToOneField('BHouseType', null=True, editable=False)
-    b_discount_save = models.OneToOneField('BDiscountSave', null=True, editable=False)
-    b_discount_save_precentage = models.OneToOneField('BDiscountSavePrecentage', null=True, editable=False)
-    b_sale_rate = models.OneToOneField('BSaleRate', null=True, editable=False)
+    c_var = models.ForeignKey('CVar', on_delete=models.PROTECT, null=True, editable=False)
+    c_var_precentage = models.ForeignKey('CVarPrecentage', on_delete=models.PROTECT, null=True, editable=False)
+    c_by_price = models.ForeignKey('CByPrice', on_delete=models.PROTECT, null= True, editable=False)
+    b_house_type = models.ForeignKey('BHouseType', on_delete=models.PROTECT, null=True, editable=False)
+    b_discount_save = models.ForeignKey('BDiscountSave', on_delete=models.PROTECT, null=True, editable=False)
+    b_discount_save_precentage = models.ForeignKey('BDiscountSavePrecentage', on_delete=models.PROTECT, null=True, editable=False)
+    b_sale_rate = models.ForeignKey('BSaleRate', on_delete=models.PROTECT, null=True, editable=False)
     def is_active(self, date=date.today()):
         if not self.end_date:
             return True
@@ -1316,7 +1316,7 @@ class EPCommission(models.Model):
         db_table = 'EPCommission'
 
 class CAmount(models.Model):
-    c_var = models.ForeignKey('CVar', related_name='amounts', editable=False)
+    c_var = models.ForeignKey('CVar', on_delete=models.PROTECT, related_name='amounts', editable=False)
     amount = models.PositiveIntegerField(ugettext('commission amount'))
     index = models.PositiveSmallIntegerField(editable=False)
 
@@ -1336,7 +1336,7 @@ class CAmount(models.Model):
         db_table = 'ECAmount'
         
 class CPrecentage(models.Model):
-    c_var_precentage = models.ForeignKey('CVarPrecentage', related_name='precentages', editable=False)
+    c_var_precentage = models.ForeignKey('CVarPrecentage', on_delete=models.PROTECT, related_name='precentages', editable=False)
     precentage = models.FloatField(ugettext('commission precentage'))
     index = models.PositiveSmallIntegerField(editable=False)
     
@@ -1356,7 +1356,7 @@ class CPrecentage(models.Model):
         db_table = 'CPrecentage'
 
 class CPriceAmount(models.Model):
-    c_by_price = models.ForeignKey('CByPrice', related_name='price_amounts', editable=False)
+    c_by_price = models.ForeignKey('CByPrice', on_delete=models.PROTECT, related_name='price_amounts', editable=False)
     price = models.PositiveIntegerField(ugettext('price'))
     amount = models.PositiveIntegerField(ugettext('commission amount'))
     
@@ -1367,15 +1367,15 @@ class CPriceAmount(models.Model):
         db_table = 'CPriceAmount'
     
 class HouseTypeBonus(models.Model):
-    bonus = models.ForeignKey('BHouseType', related_name ='bonuses')
-    type = models.ForeignKey('HouseType', verbose_name=ugettext('house_type'))
+    bonus = models.ForeignKey('BHouseType', on_delete=models.PROTECT, related_name ='bonuses')
+    type = models.ForeignKey('HouseType', on_delete=models.PROTECT, verbose_name=ugettext('house_type'))
     amount = models.PositiveIntegerField(ugettext('amount'))
     class Meta:
         db_table = 'HouseTypeBonus'
         unique_together = ('bonus','type')
         
 class SaleRateBonus(models.Model):
-    b_sale_rate = models.ForeignKey('BSaleRate', related_name='bonuses')
+    b_sale_rate = models.ForeignKey('BSaleRate', on_delete=models.PROTECT, related_name='bonuses')
     house_count = models.PositiveSmallIntegerField(ugettext('house count'))
     amount = models.PositiveIntegerField(ugettext('commission amount'))
     class Meta:
@@ -1678,11 +1678,11 @@ class BSaleRate(models.Model):
         db_table = 'BSaleRate'
     
 class ProjectCommission(models.Model):
-    project = models.OneToOneField('Project', related_name= 'commissions', editable=False)
-    c_var_precentage = models.OneToOneField('CVarPrecentage', related_name= 'projectcommission', null=True, editable=False)
-    c_var_precentage_fixed = models.OneToOneField('CVarPrecentageFixed', related_name= 'projectcommission', null=True, editable=False)
-    c_zilber = models.OneToOneField('CZilber', related_name='projectcommission', null=True, editable=False)
-    b_discount_save_precentage = models.OneToOneField('BDiscountSavePrecentage', related_name= 'projectcommission', null=True, editable=False)
+    project = models.ForeignKey('Project', on_delete=models.PROTECT, related_name= 'commissions', editable=False)
+    c_var_precentage = models.ForeignKey('CVarPrecentage', on_delete=models.PROTECT, related_name= 'projectcommission', null=True, editable=False)
+    c_var_precentage_fixed = models.ForeignKey('CVarPrecentageFixed', on_delete=models.PROTECT, related_name= 'projectcommission', null=True, editable=False)
+    c_zilber = models.ForeignKey('CZilber', on_delete=models.PROTECT, related_name='projectcommission', null=True, editable=False)
+    b_discount_save_precentage = models.ForeignKey('BDiscountSavePrecentage', on_delete=models.PROTECT, related_name= 'projectcommission', null=True, editable=False)
    
     add_amount = models.PositiveIntegerField(ugettext('add_amount'), null=True, blank=True)
     add_type = models.CharField(ugettext('add_type'), max_length = 20, null=True, blank=True)
@@ -1841,7 +1841,7 @@ class Invoice(models.Model):
     date = models.DateField(ugettext('invoice_date'))
     amount = models.IntegerField(ugettext('amount'))
     remarks = models.TextField(ugettext('remarks'), null=True,blank=True)
-    offset = models.OneToOneField('InvoiceOffset', editable=False, null=True)
+    offset = models.ForeignKey('InvoiceOffset', on_delete=models.PROTECT, editable=False, null=True)
     
     objects = InvoiceManager()
     
@@ -1875,7 +1875,7 @@ class Payment(models.Model):
     support_num = models.IntegerField(ugettext('support_num'), null=True, blank=True)
     bank = models.CharField(ugettext('bank'), max_length=40, null=True, blank=True)
     branch_num = models.PositiveSmallIntegerField(ugettext('branch_num'), null=True, blank=True)
-    payment_type = models.ForeignKey('PaymentType', verbose_name=ugettext('payment_type'))
+    payment_type = models.ForeignKey('PaymentType', on_delete=models.PROTECT, verbose_name=ugettext('payment_type'))
     payment_date = models.DateField(ugettext('payment_date'))
     creation_date = models.DateField(auto_now_add = True)
     amount = models.IntegerField(ugettext('amount'))
@@ -1903,9 +1903,9 @@ class DemandStatusType(models.Model):
         db_table = 'DemandStatusType'
 
 class DemandStatus(models.Model):
-    demand = models.ForeignKey('Demand', related_name='statuses')
+    demand = models.ForeignKey('Demand', on_delete=models.PROTECT, related_name='statuses')
     date = models.DateTimeField(auto_now_add=True)
-    type = models.ForeignKey('DemandStatusType')
+    type = models.ForeignKey('DemandStatusType', on_delete=models.PROTECT)
     def __unicode__(self):
         return u'%s - %s' % (self.type, self.date.strftime('%d/%m/%Y %H:%M'))
     class Meta:
@@ -1913,7 +1913,7 @@ class DemandStatus(models.Model):
         get_latest_by = 'date'
 
 class DemandDiff(models.Model):
-    demand = models.ForeignKey('Demand', editable=False, related_name='diffs')
+    demand = models.ForeignKey('Demand', on_delete=models.PROTECT, editable=False, related_name='diffs')
     type = models.CharField(ugettext('diff_type'), max_length=30, help_text=u'קבועה, משתנה, בונוס, קיזוז או לבחירתך')
     reason = models.CharField(ugettext('diff_reason'), max_length=30, null=True, blank=True)
     amount = models.FloatField(ugettext('amount'))
@@ -1929,7 +1929,7 @@ class DemandDiff(models.Model):
         unique_together = ('demand','type')
       
 class Demand(models.Model):
-    project = models.ForeignKey('Project', related_name='demands', verbose_name = ugettext('project'))
+    project = models.ForeignKey('Project', on_delete=models.PROTECT, related_name='demands', verbose_name = ugettext('project'))
     month = models.PositiveSmallIntegerField(ugettext('month'), choices=common.get_month_choices())
     year = models.PositiveSmallIntegerField(ugettext('year'), choices=common.get_year_choices())
     sale_count = models.PositiveSmallIntegerField(ugettext('sale_count'), default=0)
@@ -2163,9 +2163,9 @@ class SignupCancel(models.Model):
         db_table='SignupCancel'
         
 class Signup(models.Model):
-    employee = models.ForeignKey('Employee', related_name = 'signups', verbose_name=ugettext('employee'),
+    employee = models.ForeignKey('Employee', on_delete=models.PROTECT, related_name = 'signups', verbose_name=ugettext('employee'),
                                  null=True, blank=True)
-    house = models.ForeignKey('House', related_name = 'signups', verbose_name=ugettext('house'))
+    house = models.ForeignKey('House', on_delete=models.PROTECT, related_name = 'signups', verbose_name=ugettext('house'))
     date = models.DateField(ugettext('signup_date'))
     clients = models.TextField(ugettext('clients'))
     clients_address = models.TextField(ugettext('clients_address'), null=True)
@@ -2174,7 +2174,7 @@ class Signup(models.Model):
     price = models.IntegerField(ugettext('signup_price'))
     price_include_lawyer = models.BooleanField(ugettext('include_lawyer'), choices = Boolean)
     remarks = models.TextField(ugettext('remarks'), null=True, blank=True)
-    cancel = models.OneToOneField('SignupCancel', related_name = 'signup', null=True, editable=False)
+    cancel = models.ForeignKey('SignupCancel', on_delete=models.PROTECT, related_name = 'signup', null=True, editable=False)
     def get_absolute_url(self):
         return '/signups/%s' % self.id
     class Meta:
@@ -2231,10 +2231,10 @@ class MadadCP(models.Model):
         unique_together = ('year', 'month')
 
 class NHPay(models.Model):
-    nhsaleside = models.ForeignKey('NHSaleSide', editable=False, related_name='pays')
-    employee = models.ForeignKey('EmployeeBase', editable=False, related_name='nhpays', 
+    nhsaleside = models.ForeignKey('NHSaleSide', on_delete=models.PROTECT, editable=False, related_name='pays')
+    employee = models.ForeignKey('EmployeeBase', on_delete=models.PROTECT, editable=False, related_name='nhpays', 
                                  null=True)
-    lawyer = models.ForeignKey('Lawyer', editable=False, related_name='nhpays', 
+    lawyer = models.ForeignKey('Lawyer', on_delete=models.PROTECT, editable=False, related_name='nhpays', 
                                null=True)
     year = models.PositiveSmallIntegerField()
     month = models.PositiveSmallIntegerField()
@@ -2258,28 +2258,28 @@ class SaleType(models.Model):
         db_table='SaleType'
 
 class NHSaleSide(models.Model):
-    nhsale = models.ForeignKey('NHSale', editable=False)
-    sale_type = models.ForeignKey('SaleType', verbose_name=ugettext('action_type'))
+    nhsale = models.ForeignKey('NHSale', on_delete=models.PROTECT, editable=False)
+    sale_type = models.ForeignKey('SaleType', on_delete=models.PROTECT, verbose_name=ugettext('action_type'))
     name1 = models.CharField(ugettext('name'), max_length=20)
     name2 = models.CharField(ugettext('name'), max_length=20, null=True, blank=True)
     phone1 = models.CharField(ugettext('phone'), max_length=20)
     phone2 = models.CharField(ugettext('phone'), max_length=20, null=True, blank=True)
     address = models.CharField(ugettext('address'), max_length=40)
-    employee1 = models.ForeignKey('NHEmployee', verbose_name=ugettext('advisor'), related_name='nhsaleside1s')
+    employee1 = models.ForeignKey('NHEmployee', on_delete=models.PROTECT, verbose_name=ugettext('advisor'), related_name='nhsaleside1s')
     employee1_commission = models.FloatField(ugettext('commission_precent'))
-    employee2 = models.ForeignKey('NHEmployee', verbose_name=ugettext('advisor'), related_name='nhsaleside2s', null=True, 
+    employee2 = models.ForeignKey('NHEmployee', on_delete=models.PROTECT, verbose_name=ugettext('advisor'), related_name='nhsaleside2s', null=True, 
                                   blank=True)
     employee2_commission = models.FloatField(ugettext('commission_precent'), null=True, blank=True)
-    employee3 = models.ForeignKey('NHEmployee', verbose_name=ugettext('advisor'), related_name='nhsaleside3s', null=True, 
+    employee3 = models.ForeignKey('NHEmployee', on_delete=models.PROTECT, verbose_name=ugettext('advisor'), related_name='nhsaleside3s', null=True, 
                                   blank=True)
     employee3_commission = models.FloatField(ugettext('commission_precent'), null=True, blank=True)
-    director = models.ForeignKey('EmployeeBase', verbose_name=ugettext('director'), related_name='nhsaleside_director', 
+    director = models.ForeignKey('EmployeeBase', on_delete=models.PROTECT, verbose_name=ugettext('director'), related_name='nhsaleside_director', 
                                 null=True, blank=True)    
     director_commission = models.FloatField(ugettext('commission_precent'), null=True, blank=True)
-    signing_advisor = models.ForeignKey('NHEmployee', verbose_name=ugettext('signing_advisor'), related_name='nhsaleside_signer')
-    lawyer1 = models.ForeignKey('Lawyer', verbose_name=ugettext('lawyer'), related_name='nhsaleside1s', 
+    signing_advisor = models.ForeignKey('NHEmployee', on_delete=models.PROTECT, verbose_name=ugettext('signing_advisor'), related_name='nhsaleside_signer')
+    lawyer1 = models.ForeignKey('Lawyer', on_delete=models.PROTECT, verbose_name=ugettext('lawyer'), related_name='nhsaleside1s', 
                                 null=True, blank=True)
-    lawyer2 = models.ForeignKey('Lawyer', verbose_name=ugettext('lawyer'), related_name='nhsaleside2s', 
+    lawyer2 = models.ForeignKey('Lawyer', on_delete=models.PROTECT, verbose_name=ugettext('lawyer'), related_name='nhsaleside2s', 
                                 null=True, blank=True)
     signed_commission = models.FloatField(ugettext('signed_commission'))
     actual_commission = models.FloatField(ugettext('actual_commission'))
@@ -2429,7 +2429,7 @@ class NHSaleSide(models.Model):
         db_table = 'NHSaleSide'
 
 class NHMonth(models.Model):
-    nhbranch = models.ForeignKey('NHBranch', verbose_name=ugettext('nhbranch'))
+    nhbranch = models.ForeignKey('NHBranch', on_delete=models.PROTECT, verbose_name=ugettext('nhbranch'))
     month = models.PositiveSmallIntegerField(ugettext('month'), choices=common.get_month_choices())
     year = models.PositiveSmallIntegerField(ugettext('year'), choices=common.get_year_choices())
     is_closed = models.BooleanField(editable=False, default=False)
@@ -2516,14 +2516,14 @@ class NHMonth(models.Model):
         unique_together = ('nhbranch','year','month')
 
 class NHSale(models.Model):
-    nhmonth = models.ForeignKey('NHMonth', editable=False, related_name='nhsales')
+    nhmonth = models.ForeignKey('NHMonth', on_delete=models.PROTECT, editable=False, related_name='nhsales')
     
     num = models.IntegerField(ugettext('sale_num'), unique=True)
     address = models.CharField(ugettext('address'), max_length=50)
     hood = models.CharField(ugettext('hood'), max_length=50)
     rooms = models.FloatField(ugettext('rooms'))
     floor = models.PositiveSmallIntegerField(ugettext('floor'))
-    type = models.ForeignKey('HouseType', verbose_name = ugettext('house_type'))
+    type = models.ForeignKey('HouseType', on_delete=models.PROTECT, verbose_name = ugettext('house_type'))
     
     sale_date = models.DateField(ugettext('sale_date'))
     price = models.FloatField(ugettext('price'))
@@ -2537,7 +2537,7 @@ class NHSale(models.Model):
         permissions = (('nhsale_move_nhmonth', 'NHSale Move Month'),)
 
 class SaleMod(models.Model):
-    sale = models.OneToOneField('Sale', unique=True, editable=False, related_name='%(class)s')
+    sale = models.ForeignKey('Sale', on_delete=models.PROTECT, unique=True, editable=False, related_name='%(class)s')
     date = models.DateField(ugettext('date'), auto_now = True)
     remarks = models.TextField(ugettext('remarks'), null=True)
     def get_absolute_url(self):
@@ -2607,9 +2607,9 @@ class SaleCancel(SaleMod):
         db_table = 'SaleCancel'
 
 class Sale(models.Model):
-    demand = models.ForeignKey('Demand', related_name='sales', editable=False)
-    house = models.ForeignKey('House', related_name = 'sales', verbose_name=ugettext('house'))
-    employee = models.ForeignKey('Employee', related_name = 'sales', verbose_name=ugettext('employee'),
+    demand = models.ForeignKey('Demand', on_delete=models.PROTECT, related_name='sales', editable=False)
+    house = models.ForeignKey('House', on_delete=models.PROTECT, related_name = 'sales', verbose_name=ugettext('house'))
+    employee = models.ForeignKey('Employee', on_delete=models.PROTECT, related_name = 'sales', verbose_name=ugettext('employee'),
                                  null=True, blank=True)
     sale_date = models.DateField(ugettext('sale_date'))
     price = models.IntegerField(ugettext('sale_price'))
@@ -2825,11 +2825,11 @@ class CheckBase(models.Model):
     num = models.IntegerField(ugettext('check_num'), unique=True)
     issue_date = models.DateField(ugettext('issue_date'))
     pay_date = models.DateField(ugettext('payment_date'))
-    division_type = models.ForeignKey('DivisionType', verbose_name=ugettext('division_type'), blank=True)
-    expense_type = models.ForeignKey('ExpenseType', verbose_name=ugettext('expense_type'), blank=True)
-    type = models.ForeignKey('CheckBaseType', verbose_name=ugettext('invoice'))
+    division_type = models.ForeignKey('DivisionType', on_delete=models.PROTECT, verbose_name=ugettext('division_type'), blank=True)
+    expense_type = models.ForeignKey('ExpenseType', on_delete=models.PROTECT, verbose_name=ugettext('expense_type'), blank=True)
+    type = models.ForeignKey('CheckBaseType', on_delete=models.PROTECT, verbose_name=ugettext('invoice'))
     amount = models.IntegerField(ugettext('amount'))
-    invoice = models.ForeignKey('Invoice', editable=False, null=True)
+    invoice = models.ForeignKey('Invoice', on_delete=models.PROTECT, editable=False, null=True)
     remarks = models.TextField(ugettext('remarks'), blank=True)
     def diff_amount_invoice(self):
         if self.invoice == None: return None
@@ -2839,8 +2839,8 @@ class CheckBase(models.Model):
         ordering = ['division_type','expense_type']
 
 class EmployeeCheck(CheckBase):
-    employee = models.ForeignKey('EmployeeBase', related_name='checks', verbose_name=ugettext('employee'))
-    purpose_type = models.ForeignKey('PurposeType', verbose_name=ugettext('purpose_type'))
+    employee = models.ForeignKey('EmployeeBase', on_delete=models.PROTECT, related_name='checks', verbose_name=ugettext('employee'))
+    purpose_type = models.ForeignKey('PurposeType', on_delete=models.PROTECT, verbose_name=ugettext('purpose_type'))
     month = models.PositiveSmallIntegerField(ugettext('month'), choices=common.get_month_choices())
     year = models.PositiveSmallIntegerField(ugettext('year'), choices=common.get_year_choices())
     def salary(self):
@@ -2862,8 +2862,8 @@ class EmployeeCheck(CheckBase):
         db_table = 'EmployeeCheck'
 
 class Check(CheckBase):
-    supplier_type = models.ForeignKey('SupplierType', verbose_name=ugettext('supplier_type'))
-    account = models.ForeignKey('Account', null=True, editable=False)
+    supplier_type = models.ForeignKey('SupplierType', on_delete=models.PROTECT, verbose_name=ugettext('supplier_type'))
+    account = models.ForeignKey('Account', on_delete=models.PROTECT, null=True, editable=False)
     tax_deduction_source = models.IntegerField(ugettext('tax_deduction_source'),null=True, blank=True)
     order_verifier = models.CharField(ugettext('order_verifier'),max_length=30)
     payment_verifier = models.CharField(ugettext('payment_verifier'),max_length=30)
@@ -2941,14 +2941,14 @@ class Income(models.Model):
     year = models.PositiveSmallIntegerField(ugettext('year'), choices=common.get_year_choices())
     month = models.PositiveSmallIntegerField(ugettext('month'), choices=common.get_month_choices())
     
-    division_type = models.ForeignKey('DivisionType', verbose_name=ugettext('division_type'), blank=True)
-    income_type = models.ForeignKey('IncomeType', verbose_name=ugettext('income_type'), blank=True)
-    income_producer_type = models.ForeignKey('IncomeProducerType', verbose_name=ugettext('income_producer_type'), blank=True)
-    client_type = models.ForeignKey('ClientType', verbose_name=ugettext('client_type'), blank=True)
+    division_type = models.ForeignKey('DivisionType', on_delete=models.PROTECT, verbose_name=ugettext('division_type'), blank=True)
+    income_type = models.ForeignKey('IncomeType', on_delete=models.PROTECT, verbose_name=ugettext('income_type'), blank=True)
+    income_producer_type = models.ForeignKey('IncomeProducerType', on_delete=models.PROTECT, verbose_name=ugettext('income_producer_type'), blank=True)
+    client_type = models.ForeignKey('ClientType', on_delete=models.PROTECT, verbose_name=ugettext('client_type'), blank=True)
     
-    invoice = models.OneToOneField('Invoice',editable=False,null=True)
-    payment = models.OneToOneField('Payment',editable=False,null=True)
-    deal = models.OneToOneField('Deal', editable=False)
+    invoice = models.ForeignKey('Invoice', on_delete=models.PROTECT,editable=False,null=True)
+    payment = models.ForeignKey('Payment', on_delete=models.PROTECT,editable=False,null=True)
+    deal = models.ForeignKey('Deal', on_delete=models.PROTECT, editable=False)
     
     objects = SeasonManager()
     
@@ -2965,7 +2965,7 @@ class Income(models.Model):
         db_table = 'Income'
 
 class Deal(models.Model):
-    client_status_type = models.ForeignKey('ClientStatusType', verbose_name=ugettext('client_status_type'), null=True, blank=True)
+    client_status_type = models.ForeignKey('ClientStatusType', on_delete=models.PROTECT, verbose_name=ugettext('client_status_type'), null=True, blank=True)
     address = models.CharField(ugettext('address'), max_length=30, null=True, blank=True)
     rooms = models.FloatField(ugettext('rooms'), null=True, blank=True)
     floor = models.IntegerField(ugettext('floor'), null=True, blank=True)
@@ -2994,9 +2994,9 @@ class City(models.Model):
         db_table = 'City'
         
 class CityCallers(models.Model):
-    activity_base = models.ForeignKey('ActivityBase', editable=False)
+    activity_base = models.ForeignKey('ActivityBase', on_delete=models.PROTECT, editable=False)
     
-    city = models.ForeignKey('City', verbose_name = ugettext('city'), blank=True)
+    city = models.ForeignKey('City', on_delete=models.PROTECT, verbose_name = ugettext('city'), blank=True)
     callers_num = models.PositiveSmallIntegerField(ugettext('callers_num'))
     
     objects = CityCallersManager()
@@ -3008,9 +3008,9 @@ class CityCallers(models.Model):
         db_table = 'CityCallers'
 
 class MediaReferrals(models.Model):
-    activity_base = models.ForeignKey('ActivityBase', editable=False)
+    activity_base = models.ForeignKey('ActivityBase', on_delete=models.PROTECT, editable=False)
     
-    media = models.ForeignKey('Media', verbose_name = ugettext('media'), blank=True)
+    media = models.ForeignKey('Media', on_delete=models.PROTECT, verbose_name = ugettext('media'), blank=True)
     referrals_num = models.PositiveSmallIntegerField(ugettext('referrals_num'))
     
     objects = MediaReferralsManager()
@@ -3022,9 +3022,9 @@ class MediaReferrals(models.Model):
         db_table = 'MediaReferrals'
 
 class PriceOffer(models.Model):
-    nhactivity = models.ForeignKey('NHActivity', editable=False)
+    nhactivity = models.ForeignKey('NHActivity', on_delete=models.PROTECT, editable=False)
     
-    nhemployee = models.ForeignKey('NHEmployee', verbose_name = ugettext('nhemployee'))
+    nhemployee = models.ForeignKey('NHEmployee', on_delete=models.PROTECT, verbose_name = ugettext('nhemployee'))
     
     address = models.CharField(ugettext('address'), max_length=50)
     rooms = models.FloatField(ugettext('rooms'))
@@ -3044,11 +3044,11 @@ class PriceOffer(models.Model):
     
 
 class SaleProcess(models.Model):
-    activity_base = models.ForeignKey('ActivityBase', editable=False)
+    activity_base = models.ForeignKey('ActivityBase', on_delete=models.PROTECT, editable=False)
     
-    project = models.ForeignKey('Project', verbose_name=ugettext('project'))
-    building = models.ForeignKey('Building', verbose_name=ugettext('building'))
-    house = models.ForeignKey('House', verbose_name=ugettext('house'))
+    project = models.ForeignKey('Project', on_delete=models.PROTECT, verbose_name=ugettext('project'))
+    building = models.ForeignKey('Building', on_delete=models.PROTECT, verbose_name=ugettext('building'))
+    house = models.ForeignKey('House', on_delete=models.PROTECT, verbose_name=ugettext('house'))
     
     price = models.IntegerField(ugettext('price'))
     objection = models.TextField(ugettext('objection'), max_length=200, null=True, blank=True)
@@ -3058,7 +3058,7 @@ class SaleProcess(models.Model):
         db_table = 'SaleProcess'
 
 class Event(models.Model):
-    activity_base = models.ForeignKey('ActivityBase', editable=False)
+    activity_base = models.ForeignKey('ActivityBase', on_delete=models.PROTECT, editable=False)
     
     date = models.DateTimeField(ugettext('date'))
     initiator = models.CharField(ugettext('event_initiator'), max_length=50)
@@ -3083,8 +3083,8 @@ class ActivityBase(models.Model):
         db_table = 'ActivityBase'
 
 class Activity(ActivityBase):
-    project = models.ForeignKey('Project', verbose_name=ugettext('project'))
-    employee = models.ForeignKey('Employee', verbose_name = ugettext('employee'))
+    project = models.ForeignKey('Project', on_delete=models.PROTECT, verbose_name=ugettext('project'))
+    employee = models.ForeignKey('Employee', on_delete=models.PROTECT, verbose_name = ugettext('employee'))
     
     @property
     def sales(self):
@@ -3105,8 +3105,8 @@ class Activity(ActivityBase):
         db_table = 'Activity'
         
 class NHActivity(ActivityBase):
-    nhbranch = models.ForeignKey('NHBranch', verbose_name=ugettext('nhbranch'))
-    nhemployee = models.ForeignKey('NHEmployee', verbose_name = ugettext('nhemployee'))
+    nhbranch = models.ForeignKey('NHBranch', on_delete=models.PROTECT, verbose_name=ugettext('nhbranch'))
+    nhemployee = models.ForeignKey('NHEmployee', on_delete=models.PROTECT, verbose_name = ugettext('nhemployee'))
     
     @property
     def nhsales(self):
@@ -3116,7 +3116,7 @@ class NHActivity(ActivityBase):
         db_table = 'NHActivity'
 
 class RevisionExt(models.Model):
-    revision = models.OneToOneField('reversion.Revision')
+    revision = models.ForeignKey('reversion, on_delete=models.PROTECT.Revision')
     date = models.DateTimeField()
     
     class Meta:
