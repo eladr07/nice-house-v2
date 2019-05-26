@@ -1,10 +1,10 @@
-import Management.models as models
-
 from reportlab.platypus import Paragraph
 from pyfribidi import log2vis
-from Management.templatetags.management_extras import commaise
 from django.utils.translation import ugettext
-from styles import *
+
+import Management.models as models
+from Management.templatetags.management_extras import commaise
+from Management.pdf.styles import *
 
 class TableField(object):
     def __init__(self, title='', width= -1, is_summarized=False, is_commaised=False, is_averaged = False):

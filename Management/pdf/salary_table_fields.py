@@ -1,11 +1,14 @@
-import Management.models as models
+
 
 from reportlab.platypus import Paragraph
 from pyfribidi import log2vis
+
+import Management.models as models
 from Management.templatetags.management_extras import commaise
+from Management.pdf.styles import *
+from Management.pdf.table_fields import TableField
+
 from django.utils.translation import ugettext
-from styles import *
-from table_fields import TableField
 
 class EmployeeHireTypeField(TableField):
     def __init__(self):

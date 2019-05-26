@@ -1,5 +1,5 @@
 from Management.templatetags.management_extras import commaise
-from styles import *
+from Management.pdf.styles import *
 from reportlab.platypus import Paragraph
 from django.utils.translation import ugettext
 

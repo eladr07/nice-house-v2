@@ -1,14 +1,16 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import settings, Management.models
 import logging, itertools
 from datetime import datetime, date
+
+from NiceHouse.settings import STATIC_URL
+import Management.models
 from Management.templatetags.management_extras import commaise
+
 import reportlab.rl_config
 reportlab.rl_config.warnOnMissingFontGlyphs = 0
 
 from reportlab.lib.pagesizes import A4, landscape
-from django.utils.translation import ugettext
 from reportlab.pdfgen import canvas
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Image, Spacer, Frame, Table, PageBreak, KeepTogether
 from reportlab.pdfbase import pdfmetrics
@@ -18,15 +20,17 @@ from pyfribidi import log2vis
 from reportlab.lib.enums import *
 from reportlab.lib.styles import ParagraphStyle
 
-from helpers import Builder, MassBuilder
-from table_fields import *
-from salary_table_fields import *
-from styles import *
+from django.utils.translation import ugettext
+
+from Management.pdf.helpers import Builder, MassBuilder
+from Management.pdf.table_fields import *
+from Management.pdf.salary_table_fields import *
+from Management.pdf.styles import *
 
 #register Hebrew fonts
 import os
-pdfmetrics.registerFont(TTFont('David', os.path.join(settings.STATIC_ROOT, 'fonts/DavidCLM-Medium.ttf')))
-pdfmetrics.registerFont(TTFont('David-Bold', os.path.join(settings.STATIC_ROOT, 'fonts/DavidCLM-Bold.ttf')))
+pdfmetrics.registerFont(TTFont('David', os.path.join(STATIC_URL, 'fonts/DavidCLM-Medium.ttf')))
+pdfmetrics.registerFont(TTFont('David-Bold', os.path.join(STATIC_URL, 'fonts/DavidCLM-Bold.ttf')))
 
 pdfmetrics.registerFontFamily('David', normal='David', bold='David-Bold')
 
@@ -58,7 +62,7 @@ def tableCaption(caption=log2vis(u'ולהלן פירוט העסקאות')):
                      ParagraphStyle(name='tableCaption', fontName='David-Bold', fontSize=15,
                                     alignment=TA_CENTER))
 def nhLogo():
-    return Image(os.path.join(settings.STATIC_ROOT, 'images/nh_logo.jpg'), 300, 50)
+    return Image(os.path.join(STATIC_URL, 'images/nh_logo.jpg'), 300, 50)
 
 def sigPara():
     s = log2vis('ברגשי כבוד,') + '<br/>'
@@ -66,7 +70,7 @@ def sigPara():
     return Paragraph(s, ParagraphStyle(name='sig', fontName='David-Bold', fontSize=15,
                                        alignment=TA_LEFT))
 def nhAddr():
-    return Image(os.path.join(settings.STATIC_ROOT, 'images/nh_addr.jpg'), 300, 50)
+    return Image(os.path.join(STATIC_URL, 'images/nh_addr.jpg'), 300, 50)
 
 class NumberedCanvas(canvas.Canvas):
     def __init__(self, *args, **kwargs):
