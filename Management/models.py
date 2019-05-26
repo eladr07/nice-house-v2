@@ -464,7 +464,7 @@ class Person(models.Model):
         
 class Contact(Person):
     phone = models.CharField(ugettext('phone'), max_length=10, null=True, blank=True)
-    fax = models.CharField(ugettext('fax'), max_length=10, null=True, blank=True);
+    fax = models.CharField(ugettext('fax'), max_length=10, null=True, blank=True)
     company = models.CharField(ugettext('company'), max_length=20, null=True, blank=True)
     remarks = models.TextField(ugettext('remarks'), null=True, blank=True)
     class Meta:
