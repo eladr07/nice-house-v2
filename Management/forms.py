@@ -1,12 +1,16 @@
-﻿import django.forms as forms
-from django.forms.models import modelform_factory
-import sys
-import common
+﻿
+from sys import maxsize
+from datetime import datetime, date
+
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext
-from models import *
-from datetime import datetime, date
+import django.forms as forms
+from django.forms.models import modelform_factory
+
 import reversion
+
+import Management.common as common
+from Management.models import *
 
 class SeasonForm(forms.Form):
     from_year = forms.ChoiceField(choices=((i,i) for i in range(datetime.now().year - 10, datetime.now().year+10)), 
@@ -49,33 +53,33 @@ class RevisionExtForm(forms.ModelForm):
     class Meta:
         pass
         
-CVarForm = modelform_factory(CVar, RevisionExtForm)
+CVarForm = modelform_factory(CVar, RevisionExtForm, fields=('date','is_retro'))
 
-CVarPrecentageForm = modelform_factory(CVarPrecentage, RevisionExtForm)
+CVarPrecentageForm = modelform_factory(CVarPrecentage, RevisionExtForm, fields=('date','is_retro','start_retro'))
 
-CByPriceForm = modelform_factory(CByPrice, RevisionExtForm)
+CByPriceForm = modelform_factory(CByPrice, RevisionExtForm, fields=('date',))
 
-CZilberForm = modelform_factory(CZilber, RevisionExtForm)
+CZilberForm = modelform_factory(CZilber, RevisionExtForm, fields=('date','base','b_discount','b_sale_rate','b_sale_rate_max','base_madad','third_start'))
 
-CVarPrecentageFixedForm = modelform_factory(CVarPrecentageFixed, RevisionExtForm)
+CVarPrecentageFixedForm = modelform_factory(CVarPrecentageFixed, RevisionExtForm, fields=('date','is_retro','first_count','first_precentage','step','last_count','last_precentage'))
 
-BDiscountSaveForm = modelform_factory(BDiscountSave, RevisionExtForm)
+BDiscountSaveForm = modelform_factory(BDiscountSave, RevisionExtForm, fields=('date','precentage_bonus','max_for_bonus'))
 
-BDiscountSavePrecentageForm = modelform_factory(BDiscountSavePrecentage, RevisionExtForm)
+BDiscountSavePrecentageForm = modelform_factory(BDiscountSavePrecentage, RevisionExtForm, fields=('date','precentage_bonus','max_for_bonus'))
 
-BHouseTypeForm = modelform_factory(BHouseType, RevisionExtForm)
+BHouseTypeForm = modelform_factory(BHouseType, RevisionExtForm, fields=('date',))
 
-BSaleRateForm = modelform_factory(BSaleRate, RevisionExtForm)
+BSaleRateForm = modelform_factory(BSaleRate, RevisionExtForm, fields=('date',))
 
-AdvancePaymentForm = modelform_factory(AdvancePayment)
+AdvancePaymentForm = modelform_factory(AdvancePayment, exclude=('date_paid','is_paid'))
 
-LoanPayForm = modelform_factory(LoanPay)
+LoanPayForm = modelform_factory(LoanPay, fields=('employee','month','year','amount','deduct_from_salary','remarks'))
         
-SalaryExpensesForm = modelform_factory(SalaryExpenses)
+SalaryExpensesForm = modelform_factory(SalaryExpenses, exclude=('approved_date',))
         
-TaskForm = modelform_factory(Task)
+TaskForm = modelform_factory(Task, fields=('user','content'))
 
-AccountForm = modelform_factory(Account)
+AccountForm = modelform_factory(Account, fields=('num','bank','branch','branch_num','payee'))
 
 DemandRemarksForm = modelform_factory(Demand, fields = ('remarks',))
 
@@ -89,15 +93,19 @@ NHEmployeeSalaryRemarksForm = modelform_factory(NHEmployeeSalary, fields = ('nhe
 
 NHEmployeeSalaryRefundForm = modelform_factory(NHEmployeeSalary, fields = ('nhemployee', 'refund','refund_type'))
 
-NHCommissionForm = modelform_factory(NHCommission, RevisionExtForm)
+NHCommissionForm = modelform_factory(NHCommission, RevisionExtForm, 
+    fields=('date',
+            'nhbranch','nhemployee','name',
+            'left_filter','left_income_type','operator','left_amount',
+            'right_filter','right_income_type','right_amount','right_amount_type'))
 
-SalePriceModForm = modelform_factory(SalePriceMod)
+SalePriceModForm = modelform_factory(SalePriceMod, exclude=('sale','date'))
 
-SaleHouseModForm = modelform_factory(SaleHouseMod)
+SaleHouseModForm = modelform_factory(SaleHouseMod, exclude=('sale','date'))
 
-SalePreForm = modelform_factory(SalePre)
+SalePreForm = modelform_factory(SalePre, exclude=('sale','date'))
 
-SaleRejectForm = modelform_factory(SaleReject)
+SaleRejectForm = modelform_factory(SaleReject, exclude=('sale','date'))
 
 class ContactForm(forms.ModelForm):
     def __init__(self, *args, **kw):
@@ -105,6 +113,8 @@ class ContactForm(forms.ModelForm):
         self.fields['remarks'].widget = forms.Textarea({'cols':'20', 'rows':'3'})
     class Meta:
         model = Contact
+        fields=('first_name','last_name','cell_phone','mail','address','role',
+                'phone','fax','company','remarks')
 
 class ExistContactForm(forms.Form):
     contact = forms.ModelChoiceField(queryset=Contact.objects.all())
@@ -117,6 +127,7 @@ class ProjectForm(forms.ModelForm):
         self.fields['end_date'].widget = forms.TextInput({'class':'vDateField'})
     class Meta:
         model = Project
+        exclude=('details','demand_contact','payment_contact','contacts','reminders')
 
 class ProjectDetailsForm(forms.ModelForm):
     def __init__(self, *args, **kw):
@@ -124,6 +135,7 @@ class ProjectDetailsForm(forms.ModelForm):
         self.fields['remarks'].widget = forms.Textarea({'cols':'20', 'rows':'3'})
     class Meta:
         model = ProjectDetails
+        fields=('architect','houses_num','buildings_num','bank','url','remarks','building_types')
 
 class BuildingForm(forms.ModelForm):
     def __init__(self, *args, **kw):
@@ -131,6 +143,7 @@ class BuildingForm(forms.ModelForm):
         self.fields['remarks'].widget = forms.Textarea({'cols':'20', 'rows':'3'})
     class Meta:
         model = Building
+        exclude=('pricelist','is_deleted')
 
 class PricelistForm(forms.ModelForm):
     def __init__(self, *args, **kw):
@@ -139,6 +152,9 @@ class PricelistForm(forms.ModelForm):
         self.fields['settle_date'].widget = forms.TextInput({'class':'vDateField'})
     class Meta:
         model = Pricelist
+        fields=('include_tax','include_lawyer','include_parking','include_storage','include_registration','include_guarantee',
+                'settle_date','allowed_discount','is_permit','permit_date','lawyer_fee',
+                'register_amount','guarantee_amount','storage_cost','remarks')
 
 class PricelistUpdateForm(forms.Form):
     Add, Multiply, Precentage = 1,2,3
@@ -167,6 +183,7 @@ class ParkingForm(forms.ModelForm):
             self.fields['house'].queryset = self.instance.building.houses.all()
     class Meta:
         model = Parking
+        fields=('building','house','num','type','remarks')
         
 class StorageForm(forms.ModelForm):
     def __init__(self, *args, **kw):
@@ -176,6 +193,7 @@ class StorageForm(forms.ModelForm):
             self.fields['house'].queryset = self.instance.building.houses.all()
     class Meta:
         model = Storage
+        fields=('building','house','num','size','remarks')
 
 class HouseForm(forms.ModelForm):
     parking1 = forms.ModelChoiceField(queryset=Parking.objects.all(), required=False, label = ugettext('parking') + ' 1')
@@ -233,6 +251,7 @@ class HouseForm(forms.ModelForm):
             self.initial['price_date'] = latest_version.date
     class Meta:
         model = House
+        exclude=('building',)
 
 class EmployeeForm(forms.ModelForm):
     def __init__(self, *args, **kw):
@@ -245,9 +264,10 @@ class EmployeeForm(forms.ModelForm):
             self.fields['main_project'].queryset = self.instance.projects
     class Meta:
         model = Employee
+        exclude=('reminders','account','employment_terms','projects')
 
 class NHEmployeeForm(forms.ModelForm):
-    nhbranch = forms.ModelChoiceField(NHBranch.objects.all(), ugettext('choose_branch'), label = ugettext('nhbranch'))
+    nhbranch = forms.ModelChoiceField(NHBranch.objects.all(), empty_label=ugettext('choose_branch'), label = ugettext('nhbranch'))
     
     def __init__(self, *args, **kw):
         forms.ModelForm.__init__(self,*args,**kw)
@@ -257,6 +277,7 @@ class NHEmployeeForm(forms.ModelForm):
         self.fields['work_end'].widget.attrs = {'class':'vDateField'}
     class Meta:
         model = NHEmployee
+        exclude=('reminders','account','employment_terms')
       
 class ProjectCommissionForm(RevisionExtForm):
     def __init__(self, *args, **kw):
@@ -264,6 +285,7 @@ class ProjectCommissionForm(RevisionExtForm):
         self.fields['remarks'].widget.attrs = {'cols':'20', 'rows':'5'}
     class Meta:
         model = ProjectCommission
+        exclude=('project','c_var_precentage','c_var_precentage_fixed','c_zilber','b_discount_save_precentage')
 
 class EmployeeAddProjectForm(forms.Form):
     employee = forms.ModelChoiceField(queryset=Employee.objects.all(), label=ugettext('employee'))
@@ -285,10 +307,11 @@ class CPriceAmountForm(forms.ModelForm):
     def clean_price(self):
         price = self.cleaned_data['price']
         if not price:
-            price = sys.maxint
+            price = maxsize
         return price
     class Meta:
         model = CPriceAmount
+        exclude=('c_by_price',)
  
 class SignupForm(forms.ModelForm):
     project = forms.ModelChoiceField(queryset = Project.objects.all(), label=ugettext('project'))
@@ -303,6 +326,7 @@ class SignupForm(forms.ModelForm):
         self.fields['sale_date'].widget.attrs = {'class':'vDateField'}
     class Meta:
         model = Signup 
+        exclude=('cancel',)
 
 class SignupCancelForm(forms.ModelForm):
     def __init__(self, *args, **kw):
@@ -311,6 +335,7 @@ class SignupCancelForm(forms.ModelForm):
         self.fields['date'].widget.attrs = {'class':'vDateField'}
     class Meta:
         model =SignupCancel
+        fields=('date','was_signed','was_fee','reason')
 
 class DemandDiffForm(forms.ModelForm):
     add_type = forms.ChoiceField(choices=((1,u'תוספת'),
@@ -326,10 +351,11 @@ class DemandDiffForm(forms.ModelForm):
             self.fields['add_type'].initial = self.instance.amount >= 0 and 1 or 2
     class Meta:
         model = DemandDiff
+        exclude=('demand',)
         
 class SaleAnalysisForm(SeasonForm):
     project = forms.ModelChoiceField(queryset = Project.objects.all(), label=ugettext('project'))
-    building_num = forms.CharField(4, 1, required = False, label = ugettext('building_num'),
+    building_num = forms.CharField(max_length=4, min_length=1, required = False, label = ugettext('building_num'),
                                    widget = forms.TextInput(attrs = {'size':'3'}))
     include_clients = forms.ChoiceField(label = ugettext('include_clients'), required = False, choices = ((0,u'לא'),
                                                                                                           (1,u'כן')))
@@ -398,6 +424,7 @@ class SaleForm(forms.ModelForm):
                 self.fields['joined_sale'].initial = True
     class Meta:
         model = Sale
+        exclude=('demand','employee_pay_month','employee_pay_year','contractor_pay_month','contractor_pay_year')
 
 class EmployeeEndForm(forms.ModelForm):
     def __init__(self, *args, **kw):
@@ -427,6 +454,7 @@ class DemandForm(forms.ModelForm):
         return i
     class Meta:
         model = Demand
+        fields=('project','month','year','sale_count','remarks')
 
 class DemandInvoiceForm(forms.ModelForm):
     project = forms.ModelChoiceField(queryset = Project.objects.all(), label = ugettext('project'))
@@ -454,6 +482,7 @@ class DemandInvoiceForm(forms.ModelForm):
             self.fields['month'].initial = demand.month
     class Meta:
         model = Invoice
+        exclude=('creation_date','offset')
 
 class InvoiceForm(forms.ModelForm):
     def __init__(self, *args, **kw):
@@ -462,6 +491,7 @@ class InvoiceForm(forms.ModelForm):
         self.fields['date'].widget.attrs = {'class':'vDateField'}
     class Meta:
         model = Invoice
+        exclude=('creation_date','offset')
         
 class InvoiceOffsetForm(forms.ModelForm):
     invoice_num = forms.IntegerField(label=ugettext('invoice_num'))       
@@ -502,6 +532,7 @@ class PaymentBaseForm(forms.ModelForm):
         return cleaned_data
     class Meta:
         model = Payment
+        exclude=('creation_date',)
         
 class PaymentForm(PaymentBaseForm):
     def __init__(self, *args, **kw):
@@ -512,6 +543,7 @@ class PaymentForm(PaymentBaseForm):
             self.fields[field].widget.attrs = {'size':10}
     class Meta:
         model = Payment
+        exclude=('creation_date',)
 
 class SplitPaymentForm(forms.ModelForm):
     def __init__(self, *args, **kw):
@@ -520,7 +552,7 @@ class SplitPaymentForm(forms.ModelForm):
         self.fields['payment_date'].widget.attrs = {'class':'vDateField', 'size':10}
     class Meta:
         model = Payment
-        exclude = ('amount')
+        exclude = ('creation_date','amount')
 
 class SplitPaymentDemandForm(MonthForm):
     project = forms.ModelChoiceField(queryset = Project.objects.all(), label = ugettext('project'))
@@ -551,6 +583,7 @@ class DemandPaymentForm(PaymentBaseForm):
             self.fields['month'].initial = demand.month
     class Meta:
         model = Payment
+        exclude = ('creation_date','amount')
 
 class NHSaleForm(forms.ModelForm):
     def __init__(self, *args, **kw):
@@ -559,6 +592,7 @@ class NHSaleForm(forms.ModelForm):
         self.fields['sale_date'].widget.attrs = {'class':'vDateField'}
     class Meta:
         model = NHSale
+        exclude=('nhmonth',)
 
 class NHSaleSideForm(forms.ModelForm):
     lawyer1_pay = forms.FloatField(label=ugettext('lawyer_pay'), required=False)
@@ -599,6 +633,7 @@ class NHSaleSideForm(forms.ModelForm):
                     self.fields['lawyer2_pay'].initial = pays[0].amount
     class Meta:
         model = NHSaleSide
+        exclude=('nhsale','invoices','payments')
 
 class LoanForm(forms.ModelForm):
     def __init__(self, *args, **kw):
@@ -607,6 +642,7 @@ class LoanForm(forms.ModelForm):
         self.fields['remarks'].widget = forms.Textarea(attrs={'cols':'30', 'rows':'6'})
     class Meta:
         model= Loan
+        fields=('employee','amount','month','year','date','pay_num','remarks')
 
 class DemandSendForm(forms.ModelForm):
     is_finished = forms.BooleanField(required=False)
@@ -649,6 +685,7 @@ class ReminderForm(forms.ModelForm):
             self.fields['status'].initial = self.instance.statuses.latest().type_id
     class Meta:
         model = Reminder
+        fields=('content','status')
 
 class TaxForm(forms.ModelForm):
     def __init__(self, *args, **kw):
@@ -656,6 +693,7 @@ class TaxForm(forms.ModelForm):
         self.fields['date'].widget.attrs = {'class':'vDateField'}
     class Meta:
         model = Tax
+        fields=('date','value')
 
 class AttachmentForm(forms.ModelForm):
     tag_new = forms.CharField(max_length=20, required=False, label=ugettext('tag_new'))
@@ -672,6 +710,7 @@ class AttachmentForm(forms.ModelForm):
     
     class Meta:
         model = Attachment
+        fields=('tags','file','type','sr_name','is_private','remarks','tag_new')
 
 class NHBranchEmployeeForm(forms.ModelForm):
     def __init__(self, *args, **kw):
@@ -680,6 +719,7 @@ class NHBranchEmployeeForm(forms.ModelForm):
         self.fields['end_date'].widget.attrs = {'class':'vDateField'}
     class Meta:
         model = NHBranchEmployee
+        fields=('nhbranch','nhemployee','is_manager','start_date','end_date')
 
 class IncomeFilterForm(SeasonForm):
     division_type = forms.ModelChoiceField(queryset = DivisionType.objects.all(), label=ugettext('division_type'), 
@@ -730,7 +770,7 @@ class CheckForm(forms.ModelForm):
         self.fields['issue_date'].widget.attrs = {'class':'vDateField'}
         self.fields['pay_date'].widget.attrs = {'class':'vDateField'}
     class Meta:
-        model = Check
+        model = PaymentCheck
         fields = ['division_type','new_division_type','expense_type','new_expense_type',
                   'supplier_type', 'new_supplier_type','invoice_num','type','issue_date','pay_date','num','amount',
                   'tax_deduction_source','order_verifier','payment_verifier','remarks']
@@ -810,6 +850,8 @@ class EmploymentTermsForm(RevisionExtForm):
         self.fields['remarks'].widget.attrs = {'cols':'20', 'rows':'3'}
     class Meta:
         model = EmploymentTerms
+        fields=('salary_base','salary_net','safety','hire_type','include_tax','include_lawyer',
+                'tax_deduction_source','tax_deduction_source_precentage','tax_deduction_date','remarks')
 
 class EmployeeSalaryForm(forms.ModelForm):
     def __init__(self, *args, **kw):
@@ -818,6 +860,7 @@ class EmployeeSalaryForm(forms.ModelForm):
         self.fields['pdf_remarks'].widget = forms.Textarea(attrs={'cols':'20', 'rows':'3'})
     class Meta:
         model = EmployeeSalary
+        exclude=('month','year','commissions','is_deleted')
   
 class NHEmployeeSalaryForm(forms.ModelForm):
     def __init__(self, *args, **kw):
@@ -826,13 +869,14 @@ class NHEmployeeSalaryForm(forms.ModelForm):
         self.fields['pdf_remarks'].widget = forms.Textarea(attrs={'cols':'20', 'rows':'3'})
     class Meta:
         model = NHEmployeeSalary
+        exclude=('month','year','commissions','is_deleted','admin_commission')
 
 class TaskFilterForm(forms.Form):
     status = forms.ChoiceField(choices = [('done', 'בוצעו'), ('undone','לא בוצעו'), ('all','הכל')])
     sender = forms.ChoiceField(choices = [('me', 'אני שלחתי'), ('others','נשלחו אלי')])
 
 class ProjectSeasonForm(SeasonForm):
-    project = forms.ModelChoiceField(Project.objects.all(), ugettext('choose_project'), label=ugettext('project'))
+    project = forms.ModelChoiceField(Project.objects.all(), empty_label=ugettext('choose_project'), label=ugettext('project'))
 
 class NHBranchSeasonForm(SeasonForm):
     nhbranch = forms.ModelChoiceField(NHBranch.objects.all(), label=ugettext('nhbranch'))
@@ -846,6 +890,7 @@ class MadadBIForm(forms.ModelForm):
         self.fields['publish_date'].widget.attrs = {'class':'vDateField'}
     class Meta:
         model = MadadBI
+        fields=('year','month','publish_date','value')
 
 class MadadCPForm(forms.ModelForm):
     def __init__(self, *args, **kw):
@@ -853,6 +898,7 @@ class MadadCPForm(forms.ModelForm):
         self.fields['publish_date'].widget.attrs = {'class':'vDateField'}
     class Meta:
         model = MadadCP
+        fields=('year','month','publish_date','value')
 
 class CityCallersForm(forms.ModelForm):
     new_city = forms.CharField(label = ugettext('new_city'), max_length = 20, required=False)
@@ -878,6 +924,7 @@ class EventForm(forms.ModelForm):
         self.fields['remarks'].widget.attrs = {'cols':'30', 'rows':'3'}
     class Meta:
         model = Event
+        exclude=('activity_base',)
         
 class SaleProcessForm(forms.ModelForm):
     def __init__(self, *args, **kw):
@@ -886,6 +933,7 @@ class SaleProcessForm(forms.ModelForm):
         self.fields['remarks'].widget.attrs = {'cols':'30', 'rows':'3'}
     class Meta:
         model = SaleProcess
+        exclude=('activity_base',)
         
 class PriceOfferForm(forms.ModelForm):
     def __init__(self, *args, **kw):
@@ -893,6 +941,7 @@ class PriceOfferForm(forms.ModelForm):
         self.fields['remarks'].widget.attrs = {'cols':'30', 'rows':'3'}
     class Meta:
         model = PriceOffer
+        exclude=('nhactivity',)
 
 class ActivityForm(forms.ModelForm):
     def __init__(self, *args, **kw):
@@ -910,7 +959,7 @@ class ContactFilterForm(forms.Form):
     company = forms.CharField(label=ugettext('company'), required=False)
 
 class LocateDemandForm(forms.Form):
-    project = forms.ModelChoiceField(Project.objects.all(), ugettext('choose_project'))
+    project = forms.ModelChoiceField(Project.objects.all(), empty_label=ugettext('choose_project'))
     year = forms.ChoiceField(choices=((i,i) for i in range(datetime.now().year - 10, datetime.now().year+10)), 
                              initial = datetime.now().year)
     month = forms.ChoiceField(choices=((i,i) for i in range(1,13)), initial = common.current_month().month)  
@@ -921,7 +970,7 @@ class LocateDemandForm(forms.Form):
         return int(self.cleaned_data['month'])
     
 class LocateHouseForm(forms.Form):
-    project = forms.ModelChoiceField(Project.objects.all(), ugettext('choose_project'))
+    project = forms.ModelChoiceField(Project.objects.all(), empty_label=ugettext('choose_project'))
     building_num = forms.CharField(widget=forms.TextInput(attrs={'size':'3'}), initial = ugettext('building_num'))
     house_num = forms.CharField(widget=forms.TextInput(attrs={'size':'3'}), initial = ugettext('house_num'))
     
@@ -962,21 +1011,28 @@ class DemandPayBalanceForm(forms.Form):
                                   DemandPayBalanceType('mis-paid', ugettext('mis-paid')), DemandPayBalanceType('partially-paid', ugettext('partially-paid')),
                                   DemandPayBalanceType('fully-paid', ugettext('fully-paid')),]
     
-    from_year = forms.ChoiceField(((i,i) for i in range(datetime.now().year - 10, datetime.now().year+10)), 
-                                  label = ugettext('from_year'), initial = common.current_month().year)
-    from_month = forms.ChoiceField(((i,i) for i in range(1,13)), label = ugettext('from_month'),
-                                   initial = common.current_month().month)
-    to_year = forms.ChoiceField(((i,i) for i in range(datetime.now().year - 10, datetime.now().year+10)), 
-                                label = ugettext('to_year'), initial = common.current_month().year)
-    to_month = forms.ChoiceField(((i,i) for i in range(1,13)), label = ugettext('to_month'),
-                                 initial = common.current_month().month)
+    from_year = forms.ChoiceField(choices=((i,i) for i in range(datetime.now().year - 10, datetime.now().year+10)), 
+                                    label = ugettext('from_year'), 
+                                    initial = common.current_month().year)
+    from_month = forms.ChoiceField(choices=((i,i) for i in range(1,13)), 
+                                    label = ugettext('from_month'),
+                                    initial = common.current_month().month)
+    to_year = forms.ChoiceField(choices=((i,i) for i in range(datetime.now().year - 10, datetime.now().year+10)), 
+                                label = ugettext('to_year'), 
+                                initial = common.current_month().year)
+    to_month = forms.ChoiceField(choices=((i,i) for i in range(1,13)), 
+                                label = ugettext('to_month'),
+                                initial = common.current_month().month)
 
-    all_times = forms.BooleanField(False, label = ugettext('all_times'))
+    all_times = forms.BooleanField(required=False, label = ugettext('all_times'))
     
-    project = forms.ModelChoiceField(Project.objects.all(), ugettext('all_projects'), label = ugettext('project'),
-                                     required = False)
+    project = forms.ModelChoiceField(queryset=Project.objects.all(), 
+                                    empty_label=ugettext('all_projects'), 
+                                    label = ugettext('project'),
+                                    required = False)
     
-    demand_pay_balance = forms.ChoiceField([(x.id, x.name) for x in demand_pay_balance_choices], label = ugettext('pay_balance'))
+    demand_pay_balance = forms.ChoiceField(choices=[(x.id, x.name) for x in demand_pay_balance_choices], 
+                                            label = ugettext('pay_balance'))
     
     def __init__(self, *args, **kw):
         super(DemandPayBalanceForm, self).__init__(*args, **kw)
