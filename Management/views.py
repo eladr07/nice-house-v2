@@ -12,9 +12,9 @@ from django.template import RequestContext
 from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
-from django.views.generic.create_update import create_object, update_object
-from django.views.generic.list_detail import object_list, object_detail
-from django.views.generic.simple import direct_to_template
+from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.list import ListView
+from django.views.generic.detail import DetailView
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.contenttypes.models import ContentType
 
@@ -127,13 +127,6 @@ def locate_demand(request):
     return HttpResponseRedirect('/')
 
 @login_required
-def limited_direct_to_template(request, permission=None, *args, **kwargs):
-    if not permission or request.user.has_perm('Management.' + permission):
-        return direct_to_template(request, *args, **kwargs)
-    else:
-        return HttpResponse('No permission. contact Elad.')
-
-@login_required
 def limited_create_object(request, permission=None, *args, **kwargs):
     if kwargs.has_key('model'):
         model = kwargs['model']
@@ -142,7 +135,7 @@ def limited_create_object(request, permission=None, *args, **kwargs):
     if not permission:
         permission = 'Management.change_' + model.__name__.lower()
     if request.user.has_perm(permission):
-        return create_object(request, *args, **kwargs)
+        return CreateView.as_view(*args, **kwargs)
     else:
         return HttpResponse('No permission. contact Elad.')
     
@@ -160,7 +153,7 @@ def limited_delete_object(request, model, object_id, post_delete_redirect, permi
 @login_required
 def limited_object_detail(request, permission=None, *args, **kwargs):
     if not permission or request.user.has_perm('Management.' + permission):
-        return object_detail(request, *args, **kwargs)
+        return DetailView.as_view(*args, **kwargs)
     else:
         return HttpResponse('No permission. contact Elad.')
 
@@ -173,14 +166,14 @@ def limited_update_object(request, permission=None, *args, **kwargs):
     if not permission:
         permission = 'Management.change_' + model.__name__.lower()
     if request.user.has_perm(permission):
-        return update_object(request, *args, **kwargs)
+        return UpdateView.as_view(*args, **kwargs)
     else:
         return HttpResponse('No permission. contact Elad.')
 
 @login_required
 def limited_object_list(request, permission=None, *args, **kwargs):
     if not permission or request.user.has_perm('Management.' + permission):
-        return object_list(request, *args, **kwargs)
+        return ListView.as_view(*args, **kwargs)
     else:
         return HttpResponse('No permission. contact Elad.')
 
