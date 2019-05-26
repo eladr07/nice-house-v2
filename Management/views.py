@@ -5,10 +5,9 @@ import django.core.paginator
 from django.db import models, transaction
 from django.db.models import Count
 from django.forms.formsets import formset_factory
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.forms.models import inlineformset_factory, modelformset_factory, modelform_factory
-from django.template import RequestContext
 from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
@@ -28,7 +27,6 @@ from mail import mail
 
 def object_edit_core(request, form_class, instance,
                      template_name = 'Management/object_edit.html', 
-                     context_class = RequestContext, 
                      before_save = None, 
                      after_save = None):
     
@@ -43,7 +41,7 @@ def object_edit_core(request, form_class, instance,
     else:
         form = form_class(instance = instance)
         
-    return render_to_response(template_name, {'form':form }, context_instance = context_class(request))
+    return render(request, template_name, {'form':form })
 
 def revision_list(request):
     if len(request.GET):
@@ -51,7 +49,7 @@ def revision_list(request):
     else:
         filterForm = RevisionFilterForm(request.GET)
         
-    return render_to_response('revision_list.html', {'filterForm':filterForm })
+    return render(request, 'revision_list.html', {'filterForm':filterForm })
 
 def calc_salaries(salaries):
     @reversion.revision.create_on_success
@@ -82,11 +80,14 @@ def calc_demands(demands):
 
 @login_required
 def index(request):
-    return render_to_response('Management/index.html',
-                              {'locateHouseForm':LocateHouseForm(), 'locateDemandForm': LocateDemandForm(),
-                               'employeeSalesForm': ProjectSeasonForm(), 'employeeSalarySeasonForm': EmployeeSeasonForm(),
-                               'nhbranches':NHBranch.objects.all()}, 
-                               context_instance=RequestContext(request))
+    context = {
+        'locateHouseForm':LocateHouseForm(), 
+        'locateDemandForm': LocateDemandForm(),
+        'employeeSalesForm': ProjectSeasonForm(), 
+        'employeeSalarySeasonForm': EmployeeSeasonForm(),
+        'nhbranches':NHBranch.objects.all()
+        }
+    return render(request, 'Management/index.html', context)
   
 @login_required  
 def locate_house(request):
@@ -102,7 +103,7 @@ def locate_house(request):
                 error = u'לא נמצאה דירה מס %s בבניין מס %s בפרוייקט %s' % (form.cleaned_data['house_num'],
                                                                            form.cleaned_data['building_num'],
                                                                            project)
-                return render_to_response('Management/error.html', {'error': error}, context_instance=RequestContext(request))
+                return render(request, 'Management/error.html', {'error': error})
 
     return HttpResponseRedirect('/')
     
@@ -122,7 +123,7 @@ def locate_demand(request):
                 
             except Demand.DoesNotExist:
                 error = u'לא נמצאה דרישה מתאימה'
-                return render_to_response('Management/error.html', {'error': error}, context_instance=RequestContext(request))
+                return render(request, 'Management/error.html', {'error': error})
 
     return HttpResponseRedirect('/')
 
@@ -179,18 +180,16 @@ def limited_object_list(request, permission=None, *args, **kwargs):
 
 @login_required
 def house_details(request, id):
-    return render_to_response('Management/house_details.html',
-                              {'house':House.objects.get(pk=id)},
-                              context_instance=RequestContext(request))
+    house = House.objects.get(pk=id)
+    return render(request, 'Management/house_details.html', {'house': house})
+
 @login_required
 def signup_details(request, house_id):
-    s = House.objects.get(pk=house_id).get_signup()
+    signup = House.objects.get(pk=house_id).get_signup()
     if not s:
         return HttpResponse('')
     else:
-        return render_to_response('Management/signup_details.html',
-                                  {'signup':s},
-                                  context_instance=RequestContext(request))
+        return render(request, 'Management/signup_details.html', {'signup':signup})
 
 @login_required
 def employeecheck_list(request):
@@ -229,13 +228,20 @@ def employeecheck_list(request):
                     sum_diff_check_salary += check.diff_amount_salary
     else:
         form = EmployeeCheckFilterForm()
-        
-    return render_to_response('Management/employeecheck_list.html',
-                              {'checks':checks, 'from_date':from_date, 'to_date':to_date, 'filterForm':form,
-                               'sum_check_amount':sum_check_amount, 'sum_invoice_amount':sum_invoice_amount, 
-                               'sum_diff_check_invoice':sum_diff_check_invoice, 'sum_salary_amount':sum_salary_amount, 
-                               'sum_diff_check_salary':sum_diff_check_salary},
-                              context_instance=RequestContext(request))
+    
+    context = {
+        'checks':checks, 
+        'from_date':from_date, 
+        'to_date':to_date, 
+        'filterForm':form,
+        'sum_check_amount':sum_check_amount, 
+        'sum_invoice_amount':sum_invoice_amount, 
+        'sum_diff_check_invoice':sum_diff_check_invoice, 
+        'sum_salary_amount':sum_salary_amount, 
+        'sum_diff_check_salary':sum_diff_check_salary
+    }
+
+    return render(request, 'Management/employeecheck_list.html', context)
 
 @permission_required('Management.delete_advancepayment')
 def advance_payment_toloan(request, id):
@@ -248,13 +254,12 @@ def advance_payment_toloan(request, id):
     else:
         form = LoanForm(initial={'employee':ap.employee.id, 'amount':ap.amount, 'year':ap.date.year, 'month':ap.date.month})
    
-    return render_to_response('Management/object_edit.html',
-                              {'form':form}, context_instance=RequestContext(request))
+    return render(request, 'Management/object_edit.html', {'form':form})
 
 @permission_required('Management.list_check')
 def check_list(request):
     month = date.today()
-    checks = Check.objects.none()
+    checks = PaymentCheck.objects.none()
     from_date, to_date = None, None
     sum_check_amount, sum_invoice_amount, sum_diff_check_invoice = 0,0,0
     if len(request.GET):
@@ -268,7 +273,7 @@ def check_list(request):
             
             from_date = date(from_year, from_month, 1)
             to_date = date(to_month == 12 and to_year + 1 or to_year, to_month == 12 and 1 or to_month + 1, 1)
-            checks = Check.objects.filter(issue_date__range = (from_date, to_date))
+            checks = PaymentCheck.objects.filter(issue_date__range = (from_date, to_date))
             if division_type:
                 checks = checks.filter(division_type = division_type)
             if expense_type:
@@ -282,11 +287,17 @@ def check_list(request):
     else:
         form = CheckFilterForm()
 
-    return render_to_response('Management/check_list.html',
-                              {'checks':checks, 'from_date':from_date, 'to_date':to_date, 'filterForm':form,
-                               'sum_check_amount':sum_check_amount,'sum_invoice_amount':sum_invoice_amount,
-                               'sum_diff_check_invoice':sum_diff_check_invoice},
-                              context_instance=RequestContext(request))
+    context = {
+        'checks':checks, 
+        'from_date':from_date, 
+        'to_date':to_date, 
+        'filterForm':form,
+        'sum_check_amount':sum_check_amount,
+        'sum_invoice_amount':sum_invoice_amount,
+        'sum_diff_check_invoice':sum_diff_check_invoice
+        }
+
+    return render(request, 'Management/check_list.html', context)
 
 def process_check_base_form(form):
     division_type, expense_type = form.cleaned_data['new_division_type'], form.cleaned_data['new_expense_type']
@@ -322,13 +333,13 @@ def check_add(request):
         accountForm = AccountForm()
         form = CheckForm()
         
-    return render_to_response('Management/check_edit.html', 
+    return render(request, 'Management/check_edit.html', 
                               { 'accountForm':accountForm, 'form':form,'title':u"הזנת צ'ק אחר" },
-                              context_instance=RequestContext(request))
+                              )
     
 @permission_required('Management.edit_check')
 def check_edit(request, id):
-    c = Check.objects.get(pk=id)
+    c = PaymentCheck.objects.get(pk=id)
     if request.method == 'POST':
         accountForm = AccountForm(request.POST, instance = c.account)
         form = CheckForm(request.POST, instance = c)
@@ -344,9 +355,9 @@ def check_edit(request, id):
         accountForm = AccountForm()
         form = CheckForm()
         
-    return render_to_response('Management/check_edit.html', 
+    return render(request, 'Management/check_edit.html', 
                               { 'accountForm':accountForm, 'form':form,'title':u"הזנת צ'ק אחר" },
-                              context_instance=RequestContext(request))
+                              )
 
 def apply_employee_check(ec):
     if ec.purpose_type.id == PurposeType.AdvancePayment:
@@ -379,9 +390,9 @@ def employeecheck_add(request):
     else:
         form = EmployeeCheckForm()
         
-    return render_to_response('Management/object_edit.html', 
+    return render(request, 'Management/object_edit.html', 
                               { 'form':form,'title':u"הזנת צ'ק לעובד" },
-                              context_instance=RequestContext(request))
+                              )
         
 @permission_required('Management.edit_employeecheck')
 def employeecheck_edit(request, id):
@@ -397,9 +408,9 @@ def employeecheck_edit(request, id):
     else:
         form = EmployeeCheckForm()
         
-    return render_to_response('Management/object_edit.html', 
+    return render(request, 'Management/object_edit.html', 
                               { 'form':form,'title':u"הזנת צ'ק לעובד" },
-                              context_instance=RequestContext(request))
+                              )
 
 def signup_list(request, project_id):
     month = date.today()
@@ -409,9 +420,9 @@ def signup_list(request, project_id):
     form = MonthForm(initial={'year':y,'month':m})
     p = Project.objects.get(pk = project_id)
     signups = p.signups(y, m)
-    return render_to_response('Management/signup_list.html', 
+    return render(request, 'Management/signup_list.html', 
                           { 'project':p, 'signups':signups, 'month':month, 'filterForm':form },
-                          context_instance=RequestContext(request))
+                          )
 
 @permission_required('Management.add_signup')
 def signup_edit(request, id=None, house_id=None, project_id=None): 
@@ -441,9 +452,9 @@ def signup_edit(request, id=None, house_id=None, project_id=None):
         else:
             form = SignupForm()
             
-    return render_to_response('Management/signup_edit.html', 
+    return render(request, 'Management/signup_edit.html', 
                               { 'form':form },
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.change_signup')
 def signup_cancel(request, id):
@@ -456,9 +467,9 @@ def signup_cancel(request, id):
             s.save()
     else:
         form = SignupCancelForm(instance=cancel)
-    return render_to_response('Management/object_edit.html', 
+    return render(request, 'Management/object_edit.html', 
                               { 'form':form },
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.add_account')
 def employee_account(request, id, model):
@@ -475,9 +486,9 @@ def employee_account(request, id, model):
     else:
         form = AccountForm(instance=acc)
         
-    return render_to_response('Management/object_edit.html', 
+    return render(request, 'Management/object_edit.html', 
                               { 'form':form },
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.list_demand')
 def demand_function(request,id , function):
@@ -626,13 +637,22 @@ def projects_profit(request):
         total_income, total_expense, total_profit, avg_relative_expense_income, total_sale_count, avg_relative_sales_expense = 0,0,0,0,0,0
         projects = []
 
-    return render_to_response('Management/projects_profit.html', 
-                              { 'projects':projects,'from_year':from_year,'from_month':from_month, 
-                                'to_year':to_year,'to_month':to_month, 'filterForm':form,
-                                'total_income':total_income,'total_expense':total_expense, 'total_profit':total_profit,
-                                'avg_relative_expense_income':avg_relative_expense_income,'total_sale_count':total_sale_count,
-                                'avg_relative_sales_expense':avg_relative_sales_expense},
-                                context_instance = RequestContext(request))
+    context = { 
+        'projects':projects,
+        'from_year':from_year,
+        'from_month':from_month, 
+        'to_year':to_year,
+        'to_month':to_month, 
+        'filterForm':form,
+        'total_income':total_income,
+        'total_expense':total_expense, 
+        'total_profit':total_profit,
+        'avg_relative_expense_income':avg_relative_expense_income,
+        'total_sale_count':total_sale_count,
+        'avg_relative_sales_expense':avg_relative_sales_expense
+        }
+
+    return render(request, 'Management/projects_profit.html', context)
 
 @permission_required('Management.list_demand')
 def demand_old_list(request):
@@ -663,14 +683,14 @@ def demand_old_list(request):
                 except ValueError:
                     pass
         
-    return render_to_response('Management/demand_old_list.html', 
+    return render(request, 'Management/demand_old_list.html', 
                               { 'demands':ds, 'month':date(year, month, 1),
                                 'filterForm':form,
                                 'total_sales_count':total_sales_count,
                                 'total_sales_amount':total_sales_amount,
                                 'total_amount':total_amount,
                                 'unhandled_projects':unhandled_projects},
-                              context_instance=RequestContext(request))
+                              )
 
 def nhemployee_salary_send(request, nhbranch_id, year, month):
     pass
@@ -705,9 +725,9 @@ def employee_salary_expenses(request, salary_id):
     else:
         vacation = terms.salary_base and (terms.salary_base / 24) or (2500/12)
         form = SalaryExpensesForm(instance= expenses, initial={'vacation':vacation})
-    return render_to_response('Management/salaryexpenses_edit.html', 
+    return render(request, 'Management/salaryexpenses_edit.html', 
                               {'form':form, 'neto': es.neto or 0},
-                               context_instance=RequestContext(request))
+                               )
 
 @permission_required('Management.change_employeesalary')
 def employee_salary_approve(request, id):
@@ -751,10 +771,10 @@ def employee_salary_list(request):
                 if es.is_deleted:
                     continue
             salaries.append(es)
-    return render_to_response('Management/employee_salaries.html', 
+    return render(request, 'Management/employee_salaries.html', 
                               {'salaries':salaries, 'month': date(int(year), int(month), 1),
                                'filterForm':MonthForm(initial={'year':year,'month':month})},
-                               context_instance=RequestContext(request))
+                               )
 
 @permission_required('Management.list_salaryexpenses')
 def salary_expenses_list(request):
@@ -762,10 +782,10 @@ def salary_expenses_list(request):
     year = int(request.GET.get('year', current.year))
     month = int(request.GET.get('month', current.month))
     salaries = list(EmployeeSalary.objects.nondeleted().filter(year = year, month= month))
-    return render_to_response('Management/salaries_expenses.html', 
+    return render(request, 'Management/salaries_expenses.html', 
                               {'salaries':salaries, 'month': date(int(year), int(month), 1),
                                'filterForm':MonthForm(initial={'year':year,'month':month})},
-                               context_instance=RequestContext(request))
+                               )
 
 @permission_required('Management.list_salaryexpenses')
 def nh_salary_expenses_list(request):
@@ -773,10 +793,10 @@ def nh_salary_expenses_list(request):
     year = int(request.GET.get('year', current.year))
     month = int(request.GET.get('month', current.month))
     salaries = list(NHEmployeeSalary.objects.nondeleted().filter(year = year, month= month))
-    return render_to_response('Management/nh_salaries_expenses.html', 
+    return render(request, 'Management/nh_salaries_expenses.html', 
                               {'salaries':salaries, 'month': date(int(year), int(month), 1),
                                'filterForm':MonthForm(initial={'year':year,'month':month})},
-                               context_instance=RequestContext(request))
+                               )
 
 @permission_required('Management.list_nhemployeesalary')
 def nhemployee_salary_list(request):
@@ -797,10 +817,10 @@ def nhemployee_salary_list(request):
         branch_sales = branch_list.setdefault(nhbe.nhbranch, [])
         branch_sales.append(es)
 
-    return render_to_response('Management/nhemployee_salaries.html', 
+    return render(request, 'Management/nhemployee_salaries.html', 
                               {'branch_list':branch_list, 'month': date(int(year), int(month), 1),
                                'filterForm':MonthForm(initial={'year':year,'month':month})},
-                               context_instance=RequestContext(request))
+                               )
 
 @permission_required('Management.salaries_bank')
 def salaries_bank(request):
@@ -844,9 +864,9 @@ def salaries_bank(request):
     salaries = list(salaries)
     salaries.sort(key = lambda salary: salary.division)
 
-    return render_to_response('Management/salaries_bank.html', 
+    return render(request, 'Management/salaries_bank.html', 
                               {'salaries':salaries,'filterForm':form, 'month':datetime(year, month, 1)},
-                               context_instance=RequestContext(request))  
+                               )  
 
 def employee_salary_pdf(request, year, month):
     filename = common.generate_unique_media_filename('pdf')
@@ -921,7 +941,7 @@ def demands_all(request):
         for d in p.demands.noinvoice():
             amount_noinvoice += d.get_total_amount()
             total_noinvoice += 1
-    return render_to_response('Management/demands_all.html', 
+    return render(request, 'Management/demands_all.html', 
                               { 'projects':projects, 'total_mispaid':total_mispaid, 'total_unpaid':total_unpaid,
                                'total_nopayment':total_nopayment, 'total_noinvoice':total_noinvoice,
                                'amount_mispaid':amount_mispaid, 'amount_unpaid':amount_unpaid, 
@@ -929,15 +949,15 @@ def demands_all(request):
                                'houseForm':LocateHouseForm(), 
                                'demandForm':LocateDemandForm(),
                                'error':error },
-                              context_instance=RequestContext(request))
+                              )
 
 @login_required
 def employee_list(request):
     employee_list = Employee.objects.active().select_related('employment_terms__hire_type')
     nhbranch_list = NHBranch.objects.all()
-    return render_to_response('Management/employee_list.html', 
+    return render(request, 'Management/employee_list.html', 
                               {'employee_list':employee_list, 'nhbranch_list':nhbranch_list},
-                              context_instance=RequestContext(request))
+                              )
     
 def employee_list_pdf(request):
     filename = common.generate_unique_media_filename('pdf')
@@ -997,10 +1017,10 @@ def nh_season_profit(request):
         month = common.current_month()
         from_year, from_month, to_year, to_month = month.year, month.month, month.year, month.month
         
-    return render_to_response('Management/nh_season_profit.html', 
+    return render(request, 'Management/nh_season_profit.html', 
                               { 'months':months,'totals':totals, 'filterForm':form, 'from_year':from_year, 'from_month': from_month,
                                'to_year': to_year, 'to_month': to_month },
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.nhmonth_season')
 def nh_season_income(request):
@@ -1084,11 +1104,11 @@ def nh_season_income(request):
                     e.season_branch_income_sellers_ratio_notax = e.season_branch_income_sellers_notax / total_net_income_notax * 100
     else:
         form = NHBranchSeasonForm()
-    return render_to_response('Management/nh_season_income.html', 
+    return render(request, 'Management/nh_season_income.html', 
                               { 'nhmonths':nhmonth_set, 'filterForm':form, 'employees':employees,
                                'totals':totals,'totals_notax':totals_notax,
                                'nhbranch':nhbranch, 'avg':avg, 'avg_notax':avg_notax },
-                              context_instance=RequestContext(request))
+                              )
     
 def nhmonth_sales(request, nhbranch_id):
     if not request.user.has_perm('Management.nhbranch_' + nhbranch_id):
@@ -1110,9 +1130,9 @@ def nhmonth_sales(request, nhbranch_id):
             for e in employees:
                 e.month_total += nhss.get_employee_pay(e)
     form = MonthForm(initial={'year':nhm.year,'month':nhm.month})
-    return render_to_response('Management/nhmonth_sales.html', 
+    return render(request, 'Management/nhmonth_sales.html', 
                               { 'nhmonth':nhm, 'filterForm':form, 'employees':employees },
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.change_nhmonth')
 def nhmonth_close(request):
@@ -1158,17 +1178,17 @@ def demand_list(request):
         sales_amount += d.get_sales().total_price_final()
         expected_sales_count += d.sale_count
         
-    return render_to_response('Management/demand_list.html', 
+    return render(request, 'Management/demand_list.html', 
                               { 'demands':ds, 'unhandled_projects':unhandled_projects, 
                                'month':date(year, month, 1), 'filterForm':form, 'sales_count':sales_count ,
                                'sales_amount':sales_amount, 'expected_sales_count':expected_sales_count },
-                              context_instance=RequestContext(request))
+                              )
 
 def employee_sales(request, id, year, month):
     es = EmployeeSalary.objects.get(employee__id = id, year = year, month = month)
-    return render_to_response('Management/employee_sales.html', 
+    return render(request, 'Management/employee_sales.html', 
                               { 'es':es },
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.add_employeesalary')
 def employee_refund(request, year, month):
@@ -1183,9 +1203,9 @@ def employee_refund(request, year, month):
     else:
         form = EmployeeSalaryRefundForm()
 
-    return render_to_response('Management/employee_salary_edit.html', 
+    return render(request, 'Management/employee_salary_edit.html', 
                               { 'form':form, 'month':month, 'year':year },
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.add_employeesalary')
 def employee_remarks(request, year, month):
@@ -1199,9 +1219,9 @@ def employee_remarks(request, year, month):
     else:
         form = EmployeeSalaryRemarksForm()
 
-    return render_to_response('Management/employee_salary_edit.html', 
+    return render(request, 'Management/employee_salary_edit.html', 
                               { 'form':form, 'month':month, 'year':year },
-                              context_instance=RequestContext(request))
+                              )
     
 def nhemployee_add(request):
     if request.method == 'POST':
@@ -1215,13 +1235,13 @@ def nhemployee_add(request):
     else:
         form = NHEmployeeForm()
         
-    return render_to_response('Management/nhemployee_form.html', {'form':form}, context_instance=RequestContext(request))
+    return render(request, 'Management/nhemployee_form.html', {'form':form}, )
 
 def nhemployee_sales(request, id, year, month):
     es = NHEmployeeSalary.objects.get(nhemployee__id = id, year = year, month = month)
-    return render_to_response('Management/nhemployee_sales.html', 
+    return render(request, 'Management/nhemployee_sales.html', 
                               { 'es':es },
-                              context_instance=RequestContext(request))
+                              )
     
 @permission_required('Management.add_nhemployeesalary')
 def nhemployee_refund(request, year, month):
@@ -1236,9 +1256,9 @@ def nhemployee_refund(request, year, month):
     else:
         form = NHEmployeeSalaryRefundForm()
 
-    return render_to_response('Management/nhemployee_salary_edit.html', 
+    return render(request, 'Management/nhemployee_salary_edit.html', 
                               { 'form':form, 'month':month, 'year':year },
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.add_nhemployeesalary')
 def nhemployee_remarks(request, year, month):
@@ -1252,9 +1272,9 @@ def nhemployee_remarks(request, year, month):
     else:
         form = NHEmployeeSalaryRemarksForm()
 
-    return render_to_response('Management/nhemployee_salary_edit.html', 
+    return render(request, 'Management/nhemployee_salary_edit.html', 
                               { 'form':form, 'month':month, 'year':year },
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.change_demand')
 def demand_edit(request, object_id):
@@ -1267,7 +1287,7 @@ def demand_edit(request, object_id):
     else:
         form = DemandForm(instance = demand)
         
-    return render_to_response('Management/demand_edit.html', { 'form':form, 'demand':demand, 'sales':sales }, context_instance=RequestContext(request))
+    return render(request, 'Management/demand_edit.html', { 'form':form, 'demand':demand, 'sales':sales }, )
     
 @permission_required('Management.change_demand')
 def demand_close(request, id):
@@ -1275,9 +1295,9 @@ def demand_close(request, id):
     if request.method == 'POST':
         d.close()
         d.save()
-    return render_to_response('Management/demand_close.html', 
+    return render(request, 'Management/demand_close.html', 
                               { 'demand':d },
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.change_demand')
 def demand_zero(request, id):
@@ -1298,7 +1318,7 @@ def send_mail(request):
     else:
         form = MailForm()
         
-    return render_to_response('Management/send_mail.html',  { 'form':form }, context_instance=RequestContext(request))
+    return render(request, 'Management/send_mail.html',  { 'form':form }, )
 
 def demand_send_mail(demand, addr):
     filename = common.generate_unique_media_filename('pdf')
@@ -1332,7 +1352,7 @@ def demands_send(request):
                     pass
             forms.append(f)
         if error:
-            return render_to_response('Management/error.html', {'error': error}, context_instance=RequestContext(request))
+            return render(request, 'Management/error.html', {'error': error}, )
         else:
             return HttpResponseRedirect('/demandsold')
     else:
@@ -1345,9 +1365,9 @@ def demands_send(request):
             f = DemandSendForm(instance=d, prefix=str(d.id), initial = initial)
             forms.append(f)
             
-    return render_to_response('Management/demands_send.html', 
+    return render(request, 'Management/demands_send.html', 
                               { 'forms':forms,'filterForm':form, 'month':month },
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.change_demand')
 def demand_closeall(request):
@@ -1400,7 +1420,7 @@ def salepaymod_edit(request, model, object_id):
     else:
         form = form_class(instance = object)
         
-    return render_to_response('Management/sale_mod_edit.html', {'form':form}, context_instance=RequestContext(request))
+    return render(request, 'Management/sale_mod_edit.html', {'form':form}, )
         
 
 @permission_required('Management.reject_sale')
@@ -1484,7 +1504,7 @@ def invoice_add(request, initial=None):
                 return HttpResponseRedirect('/payments/add')
     else:
         form = DemandInvoiceForm(initial=initial)
-    return render_to_response('Management/invoice_edit.html', {'form':form}, context_instance=RequestContext(request))
+    return render(request, 'Management/invoice_edit.html', {'form':form}, )
 
 @permission_required('Management.add_invoice')
 def demand_invoice_add(request, id):
@@ -1534,8 +1554,7 @@ def demand_invoice_list(request):
     else:
         form = ProjectSeasonForm()
 
-    return render_to_response('Management/demand_invoice_list.html', {'page': invoices,'filterForm':form},
-                              context_instance = RequestContext(request))    
+    return render(request, 'Management/demand_invoice_list.html', {'page': invoices,'filterForm':form})    
  
  
 @permission_required('Management.demand_payments')
@@ -1581,8 +1600,7 @@ def demand_payment_list(request):
     else:
         form = ProjectSeasonForm()
 
-    return render_to_response('Management/demand_payment_list.html', {'page': payments,'filterForm':form},
-                              context_instance = RequestContext(request))    
+    return render(request, 'Management/demand_payment_list.html', {'page': payments,'filterForm':form})    
    
 @permission_required('Management.add_invoice')
 def project_invoice_add(request, id):
@@ -1614,9 +1632,7 @@ def invoice_offset(request, id=None):
             invoice_num = 0
         form = InvoiceOffsetForm(instance = offset, initial={'invoice_num':invoice_num})
     
-    return render_to_response('Management/object_edit.html', 
-                              {'form': form, 'title':u'זיכוי חשבונית'}, 
-                              context_instance = RequestContext(request))    
+    return render(request, 'Management/object_edit.html', {'form': form, 'title':u'זיכוי חשבונית'})    
 
 @permission_required('Management.delete_invoiceoffset')
 def invoice_offset_del(request, id):
@@ -1678,10 +1694,14 @@ def income_core(request, instance):
                                                           InvoiceForm(instance = instance.invoice), 
                                                           PaymentForm(instance = instance.payment))
     
-    return render_to_response('Management/income_edit.html', 
-                              {'incomeForm':incomeForm, 'dealForm':dealForm, 'invoiceForm':invoiceForm,
-                               'paymentForm':paymentForm }, 
-                              context_instance = RequestContext(request)) 
+    context = {
+        'incomeForm':incomeForm, 
+        'dealForm':dealForm, 
+        'invoiceForm':invoiceForm,
+        'paymentForm':paymentForm 
+        }
+
+    return render(request, 'Management/income_edit.html', context) 
 
 @permission_required('Management.list_income')
 def income_list(request):
@@ -1704,9 +1724,9 @@ def income_list(request):
     else:
         form = IncomeFilterForm()
     
-    return render_to_response('Management/income_list.html', 
-                              {'filterForm':form, 'incomes':incomes, 'from_date':from_date, 'to_date':to_date }, 
-                              context_instance = RequestContext(request)) 
+    context = { 'filterForm':form, 'incomes':incomes, 'from_date':from_date, 'to_date':to_date }
+
+    return render(request, 'Management/income_list.html', context) 
 
 @permission_required('Management.add_payment')
 def split_payment_add(request):
@@ -1736,8 +1756,8 @@ def split_payment_add(request):
         spf = SplitPaymentForm()
         spdForms = DemandFormset()
         
-    return render_to_response('Management/split_payment_add.html', 
-                              { 'spf':spf, 'spdForms':spdForms, 'error':error }, context_instance=RequestContext(request))
+    return render(request, 'Management/split_payment_add.html', 
+                              { 'spf':spf, 'spdForms':spdForms, 'error':error }, )
 
 @permission_required('Management.add_payment')
 def payment_add(request, initial=None):
@@ -1751,8 +1771,8 @@ def payment_add(request, initial=None):
                 return HttpResponseRedirect('/invoices/add')
     else:
         form = DemandPaymentForm(initial=initial)
-    return render_to_response('Management/payment_edit.html', 
-                              { 'form':form }, context_instance=RequestContext(request))
+    return render(request, 'Management/payment_edit.html', 
+                              { 'form':form }, )
 
 @permission_required('Management.change_payment')
 def demand_payment_edit(request, id):
@@ -1771,8 +1791,8 @@ def demand_payment_edit(request, id):
                 return HttpResponseRedirect('/invoices/add')
     else:
         form = DemandPaymentForm(instance = payment)
-    return render_to_response('Management/payment_edit.html', 
-                              { 'form':form }, context_instance=RequestContext(request))
+    return render(request, 'Management/payment_edit.html', 
+                              { 'form':form }, )
 
 @permission_required('Management.change_invoice')
 def demand_invoice_edit(request, id):
@@ -1791,30 +1811,30 @@ def demand_invoice_edit(request, id):
                 return HttpResponseRedirect('/payments/add')
     else:
         form = DemandInvoiceForm(instance = invoice)
-    return render_to_response('Management/invoice_edit.html', 
-                              { 'form':form }, context_instance=RequestContext(request))
+    return render(request, 'Management/invoice_edit.html', 
+                              { 'form':form }, )
 
 def payment_details(request, project, year, month):
     try:
         d = Demand.objects.get(project = project, year = year, month = month)
-        return render_to_response('Management/demand_payment_details.html', 
-                                  { 'payments':d.payments.all()}, context_instance=RequestContext(request))
+        return render(request, 'Management/demand_payment_details.html', 
+                                  { 'payments':d.payments.all()}, )
     except Demand.DoesNotExist:
         return HttpResponse('')
     
 def invoice_details(request, project, year, month):
     try:
         d = Demand.objects.get(project = project, year = year, month = month)
-        return render_to_response('Management/demand_invoice_details.html', 
-                                  { 'invoices':d.invoices.all()}, context_instance=RequestContext(request))
+        return render(request, 'Management/demand_invoice_details.html', 
+                                  { 'invoices':d.invoices.all()}, )
     except Demand.DoesNotExist:
         return HttpResponse('')
     
 def demand_details(request, project, year, month):
     try:
         d = Demand.objects.get(project = project, year = year, month = month)
-        return render_to_response('Management/demand_details.html', 
-                                  { 'demand':d}, context_instance=RequestContext(request))
+        return render(request, 'Management/demand_details.html', 
+                                  { 'demand':d}, )
     except Demand.DoesNotExist:
         return HttpResponse('')
 
@@ -1831,8 +1851,8 @@ def demand_adddiff(request, object_id, type = None):
             return HttpResponseRedirect(diff.get_absolute_url())
     else:
         form = DemandDiffForm(initial={'type':type})
-    return render_to_response('Management/object_edit.html', 
-                              { 'form':form }, context_instance=RequestContext(request))
+    return render(request, 'Management/object_edit.html', 
+                              { 'form':form }, )
 
 @permission_required('Management.demand_force_fully_paid')
 def demand_force_fully_paid(request, id):
@@ -1876,8 +1896,8 @@ def nhsaleside_payment_add(request, object_id):
                 form = PaymentForm()
     else:
         form = PaymentForm()
-    return render_to_response('Management/object_edit.html', 
-                              { 'form':form }, context_instance=RequestContext(request))
+    return render(request, 'Management/object_edit.html', 
+                              { 'form':form }, )
     
 @permission_required('Management.add_invoice')
 def nhsaleside_invoice_add(request, object_id):
@@ -1891,8 +1911,8 @@ def nhsaleside_invoice_add(request, object_id):
             nhs.invoices.add(i)
     else:
         form = InvoiceForm()
-    return render_to_response('Management/object_edit.html', 
-                              { 'form':form }, context_instance=RequestContext(request))
+    return render(request, 'Management/object_edit.html', 
+                              { 'form':form }, )
 
  
 @permission_required('Management.delete_payment')
@@ -1908,9 +1928,9 @@ def payment_del(request, id):
 @login_required
 def project_list(request):    
     projects = Project.objects.filter(end_date = None).select_related('demand_contact','payment_contact')
-    return render_to_response('Management/project_list.html',
+    return render(request, 'Management/project_list.html',
                               {'projects': projects}, 
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.project_list_pdf')
 def project_list_pdf(request):
@@ -1930,9 +1950,9 @@ def nhsale_edit(request, object_id):
     nhs = NHSale.objects.get(pk=object_id)
     if not request.user.has_perm('Management.nhbranch_' + str(nhs.nhmonth.nhbranch.id)):
         return HttpResponse('No Permission. Contact Elad.') 
-    return render_to_response('Management/nhsale_edit.html',
+    return render(request, 'Management/nhsale_edit.html',
                               {'nhs': nhs}, 
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.nhsale_move_nhmonth')
 def nhsale_move_nhmonth(request, object_id):
@@ -1948,9 +1968,9 @@ def nhsale_move_nhmonth(request, object_id):
         nhmonth = nhsale.nhmonth
         form = NHMonthForm(initial = {'year':nhmonth.year, 'month':nhmonth.month, 'nhbranch':nhmonth.nhbranch.id})
         
-    return render_to_response('Management/object_edit.html',
+    return render(request, 'Management/object_edit.html',
                               {'form': form, 'title':u'העברת עסקה מס ' + str(nhsale.num)}, 
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.add_nhsale')
 def nhsale_add(request, branch_id):
@@ -2021,12 +2041,12 @@ def nhsale_add(request, branch_id):
         invoice2Form = InvoiceForm(prefix='invoice2')
         payment2Forms = PaymentFormset(prefix='payments2', queryset=Payment.objects.none())
         
-    return render_to_response('Management/nhsale_add.html',
+    return render(request, 'Management/nhsale_add.html',
                               {'monthForm':monthForm, 'saleForm':saleForm, 
                                'side1form':side1Form, 'side2form':side2Form, 
                                'invoice1Form':invoice1Form, 'payment1Forms':payment1Forms, 
                                'invoice2Form':invoice2Form, 'payment2Forms':payment2Forms}, 
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.change_pricelist')
 def building_pricelist(request, object_id, type_id):
@@ -2069,12 +2089,12 @@ def building_pricelist(request, object_id, type_id):
         versions = house.versions.filter(type__id = type_id)
         house.price = versions.count() > 0 and versions.latest().price or None
         
-    return render_to_response('Management/building_pricelist.html',
+    return render(request, 'Management/building_pricelist.html',
                               {'form': form, 'formset': formset, 'updateForm':updateForm, 
                                'houses' : houses,
                                'type':PricelistType.objects.get(pk=type_id), 
                                'types':PricelistType.objects.all()}, 
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.change_pricelist')
 def building_pricelist_pdf(request, object_id, type_id):
@@ -2119,9 +2139,9 @@ def building_clients(request, object_id):
             h.price = h.versions.company().latest().price
         except HouseVersion.DoesNotExist:
             h.price = None
-    return render_to_response('Management/building_clients.html',
+    return render(request, 'Management/building_clients.html',
                               { 'object':b, 'total_sale_price':total_sale_price},
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.building_clients_pdf')
 def building_clients_pdf(request, object_id):
@@ -2166,9 +2186,9 @@ def project_add(request):
         form = ProjectForm()
         ecForm = ExistContactForm()
         contactForm = ContactForm(prefix='contact')
-    return render_to_response('Management/project_add.html',
+    return render(request, 'Management/project_add.html',
                               { 'form':form,'ecForm':ecForm, 'contactForm':contactForm },
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.change_salecommissiondetail')
 def salecommissiondetail_edit(request, sale_id):
@@ -2181,9 +2201,9 @@ def salecommissiondetail_edit(request, sale_id):
     else:
         formset = InlineFormSet(instance=sale)
         
-    return render_to_response('Management/objectset_edit.html', 
+    return render(request, 'Management/objectset_edit.html', 
                               { 'formset':formset },
-                              context_instance=RequestContext(request))
+                              )
     
 @permission_required('Management.change_project')
 def project_edit(request, id):
@@ -2201,9 +2221,9 @@ def project_edit(request, id):
         form = ProjectForm(instance=project)
         detailsForm = ProjectDetailsForm(instance=details, prefix='det')
         
-    return render_to_response('Management/project_edit.html', 
+    return render(request, 'Management/project_edit.html', 
                               { 'form':form, 'detailsForm':detailsForm, 'project':project },
-                              context_instance=RequestContext(request))
+                              )
   
 @login_required  
 def project_commission_del(request, project_id, commission):
@@ -2272,9 +2292,9 @@ def project_cvp(request, project_id):
     else:
         formset = InlineFormSet(instance=cvp)
         form = CVarPrecentageForm(instance=cvp)
-    return render_to_response('Management/commission_inline.html', 
+    return render(request, 'Management/commission_inline.html', 
                               { 'formset':formset,'form':form, 'show_house_num':True },
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.add_cvarprecentagefixed')
 def project_cvpf(request, project_id):
@@ -2289,9 +2309,9 @@ def project_cvpf(request, project_id):
     else:
         form = CVarPrecentageFixedForm(instance= cvpf)
             
-    return render_to_response('Management/object_edit.html', 
+    return render(request, 'Management/object_edit.html', 
                               { 'form':form },
-                              context_instance=RequestContext(request))
+                              )
     
 @permission_required('Management.add_czilber')
 def project_cz(request, project_id):
@@ -2306,9 +2326,9 @@ def project_cz(request, project_id):
     else:
         form = CZilberForm(instance= cz)
             
-    return render_to_response('Management/object_edit.html', 
+    return render(request, 'Management/object_edit.html', 
                               { 'form':form },
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.add_bdiscountsaveprecentage')
 def project_bdsp(request, project_id):
@@ -2323,9 +2343,9 @@ def project_bdsp(request, project_id):
     else:
         form = BDiscountSavePrecentageForm(instance=bdsp)
             
-    return render_to_response('Management/object_edit.html', 
+    return render(request, 'Management/object_edit.html', 
                               { 'form':form },
-                              context_instance=RequestContext(request))
+                              )
     
 @permission_required('Management.add_contact')
 def project_contact(request, project_id, demand=False, payment=False):
@@ -2353,9 +2373,9 @@ def project_contact(request, project_id, demand=False, payment=False):
         form = ContactForm()
         existForm = ExistContactForm(initial={'contact':(demand and project.demand_contact and project.demand_contact.id) or (payment and project.payment_contact and project.payment_contact.id)})
         
-    return render_to_response('Management/project_contact_edit.html', 
+    return render(request, 'Management/project_contact_edit.html', 
                               { 'form':form, 'existForm':existForm },
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.change_employee')
 def employee_project_add(request, employee_id):
@@ -2373,9 +2393,9 @@ def employee_project_add(request, employee_id):
                 pass
     else:
         form = EmployeeAddProjectForm(initial={'employee':employee_id})
-    return render_to_response('Management/object_edit.html', 
+    return render(request, 'Management/object_edit.html', 
                               { 'form':form, 'title':u'העסקה בפרוייקט חדש' },
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.change_employee')
 def employee_project_remove(request, employee_id, project_id):
@@ -2391,9 +2411,9 @@ def employee_project_remove(request, employee_id, project_id):
             employee.projects.remove(project)
     else:
         form = EmployeeRemoveProjectForm(initial={'employee':employee_id, 'project':project.id})
-    return render_to_response('Management/object_edit.html', 
+    return render(request, 'Management/object_edit.html', 
                               { 'form':form, 'title':u'סיום העסקה בפרוייקט' },
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.change_contact')
 def project_removecontact(request, id, project_id):
@@ -2445,8 +2465,8 @@ def obj_add_attachment(request, obj_id, model):
     else:
         form = AttachmentForm()
     
-    return render_to_response('Management/attachment_add.html',
-                              {'form': form, 'obj':obj}, context_instance=RequestContext(request))
+    return render(request, 'Management/attachment_add.html',
+                              {'form': form, 'obj':obj}, )
 
 @login_required
 def obj_attachments(request, obj_id, model):
@@ -2457,9 +2477,9 @@ def obj_attachments(request, obj_id, model):
     if not request.user.is_staff:
         attachments = attachments.filter(is_private=False)
         
-    return render_to_response('Management/object_attachment_list.html', 
+    return render(request, 'Management/object_attachment_list.html', 
                               {'attachments': attachments, 'obj':obj}, 
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.add_reminder')
 def obj_add_reminder(request, obj_id, model):
@@ -2473,14 +2493,14 @@ def obj_add_reminder(request, obj_id, model):
     else:
         form = ReminderForm(initial={'status':ReminderStatusType.Added})
     
-    return render_to_response('Management/object_edit.html',
-                              {'form': form}, context_instance=RequestContext(request))
+    return render(request, 'Management/object_edit.html',
+                              {'form': form}, )
 
 @login_required
 def obj_reminders(request, obj_id, model):
     obj = model.objects.get(pk = obj_id)
-    return render_to_response('Management/reminder_list.html',
-                              {'reminders': obj.reminders}, context_instance=RequestContext(request))
+    return render(request, 'Management/reminder_list.html',
+                              {'reminders': obj.reminders}, )
 
 @permission_required('Management.delete_reminder')
 def reminder_del(request, id):
@@ -2511,10 +2531,10 @@ def project_buildings(request, project_id):
         total_sold_houses += len(b.houses.sold())
         total_avalible_houses += len(b.houses.avalible())
 
-    return render_to_response('Management/building_list.html', 
+    return render(request, 'Management/building_list.html', 
                               { 'buildings' : buildings,'total_houses':total_houses,'project':p,
                                'total_signed_houses':total_signed_houses, 'total_avalible_houses':total_avalible_houses, 'total_sold_houses':total_sold_houses},
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.add_building')
 def building_add(request, project_id=None):
@@ -2529,7 +2549,7 @@ def building_add(request, project_id=None):
             project = Project.objects.get(pk=project_id)
             form.initial = {'project':project.id}
             
-    return render_to_response('Management/object_edit.html', 
+    return render(request, 'Management/object_edit.html', 
                               {'form' : form})
 
 @permission_required('Management.add_parking')
@@ -2544,9 +2564,9 @@ def building_addparking(request, building_id = None):
             b = Building.objects.get(pk=building_id)
             form.initial = {'building':b.id}
             form.fields['house'].queryset = b.houses.all()
-    return render_to_response('Management/object_edit.html', 
+    return render(request, 'Management/object_edit.html', 
                               {'form' : form},
-                              context_instance=RequestContext(request))
+                              )
     
 @permission_required('Management.add_storage')
 def building_addstorage(request, building_id = None):
@@ -2560,7 +2580,7 @@ def building_addstorage(request, building_id = None):
             b = Building.objects.get(pk=building_id)
             form.initial = {'building':b.id}
             form.fields['house'].queryset = b.houses.all()
-    return render_to_response('Management/object_edit.html', {'form' : form}, context_instance=RequestContext(request))
+    return render(request, 'Management/object_edit.html', {'form' : form}, )
         
 @permission_required('Management.delete_building')
 def building_delete(request, building_id):
@@ -2635,9 +2655,9 @@ def building_copy(request, building_id):
         form.fields['building'].queryset = building.project.buildings.filter(is_deleted=False)
         form.fields['building'].initial = building.id
         
-    return render_to_response('Management/object_edit.html',
+    return render(request, 'Management/object_edit.html',
                               {'form' : form, 'title':ugettext('copy_building')}, 
-                              context_instance=RequestContext(request))
+                              )
     
 @permission_required('Management.add_house')
 def building_addhouse(request, type_id, building_id):
@@ -2666,9 +2686,9 @@ def building_addhouse(request, type_id, building_id):
         form.fields[f].queryset = ps
     for f in ['storage1','storage2']:
         form.fields[f].queryset = ss
-    return render_to_response('Management/house_edit.html', 
+    return render(request, 'Management/house_edit.html', 
                               {'form' : form, 'type':PricelistType.objects.get(pk = type_id) },
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.house_versionlog')
 def house_version_log(request,id , type_id):
@@ -2683,7 +2703,7 @@ def house_version_log(request,id , type_id):
             version.diff_precentage = float(version.price) / previous_version.price * 100 - 100
         previous_version = version
     
-    return render_to_response('Management/house_version_log.html', 
+    return render(request, 'Management/house_version_log.html', 
                               {'title':u'מחירי %s עבור דירה %s' % (pricelist_type, house.num),
                                'versions':versions })
     
@@ -2710,9 +2730,9 @@ def house_edit(request,id , type_id):
         form.fields[f].queryset = ps
     for f in ['storage1','storage2']:
         form.fields[f].queryset = ss
-    return render_to_response('Management/house_edit.html', 
+    return render(request, 'Management/house_edit.html', 
                               {'form' : form, 'type':PricelistType.objects.get(pk = type_id) },
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.delete_house')
 def house_delete(request, building_id, type_id, house_id):
@@ -2730,8 +2750,8 @@ def employee_addloan(request, employee_id):
     else:
         form = LoanForm(initial={'employee':employee.id})
     
-    return render_to_response('Management/object_edit.html',
-                              {'form' : form}, context_instance=RequestContext(request))
+    return render(request, 'Management/object_edit.html',
+                              {'form' : form}, )
     
 @permission_required('Management.add_loanpay')
 def employee_loanpay(request, employee_id):
@@ -2743,8 +2763,8 @@ def employee_loanpay(request, employee_id):
             form.save()
     else:
         form = LoanPayForm(initial={'employee':e.id})
-    return render_to_response('Management/object_edit.html',
-                              {'form' : form}, context_instance=RequestContext(request))
+    return render(request, 'Management/object_edit.html',
+                              {'form' : form}, )
     
 @permission_required('Management.change_employee')
 def employee_end(request, object_id):
@@ -2766,8 +2786,8 @@ def employee_end(request, object_id):
     else:
         form = EmployeeEndForm(instance = employee)
         
-    return render_to_response('Management/object_edit.html',
-                              {'form' : form}, context_instance=RequestContext(request))
+    return render(request, 'Management/object_edit.html',
+                              {'form' : form}, )
 
 @permission_required('Management.add_loan')
 def nhemployee_addloan(request, employee_id):
@@ -2779,8 +2799,8 @@ def nhemployee_addloan(request, employee_id):
     else:
         form = LoanForm(initial={'employee':employee.id})
     
-    return render_to_response('Management/object_edit.html',
-                              {'form' : form}, context_instance=RequestContext(request))
+    return render(request, 'Management/object_edit.html',
+                              {'form' : form}, )
     
 @permission_required('Management.add_loanpay')
 def nhemployee_loanpay(request, employee_id):
@@ -2792,8 +2812,8 @@ def nhemployee_loanpay(request, employee_id):
             form.save()
     else:
         form = LoanPayForm(initial={'employee':e.id})
-    return render_to_response('Management/object_edit.html',
-                              {'form' : form}, context_instance=RequestContext(request))
+    return render(request, 'Management/object_edit.html',
+                              {'form' : form}, )
 
 @permission_required('Management.add_employmentterms')
 def employee_employmentterms(request, id, model):
@@ -2806,9 +2826,9 @@ def employee_employmentterms(request, id, model):
             employee.save()
     else:
         form = EmploymentTermsForm(instance=terms)
-    return render_to_response('Management/object_edit.html', 
+    return render(request, 'Management/object_edit.html', 
                               { 'form':form },
-                              context_instance=RequestContext(request))
+                              )
     
 @permission_required('Management.add_cvar')
 def employee_cv(request, employee_id, project_id):
@@ -2826,9 +2846,9 @@ def employee_cv(request, employee_id, project_id):
     else:
         formset = InlineFormSet(instance=cv)
         form = CVarForm(instance=cv)
-    return render_to_response('Management/commission_inline.html', 
+    return render(request, 'Management/commission_inline.html', 
                               { 'formset':formset,'form':form, 'show_house_num':True },
-                              context_instance=RequestContext(request))
+                              )
     
 @permission_required('Management.add_cvarprecentage')
 def employee_cvp(request, employee_id, project_id):
@@ -2846,9 +2866,9 @@ def employee_cvp(request, employee_id, project_id):
     else:
         formset = InlineFormSet(instance=cvp)
         form = CVarPrecentageForm(instance=cvp)
-    return render_to_response('Management/commission_inline.html', 
+    return render(request, 'Management/commission_inline.html', 
                               { 'formset':formset,'form':form, 'show_house_num':True },
-                              context_instance=RequestContext(request))
+                              )
     
 @permission_required('Management.add_cbyprice')
 def employee_cbp(request, employee_id, project_id):
@@ -2866,9 +2886,9 @@ def employee_cbp(request, employee_id, project_id):
         formset = InlineFormSet(instance = cbp)
         form = CByPriceForm(instance = cbp)
         
-    return render_to_response('Management/commission_inline.html', 
+    return render(request, 'Management/commission_inline.html', 
                               { 'form':form, 'formset':formset, 'show_house_num':False },
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.add_bsalerate')
 def employee_bsr(request, employee_id, project_id):
@@ -2886,9 +2906,9 @@ def employee_bsr(request, employee_id, project_id):
         formset = InlineFormSet(instance = bsr)
         form = BSaleRateForm(instance = bsr)
         
-    return render_to_response('Management/commission_inline.html', 
+    return render(request, 'Management/commission_inline.html', 
                               { 'form':form, 'formset':formset, 'show_house_num':False},
-                              context_instance=RequestContext(request))
+                              )
     
 @permission_required('Management.add_bhousetype')
 def employee_bht(request, employee_id, project_id):
@@ -2906,9 +2926,9 @@ def employee_bht(request, employee_id, project_id):
         formset = InlineFormSet(instance=htb)
         form = BHouseTypeForm(instance = htb)
         
-    return render_to_response('Management/commission_inline.html', 
+    return render(request, 'Management/commission_inline.html', 
                               { 'form':form, 'formset':formset, 'show_house_num':False},
-                              context_instance=RequestContext(request))
+                              )
     
 @permission_required('Management.add_bdiscountsave')
 def employee_bds(request, employee_id, project_id):
@@ -2923,9 +2943,9 @@ def employee_bds(request, employee_id, project_id):
     else:
         form = BDiscountSaveForm(instance=bds)
             
-    return render_to_response('Management/object_edit.html', 
+    return render(request, 'Management/object_edit.html', 
                               { 'form':form },
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.add_bdiscountsaveprecentage')
 def employee_bdsp(request, employee_id, project_id):
@@ -2940,9 +2960,9 @@ def employee_bdsp(request, employee_id, project_id):
     else:
         form = BDiscountSavePrecentageForm(instance=bdsp)
             
-    return render_to_response('Management/object_edit.html', 
+    return render(request, 'Management/object_edit.html', 
                               { 'form':form },
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.change_nhbranchemployee')
 def nhbranch_add_nhemployee(request, nhbranch_id):
@@ -2953,9 +2973,9 @@ def nhbranch_add_nhemployee(request, nhbranch_id):
     else:
         form = NHBranchEmployeeForm(initial = {'nhbranch':nhbranch_id})
     
-    return render_to_response('Management/object_edit.html', 
+    return render(request, 'Management/object_edit.html', 
                               { 'form':form },
-                              context_instance=RequestContext(request))
+                              )
     
 @login_required
 def json_buildings(request, project_id):
@@ -3008,8 +3028,8 @@ def task_list(request):
     if status == 'undone':
         tasks = tasks.filter(is_done = False)
     
-    return render_to_response('Management/task_list.html',
-                              {'tasks': tasks, 'filterForm' : filterForm}, context_instance=RequestContext(request))
+    return render(request, 'Management/task_list.html',
+                              {'tasks': tasks, 'filterForm' : filterForm}, )
 
 @permission_required('Management.add_task')
 def task_add(request):
@@ -3022,8 +3042,8 @@ def task_add(request):
     else:
         form = TaskForm()
     
-    return render_to_response('Management/object_edit.html',
-                              {'form' : form}, context_instance=RequestContext(request))
+    return render(request, 'Management/object_edit.html',
+                              {'form' : form}, )
     
 @permission_required('Management.change_task')
 def task_do(request, id):
@@ -3086,10 +3106,10 @@ def attachment_list(request):
         employee_select_form = EmployeeSelectForm(prefix = 'employee')
         demand_select_form = DemandSelectForm(prefix = 'demand')
           
-    return render_to_response('Management/attachment_list.html', 
+    return render(request, 'Management/attachment_list.html', 
                               {'project_select_form':project_select_form, 'employee_select_form':employee_select_form,
                                'demand_select_form':demand_select_form, 'attachments':attachments },
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.add_attachment')
 def attachment_add(request):
@@ -3127,10 +3147,10 @@ def attachment_add(request):
         employee_select_form = EmployeeSelectForm(prefix = 'employee')
         demand_select_form = DemandSelectForm(prefix = 'demand')
         
-    return render_to_response('Management/attachment_add.html', 
+    return render(request, 'Management/attachment_add.html', 
                               {'form':form, 'project_select_form':project_select_form, 'employee_select_form':employee_select_form,
                                'demand_select_form':demand_select_form },
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.change_sale')
 @transaction.autocommit
@@ -3180,9 +3200,9 @@ def sale_edit(request, id):
                 return HttpResponseRedirect(next or '/demands/%s' % sale.demand.id)
     else:
         form = SaleForm(instance= sale)
-    return render_to_response('Management/sale_edit.html', 
+    return render(request, 'Management/sale_edit.html', 
                               {'form':form, 'year':sale.actual_demand.year, 'month':sale.actual_demand.month},
-                              context_instance=RequestContext(request))    
+                              )    
 
 @permission_required('Management.add_sale')
 @transaction.autocommit
@@ -3229,9 +3249,9 @@ def sale_add(request, demand_id=None):
             form.fields['employee'].queryset = p.employees.all()
             form.fields['building'].queryset = p.buildings.all()
             form.fields['commission_madad_bi'].initial = demand.get_madad()
-    return render_to_response('Management/sale_edit.html', 
+    return render(request, 'Management/sale_edit.html', 
                               {'form':form, 'year':year, 'month':month},
-                              context_instance=RequestContext(request))
+                              )
 
 def demand_sale_list(request):
     demand_id = int(request.GET.get('demand_id', 0))
@@ -3259,16 +3279,16 @@ def demand_sale_list(request):
                                                                          to_month, to_year)
     else:
         raise ValueError
-    return render_to_response('Management/sale_list.html', 
+    return render(request, 'Management/sale_list.html', 
                               {'sales':sales, 'sales_amount':sales_amount,'title':title},
-                              context_instance=RequestContext(request))
+                              )
 @login_required
 def project_demands(request, project_id, func, template_name):
     p = Project.objects.get(pk = project_id)
     demands = getattr(p, func)
-    return render_to_response(template_name,
+    return render(request, template_name,
                                {'demands':demands(), 'project':p},
-                               context_instance=RequestContext(request))
+                               )
 
 @login_required
 def demand_sales(request, project_id, year, month):
@@ -3278,9 +3298,9 @@ def demand_sales(request, project_id, year, month):
     except Demand.DoesNotExist:
         sales = Demand.objects.none()
         
-    return render_to_response('Management/sale_table.html',
+    return render(request, 'Management/sale_table.html',
 							  {'sales':sales},
-							  context_instance=RequestContext(request))
+							  )
 
 @permission_required('Management.report_employee_sales')
 def report_employee_sales(request):
@@ -3306,7 +3326,7 @@ def report_employee_sales(request):
             return response
 
     error = u'לא ניתן להפיק את הדו"ח. אנא ודא שכל הנתונים הוזנו כראוי.'
-    return render_to_response('Management/error.html', {'error': error}, context_instance=RequestContext(request))
+    return render(request, 'Management/error.html', {'error': error}, )
         
     
 
@@ -3319,7 +3339,7 @@ def report_project_month(request, project_id = 0, year = 0, month = 0, demand = 
         demand = Demand.objects.get(project__id = project_id, year = year, month = month)
     
     if demand.get_sales().count() == 0:
-        return render_to_response('Management/error.html', {'error':u'לדרישה שנבחרה אין מכירות'}, context_instance=RequestContext(request))
+        return render(request, 'Management/error.html', {'error':u'לדרישה שנבחרה אין מכירות'}, )
     
     filename = common.generate_unique_media_filename('pdf')
     
@@ -3410,13 +3430,13 @@ def demand_season_list(request):
     else:
         form = ProjectSeasonForm()
         
-    return render_to_response('Management/demand_season_list.html', 
+    return render(request, 'Management/demand_season_list.html', 
                               { 'demands':ds, 'start':from_date, 'end':to_date,
                                 'project':project, 'filterForm':form,
                                 'total_sales_count':total_sales_count,
                                 'total_sales_amount':total_sales_amount,
                                 'total_amount':total_amount},
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.demand_pay_balance')
 def demand_pay_balance_list(request):
@@ -3466,9 +3486,9 @@ def demand_pay_balance_list(request):
                     project.total_diff_invoice_payment += demand.diff_invoice_payment
                 
             if request.GET.has_key('html'):
-                return render_to_response('Management/demand_pay_balance_list.html', 
+                return render(request, 'Management/demand_pay_balance_list.html', 
                                           { 'filterForm': form, 'project_demands': project_demands},
-                                          context_instance=RequestContext(request))
+                                          )
             elif request.GET.has_key('pdf'):
                 filename = common.generate_unique_media_filename('pdf')
     
@@ -3488,9 +3508,9 @@ def demand_pay_balance_list(request):
                 p.close()
                 return response
     else:
-        return render_to_response('Management/demand_pay_balance_list.html', 
+        return render(request, 'Management/demand_pay_balance_list.html', 
                                   { 'filterForm': DemandPayBalanceForm(), 'project_demands': {}},
-                                  context_instance=RequestContext(request))
+                                  )
 
 @permission_required('Management.season_income')
 def season_income(request):
@@ -3532,12 +3552,12 @@ def season_income(request):
     else:
         form = SeasonForm()
 
-    return render_to_response('Management/season_income.html', 
+    return render(request, 'Management/season_income.html', 
                               { 'start':from_date, 'end':to_date,
                                 'projects':projects, 'filterForm':form,'total_amount':total_amount,'total_sale_count':total_sale_count,
                                 'total_amount_notax':total_amount_notax,'avg_amount':total_amount/month_count,
                                 'avg_amount_notax':total_amount_notax/month_count,'avg_sale_count':total_sale_count/month_count},
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.demand_followup')
 def demand_followup_list(request):
@@ -3563,12 +3583,12 @@ def demand_followup_list(request):
     else:
         form = ProjectSeasonForm()
             
-    return render_to_response('Management/demand_followup_list.html', 
+    return render(request, 'Management/demand_followup_list.html', 
                               { 'demands':ds, 'start':from_date, 'end':to_date,
                                 'project':project, 'filterForm':form,
                                 'total_amount':total_amount, 'total_invoices':total_invoices, 'total_payments':total_payments,
                                 'total_diff_invoice':total_diff_invoice, 'total_diff_invoice_payment':total_diff_invoice_payment},
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.season_employeesalary')
 def employeesalary_season_list(request):
@@ -3614,7 +3634,7 @@ def employeesalary_season_list(request):
     context = { 'salaries':salaries, 'start':from_date, 'end':to_date, 'employee':employee_base, 'filterForm':form }
     context.update(totals)
     
-    return render_to_response('Management/employeesalary_season_list.html', context, context_instance=RequestContext(request))
+    return render(request, 'Management/employeesalary_season_list.html', context, )
 
 @permission_required('Management.season_salaryexpenses')
 def employeesalary_season_expenses(request):
@@ -3647,12 +3667,12 @@ def employeesalary_season_expenses(request):
         template = 'Management/employeesalary_season_expenses.html'
         form = EmployeeSeasonForm()
         
-    return render_to_response(template, 
+    return render(request, template, 
                               { 'salaries':salaries, 'start':from_date, 'end':to_date,
                                 'employee': employee_base, 'filterForm':form,
                                 'total_neto':total_neto,'total_check_amount':total_check_amount,
                                 'total_loan_pay':total_loan_pay,'total_bruto':total_bruto,'total_bruto_employer':total_bruto_employer},
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.season_total_salaryexpenses')
 def employeesalary_season_total_expenses(request):
@@ -3700,10 +3720,10 @@ def employeesalary_season_total_expenses(request):
     else:
         form = DivisionTypeSeasonForm()
             
-    return render_to_response('Management/employeesalary_season_total_expenses.html', 
+    return render(request, 'Management/employeesalary_season_total_expenses.html', 
                               { 'employees':employees, 'start':from_date, 'end':to_date,
                                 'filterForm':form},
-                              context_instance=RequestContext(request))
+                              )
 
 @permission_required('Management.sale_analysis')
 def sale_analysis(request):
@@ -3775,10 +3795,10 @@ def sale_analysis(request):
     else:
         form = SaleAnalysisForm()
         
-    return render_to_response('Management/sale_analysis.html', 
+    return render(request, 'Management/sale_analysis.html', 
                               { 'filterForm':form, 'sale_months':data, 'include_clients':include_clients,
                                'total_sale_count':total_sale_count },
-                              context_instance=RequestContext(request))
+                              )
     
 @permission_required('Management.global_profit_lost')
 def global_profit_lost(request):
@@ -3846,7 +3866,7 @@ def global_profit_lost(request):
                     
                 #general information required by all divisions    
                 incomes = Income.objects.range(from_date.year, from_date.month, to_date.year, to_date.month).filter(division_type = division)
-                checks = Check.objects.filter(issue_date__range = (from_date,to_date), division_type = division)
+                checks = PaymentCheck.objects.filter(issue_date__range = (from_date,to_date), division_type = division)
                 
                 incomes_amount = 0
                 for income in incomes:
@@ -3887,10 +3907,17 @@ def global_profit_lost(request):
         form = GloablProfitLossForm()
         from_date, to_date = None, None
         
-    return render_to_response('Management/global_profit_loss.html', 
-                              { 'filterForm':form, 'data':data, 'global_income':global_income, 'global_loss':global_loss,
-                               'global_profit':global_income - global_loss, 'start':from_date, 'end':to_date },
-                              context_instance = RequestContext(request))
+    context = {
+        'filterForm':form, 
+        'data':data,
+        'global_income':global_income, 
+        'global_loss':global_loss,
+        'global_profit':global_income - global_loss, 
+        'start':from_date, 
+        'end':to_date
+    }
+
+    return render(request, 'Management/global_profit_loss.html', context)
     
 #################################################### ACTIVITY VIEWS ##########################################
     
@@ -3924,9 +3951,7 @@ def citycallers_core(request, instance):
     else:
         form = CityCallersForm(instance = instance)
     
-    return render_to_response('Management/object_edit.html', 
-                              {'form':form }, 
-                              context_instance = RequestContext(request))
+    return render(request, 'Management/object_edit.html', {'form':form })
     
 @permission_required('Management.add_mediareferrals')
 def activitybase_mediareferrals_add(request, activitybase_id):
@@ -3953,9 +3978,7 @@ def mediareferrals_core(request, instance):
     else:
         form = MediaReferralsForm(instance = instance)
     
-    return render_to_response('Management/object_edit.html', 
-                              {'form':form }, 
-                              context_instance = RequestContext(request))
+    return render(request, 'Management/object_edit.html', {'form':form })
     
 @permission_required('Management.add_event')
 def activitybase_event_add(request, activitybase_id):
