@@ -2865,7 +2865,7 @@ class EmployeeCheck(CheckBase):
     class Meta:
         db_table = 'EmployeeCheck'
 
-class Check(CheckBase):
+class PaymentCheck(CheckBase):
     supplier_type = models.ForeignKey('SupplierType', on_delete=models.PROTECT, verbose_name=ugettext('supplier_type'))
     account = models.ForeignKey('Account', on_delete=models.PROTECT, null=True, editable=False)
     tax_deduction_source = models.IntegerField(ugettext('tax_deduction_source'),null=True, blank=True)
