@@ -2558,7 +2558,7 @@ class SalePriceMod(SaleMod):
         db_table = 'SalePriceMod'
 
 class SaleHouseMod(SaleMod):
-    old_house = models.ForeignKey('House')
+    old_house = models.ForeignKey('House', on_delete=models.PROTECT)
     @property
     def old_building(self):
         return self.old_house.building
@@ -3120,7 +3120,7 @@ class NHActivity(ActivityBase):
         db_table = 'NHActivity'
 
 class RevisionExt(models.Model):
-    revision = models.ForeignKey('reversion, on_delete=models.PROTECT.Revision')
+    revision = models.ForeignKey('reversion.Revision', on_delete=models.PROTECT)
     date = models.DateTimeField()
     
     class Meta:
