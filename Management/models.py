@@ -2541,7 +2541,7 @@ class NHSale(models.Model):
         permissions = (('nhsale_move_nhmonth', 'NHSale Move Month'),)
 
 class SaleMod(models.Model):
-    sale = models.ForeignKey('Sale', on_delete=models.PROTECT, unique=True, editable=False, related_name='%(class)s')
+    sale = models.OneToOneField('Sale', on_delete=models.PROTECT, editable=False, related_name='%(class)s')
     date = models.DateField(ugettext('date'), auto_now = True)
     remarks = models.TextField(ugettext('remarks'), null=True)
     def get_absolute_url(self):
