@@ -1,4 +1,4 @@
-﻿import common, reversion, inspect, itertools, time, threading
+﻿import reversion, itertools, time, threading
 from datetime import datetime, date
 
 import django.core.paginator
@@ -11,17 +11,19 @@ from django.forms.models import inlineformset_factory, modelformset_factory, mod
 from django.template import RequestContext
 from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.views.generic.create_update import create_object, update_object
 from django.views.generic.list_detail import object_list, object_detail
 from django.views.generic.simple import direct_to_template
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.contenttypes.models import ContentType
-from forms import *
-from models import *
-from pdf.writers import MonthDemandWriter, MultipleDemandWriter, EmployeeListWriter, EmployeeSalariesWriter, ProjectListWriter
-from pdf.writers import PricelistWriter, BuildingClientsWriter, EmployeeSalariesBookKeepingWriter, SalariesBankWriter, DemandFollowupWriter
-from pdf.writers import EmployeeSalesWriter, SaleAnalysisWriter, DemandPayBalanceWriter
+
+import Management.common as common
+from Management.forms import *
+from Management.models import *
+from Management.pdf.writers import MonthDemandWriter, MultipleDemandWriter, EmployeeListWriter, EmployeeSalariesWriter, ProjectListWriter
+from Management.pdf.writers import PricelistWriter, BuildingClientsWriter, EmployeeSalariesBookKeepingWriter, SalariesBankWriter, DemandFollowupWriter
+from Management.pdf.writers import EmployeeSalesWriter, SaleAnalysisWriter, DemandPayBalanceWriter
 from mail import mail
 
 def object_edit_core(request, form_class, instance,
@@ -2227,6 +2229,7 @@ def project_commission_del(request, project_id, commission):
 
 @login_required
 def project_commission_add(request, project_id, commission):
+    import inspect
     module = inspect.getmodule(project_commission_add)
     view_func = getattr(module, 'project_' + commission)
     return view_func(request, project_id)
@@ -2255,6 +2258,7 @@ def abbrevate(s):
 
 @login_required
 def employee_commission_add(request, employee_id, project_id, commission):
+    import inspect
     module = inspect.getmodule(employee_commission_add)
     view_func = getattr(module, 'employee_' + commission)
     return view_func(request, employee_id, project_id)
