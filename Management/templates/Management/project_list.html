@@ -122,8 +122,8 @@
 			<td>{{ i.initiator }}</td>
 			<td>{{ i.name }}</td>
 			<td>{{ i.city }}</td>
-			<td>{{ i.details.buildings_num }}</td>
-			<td>{{ i.details.houses_num }}</td>
+			<td>{% if i.details %} {{ i.details.buildings_num }} {% endif %}</td>
+			<td>{% if i.details %} {{ i.details.houses_num }} {% endif %}</td>
 			<td>
 				{% for e in i.employees.all %}
 					<a href="/employees/{{e.id}}">{{e}}</a><br>
