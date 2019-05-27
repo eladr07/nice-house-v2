@@ -1,8 +1,8 @@
 import smtplib
-from email.MIMEMultipart import MIMEMultipart
-from email.MIMEBase import MIMEBase
-from email.MIMEText import MIMEText
-from email import Encoders
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email.mime.text import MIMEText
+from email import encoders
 import os
 
 gmail_user = "nevehair@gmail.com"
@@ -30,7 +30,7 @@ def mail(to, cc='', bcc='', subject='', contents='', attachments = ()):
         filename = attachment_file.name
 
         part.set_payload(payload)
-        Encoders.encode_base64(part)
+        encoders.encode_base64(part)
         part.add_header(u'Content-Disposition', 'attachment; filename="%s"' % filename)
         msg.attach(part)
 
