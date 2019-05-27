@@ -301,6 +301,16 @@
 			<a href="/projectcommission/{{c.id}}" class="fancybox">שנה תנאים</a>
 		</fieldset>
 		{% endwith %}
+		{% if history|length %}
+			<div class="clearBoth"></div>
+			<fieldset class="cardFieldset">
+				<legend>היסטוריית עידכון עמלות</legend>
+
+					{% for k in history %}
+						<li>{{ k.2 }}: עידכון {{ k.0 }} ל-<b>{{ k.1 }}</b></li>
+					{% endfor %}
+			</fieldset>
+		{% endif %}
 	{% endif %}
 	</div>
 	<div class="clearBoth"> </div>

@@ -4,27 +4,63 @@
 {% block header %}
 {{ block.super }}
 <script>
-	var selectedID = 0;
 	var prev_class;
+	var id       = null;
+	var selected = null;
+
 	$(document).ready(function() {
 		$("#demandTable tr").click(function() { 
 			var tr = $(this);
-			if (selectedID > 0)
-				$("#demandTable tr[objid='"+selectedID+"']").attr("class", prev_class);
-			selectedID = tr.attr("objid");
-			if (!selectedID)
-				return;
-			prev_class = tr.attr("class");
-			tr.attr("class","selectedRow");
-			//sync links
-			if (selectedID > 0)
-				$("#demandEdit").attr("href", "/demands/" + selectedID);
-				$("#demandAdjust").attr("href", "/demands/" + selectedID + "/adddiffadjust");
-				$("#demandAdjust").attr("href", "/demands/" + selectedID + "/adddiffadjust");
-				$("#demandForceFullyPaid").attr("href", "/demands/" + selectedID + "/forcefullypaid");
-				$("#demandAddInvoice").attr("href", "/demands/" + selectedID + "/invoice/add");
-				$("#demandAddPayment").attr("href", "/demands/" + selectedID + "/payment/add");
-			});
+			var objId = tr.attr("objid");
+
+			if( objId ) {
+				if( $(this).hasClass('selectedRow') ) {
+					tr.attr("class", selected);
+					objId = selected = null;
+				}
+				else {
+					if( selected ) {
+						tr.parent().find('> tr.selectedRow').attr('class', selected);
+					}
+
+					selected = tr.attr("class");
+
+					tr.attr("class","selectedRow");
+				}
+
+				if( objId ) {
+					$("#demandEdit").attr("href", "/demands/" + objId);
+					$("#demandAdjust").attr("href", "/demands/" + objId + "/adddiffadjust");
+					$("#demandForceFullyPaid").attr("href", "/demands/" + objId + "/forcefullypaid");
+					$("#demandAddInvoice").attr("href", "/demands/" + objId + "/invoice/add");
+					$("#demandAddPayment").attr("href", "/demands/" + objId + "/payment/add");
+					$("#demandNotYetPaid").attr("href", "/demands/" + objId + "/notyetpaid");
+				}
+				else {
+					$("#demandAddInvoice, #demandAddPayment, #demandEdit, #demandAdjust, #demandForceFullyPaid, #demandNotYetPaid").removeAttr('href');
+				}
+			}
+		});
+
+		$("#demandEdit, #demandAdjust, #demandForceFullyPaid").click( function() {
+			var ids_length = ids ? ids.split(',').length : 0;
+
+			if( ids_length === 0 ) {
+				alert('בחר דרישה מהטבלה שלמטה');
+			}
+			else if( ids_length > 1 ) {
+				alert('ניתן לבחור דרישה אחת בלבד');
+			}
+		});
+
+		$("#demandAddInvoice, #demandAddPayment").click( function() {
+			var ids_length = ids ? ids.split(',').length : 0;
+
+			if( ids_length === 0 ) {
+				alert('בחר לפחות דרישה אחת');
+			}
+		});
+
 		$(".fancybox").fancybox();
 		$(".bigfancybox").fancybox({'frameWidth':800});	
 		$("#demandCalc").click(function(event) {
@@ -94,6 +130,10 @@
 	<img src="/site_media/images/advanced-48.png" width="20" height="20"  alt="שליחה" /> 
 	<a id="demandCalc">חישוב עמלות מחדש</a>
 </div>
+<div class="someIcon"style="width:130px;">
+	<img src="/site_media/images/reload-48.png" width="20" height="20"  alt="שליחה" />
+	<a id="demandNotYetPaid">מאושר או טרם שולם</a>
+<div>
 <div class="clearBoth"></div>
 <br>
 <table id="demandTable" class="dataTable" border="1">
@@ -144,7 +184,11 @@
 			{% if d.is_fully_paid %}
 			<tr class="row5" objid={{d.id}}>
 			{% else %}
-			<tr class="{% cycle 'row1' 'row2' %}" objid={{d.id}}>
+				{% if d.not_yet_paid %}
+					<tr class="row6" objid={{d.id}}>
+				{% else %}
+					<tr class="{% cycle 'row1' 'row2' %}" objid={{d.id}}>
+				{% endif %}
 			{% endif %}
 				<td><a href="/demands/{{d.id}}">{{d.id}}</a></td>
 				<td>
