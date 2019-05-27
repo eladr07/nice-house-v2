@@ -148,7 +148,7 @@
 	{% if user.is_staff %}
 		<fieldset class="cardFieldset">
 			<legend>עמלות</legend>
-			{% with project.commissions as c %}
+			{% with project.commissions.get as c %}
 			{% if c.c_var_precentage %}	
 				<div>		
 					<table class="formTable" style="text-align:center;">
