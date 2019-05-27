@@ -118,9 +118,9 @@ def locate_demand(request):
             try:
                 demand = Demand.objects.get(**cleaned_data)
                 
-                if request.GET.has_key('find'):
+                if 'find' in request.GET:
                     return HttpResponseRedirect(demand.get_absolute_url())
-                elif request.GET.has_key('pdf'):
+                elif 'pdf' in request.GET:
                     return report_project_month(request, demand = demand)
                 
             except Demand.DoesNotExist:
@@ -131,9 +131,9 @@ def locate_demand(request):
 
 @login_required
 def limited_create_object(request, permission=None, *args, **kwargs):
-    if kwargs.has_key('model'):
+    if 'model' in kwargs:
         model = kwargs['model']
-    elif kwargs.has_key('form_class'):
+    elif 'form_class' in kwargs:
         model = kwargs['form_class']._meta.model
     if not permission:
         permission = 'Management.change_' + model.__name__.lower()
@@ -175,9 +175,9 @@ def limited_object_detail(request, permission=None, *args, **kwargs):
 
 @login_required
 def limited_update_object(request, permission=None, *args, **kwargs):
-    if kwargs.has_key('model'):
+    if 'model' in kwargs:
         model = kwargs['model']
-    elif kwargs.has_key('form_class'):
+    elif 'form_class' in kwargs:
         model = kwargs['form_class']._meta.model
 
     model_name = model.__name__.lower()
@@ -339,7 +339,7 @@ def check_list(request):
 
 def process_check_base_form(form):
     division_type, expense_type = form.cleaned_data['new_division_type'], form.cleaned_data['new_expense_type']
-    supplier_type = form.cleaned_data.has_key('new_supplier_type') and form.cleaned_data['new_supplier_type'] 
+    supplier_type = 'new_supplier_type' in form.cleaned_data and form.cleaned_data['new_supplier_type'] 
     if division_type:
         dt, new = DivisionType.objects.get_or_create(name=division_type)
         form.cleaned_data['division_type'] = dt
@@ -364,7 +364,7 @@ def check_add(request):
             form.save()
             accountForm = AccountForm()
             form = CheckForm()
-            if request.POST.has_key('addanother'):
+            if 'addanother' in request.POST:
                 accountForm = AccountForm()
                 form = CheckForm()
     else:
@@ -386,7 +386,7 @@ def check_edit(request, id):
         if form.is_valid():
             process_check_base_form(form)
             form.save()
-            if request.POST.has_key('addanother'):
+            if 'addanother' in request.POST:
                 accountForm = AccountForm()
                 form = CheckForm()
     else:
@@ -423,7 +423,7 @@ def employeecheck_add(request):
             process_check_base_form(form)
             ec = form.save()
             apply_employee_check(ec)
-            if request.POST.has_key('addanother'):
+            if 'addanother' in request.POST:
                 form = EmployeeCheckForm()
     else:
         form = EmployeeCheckForm()
@@ -441,7 +441,7 @@ def employeecheck_edit(request, id):
             process_check_base_form(form)
             ec = form.save()
             apply_employee_check(ec)
-            if request.POST.has_key('addanother'):
+            if 'addanother' in request.POST:
                 form = EmployeeCheckForm()
     else:
         form = EmployeeCheckForm()
@@ -867,7 +867,7 @@ def salaries_bank(request):
         if form.is_valid():
             month, year = form.cleaned_data['month'], form.cleaned_data['year']
             salary_ids = [key.replace('salary-','') for key in request.POST if key.startswith('salary-')]
-            if request.POST.has_key('pdf'):
+            if 'pdf' in request.POST:
                 salaries = EmployeeSalaryBase.objects.filter(pk__in = salary_ids)
                 
                 filename = common.generate_unique_media_filename('pdf')
@@ -881,7 +881,7 @@ def salaries_bank(request):
                 p.close()
                 
                 return response  
-            elif request.POST.has_key('filter'):
+            elif 'filter' in request.POST:
                 salaries = EmployeeSalaryBase.objects.filter(month=month, year=year)
         else:
             raise ValidationError
@@ -1546,9 +1546,9 @@ def invoice_add(request, initial=None):
         form = DemandInvoiceForm(request.POST)
         if form.is_valid():
             form.save()
-            if request.POST.has_key('addanother'):
+            if 'addanother' in request.POST:
                 form = DemandInvoiceForm(initial=initial)
-            if request.POST.has_key('addpayment'):
+            if 'addpayment' in request.POST:
                 return HttpResponseRedirect('/payments/add')
     else:
         form = DemandInvoiceForm(initial=initial)
@@ -1785,7 +1785,7 @@ def split_payment_add(request):
         spdForms = DemandFormset(request.POST)
         if spf.is_valid() and spdForms.is_valid():
             for form in spdForms.forms:
-                if not form.is_valid() or not form.cleaned_data.has_key('amount'):
+                if not form.is_valid() or not 'amount' in form.cleaned_data:
                     continue
                 p = Payment()
                 for attr, value in spf.cleaned_data.items():
@@ -1813,9 +1813,9 @@ def payment_add(request, initial=None):
         form = DemandPaymentForm(request.POST)
         if form.is_valid():
             form.save()
-            if request.POST.has_key('addanother'):
+            if 'addanother' in request.POST:
                 form = DemandPaymentForm(initial=initial)
-            if request.POST.has_key('addinvoice'):
+            if 'addinvoice' in request.POST:
                 return HttpResponseRedirect('/invoices/add')
     else:
         form = DemandPaymentForm(initial=initial)
@@ -1829,13 +1829,13 @@ def demand_payment_edit(request, id):
         form = DemandPaymentForm(request.POST, instance = payment)
         if form.is_valid():
             form.save()
-            if request.POST.has_key('addanother'):
+            if 'addanother' in request.POST:
                 try:
                     demand = payment.demands.all()[0]
                     return HttpResponseRedirect('/demands/%s/payment/add' % demand.id)
                 except KeyError:
                     return HttpResponseRedirect(reverse(payment_add))
-            if request.POST.has_key('addinvoice'):
+            if 'addinvoice' in request.POST:
                 return HttpResponseRedirect('/invoices/add')
     else:
         form = DemandPaymentForm(instance = payment)
@@ -1849,13 +1849,13 @@ def demand_invoice_edit(request, id):
         form = DemandInvoiceForm(request.POST, instance = invoice)
         if form.is_valid():
             form.save()
-            if request.POST.has_key('addanother'):
+            if 'addanother' in request.POST:
                 try:
                     demand = invoice.demands.all()[0]
                     return HttpResponseRedirect('/demands/%s/invoice/add' % demand.id)
                 except KeyError:
                     return HttpResponseRedirect(reverse(invoice_add))
-            if request.POST.has_key('addpayment'):
+            if 'addpayment' in request.POST:
                 return HttpResponseRedirect('/payments/add')
     else:
         form = DemandInvoiceForm(instance = invoice)
@@ -1894,7 +1894,7 @@ def demand_adddiff(request, object_id, type = None):
         if form.is_valid():
             form.instance.demand = demand
             diff = form.save()
-            if request.POST.has_key('addanother'):
+            if 'addanother' in request.POST:
                 return HttpResponseRedirect(reverse(demand_adddiff, args=[object_id]))
             return HttpResponseRedirect(diff.get_absolute_url())
     else:
@@ -1947,7 +1947,7 @@ def nhsaleside_payment_add(request, object_id):
         if form.is_valid():
             p = form.save()
             nhs.payments.add(p)
-            if request.POST.has_key('addanother'):
+            if 'addanother' in request.POST:
                 form = PaymentForm()
     else:
         form = PaymentForm()
@@ -2069,9 +2069,9 @@ def nhsale_add(request, branch_id):
             else:
                 error = True
             if not error:
-                if request.POST.has_key('addanother'):
+                if 'addanother' in request.POST:
                     return HttpResponseRedirect('add')
-                elif request.POST.has_key('tomonth'):
+                elif 'tomonth' in request.POST:
                     return HttpResponseRedirect('/nhbranch/%s/sales' % nhsale.nhmonth.nhbranch.id)
     else:
         branch = NHBranch.objects.get(pk=branch_id)
@@ -2746,9 +2746,9 @@ def building_addhouse(request, type_id, building_id):
         form.instance.building = b
         if form.is_valid():
             form.save(type_id)
-            if request.POST.has_key('addanother'):
+            if 'addanother' in request.POST:
                 next_url = reverse(building_addhouse, args=[building_id, type_id])
-            elif request.POST.has_key('finish'):
+            elif 'finish' in request.POST:
                 next_url = reverse(building_pricelist, args=[building_id, type_id])
             else:
                 next_url = reverse(house_edit, args=[form.instance.id, type_id])
@@ -2794,9 +2794,9 @@ def house_edit(request,id , type_id):
         form = HouseForm(type_id, data = request.POST, instance = h)
         if form.is_valid():
             form.save(type_id)
-            if request.POST.has_key('addanother'):
+            if 'addanother' in request.POST:
                 return HttpResponseRedirect('../../addhouse/type%s' % type_id)
-            elif request.POST.has_key('finish'):
+            elif 'finish' in request.POST:
                 return HttpResponseRedirect('../../pricelist/type%s' % type_id)
     else:
         form = HouseForm(type_id, instance = h)
@@ -3175,19 +3175,19 @@ def attachment_list(request):
         
         object_id, content_type = None, None
         
-        if request.GET.has_key('project'):
+        if 'project' in request.GET:
             if project_select_form.is_valid():
                 project = project_select_form.cleaned_data['project']
                 model = project.__class__
                 content_type = ContentType.objects.get_for_model(model)
                 object_id = project.id
-        elif request.GET.has_key('employee'):
+        elif 'employee' in request.GET:
             if employee_select_form.is_valid():
                 employee = employee_select_form.cleaned_data['employee']
                 model = employee.__class__
                 content_type = ContentType.objects.get_for_model(model)
                 object_id = employee.id
-        elif request.GET.has_key('demand'):
+        elif 'demand' in request.GET:
             if demand_select_form.is_valid():
                 kwargs = demand_select_form.cleaned_data
                 demand = Demand.objects.get(**kwargs)
@@ -3218,15 +3218,15 @@ def attachment_add(request):
         attachment.user_added = request.user
         attachment.file = request.FILES['file']
         
-        if request.POST.has_key('project'):
+        if 'project' in request.POST:
             if project_select_form.is_valid():
                 attachment.content_type = ContentType.objects.get_for_model(Project)
                 attachment.object_id = project_select_form.cleaned_data['project'].id
-        elif request.POST.has_key('employee'):
+        elif 'employee' in request.POST:
             if employee_select_form.is_valid():
                 attachment.content_type = ContentType.objects.get_for_model(EmployeeBase)
                 attachment.object_id = employee_select_form.cleaned_data['employee'].id
-        elif request.POST.has_key('demand'):
+        elif 'demand' in request.POST:
             if demand_select_form.is_valid():
                 attachment.content_type = ContentType.objects.get_for_model(Demand)
                 kwargs = demand_select_form.cleaned_data
@@ -3289,9 +3289,9 @@ def sale_edit(request, id):
             salaries_to_calc = list(EmployeeSalary.objects.nondeleted().filter(employee__in = employees, year = year, month = month))
             calc_salaries(salaries_to_calc)
 
-            if request.POST.has_key('addanother'):
+            if 'addanother' in request.POST:
                 return HttpResponseRedirect(next or '/demands/%s/sale/add' % sale.demand.id)
-            elif request.POST.has_key('todemand'):
+            elif 'todemand' in request.POST:
                 return HttpResponseRedirect(next or '/demands/%s' % sale.demand.id)
     else:
         form = SaleForm(instance= sale)
@@ -3332,9 +3332,9 @@ def sale_add(request, demand_id=None):
             salaries_to_calc = list(EmployeeSalary.objects.nondeleted().filter(employee__in = employees, year = year, month = month))
             calc_salaries(salaries_to_calc)
                 
-            if request.POST.has_key('addanother'):
+            if 'addanother' in request.POST:
                 return HttpResponseRedirect(next or reverse(sale_add, args=[demand_id]))
-            elif request.POST.has_key('todemand'):
+            elif 'todemand' in request.POST:
                 return HttpResponseRedirect(next or '/demands/%s' % demand.id)
     else:
         form = SaleForm()
@@ -3580,11 +3580,11 @@ def demand_pay_balance_list(request):
                     project.total_diff_invoice += demand.diff_invoice
                     project.total_diff_invoice_payment += demand.diff_invoice_payment
                 
-            if request.GET.has_key('html'):
+            if 'html' in request.GET:
                 return render(request, 'Management/demand_pay_balance_list.html', 
                                           { 'filterForm': form, 'project_demands': project_demands},
                                           )
-            elif request.GET.has_key('pdf'):
+            elif 'pdf' in request.GET:
                 filename = common.generate_unique_media_filename('pdf')
     
                 response = HttpResponse(mimetype='application/pdf')
@@ -3705,13 +3705,13 @@ def employeesalary_season_list(request):
             elif isinstance(employee_base.derived, NHEmployee):
                 salaries = NHEmployeeSalary.objects.nondeleted().range(from_date.year, from_date.month, to_date.year, to_date.month).filter(nhemployee__id = employee_base.id)
             
-            if request.GET.has_key('list'):    
+            if 'list' in request.GET:    
                 # aggregate to get total values
                 for salary in salaries:
                     for attr in total_attrs:
                         attr_value = getattr(salary, attr)
                         totals['total_' + attr] += attr_value or 0
-            elif request.GET.has_key('pdf'):
+            elif 'pdf' in request.GET:
                 filename = common.generate_unique_media_filename('pdf')
                 
                 response = HttpResponse(mimetype='application/pdf')
@@ -3844,7 +3844,7 @@ def sale_analysis(request):
             if building_num:
                 all_sales = all_sales.filter(house__building__num = building_num)
             
-            if request.GET.has_key('html'):    
+            if 'html' in request.GET:    
                 house_attrs = ('net_size', 'garden_size', 'rooms', 'floor', 'perfect_size')
                 sale_attrs = ('price_taxed', 'price_taxed_for_perfect_size')
                 
@@ -3875,7 +3875,7 @@ def sale_analysis(request):
                     curr_row['diff_avg_price_taxed_for_perfect_size'] = curr_row['avg_price_taxed_for_perfect_size'] - \
                         prev_row['avg_price_taxed_for_perfect_size']
                     
-            elif request.GET.has_key('pdf'):
+            elif 'pdf' in request.GET:
                 filename = common.generate_unique_media_filename('pdf')
     
                 response = HttpResponse(mimetype='application/pdf')
@@ -4041,7 +4041,7 @@ def citycallers_core(request, instance):
                 new_city.save()
                 form.cleaned_data['city'] = new_city
             form.save()
-            if request.POST.has_key('addanother'):
+            if 'addanother' in request.POST:
                 return HttpResponseRedirect(reverse(citycallers_add))
     else:
         form = CityCallersForm(instance = instance)
@@ -4068,7 +4068,7 @@ def mediareferrals_core(request, instance):
                 new_media.save()
                 form.cleaned_data['media'] = new_media
             form.save()
-            if request.POST.has_key('addanother'):
+            if 'addanother' in request.POST:
                 return HttpResponseRedirect(reverse(mediareferrals_add))
     else:
         form = MediaReferralsForm(instance = instance)

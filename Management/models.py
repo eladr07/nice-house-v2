@@ -1281,7 +1281,7 @@ class EPCommission(models.Model):
                         logger.warning('sale #%s has 0 commission!' % s.id)
                         continue
                     s.commission_details.create(employee_salary = salary, value = amounts[s], commission = c)
-                    dic[s] = dic.has_key(s) and dic[s] + amounts[s] or amounts[s]
+                    dic[s] = s in dic and dic[s] + amounts[s] or amounts[s]
             for c in ['c_var_precentage', 'b_discount_save_precentage']:
                 commission = getattr(self,c)
                 if not commission: 
@@ -1301,7 +1301,7 @@ class EPCommission(models.Model):
                         precentages[s] = self.max
                     amount = precentages[s] * s.employee_price(self.employee) / 100
                     s.commission_details.create(employee_salary = salary, value = amount, commission = c)
-                    dic[s] = dic.has_key(s) and dic[s] + amount or amount
+                    dic[s] = s in dic and dic[s] + amount or amount
             total_amount = 0
             for s in dic:
                 total_amount = total_amount + dic[s]
@@ -1819,7 +1819,7 @@ class ProjectCommission(models.Model):
                         logger.info('sale #%(id)s - %(commission)s (%(commission_value)s) exceeded max commission %(max)s',
                                     {'id':s.id, 'commission':c, 'commission_value':precentages[s], 'max':self.max})
     
-                    dic[s] = dic.has_key(s) and dic[s] + precentages[s] or precentages[s]
+                    dic[s] = s in dic and dic[s] + precentages[s] or precentages[s]
                     s_details = details.setdefault(s, {})
                     s_details[c] = precentages[s]
                     
