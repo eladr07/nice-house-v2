@@ -2277,7 +2277,8 @@ def project_edit(request, id):
     else:
         form = ProjectForm(instance=project)
         detailsForm = ProjectDetailsForm(instance=details, prefix='det')
-        transactionsForm = TransactionUpdateHistory.objects.filter(transaction_id = project.commissions.id, transaction_type = 1)
+        commission = project.commissions.get()
+        transactionsForm = TransactionUpdateHistory.objects.filter(transaction_id = commission.id, transaction_type = 1)
 
         for value in transactionsForm :
             field_value = value.field_value
