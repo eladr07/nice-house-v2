@@ -2293,7 +2293,7 @@ def project_edit(request, id):
             except :
                 pass
 
-            transactions.append( [ ugettext( field_name ), field_value, str( value.timestamp ).split(' ')[0] ] )
+            transactions.append( [ gettext( field_name ), field_value, str( value.timestamp ).split(' ')[0] ] )
 
     context = {
         'form':form, 
@@ -2735,7 +2735,7 @@ def building_copy(request, building_id):
         form.fields['building'].initial = building.id
         
     return render(request, 'Management/object_edit.html',
-                              {'form' : form, 'title':ugettext('copy_building')}, 
+                              {'form' : form, 'title':gettext('copy_building')}, 
                               )
     
 @permission_required('Management.add_house')

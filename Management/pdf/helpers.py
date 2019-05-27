@@ -1,7 +1,7 @@
 from Management.templatetags.management_extras import commaise
 from Management.pdf.styles import *
 from reportlab.platypus import Paragraph
-from django.utils.translation import ugettext
+from django.utils.translation import gettext
 
 import decimal
 

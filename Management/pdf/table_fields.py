@@ -1,6 +1,6 @@
 from reportlab.platypus import Paragraph
 from pyfribidi import log2vis
-from django.utils.translation import ugettext
+from django.utils.translation import gettext
 
 import Management.models as models
 from Management.templatetags.management_extras import commaise
@@ -33,7 +33,7 @@ class TableField(object):
         
 class ProjectNameAndCityField(TableField):
     def __init__(self):
-        return super(ProjectNameAndCityField, self).__init__(ugettext('project_name'),135)
+        return super(ProjectNameAndCityField, self).__init__(gettext('project_name'),135)
     def format(self, item):
         return log2vis(item.project.name_and_city)
     
@@ -42,7 +42,7 @@ class ProjectNameAndCityField(TableField):
 
 class ProjectInitiatorField(TableField):
     def __init__(self):
-        return super(ProjectInitiatorField, self).__init__(ugettext('initiator'),150)
+        return super(ProjectInitiatorField, self).__init__(gettext('initiator'),150)
     def format(self, item):
         return log2vis(item.project.initiator)
     
@@ -51,7 +51,7 @@ class ProjectInitiatorField(TableField):
 
 class MonthField(TableField):
     def __init__(self):
-        return super(MonthField, self).__init__(ugettext('pdf_month'), 45)
+        return super(MonthField, self).__init__(gettext('pdf_month'), 45)
     def format(self, item):
         return '%s/%s' % (item.month, item.year)
     
@@ -60,7 +60,7 @@ class MonthField(TableField):
 
 class DemandSalesCountField(TableField):
     def __init__(self):
-        return super(DemandSalesCountField, self).__init__(ugettext('demand_sales_count'),50, is_summarized=True)
+        return super(DemandSalesCountField, self).__init__(gettext('demand_sales_count'),50, is_summarized=True)
     def format(self, item):
         return len(item.get_sales())
     
@@ -69,7 +69,7 @@ class DemandSalesCountField(TableField):
 
 class DemandSalesTotalPriceField(TableField):
     def __init__(self):
-        return super(DemandSalesTotalPriceField, self).__init__(ugettext('demand_total_sales_price'),50, 
+        return super(DemandSalesTotalPriceField, self).__init__(gettext('demand_total_sales_price'),50, 
                                                                 is_commaised=True, is_summarized=True)
     def format(self, item):
         return item.get_sales().total_price()
@@ -79,7 +79,7 @@ class DemandSalesTotalPriceField(TableField):
 
 class DemandTotalAmountField(TableField):
     def __init__(self):
-        return super(DemandTotalAmountField, self).__init__(ugettext('demand_total_amount'),50, is_commaised=True, 
+        return super(DemandTotalAmountField, self).__init__(gettext('demand_total_amount'),50, is_commaised=True, 
                                                             is_summarized=True)
     def format(self, item):
         return item.get_total_amount()
@@ -89,7 +89,7 @@ class DemandTotalAmountField(TableField):
 
 class DemandDiffInvoiceField(TableField):
     def __init__(self):
-        return super(DemandDiffInvoiceField, self).__init__(ugettext('demand_diff_invoice'),50, is_commaised=True, 
+        return super(DemandDiffInvoiceField, self).__init__(gettext('demand_diff_invoice'),50, is_commaised=True, 
                                                             is_summarized=True)
     def format(self, item):
         return item.diff_invoice
@@ -99,7 +99,7 @@ class DemandDiffInvoiceField(TableField):
 
 class DemandDiffInvoicePaymentField(TableField):
     def __init__(self):
-        return super(DemandDiffInvoicePaymentField, self).__init__(ugettext('demand_diff_invoice_payment'),50, is_commaised=True, 
+        return super(DemandDiffInvoicePaymentField, self).__init__(gettext('demand_diff_invoice_payment'),50, is_commaised=True, 
                                                                    is_summarized=True)
     def format(self, item):
         return item.diff_invoice_payment
@@ -109,7 +109,7 @@ class DemandDiffInvoicePaymentField(TableField):
         
 class InvoicesNumField(TableField):
     def __init__(self):
-        return super(InvoicesNumField, self).__init__(ugettext('invoices_num'),50)
+        return super(InvoicesNumField, self).__init__(gettext('invoices_num'),50)
     def format(self, item):
         return '\n'.join([str(i.num) for i in item.invoices.all()])
     
@@ -122,7 +122,7 @@ class InvoicesNumField(TableField):
         
 class InvoicesAmountField(TableField):
     def __init__(self):
-        return super(InvoicesAmountField, self).__init__(ugettext('invoices_amount'), 50)
+        return super(InvoicesAmountField, self).__init__(gettext('invoices_amount'), 50)
     def format(self, item):
         return '\n'.join([commaise(i.amount) for i in item.invoices.all()])
     
@@ -135,7 +135,7 @@ class InvoicesAmountField(TableField):
         
 class InvoicesDateField(TableField):
     def __init__(self):
-        return super(InvoicesDateField, self).__init__(ugettext('invoices_date'), 50)
+        return super(InvoicesDateField, self).__init__(gettext('invoices_date'), 50)
     def format(self, item):
         return '\n'.join([i.date.strftime('%d/%m/%y') for i in item.invoices.all()])
     
@@ -148,7 +148,7 @@ class InvoicesDateField(TableField):
         
 class PaymentsNumField(TableField):
     def __init__(self):
-        return super(PaymentsNumField, self).__init__(ugettext('payments_num'),50)
+        return super(PaymentsNumField, self).__init__(gettext('payments_num'),50)
     def format(self, item):
         return '\n'.join([str(p.num) for p in item.payments.all()])
     
@@ -161,7 +161,7 @@ class PaymentsNumField(TableField):
         
 class PaymentsAmountField(TableField):
     def __init__(self):
-        return super(PaymentsAmountField, self).__init__(ugettext('payments_amount'),50)
+        return super(PaymentsAmountField, self).__init__(gettext('payments_amount'),50)
     def format(self, item):
         return '\n'.join([commaise(p.amount) for p in item.payments.all()])
     
@@ -174,7 +174,7 @@ class PaymentsAmountField(TableField):
 
 class PaymentsDateField(TableField):
     def __init__(self):
-        return super(PaymentsDateField, self).__init__(ugettext('payments_date'), 50)
+        return super(PaymentsDateField, self).__init__(gettext('payments_date'), 50)
     def format(self, item):
         return '\n'.join([p.payment_date.strftime('%d/%m/%y') for p in item.payments.all()])
     
@@ -187,7 +187,7 @@ class PaymentsDateField(TableField):
         
 class SaleClientsField(TableField):
     def __init__(self):
-        return super(SaleClientsField, self).__init__(ugettext('clients_name'), 65)
+        return super(SaleClientsField, self).__init__(gettext('clients_name'), 65)
     def format(self, item):
         clients = item.clients
         str2 = ''
@@ -202,7 +202,7 @@ class SaleClientsField(TableField):
         
 class SalePriceTaxedField(TableField):
     def __init__(self):
-        return super(SalePriceTaxedField, self).__init__(ugettext('price_with_tax'), 50, is_commaised = True,
+        return super(SalePriceTaxedField, self).__init__(gettext('price_with_tax'), 50, is_commaised = True,
                                                            is_summarized = True, is_averaged = True)
     def format(self, item):
         return item.price_taxed
@@ -212,7 +212,7 @@ class SalePriceTaxedField(TableField):
 
 class SalePriceTaxedForPerfectSizeField(TableField):
     def __init__(self):
-        return super(SalePriceTaxedForPerfectSizeField, self).__init__(ugettext('price_for_size'), 35, is_commaised = True,
+        return super(SalePriceTaxedForPerfectSizeField, self).__init__(gettext('price_for_size'), 35, is_commaised = True,
                                                                        is_summarized = True, is_averaged = True)
     def format(self, item):
         return item.price_taxed_for_perfect_size
@@ -222,21 +222,21 @@ class SalePriceTaxedForPerfectSizeField(TableField):
 
 class SaleIncludeLawyerTaxField(TableField):
     def __init__(self):
-        return super(SaleIncludeLawyerTaxField, self).__init__(ugettext('include_lawyer_tax'), 50)
+        return super(SaleIncludeLawyerTaxField, self).__init__(gettext('include_lawyer_tax'), 50)
     def format(self, item):
         if item.price_include_lawyer == None:
             return '---'
         elif item.price_include_lawyer == False:
-            return log2vis(ugettext('no'))
+            return log2vis(gettext('no'))
         elif item.price_include_lawyer == True:
-            return log2vis(ugettext('yes'))
+            return log2vis(gettext('yes'))
     
     class Meta:
         models = (models.Sale,)
         
 class SaleEmployeeNameField(TableField):
     def __init__(self):
-        return super(SaleEmployeeNameField, self).__init__(ugettext('employee_name'), 75)
+        return super(SaleEmployeeNameField, self).__init__(gettext('employee_name'), 75)
     def format(self, item):
         return log2vis(str(item.employee or ''))
     
@@ -245,7 +245,7 @@ class SaleEmployeeNameField(TableField):
 
 class SaleDateField(TableField):
     def __init__(self):
-        return super(SaleDateField, self).__init__(ugettext('sale_date'), 45)
+        return super(SaleDateField, self).__init__(gettext('sale_date'), 45)
     def format(self, item):
         return item.sale_date.strftime('%d/%m/%y')
     
@@ -254,7 +254,7 @@ class SaleDateField(TableField):
 
 class HouseNumField(TableField):
     def __init__(self):
-        return super(HouseNumField, self).__init__(ugettext('house_num'), 35)
+        return super(HouseNumField, self).__init__(gettext('house_num'), 35)
     def format(self, item):
         return item.num
     
@@ -263,7 +263,7 @@ class HouseNumField(TableField):
 
 class HouseBuildingNumField(TableField):
     def __init__(self):
-        return super(HouseBuildingNumField, self).__init__(ugettext('building_num'), 35)
+        return super(HouseBuildingNumField, self).__init__(gettext('building_num'), 35)
     def format(self, item):
         return item.building.num
     
@@ -272,7 +272,7 @@ class HouseBuildingNumField(TableField):
         
 class HouseRoomsField(TableField):
     def __init__(self):
-        return super(HouseRoomsField, self).__init__(ugettext('rooms_num'),35, is_averaged = True)
+        return super(HouseRoomsField, self).__init__(gettext('rooms_num'),35, is_averaged = True)
     def format(self, item):
         return item.rooms
     
@@ -281,7 +281,7 @@ class HouseRoomsField(TableField):
         
 class HouseFloorField(TableField):
     def __init__(self):
-        return super(HouseFloorField, self).__init__(ugettext('floor'),35, is_averaged = True)
+        return super(HouseFloorField, self).__init__(gettext('floor'),35, is_averaged = True)
     def format(self, item):
         return item.floor
     
@@ -290,7 +290,7 @@ class HouseFloorField(TableField):
         
 class HouseSizeField(TableField):
     def __init__(self):
-        return super(HouseSizeField, self).__init__(ugettext('house_size'),40, is_averaged = True)
+        return super(HouseSizeField, self).__init__(gettext('house_size'),40, is_averaged = True)
     def format(self, item):
         return item.net_size
     
@@ -299,7 +299,7 @@ class HouseSizeField(TableField):
         
 class HouseGardenSizeField(TableField):
     def __init__(self):
-        return super(HouseGardenSizeField, self).__init__(ugettext('garden_size'),55, is_averaged = True)
+        return super(HouseGardenSizeField, self).__init__(gettext('garden_size'),55, is_averaged = True)
     def format(self, item):
         return item.garden_size
     
@@ -308,7 +308,7 @@ class HouseGardenSizeField(TableField):
         
 class HousePerfectSizeField(TableField):
     def __init__(self):
-        return super(HousePerfectSizeField, self).__init__(ugettext('perfect_size'),55, is_averaged = True)
+        return super(HousePerfectSizeField, self).__init__(gettext('perfect_size'),55, is_averaged = True)
     def format(self, item):
         return item.perfect_size
     
@@ -317,7 +317,7 @@ class HousePerfectSizeField(TableField):
         
 class HouseTypeField(TableField):
     def __init__(self):
-        return super(HouseTypeField, self).__init__(ugettext('house_type'),55)
+        return super(HouseTypeField, self).__init__(gettext('house_type'),55)
     def format(self, item):
         return log2vis(str(item.type))
     
@@ -326,7 +326,7 @@ class HouseTypeField(TableField):
         
 class HouseSettleDateField(TableField):
     def __init__(self):
-        return super(HouseSettleDateField, self).__init__(ugettext('settle_date'),35)
+        return super(HouseSettleDateField, self).__init__(gettext('settle_date'),35)
     def format(self, item):
         settle_date = item.settle_date
         return settle_date and settle_date.strftime('%d/%m/%y') or ''

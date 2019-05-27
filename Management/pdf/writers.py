@@ -16,7 +16,7 @@ from pyfribidi import log2vis
 from reportlab.lib.enums import *
 from reportlab.lib.styles import ParagraphStyle
 
-from django.utils.translation import ugettext
+from django.utils.translation import gettext
 
 import Management.models
 from Management.templatetags.management_extras import commaise
@@ -207,20 +207,20 @@ class EmployeeListWriter(DocumentBase):
             for attr in ['work_phone','work_fax','cell_phone','home_phone','mate_phone']:
                 attr_value = getattr(e, attr)
                 if attr_value:
-                    phones += '<u>' + log2vis(ugettext(attr)) + '</u><br/>'
+                    phones += '<u>' + log2vis(gettext(attr)) + '</u><br/>'
                     phones += log2vis(attr_value) + '<br/>'
             return phones
         def get_account_str(employee):
             account = employee.account
             account_str = ''
             if account:
-                account_str += '<u>' + log2vis(ugettext('payee')) + '</u><br/>'
+                account_str += '<u>' + log2vis(gettext('payee')) + '</u><br/>'
                 account_str += log2vis(account.payee) + '<br/>'
-                account_str += '<u>' + log2vis(ugettext('bank')) + '</u><br/>'
+                account_str += '<u>' + log2vis(gettext('bank')) + '</u><br/>'
                 account_str += log2vis(account.bank) + '<br/>'
-                account_str += '<u>' + log2vis(ugettext('branch')) + '</u><br/>'
+                account_str += '<u>' + log2vis(gettext('branch')) + '</u><br/>'
                 account_str += log2vis(u'%s %s' % (account.branch, account.branch_num)) + '<br/>'
-                account_str += '<u>' + log2vis(ugettext('account_num')) + '</u><br/>'
+                account_str += '<u>' + log2vis(gettext('account_num')) + '</u><br/>'
                 account_str += str(account.num) + '<br/>'
             return account_str            
             
@@ -1165,18 +1165,18 @@ class PricelistWriter:
                                ParagraphStyle('1', fontName='David',fontSize=14, leading=15, alignment=TA_RIGHT)))
         story.append(Paragraph(log2vis('מדד תשומות הבנייה : ' + str(models.MadadBI.objects.latest().value)),
                                ParagraphStyle('1', fontName='David',fontSize=14, leading=15, alignment=TA_LEFT)))
-        include_str = log2vis(u'המחיר כולל : ' + ', '.join(ugettext(attr) for attr in ['tax','lawyer','parking','storage','registration','guarantee']
+        include_str = log2vis(u'המחיר כולל : ' + ', '.join(gettext(attr) for attr in ['tax','lawyer','parking','storage','registration','guarantee']
                                                            if getattr(self.pricelist, 'include_' + attr)))
         story.append(Paragraph(include_str, ParagraphStyle('1', fontName='David',fontSize=14, leading=15, alignment=TA_RIGHT)))
         include_str = log2vis(u'היתר : ' + (self.pricelist.is_permit and u'יש' or u'אין'))
         story.append(Paragraph(include_str, ParagraphStyle('1', fontName='David',fontSize=14, leading=15, alignment=TA_LEFT)))
         notinclude_str = u'המחיר אינו כולל : מס רכישה כחוק'
         if self.pricelist.include_registration == False:
-            notinclude_str += ', %s  (%s)' % (ugettext('register_amount'), self.pricelist.register_amount)
+            notinclude_str += ', %s  (%s)' % (gettext('register_amount'), self.pricelist.register_amount)
         if self.pricelist.include_guarantee == False:
-            notinclude_str += ', %s  (%s)' % (ugettext('guarantee_amount'), self.pricelist.guarantee_amount)
+            notinclude_str += ', %s  (%s)' % (gettext('guarantee_amount'), self.pricelist.guarantee_amount)
         if self.pricelist.include_lawyer == False:
-            notinclude_str += ', %s  %%(%s)' % (ugettext('lawyer_fee'), self.pricelist.lawyer_fee)
+            notinclude_str += ', %s  %%(%s)' % (gettext('lawyer_fee'), self.pricelist.lawyer_fee)
         story.append(Paragraph(log2vis(notinclude_str), ParagraphStyle('1', fontName='David',fontSize=14, leading=15, alignment=TA_RIGHT)))
         story.append(Spacer(0,10))
         assets_str = '<u>%s</u><br/>' % log2vis(u'נכסים משניים פנויים')
@@ -1321,8 +1321,8 @@ class DemandPayBalanceWriter(DocumentBase):
                 # skip if the project does not have some contact person
                 if not contact:
                     continue
-                contact_str = str(contact) + ", " + ugettext('phone') + ": " + contact.phone + ", " + ugettext('fax') + ": " + \
-                    contact.fax + ", " + ugettext('mail') + ": " + contact.mail
+                contact_str = str(contact) + ", " + gettext('phone') + ": " + contact.phone + ", " + gettext('fax') + ": " + \
+                    contact.fax + ", " + gettext('mail') + ": " + contact.mail
                 style = ParagraphStyle('contact_para', fontName='David',fontSize=12, alignment=TA_CENTER)
                 paragraph = Paragraph(log2vis(contact_str), style)
                 projectFlow.append(paragraph)
@@ -1334,7 +1334,7 @@ class DemandPayBalanceWriter(DocumentBase):
             # add fields sepecific to the pay balance type
             if self.demand_pay_balance.id == 'un-paid':
                 field = DemandTotalAmountField()
-                field.title = ugettext('amount_yet_paid')
+                field.title = gettext('amount_yet_paid')
                 field.name += "2"
                 fields.append(field)
             elif self.demand_pay_balance.id == 'mis-paid':
