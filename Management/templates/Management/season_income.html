@@ -54,7 +54,7 @@
 </div>
 <div class="clearBoth"></div>
 <div class="someIcon" style="width:100px;">
-	<img src="/site_media/images/print-48.png" width="20" height="20"  alt="הדפסה" /> 
+	<img src="{% static "images/print-48.png" %}" width="20" height="20"  alt="הדפסה" /> 
 	<a href="#">גרסה להדפסה</a>
 </div>
 <div class="clearBoth"></div>
@@ -75,15 +75,15 @@
 	</tr>
     {% for p in projects %}
 		<tr class="{% cycle 'row1' 'row2' %}" objid={{d.id}}>
-			<td><a href="{{p.get_absolute_url}}"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a></td>
+			<td><a href="{{p.get_absolute_url}}"><img src="{% static "images/documentinfo-48.png" %}" width="20" height="20" alt="פרטים" border="0" /></a></td>
 			<td>
 				<a target="_blank" href="/demandseason/?project={{p.id}}&from_year={{start.year}}&from_month={{start.month}}&to_year={{end.year}}&to_month={{end.month}}">
-					<img src="/site_media/images/viewmag-48.png" width="20" height="20"/>
+					<img src="{% static "images/viewmag-48.png" %}" width="20" height="20"/>
 				</a>
 			</td>
 			<td>
 				<a href="/reports/project_season/{{p.id}}/{{start.year}}/{{start.month}}/{{end.year}}/{{end.month}}">
-				<img src="/site_media/images/PDF-48.png" width="15" height="15"/>
+				<img src="{% static "images/PDF-48.png" %}" width="15" height="15"/>
 				</a>
 			</td>
 			<td>{{ p.initiator }}</td>

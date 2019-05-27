@@ -103,35 +103,35 @@
 </div>
 <div class="clearBoth"></div>
 <div class="someIcon" style="width:110px;">
-	<img src="/site_media/images/documentinfo-48.png" width="20" height="20"  alt="שינוי" /> 
+	<img src="{% static "images/documentinfo-48.png" %}" width="20" height="20"  alt="שינוי" /> 
 	<a href="{{project.get_absolute_url}}">כרטיס פרויקט</a>
 </div>
 <div class="someIcon" style="width:100px;">
-	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="שינוי" /> 
 	<a id="demandEdit">שינוי דרישה</a>
 </div>
 <div class="someIcon" style="width:100px;">
-	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="שינוי" /> 
 	<a class="fancybox" id="demandAdjust">התאמת דרישה</a>
 </div>
 <div class="someIcon" style="width:100px;">
-	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="שינוי" /> 
 	<a id="demandForceFullyPaid">התאמה כפויה</a>
 </div>
 <div class="someIcon" style="width:100px;">
-	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="שינוי" /> 
 	<a id="demandAddInvoice">הזנת חשבונית</a>
 </div>
 <div class="someIcon" style="width:100px;">
-	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="שינוי" /> 
 	<a id="demandAddPayment">הזנת תשלום</a>
 </div>
 <div class="someIcon"style="width:130px;">
-	<img src="/site_media/images/advanced-48.png" width="20" height="20"  alt="שליחה" /> 
+	<img src="{% static "images/advanced-48.png" %}" width="20" height="20"  alt="שליחה" /> 
 	<a id="demandCalc">חישוב עמלות מחדש</a>
 </div>
 <div class="someIcon"style="width:130px;">
-	<img src="/site_media/images/reload-48.png" width="20" height="20"  alt="שליחה" />
+	<img src="{% static "images/reload-48.png" %}" width="20" height="20"  alt="שליחה" />
 	<a id="demandNotYetPaid">מאושר או טרם שולם</a>
 <div>
 <div class="clearBoth"></div>
@@ -193,7 +193,7 @@
 				<td><a href="/demands/{{d.id}}">{{d.id}}</a></td>
 				<td>
 					<a href="/reports/project_month/{{d.project.id}}/{{d.year}}/{{d.month}}">
-					<img src="/site_media/images/PDF-48.png" width="15" height="15"/>
+					<img src="{% static "images/PDF-48.png" %}" width="15" height="15"/>
 					</a>
 				</td>
 				<td>{{ d.month }}/{{d.year}}</td>
@@ -237,21 +237,21 @@
 				</td>
 				<td>
 					{% if d.adjust_diff %}
-						<a href="{{d.adjust_diff.get_absolute_url}}" class="fancybox"><img src="/site_media/images/edit_48.png" width="20" height="20" border="0" alt="עריכה" /></a>
+						<a href="{{d.adjust_diff.get_absolute_url}}" class="fancybox"><img src="{% static "images/edit_48.png" %}" width="20" height="20" border="0" alt="עריכה" /></a>
 					{% endif %}
 				</td>
 				<td
-				{% if d.is_fixed %}<img src="/site_media/images/update_48.png" width="20" height="20"  alt="תיקון" />{% endif %}
+				{% if d.is_fixed %}<img src="{% static "images/update_48.png" %}" width="20" height="20"  alt="תיקון" />{% endif %}
 				</td>
 				<td>
 					{% for r in d.get_open_reminders %}
 						{{ r.content|truncatewords:5 }}
-						<a class="fancybox" href="{{r.get_absolute_url}}"><img src="/site_media/images/documentinfo-48.png" width="15" height="15" alt="פרטים" border="0" /></a>
-						<a href="{{r.get_absolute_url}}/do"><img src="/site_media/images/thumbs_up_48.png" width="15" height="15" alt="בצע" border="0" /></a>
+						<a class="fancybox" href="{{r.get_absolute_url}}"><img src="{% static "images/documentinfo-48.png" %}" width="15" height="15" alt="פרטים" border="0" /></a>
+						<a href="{{r.get_absolute_url}}/do"><img src="{% static "images/thumbs_up_48.png" %}" width="15" height="15" alt="בצע" border="0" /></a>
 						<br>
 					{% endfor %}
 					<a href="/demands/{{d.id}}/addreminder" class="fancybox">
-						<img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" />
+						<img src="{% static "images/add_48.png" %}" width="15" height="15" border="0" alt="הוספה" />
 					</a>
 				</td>
 			</tr>

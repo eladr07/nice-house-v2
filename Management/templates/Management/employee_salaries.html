@@ -64,43 +64,43 @@
 </form>
 <br>
 <div class="someIcon" style="width:100px;">
-	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="החזר הלוואה" /> 
+	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="החזר הלוואה" /> 
 	<a id="loanAdd" class="fancybox">הלוואה חדשה</a>
 </div>
 <div class="someIcon" style="width:100px;">
-	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="החזר הלוואה" /> 
+	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="החזר הלוואה" /> 
 	<a id="loanPay" class="fancybox">קיזוז הלוואה</a>
 </div>
 <div class="someIcon" style="width:170px;">
-	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="שינוי" /> 
 	<a id="edit" class="fancybox">שינוי מרכיבי שכר - חד פעמי</a>
 </div>
 <div class="someIcon" style="width:100px;">
-	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="הוצאות שכר" /> 
+	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="הוצאות שכר" /> 
 	<a id="expenses" class="fancybox">הוצאות שכר</a>
 </div>
 <div class="someIcon"style="width:130px;">
-	<img src="/site_media/images/advanced-48.png" width="20" height="20"  alt="חישוב עמלות מחדש" /> 
+	<img src="{% static "images/advanced-48.png" %}" width="20" height="20"  alt="חישוב עמלות מחדש" /> 
 	<a id="calcSalary">חישוב עמלות מחדש</a>
 </div>
 <div class="someIcon" style="width:120px;">
-	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="אישור שכר לתשלום" /> 
+	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="אישור שכר לתשלום" /> 
 	<a id="approve" >אישור שכר לתשלום</a>
 </div>
 <div class="someIcon" >
-	<img src="/site_media/images/delete_48.png" width="20" height="20"  alt="מחיקה" /> 
+	<img src="{% static "images/delete_48.png" %}" width="20" height="20"  alt="מחיקה" /> 
 	<a id="deleteSalary" >מחיקה</a>
 </div>
 <div class="someIcon" style="width:100px;">
-	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="שינוי" /> 
 	<a id="#" >תיק עובד</a>
 </div>
 <div class="someIcon" style="width:100px;">
-	<img src="/site_media/images/print-48.png" width="20" height="20"  alt="שלח להנהח" /> 
+	<img src="{% static "images/print-48.png" %}" width="20" height="20"  alt="שלח להנהח" /> 
 	<a id="#" >שלח להנה"ח</a>
 </div>
 <div class="someIcon" style="width:100px;">
-	<img src="/site_media/images/print-48.png" width="20" height="20"  alt="שינוי" /> 
+	<img src="{% static "images/print-48.png" %}" width="20" height="20"  alt="שינוי" /> 
 	<a href="{{month.year}}/{{month.month}}/pdf" >גרסת הדפסה</a>
 </div>
 <div class="clearBoth"></div>
@@ -145,17 +145,17 @@
 		{% else %}
 			<tr class="{% cycle 'row1' 'row2' %}" objid={{s.id}} employeeid={{s.employee.id}}>
 		{% endif %}
-			<td><a class="fancybox" href="{{s.id}}"><img src="/site_media/images/edit_48.png" width="20" height="20" alt="שינוי מרכיבי שכר" border="0" /></a></td>
+			<td><a class="fancybox" href="{{s.id}}"><img src="{% static "images/edit_48.png" %}" width="20" height="20" alt="שינוי מרכיבי שכר" border="0" /></a></td>
 			<td><a href="{{s.employee.get_absolute_url}}">{{ s.employee }}</a></td>
 			<td>
 				{% for demand in s.demands %}
 				<a href="{{demand.project.get_absolute_url}}" target="_blank">{{demand.project}}</a>
 				<br>
 				<a href="/reports/project_month/{{demand.project_id}}/{{demand.year}}/{{demand.month}}">
-					<img src="/site_media/images/PDF-48.png" width="15" height="15"/>
+					<img src="{% static "images/PDF-48.png" %}" width="15" height="15"/>
 				</a>
 				<a href="{{demand.get_absolute_url}}">
-					<img src="/site_media/images/documentinfo-48.png" width="15" height="15"/>
+					<img src="{% static "images/documentinfo-48.png" %}" width="15" height="15"/>
 				</a>
 				<br>
 				{% endfor %}

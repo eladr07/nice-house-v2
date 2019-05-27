@@ -20,7 +20,7 @@
 		{% for sales in es.sales.values %}
 		{% for sale in sales %}
 			<tr {% if sale.salereject %}class="row3"{% endif %} {% if sale.salepre %}class="row4"{% endif %}>				
-				<td><a target="_parent" href="{{ sale.get_absolute_url }}"><img src="/site_media/images/documentinfo-48.png" width="15" height="15" alt="פרטים" border="0" /></a></td>
+				<td><a target="_parent" href="{{ sale.get_absolute_url }}"><img src="{% static "images/documentinfo-48.png" %}" width="15" height="15" alt="פרטים" border="0" /></a></td>
 				<td>{{sale.id}}</td>
 				<td>{{sale.sale_date|date:"j/m/Y"}}</td>
 				<td>{{sale.clients}}</td>

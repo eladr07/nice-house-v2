@@ -24,10 +24,10 @@
 		</tr>
 		{% for d in demands %}
 			<tr class="{% cycle 'row1' 'row2' %}" objid={{a.id}}>
-				<td><a target="_blank" href="/demands/{{d.id}}"><img src="/site_media/images/documentinfo-48.png" width="15" height="15" alt="פרטים" border="0" /></a></td>
+				<td><a target="_blank" href="/demands/{{d.id}}"><img src="{% static "images/documentinfo-48.png" %}" width="15" height="15" alt="פרטים" border="0" /></a></td>
 				<td>
 					<a href="/reports/project_month/{{d.project.id}}/{{d.year}}/{{d.month}}">
-					<img src="/site_media/images/PDF-48.png" width="15" height="15"/>
+					<img src="{% static "images/PDF-48.png" %}" width="15" height="15"/>
 					</a>
 				</td>
 				<td>{{ d.month }}/{{ d.year }}</td>
@@ -48,18 +48,18 @@
 				<td>{{d.diff_invoice|commaise}}</td>
 				<td>
 				{% if d.is_fixed %}
-				<img src="/site_media/images/update_48.png" width="20" height="20"  alt="תיקון" />
+				<img src="{% static "images/update_48.png" %}" width="20" height="20"  alt="תיקון" />
 				{% endif %}
 				</td>
 				<td>
 				{% for r in d.get_open_reminders %}
 					{{ r.content|truncatewords:5 }}
-					<a href="{{r.get_absolute_url}}"><img src="/site_media/images/documentinfo-48.png" width="15" height="15" alt="פרטים" border="0" /></a>
-					<a href="{{r.get_absolute_url}}/do"><img src="/site_media/images/thumbs_up_48.png" width="15" height="15" alt="בצע" border="0" /></a>
+					<a href="{{r.get_absolute_url}}"><img src="{% static "images/documentinfo-48.png" %}" width="15" height="15" alt="פרטים" border="0" /></a>
+					<a href="{{r.get_absolute_url}}/do"><img src="{% static "images/thumbs_up_48.png" %}" width="15" height="15" alt="בצע" border="0" /></a>
 					<br>
 				{% endfor %}
 					<a href="/demands/{{d.id}}/addreminder" class="fancybox">
-						<img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" />
+						<img src="{% static "images/add_48.png" %}" width="15" height="15" border="0" alt="הוספה" />
 					</a>
 				</td>
 			</tr>

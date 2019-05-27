@@ -60,7 +60,7 @@
 				{% with salary.get_employee as e %}
 				{% with e.account as account %}
 					<td><input type="checkbox" name="salary-{{salary.id}}"/></td>
-					<td><a href="{{e.get_absolute_url}}"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a></td>
+					<td><a href="{{e.get_absolute_url}}"><img src="{% static "images/documentinfo-48.png" %}" width="20" height="20" alt="פרטים" border="0" /></a></td>
 					<td>{{ e.id }}</td>
 					<td>{{ e.first_name }}</td>
 					<td>{{ e.last_name }}</td>

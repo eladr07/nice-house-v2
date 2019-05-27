@@ -38,7 +38,7 @@
 		<th>ביטול</th>
 		{% for s in sales %}
 			<tr>
-				<td><a target="_parent" href="{{s.get_absolute_url}}"><img src="/site_media/images/documentinfo-48.png" width="15" height="15" alt="פרטים" border="0" /></a></td>
+				<td><a target="_parent" href="{{s.get_absolute_url}}"><img src="{% static "images/documentinfo-48.png" %}" width="15" height="15" alt="פרטים" border="0" /></a></td>
 				<td>{{s.id}}</td>
 				{% if s.contract_num %}<td>{{s.contract_num}}</td>{% endif%}
 				<td>{{s.sale_date|date:"j/m/Y"}}</td>
@@ -58,23 +58,23 @@
 				{% if s.allowed_discount %}<td>{{s.allowed_discount}}%</td>{% endif %}
 				<td>
 					{% if s.salepricemod %}
-						<a href="/salepricemod/{{s.salepricemod.id}}" target="_parent"><img src="/site_media/images/money-48.png" width="15" height="15" /></a>
+						<a href="/salepricemod/{{s.salepricemod.id}}" target="_parent"><img src="{% static "images/money-48.png" %}" width="15" height="15" /></a>
 					{% endif %}
 					{% if s.salehousemod %}
-						<a href="/salehousemod/{{s.salehousemod.id}}" target="_parent"><img src="/site_media/images/home-48.png" width="15" height="15" /></a>
+						<a href="/salehousemod/{{s.salehousemod.id}}" target="_parent"><img src="{% static "images/home-48.png" %}" width="15" height="15" /></a>
 					{% endif %}
 					{% if s.salepre %}
-						<a href="/salepre/{{s.salepre.id}}" target="_parent"><img src="/site_media/images/agt_forward-48.png" width="15" height="15" /></a>
+						<a href="/salepre/{{s.salepre.id}}" target="_parent"><img src="{% static "images/agt_forward-48.png" %}" width="15" height="15" /></a>
 					{% endif %}
 					{% if s.salereject %}
-						<a href="/salereject/{{s.salereject.id}}" target="_parent"><img src="/site_media/images/agt_back-48.png" width="15" height="15" /></a>
+						<a href="/salereject/{{s.salereject.id}}" target="_parent"><img src="{% static "images/agt_back-48.png" %}" width="15" height="15" /></a>
 					{% endif %}
 					{% if s.salecancel %}
-						<a href="/salecancel/{{s.salecancel.id}}" target="_parent"><img src="/site_media/images/delete_48.png" width="15" height="15" /></a>
+						<a href="/salecancel/{{s.salecancel.id}}" target="_parent"><img src="{% static "images/delete_48.png" %}" width="15" height="15" /></a>
 					{% endif %}
 				</td>
-				<td><a id="reject{{s.id}}" href="/demands/{{s.demand.id}}/sale/{{s.id}}/reject" target="_parent"><img src="/site_media/images/agt_back-48.png" width="15" height="15" alt="דחייה" border="0" /></a></td>
-				<td><a id="cancel{{s.id}}" href="/demands/{{s.demand.id}}/sale/{{s.id}}/cancel" target="_parent"><img src="/site_media/images/delete_48.png" width="15" height="15" alt="דחייה" border="0" /></a></td>
+				<td><a id="reject{{s.id}}" href="/demands/{{s.demand.id}}/sale/{{s.id}}/reject" target="_parent"><img src="{% static "images/agt_back-48.png" %}" width="15" height="15" alt="דחייה" border="0" /></a></td>
+				<td><a id="cancel{{s.id}}" href="/demands/{{s.demand.id}}/sale/{{s.id}}/cancel" target="_parent"><img src="{% static "images/delete_48.png" %}" width="15" height="15" alt="דחייה" border="0" /></a></td>
 			</tr>
 		{% endfor %}
 		<tr class="sumRow">

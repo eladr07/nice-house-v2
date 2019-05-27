@@ -78,7 +78,7 @@
 </tr>
 {% for i in object_list %}
 	<tr class="{% cycle 'row1' 'row2' %}" objid={{i.id}}>
-		<td><a href="{{i.id}}"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a></td>
+		<td><a href="{{i.id}}"><img src="{% static "images/documentinfo-48.png" %}" width="20" height="20" alt="פרטים" border="0" /></a></td>
 		<td>{{ i.initiator }}</td>
 		<td>{{ i.name }}</td>
 		<td>{{ i.city }}</td>
@@ -107,14 +107,14 @@
 			{% endif%}
 		</td>
 		<td>
-			<a href="{{i.id}}/buildings/add" class="fancybox"><img src="/site_media/images/add_48.png" width="20" height="20" border="0" alt="חדש" /> </a>
+			<a href="{{i.id}}/buildings/add" class="fancybox"><img src="{% static "images/add_48.png" %}" width="20" height="20" border="0" alt="חדש" /> </a>
 			{% if i.non_deleted_buildings|length %}
-				<a href="{{i.id}}/buildings" class="bigfancybox"><img src="/site_media/images/home-48.png" width="20" height="20" alt="פרטים" border="0" /></a>
+				<a href="{{i.id}}/buildings" class="bigfancybox"><img src="{% static "images/home-48.png" %}" width="20" height="20" alt="פרטים" border="0" /></a>
 			{% endif %}
 		</td>
 		<td style="text-align:center;">
 			{% if i.details.url %}
-				<a href="{{i.details.url}}" target="_blank"><img src="/site_media/images/network-48.png" width="20" height="20" alt="פרטים" border="0" /></a>
+				<a href="{{i.details.url}}" target="_blank"><img src="{% static "images/network-48.png" %}" width="20" height="20" alt="פרטים" border="0" /></a>
 			{% endif %}
 		</td>
 	</tr>

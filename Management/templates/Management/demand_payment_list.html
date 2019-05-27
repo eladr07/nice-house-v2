@@ -52,19 +52,19 @@
 	</div>
 	<div class="clearBoth"></div>
 	<div class="someIcon">
-		<img src="/site_media/images/add_48.png" width="20" height="20"  alt="חדש" /> 
+		<img src="{% static "images/add_48.png" %}" width="20" height="20"  alt="חדש" /> 
 		<a href="/payments/add">חדש</a>
 	</div>
 	<div class="someIcon" style="width:110px;">
-		<img src="/site_media/images/add_48.png" width="20" height="20"  alt="חדש" /> 
+		<img src="{% static "images/add_48.png" %}" width="20" height="20"  alt="חדש" /> 
 		<a href="/splitpayment/add">תשלום מפוצל</a>
 	</div>
 	<div class="someIcon">
-		<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+		<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="שינוי" /> 
 		<a id="objEdit">שינוי</a>
 	</div>
 	<div class="someIcon">
-		<img src="/site_media/images/delete_48.png" width="20" height="20"  alt="מחיקה" /> 
+		<img src="{% static "images/delete_48.png" %}" width="20" height="20"  alt="מחיקה" /> 
 		<a id="objDelete">מחיקה</a>
 	</div>
 	<div class="clearBoth"> </div>
@@ -73,7 +73,7 @@
 		<caption>
 		{% if page.has_previous %}
 		<a href="?page={{ page.previous_page_number }}" style="text-decoration:none;">
-			<img src="/site_media/images/1rightarrow-48.png" width="20" height="20" border="0" />
+			<img src="{% static "images/1rightarrow-48.png" %}" width="20" height="20" border="0" />
 		</a>
 		{% endif %}
 		מציג
@@ -84,7 +84,7 @@
 		{{page.paginator.num_pages}}
 		{% if page.has_next %}
 		<a href="?page={{ page.next_page_number }}" style="text-decoration:none;">
-			<img src="/site_media/images/1leftarrow-48.png" width="20" height="20" border="0" />
+			<img src="{% static "images/1leftarrow-48.png" %}" width="20" height="20" border="0" />
 		</a>
 		{% endif %}
 		</caption>
@@ -101,7 +101,7 @@
 		<th>הערות</th>
 		{% for i in page.object_list %}
 			<tr class="{% cycle 'row1' 'row2' %}" objid={{i.id}}>
-				<td><a href="{{i.demands.all.0.get_absolute_url}}"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a></td>
+				<td><a href="{{i.demands.all.0.get_absolute_url}}"><img src="{% static "images/documentinfo-48.png" %}" width="20" height="20" alt="פרטים" border="0" /></a></td>
 				<td>{{ i.demands.all.0.project.initiator }}</td>
 				<td><a href="{{i.demands.0.project.get_absolute_url}}">{{ i.demands.all.0.project }}</td>
 				<td>{{ i.demands.all.0.month }}</td>

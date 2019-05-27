@@ -28,49 +28,49 @@
 					<th>{{spf.num.label_tag}}</th>
 					<td>
 						{{spf.num}}
-						{% if spf.num.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{spf.num.errors|join:""}}'/>{% endif %}
+						{% if spf.num.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{spf.num.errors|join:""}}'/>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{spf.support_num.label_tag}}</th>
 					<td>
 						{{spf.support_num}}
-						{% if spf.support_num.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{spf.support_num.errors|join:""}}'/>{% endif %}
+						{% if spf.support_num.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{spf.support_num.errors|join:""}}'/>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{spf.bank.label_tag}}</th>
 					<td>
 						{{spf.bank}}
-						{% if spf.bank.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{spf.bank.errors|join:""}}'/>{% endif %}
+						{% if spf.bank.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{spf.bank.errors|join:""}}'/>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{spf.branch_num.label_tag}}</th>
 					<td>
 						{{spf.branch_num}}
-						{% if spf.branch_num.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{spf.branch_num.errors|join:""}}'/>{% endif %}
+						{% if spf.branch_num.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{spf.branch_num.errors|join:""}}'/>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{spf.payment_type.label_tag}}</th>
 					<td>
 						{{spf.payment_type}}
-						{% if spf.payment_type.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{spf.payment_type.errors|join:""}}'/>{% endif %}
+						{% if spf.payment_type.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{spf.payment_type.errors|join:""}}'/>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{spf.payment_date.label_tag}}</th>
 					<td>
 						{{spf.payment_date}}
-						{% if spf.payment_date.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{spf.payment_date.errors|join:""}}'/>{% endif %}
+						{% if spf.payment_date.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{spf.payment_date.errors|join:""}}'/>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{spf.remarks.label_tag}}</th>
 					<td>
 						{{spf.remarks}}
-						{% if spf.remarks.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{spf.remarks.errors|join:""}}'/>{% endif %}
+						{% if spf.remarks.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{spf.remarks.errors|join:""}}'/>{% endif %}
 					</td>
 				</tr>
 				<tr>
@@ -85,7 +85,7 @@
 				{% for form in spdForms.forms %}
 				<tr>
 					{% for field in form %}
-						<td>{{field}}{% if field.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{field.errors|join:""}}'/>{% endif %}</td>
+						<td>{{field}}{% if field.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{field.errors|join:""}}'/>{% endif %}</td>
 					{% endfor %}
 				</tr>
 				{% endfor %}

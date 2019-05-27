@@ -101,27 +101,27 @@
 <fieldset class="cardFieldset">
 	<legend>פירוט יחידות</legend>
 	<div class="someIcon"  style="width:165px;">
-		<img src="/site_media/images/add_48.png" width="20" height="20"  alt="הוספה" /> 
+		<img src="{% static "images/add_48.png" %}" width="20" height="20"  alt="הוספה" /> 
 			<a href="../addhouse/type{{type.id}}">הוספת דירה חדשה למחירון</a>
 	</div>	
 	<div class="someIcon">
-		<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="עריכה" /> 
+		<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="עריכה" /> 
 		<a id="houseEdit">שינוי</a>
 	</div>
 	<div class="someIcon">
-		<img src="/site_media/images/delete_48.png" width="20" height="20"  alt="מחיקה" /> 
+		<img src="{% static "images/delete_48.png" %}" width="20" height="20"  alt="מחיקה" /> 
 		<a id="houseDelete">מחיקה</a>
 	</div>
 	<div class="someIcon" style="width:100px;">
-		<img src="/site_media/images/agt_forum-48.png" width="20" height="20" /> 
+		<img src="{% static "images/agt_forum-48.png" %}" width="20" height="20" /> 
 		<a href="../clients" >מצבת רוכשים</a>
 	</div>
 	<div class="someIcon" style="width:100px;">
-		<img src="/site_media/images/print-48.png" width="20" height="20" /> 
+		<img src="{% static "images/print-48.png" %}" width="20" height="20" /> 
 		<a href="type{{type.id}}/pdf?type=avaliable" >גרסת הדפסה</a>
 	</div>
 	<div class="someIcon" style="width:120px;">
-		<img src="/site_media/images/print-48.png" width="20" height="20" /> 
+		<img src="{% static "images/print-48.png" %}" width="20" height="20" /> 
 		<a href="type{{type.id}}/pdf?type=full" >גרסת הדפסה מלאה</a>
 	</div>
 		<table class="formTable" style="float:left;">
@@ -172,7 +172,7 @@
 			<tr class="{% cycle 'row1' 'row2' %}" objid={{h.id}}>
 		{% endif %}
 			<td><input type="checkbox" name="house-{{h.id}}"/></td>
-			<td><a href="../house/{{h.id}}/type{{type.id}}"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a></td>
+			<td><a href="../house/{{h.id}}/type{{type.id}}"><img src="{% static "images/documentinfo-48.png" %}" width="20" height="20" alt="פרטים" border="0" /></a></td>
 			<td>{{h.num}}</td>
 			<td>{{h.floor}}</td>
 			<td>{{h.type}}</td>
@@ -211,7 +211,7 @@
 					<th>{{field.label_tag}}</th>
 					<td>
 						{{field}}
-						{% if field.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{field.errors|join:""}}'/>{% endif %}
+						{% if field.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{field.errors|join:""}}'/>{% endif %}
 					</td>
 					{% endfor %}
 					<td><input type="submit" value="אישור" class="button"/></td>
@@ -227,77 +227,77 @@
 					<th>{{form.include_tax.label_tag}}</th>
 					<td>
 						{{form.include_tax}}
-						{% if form.include_tax.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.include_tax.errors|join:""}}'/>{% endif %}
+						{% if form.include_tax.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.include_tax.errors|join:""}}'/>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{form.include_lawyer.label_tag}}</th>
 					<td>
 						{{form.include_lawyer}}
-						{% if form.include_lawyer.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.include_lawyer.errors|join:""}}'/>{% endif %}
+						{% if form.include_lawyer.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.include_lawyer.errors|join:""}}'/>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{form.include_parking.label_tag}}</th>
 					<td>
 						{{form.include_parking}}
-						{% if form.include_parking.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.include_parking.errors|join:""}}'/>{% endif %}
+						{% if form.include_parking.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.include_parking.errors|join:""}}'/>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{form.include_storage.label_tag}}</th>
 					<td>
 						{{form.include_storage}}
-						{% if form.include_storage.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.include_storage.errors|join:""}}'/>{% endif %}
+						{% if form.include_storage.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.include_storage.errors|join:""}}'/>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{form.include_registration.label_tag}}</th>
 					<td>
 						{{form.include_registration}}
-						{% if form.include_registration.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.include_registration.errors|join:""}}'/>{% endif %}
+						{% if form.include_registration.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.include_registration.errors|join:""}}'/>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{form.include_guarantee.label_tag}}</th>
 					<td>
 						{{form.include_guarantee}}
-						{% if form.include_guarantee.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.include_guarantee.errors|join:""}}'/>{% endif %}
+						{% if form.include_guarantee.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.include_guarantee.errors|join:""}}'/>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{form.settle_date.label_tag}}</th>
 					<td>
 						{{form.settle_date}}
-						{% if form.settle_date.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.settle_date.errors|join:""}}'/>{% endif %}
+						{% if form.settle_date.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.settle_date.errors|join:""}}'/>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{form.allowed_discount.label_tag}}</th>
 					<td>
 						{{form.allowed_discount}}
-						{% if form.allowed_discount.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.allowed_discount.errors|join:""}}'/>{% endif %}
+						{% if form.allowed_discount.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.allowed_discount.errors|join:""}}'/>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{form.is_permit.label_tag}}</th>
 					<td>
 						{{form.is_permit}}
-						{% if form.is_permit.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.is_permit.errors|join:""}}'/>{% endif %}
+						{% if form.is_permit.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.is_permit.errors|join:""}}'/>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{form.permit_date.label_tag}}</th>
 					<td>
 						{{form.permit_date}}
-						{% if form.permit_date.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.permit_date.errors|join:""}}'/>{% endif %}
+						{% if form.permit_date.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.permit_date.errors|join:""}}'/>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{form.remarks.label_tag}}</th>
 					<td>
 						{{form.remarks}}
-						{% if form.remarks.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.remarks.errors|join:""}}'/>{% endif %}
+						{% if form.remarks.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.remarks.errors|join:""}}'/>{% endif %}
 					</td>
 				</tr>
 			</table>
@@ -315,28 +315,28 @@
 					<th>{{form.lawyer_fee.label_tag}}</th>
 					<td>
 						{{form.lawyer_fee}}
-						{% if form.lawyer_fee.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.lawyer_fee.errors|join:""}}'/>{% endif %}
+						{% if form.lawyer_fee.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.lawyer_fee.errors|join:""}}'/>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{form.register_amount.label_tag}}</th>
 					<td>
 						{{form.register_amount}}
-						{% if form.register_amount.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.register_amount.errors|join:""}}'/>{% endif %}
+						{% if form.register_amount.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.register_amount.errors|join:""}}'/>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{form.guarantee_amount.label_tag}}</th>
 					<td>
 						{{form.guarantee_amount}}
-						{% if form.guarantee_amount.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.guarantee_amount.errors|join:""}}'/>{% endif %}
+						{% if form.guarantee_amount.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.guarantee_amount.errors|join:""}}'/>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{form.storage_cost.label_tag}}</th>
 					<td>
 						{{form.storage_cost}}
-						{% if form.storage_cost.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.storage_cost.errors|join:""}}'/>{% endif %}
+						{% if form.storage_cost.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.storage_cost.errors|join:""}}'/>{% endif %}
 					</td>
 				</tr>	
 			</table>
@@ -366,7 +366,7 @@
 				<td>{{s.num}}</td>
 				<td>{{s.size|default_if_none:""}}</td>
 				<td style="text-align:center;">{{s.house.num}}</td>
-				<td><a href="/storages/{{s.id}}" class="fancybox"><img src="/site_media/images/edit_48.png" width="20" height="20" border="0" alt="עריכה" /></a></td>
+				<td><a href="/storages/{{s.id}}" class="fancybox"><img src="{% static "images/edit_48.png" %}" width="20" height="20" border="0" alt="עריכה" /></a></td>
 			</tr>
 			{% endfor %}
 		</table>
@@ -387,7 +387,7 @@
 				<td>{{p.num}}</td>
 				<td>{{p.type}}</td>
 				<td style="text-align:center;">{{p.house.num}}</td>
-				<td><a href="/parkings/{{p.id}}" class="fancybox"><img src="/site_media/images/edit_48.png" width="20" height="20" border="0" alt="עריכה" /></a></td>
+				<td><a href="/parkings/{{p.id}}" class="fancybox"><img src="{% static "images/edit_48.png" %}" width="20" height="20" border="0" alt="עריכה" /></a></td>
 			</tr>
 			{% endfor %}
 		</table>

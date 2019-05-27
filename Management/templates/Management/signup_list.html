@@ -32,15 +32,15 @@
 		</div>
 	</div>
 	<div class="someIcon" style="width:100px;">
-		<img src="/site_media/images/add_48.png" width="20" height="20"  alt="חדש" /> 
+		<img src="{% static "images/add_48.png" %}" width="20" height="20"  alt="חדש" /> 
 		<a href="add">הרשמה חדשה</a>
 	</div>
 	<div class="someIcon" style="width:120px;">
-		<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+		<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="שינוי" /> 
 		<a id="signupEdit">שינוי פרטי הרשמה</a>
 	</div>
 	<div class="someIcon" style="width:90px;">
-		<img src="/site_media/images/delete_48.png" width="20" height="20"  alt="מחיקה" /> 
+		<img src="{% static "images/delete_48.png" %}" width="20" height="20"  alt="מחיקה" /> 
 		<a id="signupCancel" class="fancybox">ביטול הרשמה</a>
 	</div>
 	<div class="clearBoth"></div>	
@@ -77,7 +77,7 @@
 	</tr>
     {% for s in signups %}
     	<tr class="{% cycle 'row1' 'row2' %}" objid={{s.id}}>			
-			<td><a href="{{s.id}}"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a></td>
+			<td><a href="{{s.id}}"><img src="{% static "images/documentinfo-48.png" %}" width="20" height="20" alt="פרטים" border="0" /></a></td>
 			<td>{{ s.date }}</td>
 			<td>{{ s.clients }}</td>
 			<td>{{ s.house.building.num }}</td>

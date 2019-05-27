@@ -29,7 +29,7 @@
 					<th>{{ field.label_tag }}</th>
 					<td>
 						{{field}}
-						{% if field.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{field.errors|join:""}}'/>{% endif %}
+						{% if field.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{field.errors|join:""}}'/>{% endif %}
 					</td>
 				</tr>
 			{% endfor %}
@@ -70,12 +70,12 @@
 					</table>
 					<a href="/employees/{{form.instance.id}}/employmentterms" class="fancybox" style="text-decoration:none;">
 						שינוי תנאי העסקה 
-						<img src="/site_media/images/edit_48.png" width="15" height="15" border="0" alt="שינוי" />
+						<img src="{% static "images/edit_48.png" %}" width="15" height="15" border="0" alt="שינוי" />
 					</a>
 				{% else %}
 					<a href="/employees/{{form.instance.id}}/employmentterms" class="fancybox" style="text-decoration:none;">
 						הזנת תנאי העסקה 
-						<img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" />
+						<img src="{% static "images/add_48.png" %}" width="15" height="15" border="0" alt="הוספה" />
 					</a>
 				{% endif %}
 			</fieldset>
@@ -109,12 +109,12 @@
 				</table>
 				<a href="account" class="fancybox" style="text-decoration:none;">
 					שינוי פרטי חשבון
-					<img src="/site_media/images/edit_48.png" width="15" height="15" border="0" alt="שינוי" />
+					<img src="{% static "images/edit_48.png" %}" width="15" height="15" border="0" alt="שינוי" />
 				</a>
 			{% else %}
 				<a href="account" class="fancybox" style="text-decoration:none;">
 					הזנת פרטי חשבון
-					<img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="חדש" />
+					<img src="{% static "images/add_48.png" %}" width="15" height="15" border="0" alt="חדש" />
 				</a>
 			{% endif %}
 		</fieldset>
@@ -137,11 +137,11 @@
 					ממכירות 
 					{{nhc.right_filter}}
 				{% endif %}
-				<a href="{{nhc.get_absolute_url}}" class="fancybox"><img src="/site_media/images/edit_48.png" width="15" height="15" border="0" alt="עריכה" /></a>
-				<a href="{{nhc.get_absolute_url}}/del"><img src="/site_media/images/delete_48.png" width="15" height="15" border="0" alt="מחיקה" /></a>
+				<a href="{{nhc.get_absolute_url}}" class="fancybox"><img src="{% static "images/edit_48.png" %}" width="15" height="15" border="0" alt="עריכה" /></a>
+				<a href="{{nhc.get_absolute_url}}/del"><img src="{% static "images/delete_48.png" %}" width="15" height="15" border="0" alt="מחיקה" /></a>
 				<br>
 			{% endfor %}
-			<a href="/nhcbi/add" class="fancybox"><img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" /></a>
+			<a href="/nhcbi/add" class="fancybox"><img src="{% static "images/add_48.png" %}" width="15" height="15" border="0" alt="הוספה" /></a>
 		</fieldset>
 		<fieldset class="cardFieldset">
 			<legend>הלוואות</legend>

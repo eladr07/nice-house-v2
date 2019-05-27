@@ -41,7 +41,7 @@
 					<th>{{field.label_tag}}</th>
 					<td>
 						{{field}}
-						{% if field.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{field.errors|join:""}}'/>{% endif %}
+						{% if field.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{field.errors|join:""}}'/>{% endif %}
 					</td>
 				</tr>
 				{% endfor %}
@@ -61,7 +61,7 @@
 				<th>{{field.label_tag}}</th>
 				<td>
 					{{field}}
-					{% if field.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{field.errors|join:""}}'/>{% endif %}
+					{% if field.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{field.errors|join:""}}'/>{% endif %}
 				</td>
 			</tr>
 			{% endfor %}
@@ -77,7 +77,7 @@
 		{% for e in project.employees.all %}
 			<tr>
 				<td>{{ e }}</td>
-				<td><a href="/employees/{{e.id}}"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a></td>
+				<td><a href="/employees/{{e.id}}"><img src="{% static "images/documentinfo-48.png" %}" width="20" height="20" alt="פרטים" border="0" /></a></td>
 			</tr>
 		{% endfor %}
 		</table>
@@ -89,7 +89,7 @@
 				{{project.demand_contact|default_if_none:" --- "}} 
 				<a href="demandcontact" class="fancybox">הגדר</a>
 				{% if project.demand_contact %}
-					<a href="/contact/{{project.demand_contact.id}}" class="fancybox"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a>
+					<a href="/contact/{{project.demand_contact.id}}" class="fancybox"><img src="{% static "images/documentinfo-48.png" %}" width="20" height="20" alt="פרטים" border="0" /></a>
 					<a href="contact/{{project.demand_contact.id}}/remove">מחיקה מהפרוייקט</a>
 					<a href="contact/{{project.demand_contact.id}}/delete">מחיקה מהמערכת</a>
 				{% endif %}
@@ -98,7 +98,7 @@
 				{{project.payment_contact|default_if_none:" --- "}} 
 				<a href="paymentcontact" class="fancybox">הגדר</a>
 				{% if project.payment_contact %}
-					<a href="/contact/{{project.payment_contact.id}}" class="fancybox"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a>
+					<a href="/contact/{{project.payment_contact.id}}" class="fancybox"><img src="{% static "images/documentinfo-48.png" %}" width="20" height="20" alt="פרטים" border="0" /></a>
 					<a href="contact/{{project.payment_contact.id}}/remove">מחיקה מהפרוייקט</a>
 					<a href="contact/{{project.payment_contact.id}}/delete">מחיקה מהמערכת</a>
 				{% endif %}
@@ -106,7 +106,7 @@
 				<u>אנשי קשר נוספים:</u><br>
 				{% for c in project.contacts.all %}
 					{{c}} 
-					<a href="/contact/{{c.id}}" class="fancybox"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a>
+					<a href="/contact/{{c.id}}" class="fancybox"><img src="{% static "images/documentinfo-48.png" %}" width="20" height="20" alt="פרטים" border="0" /></a>
 					<a href="contact/{{c.id}}/remove">מחיקה מהפרוייקט</a>
 					<a href="contact/{{c.id}}/delete">מחיקה מהמערכת</a>
 					<br>
@@ -170,8 +170,8 @@
 							</td>
 						</tr>
 					</table>
-					<a id="edit_cvp" href="cvp" class="fancybox"><img src="/site_media/images/edit_48.png" width="15" height="15" border="0" alt="עריכה" /></a>
-					<a href="cvp/del"><img src="/site_media/images/delete_48.png" width="15" height="15" border="0" alt="מחיקה" /></a>
+					<a id="edit_cvp" href="cvp" class="fancybox"><img src="{% static "images/edit_48.png" %}" width="15" height="15" border="0" alt="עריכה" /></a>
+					<a href="cvp/del"><img src="{% static "images/delete_48.png" %}" width="15" height="15" border="0" alt="מחיקה" /></a>
 				</div>
 			{% endif %}
 			{% if c.c_var_precentage_fixed %}		
@@ -188,8 +188,8 @@
 						{{c.c_var_precentage_fixed.last_count}}
 						דירות אחרונות.
 					{% endif %}
-					<a id="edit_cvpf" href="cvpf" class="fancybox"><img src="/site_media/images/edit_48.png" width="15" height="15" border="0" alt="עריכה" /></a>
-					<a href="cvpf/del"><img src="/site_media/images/delete_48.png" width="15" height="15" border="0" alt="מחיקה" /></a>
+					<a id="edit_cvpf" href="cvpf" class="fancybox"><img src="{% static "images/edit_48.png" %}" width="15" height="15" border="0" alt="עריכה" /></a>
+					<a href="cvpf/del"><img src="{% static "images/delete_48.png" %}" width="15" height="15" border="0" alt="מחיקה" /></a>
 				</div>
 			{% endif %}
 			{% if c.c_zilber %}		
@@ -207,8 +207,8 @@
 					{{c.c_zilber.base_madad}},
 					בתאריך 
 					{{c.c_zilber.third_start|date:"j/m/y"}}.
-					<a id="edit_cz" href="cz" class="fancybox"><img src="/site_media/images/edit_48.png" width="15" height="15" border="0" alt="עריכה" /></a>
-					<a href="cz/del"><img src="/site_media/images/delete_48.png" width="15" height="15" border="0" alt="מחיקה" /></a>
+					<a id="edit_cz" href="cz" class="fancybox"><img src="{% static "images/edit_48.png" %}" width="15" height="15" border="0" alt="עריכה" /></a>
+					<a href="cz/del"><img src="{% static "images/delete_48.png" %}" width="15" height="15" border="0" alt="מחיקה" /></a>
 				</div>
 			{% endif %}
 			{% if c.b_discount_save_precentage %}	
@@ -219,8 +219,8 @@
 						עד מקס' של
 						{{c.b_discount_save_precentage.max_for_bonus}}%
 					{% endif %}
-					<a id="edit_bdsp" href="bdsp" class="fancybox"><img src="/site_media/images/edit_48.png" width="15" height="15" border="0" alt="עריכה" /></a>
-					<a href="bdsp/del"><img src="/site_media/images/delete_48.png" width="15" height="15" border="0" alt="מחיקה" /></a>
+					<a id="edit_bdsp" href="bdsp" class="fancybox"><img src="{% static "images/edit_48.png" %}" width="15" height="15" border="0" alt="עריכה" /></a>
+					<a href="bdsp/del"><img src="{% static "images/delete_48.png" %}" width="15" height="15" border="0" alt="מחיקה" /></a>
 				</div>
 			{% endif %}
 			<div>
@@ -229,19 +229,19 @@
 			<div id="new_commissions">
 				{% if not c.c_var_precentage %}
 					עמלה משתנה (באחוזים)
-					<a id="add_cvp" href="cvp" class="fancybox"><img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" /></a> 
+					<a id="add_cvp" href="cvp" class="fancybox"><img src="{% static "images/add_48.png" %}" width="15" height="15" border="0" alt="הוספה" /></a> 
 				{% endif %}
 				{% if not c.c_var_precentage_fixed %}
 					<br>עמלה משתנה בקצב קבוע (באחוזים)
-					<a id="add_cvpf" href="cvpf" class="fancybox"><img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" /></a> 
+					<a id="add_cvpf" href="cvpf" class="fancybox"><img src="{% static "images/add_48.png" %}" width="15" height="15" border="0" alt="הוספה" /></a> 
 				{% endif %}
 				{% if not c.c_zilber %}
 					<br>עמלת זילברמינץ
-					<a id="add_cz" href="cz" class="fancybox"><img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" /></a> 
+					<a id="add_cz" href="cz" class="fancybox"><img src="{% static "images/add_48.png" %}" width="15" height="15" border="0" alt="הוספה" /></a> 
 				{% endif %}
 				{% if not c.b_discount_save_precentage %}
 					<br>בונוס חיסכון בהנחה (באחוזים)
-					<a id="add_bdsp" href="bdsp" class="fancybox"><img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" /></a> 
+					<a id="add_bdsp" href="bdsp" class="fancybox"><img src="{% static "images/add_48.png" %}" width="15" height="15" border="0" alt="הוספה" /></a> 
 				{% endif %}
 			</div>
 			{% if c.agreement %}

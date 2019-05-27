@@ -61,14 +61,14 @@
 					<td>{{citycallers.callers_num}}</td>
 					<td>
 						<a href="{{citycallers.get_absolute_url}}" class="fancybox">
-							<img src="/site_media/images/edit_48.png" width="15" height="15" border="0" alt="שינוי" />
+							<img src="{% static "images/edit_48.png" %}" width="15" height="15" border="0" alt="שינוי" />
 						</a>
 					</td>
 				</tr>
 			{% endfor %}
 			</table>
 			<a href="/activitybase/{{object.id}}/citycallers/add" class="fancybox"> 
-				<img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" />
+				<img src="{% static "images/add_48.png" %}" width="15" height="15" border="0" alt="הוספה" />
 			</a>
 		</fieldset>
 		<fieldset class="cardFieldset" style="float:right; width:45%">
@@ -80,14 +80,14 @@
 					<td>{{mediareferrals.referrals_num}}</td>
 					<td>
 						<a href="{{mediareferrals.get_absolute_url}}" class="fancybox">
-							<img src="/site_media/images/edit_48.png" width="15" height="15" border="0" alt="שינוי" />
+							<img src="{% static "images/edit_48.png" %}" width="15" height="15" border="0" alt="שינוי" />
 						</a>
 					</td>
 				</tr>
 			{% endfor %}
 			</table>
 			<a href="/activitybase/{{object.id}}/mediareferrals/add" class="fancybox"> 
-				<img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" />
+				<img src="{% static "images/add_48.png" %}" width="15" height="15" border="0" alt="הוספה" />
 			</a>
 		</fieldset>
 	</div>
@@ -108,7 +108,7 @@
 				<tr>
 					<th>
 						<a href="{{signup.get_absolute_url}}">
-							<img src="/site_media/images/edit_48.png" width="15" height="15" border="0" alt="פרטים" />
+							<img src="{% static "images/edit_48.png" %}" width="15" height="15" border="0" alt="פרטים" />
 						</a>
 					</th>
 					<th>{{signup.clients}}</th>
@@ -121,7 +121,7 @@
 			{% endfor %}
 			</table>
 			<a href="{{object.project.get_absolute_url}}/signups/add" > 
-				<img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" />
+				<img src="{% static "images/add_48.png" %}" width="15" height="15" border="0" alt="הוספה" />
 			</a>
 		</fieldset>
 		<fieldset class="cardFieldset">
@@ -138,7 +138,7 @@
 				<tr>
 					<th>
 						<a href="{{signup.cancel.get_absolute_url}}" class="fancybox">
-							<img src="/site_media/images/edit_48.png" width="15" height="15" border="0" alt="פרטים" />
+							<img src="{% static "images/edit_48.png" %}" width="15" height="15" border="0" alt="פרטים" />
 						</a>
 					</th>
 					<th>{{signup.clients}}</th>
@@ -164,7 +164,7 @@
 				<tr>
 					<th>
 						<a href="{{sale.get_absolute_url}}">
-							<img src="/site_media/images/edit_48.png" width="15" height="15" border="0" alt="פרטים" />
+							<img src="{% static "images/edit_48.png" %}" width="15" height="15" border="0" alt="פרטים" />
 						</a>
 					</th>
 					<th>{{sale.clients}}</th>
@@ -175,7 +175,7 @@
 			{% endfor %}
 			</table>
 			<a href="/sale"> 
-				<img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" />
+				<img src="{% static "images/add_48.png" %}" width="15" height="15" border="0" alt="הוספה" />
 			</a>
 		</fieldset>
 		<fieldset class="cardFieldset">
@@ -193,7 +193,7 @@
 				<tr>
 					<th>
 						<a href="{{saleprocess.get_absolute_url}}" class="fancybox">
-							<img src="/site_media/images/edit_48.png" width="15" height="15" border="0" alt="פרטים" />
+							<img src="{% static "images/edit_48.png" %}" width="15" height="15" border="0" alt="פרטים" />
 						</a>
 					</th>
 					<th>{{saleprocess.clients}}</th>
@@ -205,7 +205,7 @@
 			{% endfor %}
 			</table>
 			<a href="/activitybase/{{object.id}}/saleprocess/add" class="fancybox"> 
-				<img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" />
+				<img src="{% static "images/add_48.png" %}" width="15" height="15" border="0" alt="הוספה" />
 			</a>
 		</fieldset>
 		<fieldset class="cardFieldset">
@@ -225,7 +225,7 @@
 				<tr>
 					<th>
 						<a href="{{event.get_absolute_url}}" class="fancybox">
-							<img src="/site_media/images/edit_48.png" width="15" height="15" border="0" alt="פרטים" />
+							<img src="{% static "images/edit_48.png" %}" width="15" height="15" border="0" alt="פרטים" />
 						</a>
 					</th>
 					<th>{{event.date|date:"j/m/y"}}</th>
@@ -239,7 +239,7 @@
 			{% endfor %}
 			</table>
 			<a href="/activitybase/{{object.id}}/event/add" class="fancybox"> 
-				<img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" />
+				<img src="{% static "images/add_48.png" %}" width="15" height="15" border="0" alt="הוספה" />
 			</a>
 		</fieldset>
 	</div>

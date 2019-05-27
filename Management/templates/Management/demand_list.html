@@ -104,39 +104,39 @@
 </div>
 <div class="clearBoth"></div>
 <div class="someIcon" style="width:90px;">
-	<img src="/site_media/images/add_48.png" width="20" height="20"  alt="חדש" /> 
+	<img src="{% static "images/add_48.png" %}" width="20" height="20"  alt="חדש" /> 
 	<a id="saleAdd">הזנת מכירות</a>
 </div>
 <div class="someIcon" style="width:90px;">
-	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="חדש" /> 
+	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="חדש" /> 
 	<a id="saleZero">אין מכירות</a>
 </div>
 <div class="someIcon" style="width:90px;">
-	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="חדש" /> 
+	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="חדש" /> 
 	<a id="demandSaleCount" class="fancybox">מס' מכירות</a>
 </div>
 <div class="someIcon" style="width:100px;">
-	<img src="/site_media/images/Note_48.png" width="20" height="20"  alt="שינוי" /> 
+	<img src="{% static "images/Note_48.png" %}" width="20" height="20"  alt="שינוי" /> 
 	<a id="demandRemarks" class="fancybox">הערות לדרישה</a>
 </div>
 <div class="someIcon" style="width:90px;">
-	<img src="/site_media/images/thumbs_up_48.png" width="20" height="20"  alt="סגירה" /> 
+	<img src="{% static "images/thumbs_up_48.png" %}" width="20" height="20"  alt="סגירה" /> 
 	<a id="demandClose" class="fancybox">אשר דרישה</a>
 </div>
 <div class="someIcon" style="width: 80px;">
-	<img src="/site_media/images/thumbs_up_48.png" width="20" height="20"  alt="סגירה" /> 
+	<img src="{% static "images/thumbs_up_48.png" %}" width="20" height="20"  alt="סגירה" /> 
 	<a id="demandCloseAll" href="/demands/closeall">אשר הכל</a>
 </div>
 <div class="someIcon" style="width:100px; float:left;">
-	<img src="/site_media/images/Note_48.png" width="20" height="20"  alt="שינוי" /> 
+	<img src="{% static "images/Note_48.png" %}" width="20" height="20"  alt="שינוי" /> 
 	<a href="/employee/remarks/{{month.year}}/{{month.month}}" class="fancybox">הערות לעובד</a>
 </div>
 <div class="someIcon" style="width:130px; float:left;">
-	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="שינוי" /> 
 	<a href="/employee/refund/{{month.year}}/{{month.month}}" class="fancybox">החזר הוצאות לעובד</a>
 </div>
 <div class="someIcon" style="width:140px; float:left;">
-	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="שינוי" /> 
 	<a href="#" >ימי חופש ומחלה לעובד</a>
 </div>
 <div class="clearBoth"></div>	
@@ -178,7 +178,7 @@
 			<td>{{d.id}}</td>
 			<td>
 				<a href="/reports/project_month/{{d.project.id}}/{{d.year}}/{{d.month}}">
-				<img src="/site_media/images/PDF-48.png" width="15" height="15"/>
+				<img src="{% static "images/PDF-48.png" %}" width="15" height="15"/>
 				</a>
 			</td>
 			<td>{{ d.project.initiator }}</td>
@@ -193,7 +193,7 @@
 				<a href="{{d.get_absolute_url}}/reminders" class="fancybox">{{d.get_open_reminders|length}} תזכורות</a>
 			{% endif %}
 				<a href="{{d.get_absolute_url}}/addreminder" class="fancybox">
-					<img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" />
+					<img src="{% static "images/add_48.png" %}" width="15" height="15" border="0" alt="הוספה" />
 				</a>
 			</td>
 			<td>

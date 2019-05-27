@@ -52,15 +52,15 @@ $(document).ready(function() {
 </div>
 <div class="clearBoth"></div>
 <div class="someIcon" style="width:100px;">
-	<img src="/site_media/images/add_48.png" width="20" height="20"  alt="חדש" /> 
+	<img src="{% static "images/add_48.png" %}" width="20" height="20"  alt="חדש" /> 
 	<a href="/nhbranch/{{nhmonth.nhbranch.id}}/nhsale/add">הזנת עסקאות</a>
 </div>
 <div class="someIcon" style="width:100px;">
-	<img src="/site_media/images/reload-48.png" width="20" height="20"  alt="חדש" /> 
+	<img src="{% static "images/reload-48.png" %}" width="20" height="20"  alt="חדש" /> 
 	<a id="saleMove" class="fancybox">העבר עסקה</a>
 </div>
 <div class="someIcon" style="width:100px">
-	<img src="/site_media/images/Archive-48.png" width="20" height="20"  alt="מחיקה" /> 
+	<img src="{% static "images/Archive-48.png" %}" width="20" height="20"  alt="מחיקה" /> 
 	<a id="monthClose" href="/nhmonth/close?nhbranch={{nhmonth.nhbranch.id}}&year={{nhmonth.year}}&month={{nhmonth.month}}">סגור חודש</a>
 </div>
 <div class="clearBoth"></div>	

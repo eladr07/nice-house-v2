@@ -46,7 +46,7 @@
 </form>
 <br>
 <div class="someIcon">
-	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="שינוי" /> 
 	<a id="edit" class="fancybox">עדכון</a>
 </div>
 <div style="float:left;">
@@ -109,7 +109,7 @@
 		{% if s.expenses.approved_date %}
 			<tr class="rowLightBlue" objid={{s.id}} employeeid={{s.get_employee.id}}>
 		{% endif %}
-			<td><a class="fancybox" href="/salary/{{s.id}}/expenses"><img src="/site_media/images/edit_48.png" width="20" height="20" alt="עדכון" border="0" /></a></td>
+			<td><a class="fancybox" href="/salary/{{s.id}}/expenses"><img src="{% static "images/edit_48.png" %}" width="20" height="20" alt="עדכון" border="0" /></a></td>
 			<td><a href="{{s.get_employee.get_absolute_url}}">{{ s.get_employee }}</a></td>
 			<td>{{s.get_employee.employment_terms.hire_type}}</td>
 			<td>{{s.neto|default_if_none:""|commaise}}</td>

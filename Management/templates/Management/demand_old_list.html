@@ -117,31 +117,31 @@
 </div>
 <div class="clearBoth"></div>
 <div class="someIcon" style="width:100px;">
-	<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="שינוי" /> 
 	<a id="demandEdit">שינוי דרישה</a>
 </div>
 <div class="someIcon" style="width:100px;">
-	<img src="/site_media/images/Note_48.png" width="20" height="20"  alt="שינוי" /> 
+	<img src="{% static "images/Note_48.png" %}" width="20" height="20"  alt="שינוי" /> 
 	<a id="demandRemarks" class="fancybox">הערות לדרישה</a>
 </div>
 <div class="someIcon"style="width:120px;">
-	<img src="/site_media/images/thumbs_up_48.png" width="20" height="20"  alt="שליחה" /> 
+	<img src="{% static "images/thumbs_up_48.png" %}" width="20" height="20"  alt="שליחה" /> 
 	<a href="/demands/sendall">אשר ושלח דרישות</a>
 </div>
 <div class="someIcon"style="width:130px;">
-	<img src="/site_media/images/advanced-48.png" width="20" height="20"  /> 
+	<img src="{% static "images/advanced-48.png" %}" width="20" height="20"  /> 
 	<a id="demandReturnToCalc">החזר לחישוב עמלות</a>
 </div>
 <div class="someIcon"style="width:130px;">
-	<img src="/site_media/images/advanced-48.png" width="20" height="20" /> 
+	<img src="{% static "images/advanced-48.png" %}" width="20" height="20" /> 
 	<a id="demandCalc">חישוב עמלות מחדש</a>
 </div>
 <div class="someIcon" style="width:100px;">
-	<img src="/site_media/images/print-48.png" width="20" height="20" /> 
+	<img src="{% static "images/print-48.png" %}" width="20" height="20" /> 
 	<a href="#">שלח להנה"ח</a>
 </div>
 <div class="someIcon" style="width:100px;">
-	<img src="/site_media/images/print-48.png" width="20" height="20"  alt="הדפסה" /> 
+	<img src="{% static "images/print-48.png" %}" width="20" height="20"  alt="הדפסה" /> 
 	<a href="/reports/projects_month/{{month.year}}/{{month.month}}">גרסה להדפסה</a>
 </div>
 <div class="clearBoth"></div>
@@ -194,7 +194,7 @@
 			<td><a href="/demands/{{d.id}}">{{d.id}}</a></td>
 			<td>
 				<a href="/reports/project_month/{{d.project.id}}/{{d.year}}/{{d.month}}">
-				<img src="/site_media/images/PDF-48.png" width="15" height="15"/>
+				<img src="{% static "images/PDF-48.png" %}" width="15" height="15"/>
 				</a>
 			</td>
 			<td>{{ d.project.initiator }}</td>
@@ -209,14 +209,14 @@
 			<td style="color:#D50808;">{% if d.fee_diff %} {{ d.fee_diff.amount|commaise }} ש"ח - {{ d.fee_diff.reason }} {% endif %}</td>
 			<td><b>{% if d.get_total_amount %} {{ d.get_total_amount|commaise }} ש"ח {% else %}----{% endif %}</b></td>
 			<td
-			{% if d.is_fixed %}<img src="/site_media/images/update_48.png" width="20" height="20"  alt="תיקון" />{% endif %}
+			{% if d.is_fixed %}<img src="{% static "images/update_48.png" %}" width="20" height="20"  alt="תיקון" />{% endif %}
 			</td>
 			<td>
 			{% if d.get_open_reminders|length %}
 				<a href="/demands/{{d.id}}/reminders" class="fancybox">{{d.get_open_reminders|length}} תזכורות</a>
 			{% endif %}
 				<a href="/demands/{{d.id}}/addreminder" class="fancybox">
-					<img src="/site_media/images/add_48.png" width="15" height="15" border="0" alt="הוספה" />
+					<img src="{% static "images/add_48.png" %}" width="15" height="15" border="0" alt="הוספה" />
 				</a>
 			</td>
 			<td>{{ d.remarks|default_if_none:"" }}</td>

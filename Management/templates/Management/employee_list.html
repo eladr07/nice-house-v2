@@ -76,31 +76,31 @@
 	</div>
 	<div class="clearBoth"> </div>
 	<div class="someIcon" style="width:100px;">
-		<img src="/site_media/images/add_48.png" width="20" height="20"  alt="חדש" /> 
+		<img src="{% static "images/add_48.png" %}" width="20" height="20"  alt="חדש" /> 
 		<a href="/employees/add">עובד חדש</a>
 	</div>
 	<div class="someIcon" style="width:130px;">
-		<img src="/site_media/images/add_48.png" width="20" height="20"  alt="חדש" /> 
+		<img src="{% static "images/add_48.png" %}" width="20" height="20"  alt="חדש" /> 
 		<a href="/nhemployees/add">עובד נייסהאוס חדש</a>
 	</div>
 	<div class="someIcon" style="width:100px;">
-		<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+		<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="שינוי" /> 
 		<a id="employeeEdit">כרטיס עובד</a>
 	</div>
 	<div class="someIcon" style="width:80px;">
-		<img src="/site_media/images/Briefcase_48.png" width="20" height="20"  alt="שינוי" /> 
+		<img src="{% static "images/Briefcase_48.png" %}" width="20" height="20"  alt="שינוי" /> 
 		<a id="employeeBag">תיק עובד</a>
 	</div>
 	<div class="someIcon" style="width:100px;">
-		<img src="/site_media/images/Archive-Add-48.png" width="20" height="20"  alt="מחיקה" /> 
+		<img src="{% static "images/Archive-Add-48.png" %}" width="20" height="20"  alt="מחיקה" /> 
 		<a id="employeeEnd" class="fancybox">העבר לארכיון</a>
 	</div>
 	<div class="someIcon" style="width:100px;">
-		<img src="/site_media/images/Archive-48.png" width="20" height="20"  alt="מחיקה" /> 
+		<img src="{% static "images/Archive-48.png" %}" width="20" height="20"  alt="מחיקה" /> 
 		<a href="archive">ארכיון עובדים</a>
 	</div>
 	<div class="someIcon" style="width:100px;">
-		<img src="/site_media/images/print-48.png" width="20" height="20"  alt="הדפסה" /> 
+		<img src="{% static "images/print-48.png" %}" width="20" height="20"  alt="הדפסה" /> 
 		<a href="pdf">גרסת הדפסה</a>
 	</div>
 	<div class="clearBoth"> </div>
@@ -122,7 +122,7 @@
 			<tr style="text-align:center; color:#4669D6; font-size:14px"><td colspan="10"><b>{{rank.grouper|default:"-- לא הוגדר דרג --"}}</b></td></tr>
 			{% for e in rank.list %}
 				<tr class="{% cycle 'row1' 'row2' %}" objid={{e.id}}>
-					<td><a href="/employees/{{e.id}}"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a></td>
+					<td><a href="/employees/{{e.id}}"><img src="{% static "images/documentinfo-48.png" %}" width="20" height="20" alt="פרטים" border="0" /></a></td>
 					<td>{{ e.id }}</td>
 					<td>{{ e.first_name }}</td>
 					<td>{{ e.last_name }}</td>
@@ -159,7 +159,7 @@
 			<tr style="text-align:center; color:#4669D6; font-size:14px"><td colspan="10"><b>{{nhbranch}}</b></td></tr>
 			{% for e in nhbranch.nhemployees %}
 				<tr class="{% cycle 'row1' 'row2' %}" objid={{e.id}}>
-					<td><a href="/nhemployees/{{e.id}}"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a></td>
+					<td><a href="/nhemployees/{{e.id}}"><img src="{% static "images/documentinfo-48.png" %}" width="20" height="20" alt="פרטים" border="0" /></a></td>
 					<td>{{ e.id }}</td>
 					<td>{{ e.first_name }}</td>
 					<td>{{ e.last_name }}</td>

@@ -24,21 +24,21 @@
 				<th>{{form.file.label_tag}}</th>
 				<td>
 					{{form.file}}
-					{% if form.file.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.file.errors|join:""}}'/>{% endif %}
+					{% if form.file.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.file.errors|join:""}}'/>{% endif %}
 				</td>
 			</tr>
 			<tr>
 				<th>{{form.type.label_tag}}</th>
 				<td>
 					{{form.type}}
-					{% if form.type.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.type.errors|join:""}}'/>{% endif %}
+					{% if form.type.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.type.errors|join:""}}'/>{% endif %}
 				</td>
 			</tr>
 			<tr>
 				<th>{{form.sr_name.label_tag}}</th>
 				<td>
 					{{form.sr_name}}
-					{% if form.sr_name.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.sr_name.errors|join:""}}'/>{% endif %}
+					{% if form.sr_name.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.sr_name.errors|join:""}}'/>{% endif %}
 				</td>
 			</tr>
 			{% if user.is_staff %}
@@ -46,7 +46,7 @@
 				<th>{{form.is_private.label_tag}}</th>
 				<td>
 					{{form.is_private}}
-					{% if form.is_private.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.is_private.errors|join:""}}'/>{% endif %}
+					{% if form.is_private.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.is_private.errors|join:""}}'/>{% endif %}
 				</td>
 			</tr>
 			{% endif %}
@@ -54,21 +54,21 @@
 				<th>{{form.tags.label_tag}}</th>
 				<td>
 					{{form.tags}}
-					{% if form.tags.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.tags.errors|join:""}}'/>{% endif %}
+					{% if form.tags.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.tags.errors|join:""}}'/>{% endif %}
 				</td>
 			</tr>
 			<tr>
 				<th>{{form.tag_new.label_tag}}</th>
 				<td>
 					{{form.tag_new}}
-					{% if form.tag_new.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.tag_new.errors|join:""}}'/>{% endif %}
+					{% if form.tag_new.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.tag_new.errors|join:""}}'/>{% endif %}
 				</td>
 			</tr>
 			<tr>
 				<th>{{form.remarks.label_tag}}</th>
 				<td>
 					{{form.remarks}}
-					{% if form.remarks.errors %}<img src="/site_media/images/error-48.png" width="15" height="15" title='{{form.remarks.errors|join:""}}'/>{% endif %}
+					{% if form.remarks.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.remarks.errors|join:""}}'/>{% endif %}
 				</td>
 			</tr>
 			<tr>

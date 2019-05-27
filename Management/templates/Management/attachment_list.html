@@ -27,15 +27,15 @@ $(document).ready(function () {
 		<div class="pageTitle">ארכיב מסמכים</div>
 	</div>
 	<div class="someIcon">
-		<img src="/site_media/images/add_48.png" width="20" height="20"  alt="חדש" /> 
+		<img src="{% static "images/add_48.png" %}" width="20" height="20"  alt="חדש" /> 
 		<a href="/attachment/add">חדש</a>
 	</div>
 	<div class="someIcon">
-		<img src="/site_media/images/edit_48.png" width="20" height="20"  alt="שינוי" /> 
+		<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="שינוי" /> 
 		<a id="attachmentEdit" class="fancybox" >שינוי</a>
 	</div>
 	<div class="someIcon">
-		<img src="/site_media/images/delete_48.png" width="20" height="20"  alt="מחיקה" /> 
+		<img src="{% static "images/delete_48.png" %}" width="20" height="20"  alt="מחיקה" /> 
 		<a id="attachmentDelete">מחיקה</a>
 	</div>
 	<div class="clearBoth"> </div>
@@ -99,7 +99,7 @@ $(document).ready(function () {
 		</tr>
 		{% for a in attachments %}
 			<tr class="{% cycle 'row1' 'row2' %}" objid={{a.id}}>
-				<td><a href="{{a.id}}"><img src="/site_media/images/documentinfo-48.png" width="20" height="20" alt="פרטים" border="0" /></a></td>
+				<td><a href="{{a.id}}"><img src="{% static "images/documentinfo-48.png" %}" width="20" height="20" alt="פרטים" border="0" /></a></td>
 				<td>{{ a.add_time }}</td>
 				<td>{{ a.user_added }}</td>
 				<td><a href="{{a.file.url}}" target="_blank">{{ a.file.name }}</a></td>
