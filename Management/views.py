@@ -187,7 +187,7 @@ def house_details(request, id):
 @login_required
 def signup_details(request, house_id):
     signup = House.objects.get(pk=house_id).get_signup()
-    if not s:
+    if not signup:
         return HttpResponse('')
     else:
         return render(request, 'Management/signup_details.html', {'signup':signup})
