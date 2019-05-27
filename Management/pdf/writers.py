@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import os,logging, itertools
+import os,logging, itertools, textwrap
 from datetime import datetime, date
 
 import reportlab.rl_config
@@ -63,7 +63,7 @@ def tableCaption(caption=log2vis(u'ולהלן פירוט העסקאות')):
                      ParagraphStyle(name='tableCaption', fontName='David-Bold', fontSize=15,
                                     alignment=TA_CENTER))
 def nhLogo():
-    return Image(os.path.join(STATIC_URL, 'images/nh_logo.jpg'), 300, 50)
+    return Image(os.path.join(STATIC_URL, 'images/nh_logo_new.jpg'), 170, 75)
 
 def sigPara():
     s = log2vis('ברגשי כבוד,') + '<br/>'
@@ -71,7 +71,12 @@ def sigPara():
     return Paragraph(s, ParagraphStyle(name='sig', fontName='David-Bold', fontSize=15,
                                        alignment=TA_LEFT))
 def nhAddr():
-    return Image(os.path.join(STATIC_URL, 'images/nh_addr.jpg'), 300, 50)
+    s = log2vis('רחוב הגולן 1, בית ברקת 1, איירפורט סיטי') + '<br/>'
+    s += log2vis('ת.ד 1103 איירפורט סיטי נתב"ג') + '<br /><br />'
+    s += '<b>9302960</b>' + log2vis('  טלפון: ') + '<b>08-9302950</b>' + log2vis('  פקס: ') + '<br />'
+    s += log2vis('nicehouse1@bezeqint.net')
+ 
+    return Paragraph(s, ParagraphStyle(name='addr', fontName='David', fontSize=12, alignment=TA_CENTER))
 
 class NumberedCanvas(canvas.Canvas):
     def __init__(self, *args, **kwargs):
@@ -102,7 +107,7 @@ class DocumentBase(object):
     def addLater(self, canv, doc):
         frame2 = Frame(0, 680, 650, 150)
         frame2.addFromList([nhLogo()], canv)
-        frame4 = Frame(50, 20, 500, 70)
+        frame4 = Frame(50, 0, 500, 100)
         frame4.addFromList([nhAddr()], canv)
         date_str = log2vis(u'תאריך : %s' % date.today().strftime('%d/%m/%Y'))
         canv.setFont('David',14)
@@ -110,7 +115,7 @@ class DocumentBase(object):
     def addFirst(self, canv, doc):
         frame2 = Frame(0, 680, 650, 150)
         frame2.addFromList([nhLogo()], canv)
-        frame4 = Frame(50, 10, 500, 70)
+        frame4 = Frame(50, 0, 500, 100)
         frame4.addFromList([nhAddr()], canv)
         date_str = log2vis(u'תאריך : %s' % date.today().strftime('%d/%m/%Y'))
         canv.setFont('David',14)
@@ -118,7 +123,7 @@ class DocumentBase(object):
     def get_pagesize(self):
         return A4
     def build(self, filename):
-        doc = SimpleDocTemplate(filename, pagesize = self.get_pagesize())
+        doc = SimpleDocTemplate(filename, pagesize = self.get_pagesize(), topMargin=100, bottomMargin=100)
         doc.build(self.get_story(), self.addFirst, self.addLater, NumberedCanvas)
         return doc.canv
     def get_story(self):
@@ -823,6 +828,18 @@ class EmployeeSalariesBookKeepingWriter(DocumentBase):
 class EmployeeSalariesWriter:
     def __init__(self, salaries, title, show_employee, show_month):
         self.salaries, self.title, self.show_employee, self.show_month = salaries, title, show_employee, show_month
+
+    def __chopLine(self, line, maxline):
+        cant = len(line) / maxline
+        cant += 1
+        strline = ""
+        index = maxline
+        for i in range(1,cant):
+            index = maxline * i
+            strline += "%s\n" %(line[(index-maxline):index])
+        strline += "%s\n" %(line[index:])
+        return strline
+
     @property
     def pages_count(self):
         return len(self.salaries) / 28 + 1
@@ -843,9 +860,17 @@ class EmployeeSalariesWriter:
         if self.show_month:
             headers.append(log2vis(u'חודש'))
         headers.append(log2vis(u'העסקה\nסוג'))
+        headers.append(log2vis(u'מכירות\nמספר'))
+        headers.append(log2vis(u'בסיס\nשכר'))
+        headers.append(log2vis(u'עמלות'))
+        headers.append(log2vis(u'ביטחון\nרשת'))
+        headers.append(log2vis(u'משתנה\nתוספת'))
+        headers.append(log2vis(u'שכר\nקיזוז'))
+        headers.append(log2vis(u'הלוואה\nהחזר'))
+        headers.append(log2vis(u'הערות'))
         headers.append(log2vis(u'הצק\nסכום'))
         headers.reverse()
-        colWidths = [None,None,None,None,None,None,None,None]
+        colWidths = [None,None,None,None,None,None,None,None,None,None,None]
         colWidths.reverse()
         rows = []
         i = 0
@@ -857,7 +882,32 @@ class EmployeeSalariesWriter:
                 row.append(log2vis(str(employee)))
             if self.show_month:
                 row.append('%s/%s' % (es.month, es.year))
+
+            total_sales = 0
+
+            for p, sales in es.sales.items() :
+                total_sales += len(sales)
+                
             row.extend([log2vis(u'%s - %s' % (terms.hire_type.name, terms.salary_net and u'נטו' or u'ברוטו'))])
+
+            row.append(commaise(total_sales))
+            row.append(commaise(es.base))
+            row.append(commaise(es.commissions))
+            row.extend([log2vis(u'%s' % ( es.safety_net and es.safety_net or '' ))])
+
+            if es.var_pay :
+                row.extend([log2vis(u'%s' % ( commaise(es.var_pay) ))])
+            else :
+                row.append('')
+
+            if es.deduction :
+                row.extend([log2vis(u'%s' % ( commaise(es.deduction) ))])
+            else :
+                row.append('')
+
+            row.extend([log2vis(u'יתרה - %s\nהחזרה - %s' % (commaise( employee.loan_left and employee.loan_left() or 0 ), commaise(es.loan_pay) ))])
+            row.extend([log2vis(u'%s' % ( es.remarks and ( '\n'.join( textwrap.fill( es.remarks, 15 ).split('\n')[::-1] ) ) or '' ))])
+
             row.append(commaise(es.check_amount))
             row.reverse()
             rows.append(row)
@@ -899,6 +949,91 @@ class EmployeeSalariesSeasonExpensesWriter:
             salary_expenses_fields2 = [SalaryExpensesNationalInsuranceField, SalaryExpensesEmployerBenefitField(),
                                        SalaryExpensesCompensationAllocationField()]
             employee_salary_fields3 = [EmployeeSalaryBrutoWithEmployerField()]
+
+
+class EmployeesLoans:
+    def __init__(self, employee):
+        self.loans = employee.loans_and_pays()
+        self.title = u'פירוט הלוואות לעובד - %s' % ( employee )
+    @property
+    def pages_count(self):
+        return len(self.loans) / 28 + 1
+    def addTemplate(self, canv, doc):
+        frame2 = Frame(0, 680, 650, 150)
+        frame2.addFromList([nhLogo(), datePara()], canv)
+        frame3 = Frame(50, 20, 150, 40)
+        frame3.addFromList([Paragraph(log2vis(u'עמוד %s מתוך %s' % (self.current_page, self.pages_count)),
+                            ParagraphStyle('pages', fontName='David', fontSize=13,))], canv)
+        frame4 = Frame(50, 30, 500, 70)
+        frame4.addFromList([nhAddr()], canv)
+        self.current_page += 1
+    def loansFlow(self):
+        flows = []
+        headers = [log2vis(n) for n in [u'תאריך',
+                                        u'פעולה',
+                                        u'הלוואה\nסך',
+                                        u'החזר\nסך',
+                                        u'יתרה',
+                                        u'מהשכר\nמקוזז',
+                                        u'הערות' ]]
+        colWidths = [None for header in headers]
+        headers.reverse()
+        colWidths.reverse()
+        rows = []
+        i = 0
+        for s in self.loans:
+            i+=1
+
+            deduct_from_salary = ''
+
+            row = []
+            row.append( '%s/%s' % (s.month, s.year) )
+
+            try :
+                paynum = s.pay_num
+
+                row.append(log2vis(u'הלוואה')),
+                row.append(log2vis(commaise(s.amount))),
+                row.append(log2vis(''))
+            except :
+                row.append(log2vis(u'קיזוז'))
+                row.append(log2vis('')),
+                row.append(log2vis(commaise(s.amount)))
+
+            row.append( log2vis(commaise( s.left )) )
+
+            try :
+                deduct_from_salary = s.deduct_from_salary
+
+                row.append(log2vis(deduct_from_salary == True and u'כן' or u'לא'))
+            except :
+                row.append('')
+
+            row.append( log2vis(s.remarks and s.remarks or '') )
+
+            row.reverse()
+            rows.append(row)
+
+            if len(rows) % 27 == 0 or i == len(self.loans):
+                data = [headers]
+                data.extend(rows)
+                t = Table(data, colWidths)
+                t.setStyle(saleTableStyle)
+                flows.append(t)
+                if i < len(self.loans):
+                    flows.extend([PageBreak(), Spacer(0, 50)])
+                rows = []
+
+        return flows
+    def build(self, filename):
+        self.current_page = 1
+        doc = SimpleDocTemplate(filename)
+        story = [Spacer(0,50)]
+        story.append(titlePara(self.title))
+        story.append(Spacer(0, 10))
+        story.extend(self.loansFlow())
+        doc.build(story, self.addTemplate, self.addTemplate)
+        return doc.canv
 
 
 class SalariesBankWriter:

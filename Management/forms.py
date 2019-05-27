@@ -256,12 +256,29 @@ class HouseForm(forms.ModelForm):
 class EmployeeForm(forms.ModelForm):
     def __init__(self, *args, **kw):
         forms.ModelForm.__init__(self,*args,**kw)
+
+        self.history_trans_update = []
         self.fields['remarks'].widget.attrs = {'cols':'20', 'rows':'3'}
         self.fields['birth_date'].widget.attrs = {'class':'vDateField'}
         self.fields['work_start'].widget.attrs = {'class':'vDateField'}
         self.fields['work_end'].widget.attrs = {'class':'vDateField'}
+
         if self.instance.id:
             self.fields['main_project'].queryset = self.instance.projects
+
+        transactions = TransactionUpdateHistory.objects.filter(transaction_id = self.instance.id, transaction_type = 0)
+
+        for value in transactions :
+            field_value = value.field_value
+            field_name  = value.field_name
+
+            try :
+                field_value = commaise( int( field_value ) ) + ' ש"ח'
+            except :
+                if field_name == 'tax_deduction_source_precentage' :
+                    field_value = field_value + ' %'
+
+            self.history_trans_update.append( [ ugettext( field_name ), field_value, str( value.timestamp ).split(' ')[0] ] )
     class Meta:
         model = Employee
         exclude=('reminders','account','employment_terms','projects')
@@ -290,18 +307,18 @@ class ProjectCommissionForm(RevisionExtForm):
 class EmployeeAddProjectForm(forms.Form):
     employee = forms.ModelChoiceField(queryset=Employee.objects.all(), label=ugettext('employee'))
     project = forms.ModelChoiceField(queryset=Project.objects.active(), label=ugettext('project'))
-    start_date = forms.DateField(label=ugettext('start date'))
+    start_date = forms.DateField(label=ugettext('start date'), input_formats=['%d-%m-%Y'])
     def __init__(self, *args, **kw):
         super(EmployeeAddProjectForm, self).__init__(*args, **kw)
-        self.fields['start_date'].widget.attrs = {'class':'vDateField'}
+        self.fields['start_date'].widget.attrs = {'class':'vDateFormatField'}
 
 class EmployeeRemoveProjectForm(forms.Form):
     employee = forms.ModelChoiceField(queryset=Employee.objects.all(), label=ugettext('employee'))
     project = forms.ModelChoiceField(queryset=Project.objects.all(), label=ugettext('project'))
-    end_date = forms.DateField(label=ugettext('end_date'))
+    end_date = forms.DateField(label=ugettext('end_date'), input_formats=['%d-%m-%Y'])
     def __init__(self, *args, **kw):
         super(EmployeeRemoveProjectForm, self).__init__(*args, **kw)
-        self.fields['end_date'].widget.attrs = {'class':'vDateField'}
+        self.fields['end_date'].widget.attrs = {'class':'vDateFormatField'}
 
 class CPriceAmountForm(forms.ModelForm):
     def clean_price(self):

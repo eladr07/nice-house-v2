@@ -20,11 +20,12 @@ from django.contrib.contenttypes.models import ContentType
 import Management.common as common
 from Management.forms import *
 from Management.models import *
-from Management.pdf.writers import MonthDemandWriter, MultipleDemandWriter, EmployeeListWriter, EmployeeSalariesWriter, ProjectListWriter
+from Management.pdf.writers import MonthDemandWriter, MultipleDemandWriter, EmployeeListWriter, EmployeeSalariesWriter, ProjectListWriter, EmployeesLoans
 from Management.pdf.writers import PricelistWriter, BuildingClientsWriter, EmployeeSalariesBookKeepingWriter, SalariesBankWriter, DemandFollowupWriter
 from Management.pdf.writers import EmployeeSalesWriter, SaleAnalysisWriter, DemandPayBalanceWriter
 
-#from mail import mail
+from Management.mail import mail
+from pprint import pprint
 
 def object_edit_core(request, form_class, instance,
                      template_name = 'Management/object_edit.html', 
@@ -155,6 +156,19 @@ def limited_delete_object(request, model, object_id, post_delete_redirect, permi
 @login_required
 def limited_object_detail(request, permission=None, *args, **kwargs):
     if not permission or request.user.has_perm('Management.' + permission):
+        if request.GET.get('t') == 'pdf' :
+            filename = common.generate_unique_media_filename('pdf')
+
+            response = HttpResponse(mimetype='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename=' + filename
+
+            EmployeesLoans(kwargs.get('queryset').filter(pk = kwargs.get('object_id')).get()).build(filename)
+            p = open(filename,'r')
+            response.write(p.read())
+            p.close()
+
+            return response
+
         return DetailView.as_view(*args, **kwargs)
     else:
         return HttpResponse('No permission. contact Elad.')
@@ -165,8 +179,31 @@ def limited_update_object(request, permission=None, *args, **kwargs):
         model = kwargs['model']
     elif kwargs.has_key('form_class'):
         model = kwargs['form_class']._meta.model
+
+    model_name = model.__name__.lower()
+
+    if request.method == "POST" :
+        if model_name == 'projectcommission':
+            allow_history = [ 'add_amount', 'add_type', 'registration_amount', 'max' ]
+            form_old      = ProjectCommission()
+            form_old_dict = form_old.__dict__.copy()
+            form          = ProjectCommissionForm(request.POST, instance=form_old)
+
+            if form.is_valid():
+                form_dict = form.instance.__dict__
+
+                for item in form_old._meta.fields :
+                    name = item.name
+
+                    if form_dict.has_key(name) and name in allow_history :
+                        value     = form_dict.get(name)
+                        value_len = value != None and len(str(value)) or 0
+
+                        if value_len > 0 and ( form_old_dict.get(name) != value ):
+                            TransactionUpdateHistory( transaction_type='1', transaction_id=kwargs.get('object_id'), field_name=name, field_value=(value and value or ''), timestamp=datetime.now() ).save()
+
     if not permission:
-        permission = 'Management.change_' + model.__name__.lower()
+        permission = 'Management.change_' + model_name
     if request.user.has_perm(permission):
         return UpdateView.as_view(*args, **kwargs)
     else:
@@ -926,8 +963,8 @@ def demands_all(request):
                 return HttpResponseRedirect('/reports/project_month/%s/%s/%s' % (demands[0].project.id,
                                                                          demands[0].year, demands[0].month))
     
-    total_mispaid, total_unpaid, total_nopayment, total_noinvoice = 0,0,0,0
-    amount_mispaid, amount_unpaid, amount_nopayment, amount_noinvoice = 0,0,0,0
+    total_mispaid, total_unpaid, total_nopayment, total_noinvoice, total_notyetpaid = 0,0,0,0,0
+    amount_mispaid, amount_unpaid, amount_nopayment, amount_noinvoice, amount_notyetpaid = 0,0,0,0,0
     projects = Project.objects.all()
     for p in projects:
         for d in p.demands_mispaid():
@@ -942,10 +979,14 @@ def demands_all(request):
         for d in p.demands.noinvoice():
             amount_noinvoice += d.get_total_amount()
             total_noinvoice += 1
+        for d in p.demands_not_yet_paid():
+            amount_notyetpaid += d.get_total_amount()
+            total_notyetpaid += 1
+
     return render(request, 'Management/demands_all.html', 
                               { 'projects':projects, 'total_mispaid':total_mispaid, 'total_unpaid':total_unpaid,
-                               'total_nopayment':total_nopayment, 'total_noinvoice':total_noinvoice,
-                               'amount_mispaid':amount_mispaid, 'amount_unpaid':amount_unpaid, 
+                               'total_nopayment':total_nopayment, 'total_noinvoice':total_noinvoice,'total_notyetpaid':total_notyetpaid,
+                               'amount_mispaid':amount_mispaid, 'amount_unpaid':amount_unpaid, 'amount_notyetpaid':amount_notyetpaid,
                                'amount_nopayment':amount_nopayment, 'amount_noinvoice':amount_noinvoice,
                                'houseForm':LocateHouseForm(), 
                                'demandForm':LocateDemandForm(),
@@ -1281,14 +1322,17 @@ def nhemployee_remarks(request, year, month):
 def demand_edit(request, object_id):
     demand = Demand.objects.select_related('project').get(pk = object_id)
     sales = demand.get_sales().select_related('house__building')
+    months = None
+
     if request.method == 'POST':
         form = DemandForm(request.POST, instance = demand)
         if form.is_valid():
             form.save()
     else:
         form = DemandForm(instance = demand)
+        months = MonthForm()
         
-    return render(request, 'Management/demand_edit.html', { 'form':form, 'demand':demand, 'sales':sales }, )
+    return render(request, 'Management/demand_edit.html', { 'form':form, 'demand':demand, 'sales':sales, 'months':months }, )
     
 @permission_required('Management.change_demand')
 def demand_close(request, id):
@@ -1453,7 +1497,7 @@ def demand_sale_reject(request, id):
 @permission_required('Management.pre_sale')
 def demand_sale_pre(request, id):
     sale = Sale.objects.get(pk=id)
-    y,m = sale.contractor_pay_year, sale.contractor_pay_month
+    y,m = request.GET.get('year'), request.GET.get('month')
     demands_to_calc = []
     
     try:
@@ -1461,7 +1505,7 @@ def demand_sale_pre(request, id):
     except SalePre.DoesNotExist:
         sr = SalePre(sale = sale, employee_pay_month = sale.employee_pay_month, employee_pay_year = sale.employee_pay_year)
     
-    to_year, to_month = m==1 and y-1 or y, m==1 and 12 or m-1
+    to_year, to_month = y is None and sale.contractor_pay_year or y, m is None and sale.contractor_pay_month or m
     
     if to_year != sr.to_year or to_month != sr.to_month:
         project = sale.demand.project
@@ -1495,6 +1539,9 @@ def demand_sale_cancel(request, id):
 
 @permission_required('Management.add_invoice')
 def invoice_add(request, initial=None):
+    
+    sales = initial.get('demand').get_sales().select_related('house__building')
+
     if request.method == 'POST':
         form = DemandInvoiceForm(request.POST)
         if form.is_valid():
@@ -1505,12 +1552,12 @@ def invoice_add(request, initial=None):
                 return HttpResponseRedirect('/payments/add')
     else:
         form = DemandInvoiceForm(initial=initial)
-    return render(request, 'Management/invoice_edit.html', {'form':form}, )
+    return render(request, 'Management/invoice_edit.html', {'form':form, 'sales':sales, 'demand': initial.get('demand')}, )
 
 @permission_required('Management.add_invoice')
 def demand_invoice_add(request, id):
-    demand = Demand.objects.get(pk=id)
-    return invoice_add(request, {'project':demand.project.id, 'month':demand.month, 'year':demand.year})
+    demand = Demand.objects.select_related('project').get(pk=id)
+    return invoice_add(request, {'project':demand.project.id, 'month':demand.month, 'year':demand.year, 'demand': demand})
 
 @permission_required('Management.demand_invoices')
 def demand_invoice_list(request):
@@ -1861,7 +1908,14 @@ def demand_force_fully_paid(request, id):
     demand.force_fully_paid = True
     demand.save()
     return HttpResponse('ok')
-    
+
+@permission_required('Management.demand_not_yet_paid')
+def demand_not_yet_paid(request, id):
+    demand = Demand.objects.get(pk=id)
+    demand.not_yet_paid = demand.not_yet_paid == 0 and True or False
+    demand.save()
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
 @permission_required('Management.add_demanddiff')
 def demand_adddiff_adjust(request, object_id):
     return demand_adddiff(request, object_id, u'התאמה')
@@ -2210,6 +2264,8 @@ def salecommissiondetail_edit(request, sale_id):
 def project_edit(request, id):
     project = Project.objects.select_related('demand_contact','payment_contact').get(pk=id)
     details = project.details or ProjectDetails()
+    transactions = []
+    
     if request.method == 'POST':
         form = ProjectForm(request.POST, instance=project)
         detailsForm = ProjectDetailsForm(request.POST, instance=details, prefix='det')
@@ -2221,10 +2277,31 @@ def project_edit(request, id):
     else:
         form = ProjectForm(instance=project)
         detailsForm = ProjectDetailsForm(instance=details, prefix='det')
-        
-    return render(request, 'Management/project_edit.html', 
-                              { 'form':form, 'detailsForm':detailsForm, 'project':project },
-                              )
+        transactionsForm = TransactionUpdateHistory.objects.filter(transaction_id = project.commissions.id, transaction_type = 1)
+
+        for value in transactionsForm :
+            field_value = value.field_value
+            field_name  = value.field_name
+
+            try :
+                if field_name == 'max' :
+                    field_name  = u'מקסימום עמלה'
+                    field_value = field_value + ' %'
+                else :
+                    field_value = commaise( int( field_value ) ) + ' ש"ח'
+            except :
+                pass
+
+            transactions.append( [ ugettext( field_name ), field_value, str( value.timestamp ).split(' ')[0] ] )
+
+    context = {
+        'form':form, 
+        'detailsForm':detailsForm, 
+        'project':project, 
+        'history':transactions
+    }
+
+    return render(request, 'Management/project_edit.html', context)
   
 @login_required  
 def project_commission_del(request, project_id, commission):
@@ -2820,9 +2897,25 @@ def nhemployee_loanpay(request, employee_id):
 def employee_employmentterms(request, id, model):
     employee = model.objects.get(pk = id)
     terms = employee.employment_terms or EmploymentTerms()
+    terms_dict = terms.__dict__.copy()
+
+    allow_history = [ 'salary_base', 'safety', 'tax_deduction_source_precentage' ]
+
     if request.method == "POST":
         form = EmploymentTermsForm(request.POST, instance=terms)
         if form.is_valid():
+            form_dict = form.instance.__dict__
+
+            for item in terms._meta.fields :
+                name = item.name
+
+                if form_dict.has_key(name) and name in allow_history :
+                    value     = form_dict.get(name)
+                    value_len = value != None and len(str(value)) or 0
+
+                    if value_len > 0 and ( terms_dict.get(name) != value ):
+                        TransactionUpdateHistory( transaction_type='0', transaction_id=id, field_name=name, field_value=(value and value or ''), timestamp=datetime.now() ).save()
+
             employee.employment_terms = form.save()
             employee.save()
     else:
