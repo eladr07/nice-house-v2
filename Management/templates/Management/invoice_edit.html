@@ -1,4 +1,4 @@
-﻿{% extends "./base.html" %}
+﻿{% extends "../base.html" %}
 {% block header %}
 {{block.super}}
 <script>
@@ -108,4 +108,7 @@
 		</form>
 	</div>
 	<div class="clearBoth"></div>
+	
+	{% include './Management/demand_deals.html' %}
+
 {% endblock content %}

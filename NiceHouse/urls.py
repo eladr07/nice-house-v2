@@ -83,6 +83,8 @@ urlpatterns += [
     path('projects/<int:id>/addinvoice', project_invoice_add),
     path('projects/<int:id>/addpayment', project_payment_add),
     
+    path('projects/<int:project_id>/demands/notyetpaid$', project_demands,
+     {'func':'demands_not_yet_paid', 'template_name' : 'Management/project_demands_noinvoice.html'}),
     path('projects/<int:project_id>/demands/unpaid', project_demands, 
      {'func':'demands_unpaid', 'template_name' : 'Management/project_demands_unpaid.html'}),
     path('projects/<int:project_id>/demands/noinvoice', project_demands, 
@@ -410,6 +412,7 @@ urlpatterns += [
 urlpatterns += [
     path('demands/<int:id>/zero', demand_zero),
     path('demands/<int:id>/forcefullypaid', demand_force_fully_paid),
+    path('demands/<int:id>/notyetpaid$', demand_not_yet_paid),
     path('demands/<int:object_id>', demand_edit),
     path('demands/<int:obj_id>/reminders', obj_reminders,
      {'model': Demand}),

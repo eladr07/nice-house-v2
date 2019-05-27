@@ -1,4 +1,4 @@
-﻿{% extends "./base.html" %}
+﻿{% extends "../base.html" %}
 {% load management_extras %}
 {% block header %}	
 {{ block.super }}
@@ -152,6 +152,18 @@
 				{% endif %}
 			</fieldset>
 		{% endif %}
+
+		{% if form.history_trans_update|length %}
+			<div class="clearBoth"></div>
+			<fieldset class="cardFieldset">
+				<legend>היסטוריית תנאי העסקה</legend>
+
+					{% for k in form.history_trans_update %}
+						<li>{{ k.2 }}: עידכון {{ k.0 }} ל-<b>{{ k.1 }}</b></li>
+					{% endfor %}
+			</fieldset>
+		{% endif %}
+
 		{% if user.is_staff %}
 			<div class="clearBoth"></div>
 			{% for c in form.instance.commissions.all %}

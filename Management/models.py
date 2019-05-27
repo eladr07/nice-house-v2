@@ -189,13 +189,22 @@ class Project(models.Model):
         return [d for d in query if d.is_fully_paid == False]
     def demands_mispaid(self):
         query = self.demands.annotate(invoices_num = Count('invoices'), payments_num = Count('payments'))
-        query = query.filter(invoices_num__gt = 0, payments_num__gt = 0)
+        query = query.filter(invoices_num__gt = 0, payments_num__gt = 0).iterator()
         return [d for d in query if d.diff_invoice_payment != 0 and d.is_fully_paid == False]
     def current_demand(self):
         try:
             return Demand.objects.current().get(project = self)
         except Demand.DoesNotExist:
             return None
+    def demands_not_yet_paid(self):
+        demands = []
+        query   = Demand.objects.filter(project = self, not_yet_paid = 1)
+
+        for d in query :
+            if d.is_fully_paid == False :
+                demands.append(d)
+
+        return demands
     def get_open_reminders(self):
         return [r for r in self.reminders.all() if r.statuses.latest().type.id 
                 not in (ReminderStatusType.Deleted,ReminderStatusType.Done)]
@@ -485,11 +494,22 @@ class EmploymentTerms(models.Model):
     class Meta:
         db_table='EmploymentTerms'
     
+class TransactionUpdateHistory(models.Model):
+    tid              = models.AutoField(primary_key=True)
+    transaction_type = models.PositiveIntegerField(ugettext('transaction_type'))
+    transaction_id   = models.PositiveIntegerField(ugettext('transaction_id'))
+    field_name       = models.TextField(ugettext('field_name'))
+    field_value      = models.TextField(ugettext('field_value'))
+    timestamp        = models.DateTimeField(ugettext('timestamp'))
+
+    class Meta:
+        db_table='TransactionUpdateHistory'
+
 class EmployeeBase(Person):
     pid = models.PositiveIntegerField(ugettext('pid'), unique=True)
     birth_date = models.DateField(ugettext('birth_date'))
     work_phone = models.CharField(ugettext('work_phone'), max_length=10, null=True, blank=True)
-    work_fax = models.CharField(ugettext('work_fax'), max_length=10, null=True, blank=True);
+    work_fax = models.CharField(ugettext('work_fax'), max_length=10, null=True, blank=True)
     home_phone = models.CharField(ugettext('home_phone'), max_length=10)
     mate_phone = models.CharField(ugettext('mate_phone'), max_length=10, null=True, blank=True)
     family_state = models.PositiveIntegerField(ugettext('family state'), choices = Family_State_Types)
@@ -1942,6 +1962,7 @@ class Demand(models.Model):
                                       editable=False, blank=True)
     payments = models.ManyToManyField('Payment',  related_name = 'demands', 
                                       editable=False, blank=True)
+    not_yet_paid = models.IntegerField(editable=False, default=0)
 
     objects = DemandManager()
     
