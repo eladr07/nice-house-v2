@@ -1129,6 +1129,8 @@ class NHEmployeeSalary(EmployeeSalaryBase):
         defines a multiplier for all commissions. used to reduce tax for employees that get the commission w/o tax
         '''
         self.ratio = 1
+    def get_absolute_url(self):
+        return '/nhemployeesalaries/%s' % self.id
     class Meta:
         db_table='NHEmployeeSalary'
         

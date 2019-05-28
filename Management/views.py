@@ -1130,6 +1130,12 @@ class EmployeeSalaryUpdate(PermissionRequiredMixin, UpdateView):
     template_name = 'Management/employee_salary_edit.html'
     permission_required = 'Management.change_employeesalary'
 
+class NHEmployeeSalaryUpdate(PermissionRequiredMixin, UpdateView):
+    model = NHEmployeeSalary
+    form_class = NHEmployeeSalaryForm
+    template_name = 'Management/nhemployee_salary_edit.html'
+    permission_required = 'Management.change_nhemployeesalary'
+
 def employee_salary_pdf(request, year, month):
     filename = common.generate_unique_media_filename('pdf')
     
@@ -1270,6 +1276,20 @@ def employee_list_pdf(request):
     response.write(p.read())
     p.close()
     return response
+
+class EmployeeArchiveListView(LoginRequiredMixin, ListView):
+    model = Employee
+    template_name = 'Management/employee_archive.html'
+    context_object_name = 'employee'
+
+    def get_queryset(self):
+        return Employee.objects.archive()
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        
+        context['nhbranch_list'] = NHBranch.objects.all()
+        return context
 
 @permission_required('Management.nh_season_profit')
 def nh_season_profit(request):

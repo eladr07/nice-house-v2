@@ -1,4 +1,5 @@
 ﻿{% extends "../base.html" %}
+{% load static %}
 {% block header %}
 <script>
 	var selectedID = 0;
@@ -79,17 +80,16 @@
 	<div class="clearBoth"> </div>
 	<br />
 	<table id="employee_table" class="dataTable" border="1">
-		<caption>מציג סה"כ {{employee_list.count}} עובדים</caption>
+		<caption>מציג סה"כ {{object_list.count}} עובדים</caption>
 		<th/>
 		<th>מספר</th>
 		<th>שם פרטי</th>
 		<th>שם משפחה</th>
-		<th>טלפון</th>
 		<th>כתובת</th>
 		<th>תחילת העסקה</th>
 		<th>סיום העסקה</th>
 		<th>הערות</th>
-		{% regroup employee_list by rank as rank_list %}
+		{% regroup object_list by rank as rank_list %}
 		{% for rank in rank_list %}
 			<tr style="text-align:center; color:#4669D6; font-size:14px"><td colspan="10"><b>{{rank.grouper|default:"-- לא הוגדר דרג --"}}</b></td></tr>
 			{% for e in rank.list %}
@@ -98,7 +98,6 @@
 					<td>{{ e.id }}</td>
 					<td>{{ e.first_name }}</td>
 					<td>{{ e.last_name }}</td>
-					<td>{{ e.phone }}</td>
 					<td>{{ e.address }}</td>
 					<td>{{ e.work_start|date:"j/m/y" }}</td>
 					<td>{{ e.work_end|date:"j/m/y" }}</td>
@@ -109,12 +108,10 @@
 	</table>
 	<br><br>
 	<table id="nhemployee_table" class="dataTable" border="1">
-		<caption>מציג סה"כ {{nhemployee_list.count}} עובדים בנייס האוס</caption>
 		<th/>
 		<th>מספר</th>
 		<th>שם פרטי</th>
 		<th>שם משפחה</th>
-		<th>טלפון</th>
 		<th>כתובת</th>
 		<th>תחילת העסקה</th>
 		<th>סוג העסקה</th>
@@ -127,13 +124,14 @@
 					<td>{{ e.id }}</td>
 					<td>{{ e.first_name }}</td>
 					<td>{{ e.last_name }}</td>
-					<td>{{ e.phone }}</td>
 					<td>{{ e.address }}</td>
 					<td>{{ e.work_start }}</td>
-					<td {% if e.employment_terms.hire_type.id == 1 %}style="color:#1AA337;"{%endif%}>
-					{{e.employment_terms.hire_type}}
-					{% if e.employment_terms.hire_type.id == 2 %} - {{e.employment_terms.salary_net|yesno:"נטו, ברוטו"}} {%endif%}
+					{% with e.employment_terms as terms %}
+					<td {% if terms.hire_type.id == 1 %}style="color:#1AA337;"{%endif%}>
+						{% if terms %} {{terms.hire_type}} {% endif %}
+						{% if terms.hire_type.id == 2 %} - {{terms.salary_net|yesno:"נטו, ברוטו"}} {%endif%}
 					</td>
+					{% endwith %}
 					<td>{{ e.remarks }}</td>
 				</tr>
 			{% endfor %}
