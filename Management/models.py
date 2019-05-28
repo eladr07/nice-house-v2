@@ -267,6 +267,8 @@ class Parking(models.Model):
     num = models.PositiveSmallIntegerField(gettext('parking_num'))
     type = models.ForeignKey('ParkingType', on_delete=models.PROTECT, verbose_name=gettext('parking_type'))
     remarks = models.TextField(gettext('remarks'), null=True, blank=True)
+    def get_absolute_url(self):
+        return '/parkings/%s' % self.id
     def __str__(self):
         return u'מס\' %s - %s' % (self.num, self.type)
     class Meta:
@@ -280,6 +282,9 @@ class Storage(models.Model):
     num = models.PositiveSmallIntegerField(gettext('storage_num'))
     size = models.FloatField(gettext('size'), null=True, blank=True)
     remarks = models.TextField(gettext('remarks'), null=True, blank=True)
+    
+    def get_absolute_url(self):
+        return '/storages/%s' % self.id
     def __str__(self):
         return self.size and u'מס\' %s - %s מ"ר' % (self.num, self.size) or u'מס\' %s' % self.num 
     class Meta:
