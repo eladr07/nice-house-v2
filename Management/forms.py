@@ -702,7 +702,7 @@ class ReminderForm(forms.ModelForm):
             self.fields['status'].initial = self.instance.statuses.latest().type_id
     class Meta:
         model = Reminder
-        fields=('content','status')
+        fields=('content',)
 
 class TaxForm(forms.ModelForm):
     def __init__(self, *args, **kw):
