@@ -81,7 +81,7 @@ class SaleManager(models.Manager):
     def contractor_pay_range(self, from_year, from_month, to_year, to_month):
         return self.get_query_set().contractor_pay_range(from_year, from_month, to_year, to_month)
     def get_query_set(self):
-        return SaleQuerySet(self.model)
+        return SaleQuerySet(self.model, using=self._db)
     
 class HouseManager(models.Manager):
     use_for_related_fields = True
