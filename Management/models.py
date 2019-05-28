@@ -2077,8 +2077,7 @@ class Demand(models.Model):
         return [r for r in self.reminders.all() if r.statuses.latest().type.id 
                 not in (ReminderStatusType.Deleted,ReminderStatusType.Done)]
     def _get_sales(self):
-        queryset = Sale.objects.get_query_set()
-        return queryset.filter(contractor_pay_year = self.year, contractor_pay_month = self.month,
+        return Sale.objects.filter(contractor_pay_year = self.year, contractor_pay_month = self.month,
                                 house__building__project = self.project)
     @cache_method
     def get_pricemodsales(self):

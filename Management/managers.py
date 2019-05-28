@@ -20,30 +20,30 @@ def nhemployee_sort(nhemployee1, nhemployee2):
 
 class SeasonManager(models.Manager):
     def range(self, from_year, from_month, to_year, to_month):
-        return self.get_query_set().range(from_year, from_month, to_year, to_month)
-    def get_query_set(self):
+        return self.get_queryset().range(from_year, from_month, to_year, to_month)
+    def get_queryset(self):
         return SeasonQuerySet(self.model)
 
 class EmployeeSalaryBaseManager(SeasonManager):
     def nondeleted(self):
-        return self.get_query_set().nondeleted()
-    def get_query_set(self):
+        return self.get_queryset().nondeleted()
+    def get_queryset(self):
         return EmployeeSalaryBaseQuerySet(self.model)
     
 class InvoiceManager(models.Manager):
     use_for_related_fields = True
     
     def total_amount_offset(self):
-        return self.get_query_set().total_amount_offset()
-    def get_query_set(self):
+        return self.get_queryset().total_amount_offset()
+    def get_queryset(self):
         return InvoiceQuerySet(self.model)
 
 class PaymentManager(models.Manager):
     use_for_related_fields = True
     
     def total_amount(self):
-        return self.get_query_set().total_amount()
-    def get_query_set(self):
+        return self.get_queryset().total_amount()
+    def get_queryset(self):
         return PaymentQuerySet(self.model)
 
 class DemandManager(SeasonManager):
@@ -57,66 +57,66 @@ class DemandManager(SeasonManager):
         return demand, created
             
     def noinvoice(self):
-        return self.get_query_set().noinvoice()
+        return self.get_queryset().noinvoice()
     def nopayment(self):
-        return self.get_query_set().nopayment()
+        return self.get_queryset().nopayment()
     def current(self):
         now = common.current_month()
         return self.filter(year = now.year, month = now.month)
     
-    def get_query_set(self):
-        return DemandQuerySet(self.model)
+    def get_queryset(self):
+        return DemandQuerySet(self.model, using=self._db)
 
 class DemandDiffManager(models.Manager):
     use_for_related_fields = True
     
     def total_amount(self):
-        return self.get_query_set().total_amount()
-    def get_query_set(self):
+        return self.get_queryset().total_amount()
+    def get_queryset(self):
         return DemandDiffQuerySet(self.model)
 
 class SaleManager(models.Manager):
     use_for_related_fields = True
     
     def contractor_pay_range(self, from_year, from_month, to_year, to_month):
-        return self.get_query_set().contractor_pay_range(from_year, from_month, to_year, to_month)
-    def get_query_set(self):
+        return self.get_queryset().contractor_pay_range(from_year, from_month, to_year, to_month)
+    def get_queryset(self):
         return SaleQuerySet(self.model, using=self._db)
     
 class HouseManager(models.Manager):
     use_for_related_fields = True
     
     def sold(self):
-        return self.get_query_set().sold()
+        return self.get_queryset().sold()
     def signed(self):
-        return self.get_query_set().signed()
+        return self.get_queryset().signed()
     def avalible(self):
-        return self.get_query_set().avalible()
-    def get_query_set(self):
+        return self.get_queryset().avalible()
+    def get_queryset(self):
         return HouseQuerySet(self.model)
 
 class HouseVersionManager(models.Manager):
     use_for_related_fields = True
     
     def company(self):
-        return self.get_query_set().company()
+        return self.get_queryset().company()
     def doh0(self):
-        return self.get_query_set().doh0()
-    def get_query_set(self):
+        return self.get_queryset().doh0()
+    def get_queryset(self):
         return HouseVersionQuerySet(self.model)
 
 class CityCallersManager(models.Manager):
     use_for_related_fields = True
     
     def total_callers_num(self):
-        return self.get_query_set().total_callers_num()
+        return self.get_queryset().total_callers_num()
 
 class MediaReferralsManager(models.Manager):
     use_for_related_fields = True
     
     def total_referrals_num(self):
-        return self.get_query_set().total_referrals_num()
-    def get_query_set(self):
+        return self.get_queryset().total_referrals_num()
+    def get_queryset(self):
         return MediaReferralsQuerySet(self.model)
 
 class DivisionTypeManager(models.Manager):
