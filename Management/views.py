@@ -1180,6 +1180,22 @@ class EmployeeSalaryTotalDetailView(LoginRequiredMixin, DetailView):
     template_name = 'Management/employee_salary_total_details.html'
     
 
+class NHEmployeeSalaryCommissionDetailView(LoginRequiredMixin, DetailView):
+    model = NHEmployeeSalary
+    context_object_name = 'salary'
+    template_name = 'Management/nhemployee_commission_details.html'
+
+class NHEmployeeSalaryCheckDetailView(LoginRequiredMixin, DetailView):
+    model = NHEmployeeSalary
+    context_object_name = 'salary'
+    template_name = 'Management/employee_salary_check_details.html'
+
+class NHEmployeeSalaryTotalDetailView(LoginRequiredMixin, DetailView):
+    model = NHEmployeeSalary
+    context_object_name = 'salary'
+    template_name = 'Management/employee_salary_total_details.html'
+
+
 @permission_required('Management.list_demand')
 def demands_all(request):
     error = None
