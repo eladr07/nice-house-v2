@@ -51,7 +51,7 @@ class DemandManager(SeasonManager):
     
     def get_or_create(self, **kwargs):
         demand, created = super(DemandManager, self).get_or_create(**kwargs)
-        commissions = demand.project.commissions
+        commissions = demand.project.commissions.get()
         if created and commissions.add_amount:
             demand.diffs.create(type=u'קבועה', amount = commissions.add_amount, reason = commissions.add_type)
         return demand, created

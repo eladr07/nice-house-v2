@@ -2095,7 +2095,8 @@ class Demand(models.Model):
     @cache_method
     def get_sales(self):
         query = self._get_sales().filter(commission_include=True, salecancel__isnull=True)
-        if self.project.commissions.commission_by_signups:
+        commissions = self.project.commissions.get()
+        if commissions.commission_by_signups:
             query = query.order_by('house__signups__date')
         return query
     @cache_method
