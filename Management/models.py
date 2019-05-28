@@ -741,7 +741,7 @@ class NHBranch(models.Model):
     address = models.CharField(gettext('address'), max_length=40, null=True, blank=True)
     phone = models.CharField(gettext('phone'), max_length=15, null=True, blank=True)
     mail = models.EmailField(gettext('mail'), null=True, blank=True)
-    fax = models.CharField(gettext('fax'), max_length=15, null=True, blank=True);
+    fax = models.CharField(gettext('fax'), max_length=15, null=True, blank=True)
     url = models.URLField(gettext('url'), null=True, blank=True)
     @property
     @cache_method
