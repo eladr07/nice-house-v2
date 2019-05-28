@@ -30,25 +30,25 @@ urlpatterns += [
     path('locatehouse', locate_house),
     path('locatedemand', locate_demand),
     
-    path('contacts/', limited_object_list,
-     {'queryset' : Contact.objects.all(), 'template_name' : 'Management/contact_list.html'}),
-    path('contact/add', limited_create_object,
-     {'form_class' : Management.forms.ContactForm, 'template_name' : 'Management/object_edit.html', 'post_save_redirect' : '.'}),
-    path('contact/<int:object_id>', limited_update_object,
-     {'form_class' : Management.forms.ContactForm, 'template_name' : 'Management/object_edit.html', 'post_save_redirect' : '%(id)s'}),
+    path('contacts/', ContactListView.as_view()),
+    path('contact/add', ContactCreate.as_view()),
+    path('contact/<int:pk>', ContactUpdate.as_view()),
     path('contact/<int:id>/del', contact_delete),
-    path('projects/', project_list),
+
+    path('projects/', ProjectListView.as_view()),
     path('projects/pdf', project_list_pdf),
-    path('projects/archive', limited_object_list,
-     {'queryset':Project.objects.archive(), 'template_name':'Management/project_archive.html'}),
+    path('projects/archive', ProjectArchiveListView.as_view()),
+    
     path('projects/<int:obj_id>/addreminder', obj_add_reminder,
      {'model':Project}),
     path('projects/<int:obj_id>/reminders', obj_reminders,
      {'model':Project}),
+    
     path('projects/<int:obj_id>/attachment/add', obj_add_attachment,
      {'model':Project}),
     path('projects/<int:obj_id>/attachments', obj_attachments,
      {'model':Project}),
+
     path('projects/<int:project_id>/addcontact', project_contact),
     path('projects/<int:project_id>/contact/<int:id>/remove', project_removecontact),
     path('projects/<int:project_id>/contact/<int:id>/delete', project_deletecontact),
@@ -63,6 +63,7 @@ urlpatterns += [
      {'form_class' : Management.forms.ProjectEndForm, 'template_name' : 'Management/object_edit.html', 'post_save_redirect' : '%(id)s'}),
     path('projects/<int:project_id>/buildings', project_buildings),
     path('projects/<int:project_id>/buildings/add', building_add),
+    
     path('buildings/<int:object_id>', limited_update_object,
      {'form_class' : Management.forms.BuildingForm, 'template_name' : 'Management/object_edit.html', 'post_save_redirect' : '%(id)s'}),
     path('buildings/<int:object_id>/clients/', building_clients),
@@ -77,6 +78,7 @@ urlpatterns += [
     path('buildings/\d+/house/<int:id>/type<int:type_id>/versionlog', house_version_log),
     path('buildings/<int:building_id>/copy', building_copy),
     path('buildings/<int:building_id>/del', building_delete),
+
     path('projects/<int:project_id>/<commission>/', project_commission_add),
     path('projects/<int:project_id>/<commission>/del', project_commission_del),
 
@@ -99,10 +101,8 @@ urlpatterns += [
     
     path('buildings/add', building_add),
      
-    path('parkings/<int:object_id>', limited_update_object,
-     {'form_class' : Management.forms.ParkingForm, 'template_name' : 'Management/object_edit.html', 'post_save_redirect' : '%(id)s'}),
-    path('storages/<int:object_id>', limited_update_object,
-     {'form_class' : Management.forms.StorageForm, 'template_name' : 'Management/object_edit.html', 'post_save_redirect' : '%(id)s'}),
+    path('parkings/<int:pk>', ParkingUpdate.as_view()),
+    path('storages/<int:pk>', StorageUpdate.as_view()),
         
     path('employees/<int:obj_id>/attachment/add', obj_add_attachment,
      {'model':Employee}),
@@ -125,10 +125,8 @@ urlpatterns += [
     path('employees/archive', limited_object_list,
      {'queryset':Employee.objects.archive(), 'template_name':'Management/employee_archive.html', 'template_object_name':'employee',
       'extra_context':{'nhbranch_list':NHBranch.objects.all()}}),
-    path('employees/add/', limited_create_object,
-     {'form_class' : Management.forms.EmployeeForm, 'post_save_redirect' : '/employees/%(id)s'}),
-    path('employees/<int:object_id>/', limited_update_object,
-     {'form_class' : Management.forms.EmployeeForm, 'post_save_redirect' : '/employees/%(id)s'}),
+    path('employees/add/', EmployeeCreate.as_view()),
+    path('employees/<int:pk>/', EmployeeUpdate.as_view()),
     path('employees/end/<int:object_id>', employee_end),
     path('employees/<int:id>/employmentterms', employee_employmentterms,
      {'model':EmployeeBase}),

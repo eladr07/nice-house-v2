@@ -15,6 +15,7 @@ from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.contenttypes.models import ContentType
 
 import Management.common as common
@@ -1980,12 +1981,11 @@ def payment_del(request, id):
     p.delete()
     return HttpResponseRedirect(next)
 
-@login_required
-def project_list(request):    
-    projects = Project.objects.filter(end_date = None).select_related('demand_contact','payment_contact')
-    return render(request, 'Management/project_list.html',
-                              {'projects': projects}, 
-                              )
+class ProjectListView(LoginRequiredMixin, ListView):
+    model = Project
+
+    def get_queryset(self):
+        return Project.objects.filter(end_date = None).select_related('demand_contact','payment_contact')
 
 @permission_required('Management.project_list_pdf')
 def project_list_pdf(request):
@@ -1999,6 +1999,13 @@ def project_list_pdf(request):
     response.write(p.read())
     p.close()
     return response
+
+class ProjectArchiveListView(LoginRequiredMixin, ListView):
+    model = Project
+    template_name = 'Management/project_archive.html'
+
+    def get_queryset(self):
+        return Project.objects.archive()
 
 @permission_required('Management.change_nhsale')
 def nhsale_edit(request, object_id):
@@ -2494,6 +2501,22 @@ def employee_project_remove(request, employee_id, project_id):
                               { 'form':form, 'title':u'סיום העסקה בפרוייקט' },
                               )
 
+class ContactListView(LoginRequiredMixin, ListView):
+    model = Contact
+    template_name = 'Management/contact_list.html'
+
+class ContactCreate(PermissionRequiredMixin, CreateView):
+    model = Contact
+    form_class = ContactForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.change_contact'
+
+class ContactUpdate(PermissionRequiredMixin, UpdateView):
+    model = Contact
+    form_class = ContactForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.change_contact'
+
 @permission_required('Management.change_contact')
 def project_removecontact(request, id, project_id):
     p = Project.objects.get(pk=project_id)
@@ -2646,7 +2669,13 @@ def building_addparking(request, building_id = None):
     return render(request, 'Management/object_edit.html', 
                               {'form' : form},
                               )
-    
+
+class ParkingUpdate(PermissionRequiredMixin, UpdateView):
+    model = Parking
+    form_class = ParkingForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.change_parking'
+
 @permission_required('Management.add_storage')
 def building_addstorage(request, building_id = None):
     if request.method == 'POST':
@@ -2661,6 +2690,12 @@ def building_addstorage(request, building_id = None):
             form.fields['house'].queryset = b.houses.all()
     return render(request, 'Management/object_edit.html', {'form' : form}, )
         
+class StorageUpdate(PermissionRequiredMixin, UpdateView):
+    model = Storage
+    form_class = StorageForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.change_storage'
+
 @permission_required('Management.delete_building')
 def building_delete(request, building_id):
     building = Building.objects.get(pk = building_id)
@@ -2844,7 +2879,17 @@ def employee_loanpay(request, employee_id):
         form = LoanPayForm(initial={'employee':e.id})
     return render(request, 'Management/object_edit.html',
                               {'form' : form}, )
-    
+
+class EmployeeCreate(PermissionRequiredMixin, CreateView):
+    model = Employee
+    form_class = EmployeeForm
+    permission_required = 'Management.change_employee'
+
+class EmployeeUpdate(PermissionRequiredMixin, UpdateView):
+    model = Employee
+    form_class = EmployeeForm
+    permission_required = 'Management.change_employee'
+
 @permission_required('Management.change_employee')
 def employee_end(request, object_id):
     employee = EmployeeBase.objects.get(pk=object_id)
