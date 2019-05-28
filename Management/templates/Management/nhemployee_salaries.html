@@ -1,5 +1,8 @@
 ﻿{% extends "../base.html" %}
+
+{% load static %}
 {% load management_extras %}
+
 {% block header %}
 {{ block.super }}
 <script>
@@ -107,7 +110,6 @@
 			<th></th>
 			<th>שם<br>העובד</th>
 			<th>סוג<br>העסקה</th>
-			<th>מס'<br>עסקאות</th>
 			<th>שכר<br>בסיס+<br>עמלות</th>
 			<th>עמלת<br>ניהול</th>
 			<th>רשת<br>בטחון</th>
@@ -142,7 +144,6 @@
 					{{s.nhemployee.employment_terms.include_tax|yesno}}
 				{% endif %}
 			</td>
-			<td><a class="fancybox" href="/nhemployee/{{s.nhemployee.id}}/sales/{{month.year}}/{{month.month}}">{{ s.sales_count }}</a></td>
 			<td style="color:#08A600;">
 				{{s.base|default_if_none:""}} + 
 				<a href="{{s.id}}/details" class="fancybox">{{s.commissions|default_if_none:""|commaise}}</a>
