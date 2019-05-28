@@ -1,3 +1,6 @@
+{% load static %}
+{% load management_extras %}
+
 <script>
 	var selectedID = 0;
 	var prevClass;
@@ -58,8 +61,6 @@
 		$(".fancybox").fancybox();
 	});
 </script>
-
-{% load management_extras %}
 
 <div class="clearBoth"></div>
 	<fieldset class="cardFieldset">
@@ -183,7 +184,7 @@
 						{{s.house}}
 					</a>
 				</td>
-				<td>{{s.house.get_signup.date|date:"j/m/Y"}}</td>
+				<td>{% if s.house.get_signup %} {{s.house.get_signup.date|date:"j/m/Y"}} {% endif %}</td>
 				<td>{{s.sale_date|date:"j/m/Y"}}</td>
 				<td {% if s.salepricemod.id %}style="background-color: #F69F9F;"{% endif %}>
 					{{s.price|commaise}} ש"ח

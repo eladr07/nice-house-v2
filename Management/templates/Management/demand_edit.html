@@ -1,4 +1,6 @@
 ﻿{% extends "../base.html" %}
+
+{% load static %}
 {% load management_extras %}
 
 {% block content %}
@@ -203,6 +205,6 @@
 		<a href="close">סגור דרישה</a><br><br>
 	{% endif %}
 
-	{% include './Management/demand_deals.html' %}
+	{% include './demand_deals.html' %}
 	
 {% endblock content%}
