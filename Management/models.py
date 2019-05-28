@@ -1997,7 +1997,8 @@ class Demand(models.Model):
         q = MadadBI.objects.filter(year = self.year, month=self.month)
         return q.count() > 0 and q[0].value or MadadBI.objects.latest().value
     def zilber_cycle_index(self):
-        start = self.project.commissions.c_zilber.third_start
+        commissions = self.project.commissions.get()
+        start = commissions.c_zilber.third_start
         if (start.year == self.year and start.month > self.month) or self.year < start.year:
             return -1
         i = 1
@@ -2031,7 +2032,8 @@ class Demand(models.Model):
         excluding sales from current demand. key is (month, year) and value is the sales
         '''
         dic = {}
-        if not self.project.commissions.commission_by_signups:
+        commissions = self.project.commissions.get()
+        if not commissions.commission_by_signups:
             return dic
         for m,y in self.get_signup_months():
             q = models.Q(contractor_pay_year = self.year, contractor_pay_month__gte = self.month) | models.Q(contractor_pay_year__gt = self.year)
@@ -2108,7 +2110,8 @@ class Demand(models.Model):
     def get_excluded_sales(self):
         q = models.Q(commission_include=False) | models.Q(salecancel__isnull=False)
         query = self._get_sales().filter(q)
-        if self.project.commissions.commission_by_signups:
+        commissions = self.project.commissions.get()
+        if commissions.commission_by_signups:
             query = query.order_by('house__signups__date')
         return query
         
@@ -2117,7 +2120,7 @@ class Demand(models.Model):
         logger.info('calculaion commissions for demand #%(demand_id)s - project_id:%(project_id),month:%(month)s,year:%(year)s',
                     {'demand_id':self.id,'project_id':self.project_id,'month':self.month, 'year':self.year})
         
-        c = self.project.commissions
+        c = self.project.commissions.get()
         
         # check if fixed add amount has changed
         fixed_diff = self.fixed_diff
