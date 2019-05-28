@@ -573,7 +573,7 @@ class Employee(EmployeeBase):
     def loans_and_pays(self):
         l = [l for l in self.loans.all()]
         l.extend([p for p in self.loan_pays.all()])
-        l.sort(lambda x,y: cmp(date(x.year, x.month, 1), date(y.year, y.month, 1)))
+        l.sort(key=lambda elem: date(elem.year, elem.month, 1))
         left = 0
         for o in l:
             if isinstance(o, Loan):
@@ -786,7 +786,7 @@ class NHEmployee(EmployeeBase):
     def loans_and_pays(self):
         l = [l for l in self.loans.all()]
         l.extend([p for p in self.loan_pays.all()])
-        l.sort(lambda x,y: cmp(date(x.year, x.month, 1), date(y.year, y.month, 1)))
+        l.sort(key=lambda elem: date(elem.year, elem.month, 1))
         left = 0
         for o in l:
             if isinstance(o, Loan):

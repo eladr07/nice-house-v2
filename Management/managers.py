@@ -16,7 +16,7 @@ def nhemployee_sort(nhemployee1, nhemployee2):
         return 1
     elif query2.count() == 0:
         return -1
-    return cmp(query1.latest().nhbranch.id, query2.latest().nhbranch.id)
+    return 1 if query1.latest().nhbranch.id > query2.latest().nhbranch.id else -1
 
 class SeasonManager(models.Manager):
     def range(self, from_year, from_month, to_year, to_month):
