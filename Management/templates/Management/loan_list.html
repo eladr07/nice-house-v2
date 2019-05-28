@@ -1,7 +1,7 @@
 ﻿{% extends "../base.html" %}
 
 {% load static %}
-{% load management_extras %}
+{% load humanize %}
 
 {% block header %}
 {{ block.super }}
@@ -59,9 +59,9 @@
 			<tr class="{% cycle 'row1' 'row2' %}" objid={{loan.id}}>
 				<td><a href="/employees/{{ loan.employee.id }}">{{ loan.employee }}</td>
 				<td>{{ loan.month }}/{{ loan.year }}</td>
-				<td>{{ loan.amount|commaise }} ש"ח</td>
+				<td>{{ loan.amount|intcomma }} ש"ח</td>
 				<td>{{ loan.pay_num }}</td>
-				<td>{{ loan.employee.loan_left|commaise }} ש"ח</td>
+				<td>{{ loan.employee.loan_left|intcomma }} ש"ח</td>
 			</tr>
 		{% endif %}
 		{% endfor %}

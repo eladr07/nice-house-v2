@@ -1,7 +1,7 @@
 ﻿{% extends "../template.html" %}
 
 {% load static %}
-{% load management_extras %}
+{% load humanize %}
 
 {% block header %}
 {{ block.super }}
@@ -51,7 +51,7 @@
 				<td><a target="_parent" href="/buildings/{{b.id}}/house/{{s.house.id}}/type1">{{s.house.num}}</a></td>
 				{% endwith %}
 				<td>
-					{{s.price|commaise}}<br>
+					{{s.price|intcomma}}<br>
 					{{s.include_tax|yesno:"כולל מע\"מ, לא כולל מע\"מ"}}, 
 					{% if s.house.building.project.commissions.include_lawyer != None %}
 						{{s.price_include_lawyer|yesno:"כולל עו\"ד, לא כולל עו\"ד"}}
@@ -83,7 +83,7 @@
 		<tr class="sumRow">
 			<td colspan="5"></td>
 			<td><b>סה"כ מכירות</b></td>
-			<td colspan="2"><b>{{sales_amount|commaise}}</b></td>
+			<td colspan="2"><b>{{sales_amount|intcomma}}</b></td>
 		</tr>
 	</table>
 </div>

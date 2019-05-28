@@ -1,7 +1,7 @@
 ﻿{% extends "../template.html" %}
 
 {% load static %}
-{% load management_extras %}
+{% load humanize %}
 
 {% block page %}
 <div id="content">
@@ -24,10 +24,10 @@
 				{% if scd.commission == "nhcbranchincome_min" %}מינימום{% endif %}
 			</td>
 			<td>
-				{{scd.amount|commaise}} 
+				{{scd.amount|intcomma}} 
 				{% if scd.precentage and scd.income %}
 					= {{scd.precentage}}% 
-					 * {{scd.income|commaise}}
+					 * {{scd.income|intcomma}}
 				{% endif %}
 			</td>
 			<td><a href="{{scd.nhsaleside.nhsale.get_absolute_url}}" target="_blank">{{scd.nhsaleside.nhsale.verbose_id}}</a></td>

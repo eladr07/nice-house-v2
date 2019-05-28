@@ -1,5 +1,5 @@
 ﻿{% extends "../base.html" %}
-{% load management_extras %}
+{% load humanize %}
 {% block content %}
 <div id="content">
 	<div class="title">
@@ -45,8 +45,8 @@
 				<td></td>
 				<td>{{ s.get_signup.date|default_if_none:"" }}</td>
 				<td>{{ s.sale_date|date:"j/m/Y"|default_if_none:"" }}</td>
-				<td>{% if h.price %}{{ h.price|commaise }} ש"ח{% endif %}</td>
-				<td>{% if s.price %}{{ s.price|commaise }} ש"ח{% endif %}</td>
+				<td>{% if h.price %}{{ h.price|intcomma }} ש"ח{% endif %}</td>
+				<td>{% if s.price %}{{ s.price|intcomma }} ש"ח{% endif %}</td>
 				<td>{% for p in h.parkings.all %} {{p}} {% endfor %}</td>
 				<td>{% for s in h.storages.all %} {{s}} {% endfor %}</td>
 				<td></td>
@@ -59,7 +59,7 @@
 		<tr class="rowSum">
 			<td>{{object.houses.count}} סה"כ</td>
 			<td colspan="11"></td>
-			<td>{{total_sale_price|commaise}}</td>
+			<td>{{total_sale_price|intcomma}}</td>
 		</tr>
 	</table>
 </div>

@@ -1,5 +1,5 @@
 ﻿{% extends "./template.html" %}
-{% load management_extras %}
+{% load humanize %}
 {% block page %}
 <div id="content">	
 	{% if title %}
@@ -16,8 +16,8 @@
 		{% for version in versions %}
 			<tr class="{% cycle 'row1' 'row2' %}">
 				<td>{{version.date|date:"j/m/y"}}</td>
-				<td>{{version.price|commaise}}</td>
-				<td>{{version.diff_amount|commaise}}</td>
+				<td>{{version.price|intcomma}}</td>
+				<td>{{version.diff_amount|intcomma}}</td>
 				<td>{% if version.diff_precentage %} {{version.diff_precentage|floatformat:-2}}% {% endif %}</td>
 			</tr>
 		{% endfor %}

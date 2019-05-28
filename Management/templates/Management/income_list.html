@@ -1,5 +1,5 @@
 ﻿{% extends "../base.html" %}
-{% load management_extras %}
+{% load humanize %}
 {% block header %}
 {{ block.super }}
 <script>
@@ -97,12 +97,12 @@
 			<td>{{income.income_producer_type}}</td>
 			<td>{{income.payment.id}}</td>
 			<td>{{income.payment.pay_date|date:"j/m/y"}}</td>
-			<td>{{income.payment.amount|commaise}}</td>
+			<td>{{income.payment.amount|intcomma}}</td>
 			<td>{{income.invoice.num}}</td>
 			<td>{{income.invoice.date|date:"j/m/y"}}</td>
-			<td>{{income.invoice.tax_deduction_source|commaise}}</td>
-			<td>{{income.invoice.amount|commaise}}</td>
-			<td>{{income.diff_payment_invoice|default_if_none:""|commaise}}</td>
+			<td>{{income.invoice.tax_deduction_source|intcomma}}</td>
+			<td>{{income.invoice.amount|intcomma}}</td>
+			<td>{{income.diff_payment_invoice|default_if_none:""|intcomma}}</td>
 			<td>{{income.deal}}</td>
 			<td>{{income.remarks}}</td>
 		</tr>

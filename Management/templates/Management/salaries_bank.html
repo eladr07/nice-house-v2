@@ -1,5 +1,5 @@
 ﻿{% extends "../base.html" %}
-{% load management_extras %}
+{% load humanize %}
 {% block header %}
 {{ block.super }}
 <script>
@@ -66,7 +66,7 @@
 					<td>{{ e.last_name }}</td>
 					<td>{{e.pid}}</td>
 					<td>{{e.payee}}</td>
-					<td>{{salary.neto|default_if_none:""|commaise}}</td>
+					<td>{{salary.neto|default_if_none:""|intcomma}}</td>
 					<td>{{account.num}}</td>
 					<td>{{account.bank}}</td>
 					<td>{{account.branch}}</td>

@@ -1,7 +1,7 @@
 ﻿{% extends "../base.html" %}
 
 {% load static %}
-{% load management_extras %}
+{% load humanize %}
 
 {% block header %}
 {{ block.super }}
@@ -103,15 +103,15 @@
 				<td>{{c.supplier_type}}</td>
 				<td>{{c.num}}</td>
 				<td>{{c.pay_date|date:"j/m/y"}}</td>
-				<td>{{c.amount|commaise}}</td>
+				<td>{{c.amount|intcomma}}</td>
 				{% if c.invoice %}
-					<td>{{c.invoice.amount|commaise}}</td>
-					<td>{{c.tax_deduction_source|commaise}}</td>
+					<td>{{c.invoice.amount|intcomma}}</td>
+					<td>{{c.tax_deduction_source|intcomma}}</td>
 					<td>{{c.num}}</td>
 				{% else %}
 					<td colspan="3">{{c.type}}</td>
 				{% endif %}
-				<td>{{diff_amount_invoice|default_if_none:""|commaise}}</td>
+				<td>{{diff_amount_invoice|default_if_none:""|intcomma}}</td>
 				<td>{{c.order_verifier}}</td>
 				<td>{{c.payment_verifier}}</td>
 				<td>{{c.remarks}}</td>
@@ -120,10 +120,10 @@
 	{% endfor %}
 	<tr class="rowSum">
 		<td colspan="6"></td>
-		<td>{{sum_check_amount|commaise}}</td>
-		<td>{{sum_invoice_amount|commaise}}</td>
+		<td>{{sum_check_amount|intcomma}}</td>
+		<td>{{sum_invoice_amount|intcomma}}</td>
 		<td colspan="2"></td>
-		<td>{{sum_diff_check_invoice|commaise}}</td>
+		<td>{{sum_diff_check_invoice|intcomma}}</td>
 	</tr>
 </table>
 {% endblock content %}

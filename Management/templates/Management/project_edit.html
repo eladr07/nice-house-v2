@@ -1,5 +1,5 @@
 ﻿{% extends "../base.html" %}
-{% load management_extras %}
+{% load humanize %}
 {% block header %}
 {% load static %}
 {{ block.super }}
@@ -256,7 +256,7 @@
 				</tr>
 				<tr>
 					<th>סכום תוספת</th>
-					<td>{{c.add_amount|commaise|default_if_none:""}}</td>
+					<td>{{c.add_amount|intcomma|default_if_none:""}}</td>
 				</tr>
 				<tr>
 					<th>סוג תוספת</th>

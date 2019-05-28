@@ -1,5 +1,5 @@
 ﻿{% extends "../base.html" %}
-{% load management_extras %}
+{% load humanize %}
 {% block header %}
 {{ block.super }}
 <script>
@@ -110,7 +110,7 @@
 				<td>{{ i.support_num }}</td>
 				<td>{{ i.payment_type }}</td>
 				<td>{{ i.payment_date|date:"j/m/y" }}</td>
-				<td>{{ i.amount|commaise }} ש"ח</td>
+				<td>{{ i.amount|intcomma }} ש"ח</td>
 				<td>{{ i.remarks }}</td>
 			</tr>
 		{% endfor %}

@@ -1,6 +1,6 @@
 ﻿{% extends "../template.html" %}
 {% load static %}
-{% load management_extras %}
+{% load humanize %}
 {% block page %}
 <div id="content">
 	<div class="title">
@@ -30,11 +30,11 @@
 				</td>
 				<td>{{ d.month }}/{{ d.year }}</td>
 				<td><a href="/demandsales/?demand_id={{d.id}}">{{d.get_sales.count}}</a></td>
-				<td>{{ d.get_sales_amount|commaise }} ש"ח</td>
-				<td>{{ d.get_total_amount|commaise }} ש"ח</td>
+				<td>{{ d.get_sales_amount|intcomma }} ש"ח</td>
+				<td>{{ d.get_total_amount|intcomma }} ש"ח</td>
 				<td>
 				{% for p in d.payments.all %}
-					<a href="/payments/{{p.id}}" target="_blank">{{p.amount|commaise}}</a><br>
+					<a href="/payments/{{p.id}}" target="_blank">{{p.amount|intcomma}}</a><br>
 				{% endfor %}
 				</td>
 				<td>

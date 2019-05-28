@@ -1,5 +1,5 @@
 ﻿{% extends "../base.html" %}
-{% load management_extras %}
+{% load humanize %}
 {% block header %}
 {{ block.super }}
 <script>
@@ -56,7 +56,7 @@
 				</tr>
 				<tr>
 					<th>מחיר</th>
-					<td>{{nhs.price|commaise}} ש"ח</td>
+					<td>{{nhs.price|intcomma}} ש"ח</td>
 				</tr>
 				<tr>
 					<th>הערות</th>
@@ -116,11 +116,11 @@
 			</tr>
 			<tr>
 				<th>עמלה</th>
-				<td>{{side.income|commaise}} ש"ח</td>
+				<td>{{side.income|intcomma}} ש"ח</td>
 			</tr>
 			<tr>
 				<th>עמלה נטו</th>
-				<td>{{side.net_income|commaise}} ש"ח</td>
+				<td>{{side.net_income|intcomma}} ש"ח</td>
 			</tr>
 			<tr>
 				<th>מס' הזמנת שרותי תיווך</th>
@@ -151,7 +151,7 @@
 				<td>
 					{{side.employee1}} - 
 					{{side.employee1_commission}}% - 
-					{{side.employee1_pay|commaise}} ש"ח
+					{{side.employee1_pay|intcomma}} ש"ח
 				</td>
 			</tr>
 			<tr>
@@ -160,7 +160,7 @@
 					{% if side.employee2 %}
 						{{side.employee2}} - 
 						{{side.employee2_commission}}% - 
-						{{side.employee2_pay|commaise}} ש"ח
+						{{side.employee2_pay|intcomma}} ש"ח
 					{% endif %}
 				</td>
 			</tr>
@@ -170,7 +170,7 @@
 					{% if side.employee3 %}
 						{{side.employee3}} - 
 						{{side.employee3_commission}}% - 
-						{{side.employee3_pay|commaise}} ש"ח
+						{{side.employee3_pay|intcomma}} ש"ח
 					{% endif %}
 				</td>
 			</tr>
@@ -180,7 +180,7 @@
 					{% if side.director %}
 						{{side.director}} - 
 						{{side.director_commission}}% - 
-						{{side.director_pay|commaise}} ש"ח
+						{{side.director_pay|intcomma}} ש"ח
 					{% endif %}
 				</td>
 			</tr>
@@ -204,7 +204,7 @@
 				<th>חשבונית</th>
 				<td>
 				{% for i in side.invoices.all %}
-					{{i.num}} - {{i.amount|commaise}} ש"ח
+					{{i.num}} - {{i.amount|intcomma}} ש"ח
 					<a href="/invoices/{{i.id}}">עדכן</a>
 					<br>
 				{% empty %}
@@ -222,7 +222,7 @@
 			</tr>
 			{% for p in side.payments.all %}
 				<tr>
-					<td>{{p.payment_date|date:"j/m/y"}} - {{p.amount|commaise}} ש"ח</td>
+					<td>{{p.payment_date|date:"j/m/y"}} - {{p.amount|intcomma}} ש"ח</td>
 					<td><a href="/payments/{{p.id}}">עדכן תשלום</a></td>
 				</tr>
 			{% endfor %}

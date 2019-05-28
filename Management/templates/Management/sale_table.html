@@ -1,11 +1,11 @@
 ﻿{% load static %}
-{% load management_extras %}
+{% load humanize %}
 <table id="sales_table" class="dataTable" border="1">
 	<caption>	
 		סה"כ מכירות : 
 		<b>{{sales|length}}</b>
 		על סך כולל של 
-		<b>{{sales.total_price|commaise}}</b>
+		<b>{{sales.total_price|intcomma}}</b>
 		ש"ח
 	</caption>
 	<th></th>
@@ -40,7 +40,7 @@
 				{% endif %}
 			</td>
 			<td>
-				{{s.price|commaise}}<br>
+				{{s.price|intcomma}}<br>
 				{{s.include_tax|yesno:"כולל מע\"מ, לא כולל מע\"מ"}}, 
 				{% if s.house.building.project.commissions.include_lawyer != None %}
 					{{s.price_include_lawyer|yesno:"כולל עו\"ד, לא כולל עו\"ד"}}

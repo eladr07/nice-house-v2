@@ -1,7 +1,7 @@
 ﻿{% extends "../base.html" %}
 
 {% load static %}
-{% load management_extras %}
+{% load humanize %}
 
 {% block header %}
 {{ block.super }}
@@ -166,18 +166,18 @@
 			<td>{{s.employee.employment_terms.hire_type}}</td>
 			<td><a class="fancybox" href="{{s.employee.get_absolute_url}}/sales/{{month.year}}/{{month.month}}">{{ s.sales_count }}</a></td>
 			<td style="color:#08A600;">
-				{{s.base|commaise}} + 
-				<a href="{{s.id}}/details" class="fancybox">{{s.commissions|default_if_none:"0"|commaise}}</a>
+				{{s.base|intcomma}} + 
+				<a href="{{s.id}}/details" class="fancybox">{{s.commissions|default_if_none:"0"|intcomma}}</a>
 			</td>
 			<td style="color:#08A600;">{{s.safety_net|default_if_none:""}}</td>
-			<td style="color:#08A600;">{% if s.var_pay %}{{s.var_pay|commaise}} - {{s.var_pay_type}} {% endif %}</td>
-			<td style="color:#D50808;">{% if s.deduction %}{{s.deduction|commaise}} - {{s.deduction_type}} {% endif %}</td>
-			<td><a href="{{s.id}}/totaldetails" class="fancybox">{{s.neto|default_if_none:""|commaise}}</a></td>
+			<td style="color:#08A600;">{% if s.var_pay %}{{s.var_pay|intcomma}} - {{s.var_pay_type}} {% endif %}</td>
+			<td style="color:#D50808;">{% if s.deduction %}{{s.deduction|intcomma}} - {{s.deduction_type}} {% endif %}</td>
+			<td><a href="{{s.id}}/totaldetails" class="fancybox">{{s.neto|default_if_none:""|intcomma}}</a></td>
 			<td>
-				<span style="color:#BF0000;">{{s.loan_pay|commaise}}</span>
+				<span style="color:#BF0000;">{{s.loan_pay|intcomma}}</span>
 				<br>
 				{% if s.employee.loan_left %}
-				יתרה - {{s.employee.loan_left|commaise}} ש"ח
+				יתרה - {{s.employee.loan_left|intcomma}} ש"ח
 				<br>
 				{% endif %}
 				{% if s.employee.loans_and_pays|length %}
@@ -188,12 +188,12 @@
 				{% if s.employee.employment_terms.salary_net == None %}
 					הנהלת חשבונות
 				{% else %}
-					<a href="{{s.id}}/checkdetails" class="fancybox">{{s.check_amount|default_if_none:""|commaise}}</a>
+					<a href="{{s.id}}/checkdetails" class="fancybox">{{s.check_amount|default_if_none:""|intcomma}}</a>
 				{% endif %}
 			</td>
-			<td>{{s.bruto|default_if_none:""|commaise}}</td>
+			<td>{{s.bruto|default_if_none:""|intcomma}}</td>
 			<td></td>
-			<td>{{s.invoice_amount|default_if_none:""|commaise}}</td>
+			<td>{{s.invoice_amount|default_if_none:""|intcomma}}</td>
 			<td>{% if s.refund %}{{s.refund}} - {{s.refund_type}} {% endif %}</td>
 			<td></td>
 			<td>{{s.remarks|default_if_none:""}}</td>
@@ -212,17 +212,17 @@
 	<tr class="rowSum">
 		<td colspan="4" align="center">סיכום</td>
 		<td>{{salaries|attrsum:"sales_count"}}</td>
-		<td>{{salaries|attrsum:"base"|commaise}} + {{salaries|attrsum:"commissions"|commaise}} </td>
-		<td>{{salaries|attrsum:"safety_net"|commaise}}</td>
-		<td>{{salaries|attrsum:"var_pay"|commaise}}</td>
-		<td>{{salaries|attrsum:"deduction"|commaise}}</td>
-		<td>{{salaries|attrsum:"neto"|commaise}}</td>
+		<td>{{salaries|attrsum:"base"|intcomma}} + {{salaries|attrsum:"commissions"|intcomma}} </td>
+		<td>{{salaries|attrsum:"safety_net"|intcomma}}</td>
+		<td>{{salaries|attrsum:"var_pay"|intcomma}}</td>
+		<td>{{salaries|attrsum:"deduction"|intcomma}}</td>
+		<td>{{salaries|attrsum:"neto"|intcomma}}</td>
 		<td></td>
-		<td>{{salaries|attrsum:"check_amount"|commaise}}</td>
-		<td>{{salaries|attrsum:"bruto"|commaise}}</td>
+		<td>{{salaries|attrsum:"check_amount"|intcomma}}</td>
+		<td>{{salaries|attrsum:"bruto"|intcomma}}</td>
 		<td></td>
-		<td>{{salaries|attrsum:"invoice_amount"|commaise}}</td>
-		<td>{{salaries|attrsum:"refund"|commaise}}</td>
+		<td>{{salaries|attrsum:"invoice_amount"|intcomma}}</td>
+		<td>{{salaries|attrsum:"refund"|intcomma}}</td>
 	</tr>
 </table>
 {% endblock content %}

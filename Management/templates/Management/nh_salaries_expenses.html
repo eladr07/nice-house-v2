@@ -1,5 +1,5 @@
 ﻿{% extends "../base.html" %}
-{% load management_extras %}
+{% load humanize %}
 {% block header %}
 {{ block.super }}
 <script>
@@ -106,9 +106,9 @@
 			<td><a class="fancybox" href="/salary/{{s.id}}/expenses"><img src="{% static "images/edit_48.png" %}" width="20" height="20" alt="עדכון" border="0" /></a></td>
 			<td><a href="{{s.get_employee.get_absolute_url}}">{{ s.get_employee }}</a></td>
 			<td>{{s.get_employee.employment_terms.hire_type}}</td>
-			<td>{{s.neto|default_if_none:""|commaise}}</td>
-			<td>{{s.loan_pay|commaise}}</td>
-			<td>{{s.check_amount|default_if_none:""|commaise}}</td>
+			<td>{{s.neto|default_if_none:""|intcomma}}</td>
+			<td>{{s.loan_pay|intcomma}}</td>
+			<td>{{s.check_amount|default_if_none:""|intcomma}}</td>
 			{% with s.expenses as e %}
 				<td>{{e.income_tax}}</td>
 				<td>{{e.national_insurance}}</td>
@@ -116,11 +116,11 @@
 				<td>{{e.pension_insurance}}</td>
 				<td>{{e.vacation}}</td>
 				<td>{{e.convalescence_pay}}</td>
-				<td style="background-color:#2990FF;">{{s.bruto|commaise|default_if_none:""}}</td>
+				<td style="background-color:#2990FF;">{{s.bruto|intcomma|default_if_none:""}}</td>
 				<td>{{e.employer_national_insurance}}</td>
 				<td>{{e.employer_benefit}}</td>
 				<td>{{e.compensation_allocation}}</td>
-				<td style="background-color:#2990FF;">{{s.bruto_with_employer|commaise}}</td>
+				<td style="background-color:#2990FF;">{{s.bruto_with_employer|intcomma}}</td>
 				<td>
 					{% if e.approved_date %}
 						{{e.approved_date}}

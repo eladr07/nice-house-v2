@@ -1,5 +1,5 @@
 ﻿{% extends "../base.html" %}
-{% load management_extras %}
+{% load humanize %}
 {% load static %}
 {% block header %}	
 {{ block.super }}
@@ -238,7 +238,7 @@
 								<th>סכום</th>
 								{% for pa in c.c_by_price.price_amounts.all %}
 									<tr>
-										<td>{{pa.price|commaise}} ש"ח</td>
+										<td>{{pa.price|intcomma}} ש"ח</td>
 										<td>{{pa.amount}} ש"ח</td>
 									</tr>
 								{% endfor %}

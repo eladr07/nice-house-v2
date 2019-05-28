@@ -1,5 +1,5 @@
 ﻿{% extends "../base.html" %}
-{% load management_extras %}
+{% load humanize %}
 {% block header %}
 {{ block.super }}
 <script>
@@ -89,10 +89,10 @@
 	</tr>
 	<tr class="rowSum">
 		<td colspan="5"></td>
-		<td>{{amount_mispaid|commaise}}</td>
-		<td>{{amount_unpaid|commaise}}</td>
-		<td>{{amount_nopayment|commaise}}</td>
-		<td>{{amount_noinvoice|commaise}}</td>
+		<td>{{amount_mispaid|intcomma}}</td>
+		<td>{{amount_unpaid|intcomma}}</td>
+		<td>{{amount_nopayment|intcomma}}</td>
+		<td>{{amount_noinvoice|intcomma}}</td>
 	</tr>
 </table>
 {% endblock content %}

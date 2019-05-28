@@ -1,5 +1,5 @@
 ﻿{% extends "../template.html" %}
-{% load management_extras %}
+{% load humanize %}
 {% block page %}
 <div id="content">
 	<div class="title">
@@ -32,7 +32,7 @@
 			{% for v in value_list %}
 			<tr>
 				<td></td>
-				<td>{{v.grouper|commaise}} * {{v.list|length}}</td>
+				<td>{{v.grouper|intcomma}} * {{v.list|length}}</td>
 				<td>
 				{% for scd in v.list %}
 					<a href="{{scd.sale.get_absolute_url}}" target="_parent">{{scd.sale.house.building.num}}/{{scd.sale.house.num}}</a> ,

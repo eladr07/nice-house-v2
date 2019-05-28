@@ -1,5 +1,5 @@
 ﻿{% extends "../base.html" %}
-{% load management_extras %}
+{% load humanize %}
 {% block content %}
 <div class="title">
 	<div class="pageTitle">דו"ח ניתוח וריכוז מכירות לפי תקופה</div>
@@ -67,8 +67,8 @@
 			<td>{{s.house.net_size}}</td>
 			<td>{{s.house.garden_size|default_if_none:""}}</td>
 			<td>{{s.house.perfect_size}}</td>
-			<td>{{s.price_taxed|commaise}}</td>
-			<td>{{s.price_taxed_for_perfect_size|commaise}}</td>
+			<td>{{s.price_taxed|intcomma}}</td>
+			<td>{{s.price_taxed_for_perfect_size|intcomma}}</td>
 			<td></td>
 			<td></td>
 			<td>{{s.remarks}}</td>
@@ -84,8 +84,8 @@
 		<td>{{sm.avg_net_size|floatformat:-2}}</td>
 		<td>{{sm.avg_garden_size|floatformat:-2}}</td>
 		<td>{{sm.avg_perfect_size|floatformat:-2}}</td>
-		<td>{{sm.avg_price_taxed|commaise}}</td>
-		<td>{{sm.avg_price_taxed_for_perfect_size|commaise}} ({{sm.diff_avg_price_taxed_for_perfect_size|commaise}})</td>
+		<td>{{sm.avg_price_taxed|intcomma}}</td>
+		<td>{{sm.avg_price_taxed_for_perfect_size|intcomma}} ({{sm.diff_avg_price_taxed_for_perfect_size|intcomma}})</td>
 	</tr>
 	{% endfor %}
 </table>

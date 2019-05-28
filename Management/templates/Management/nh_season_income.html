@@ -1,5 +1,5 @@
 ﻿{% extends "../base.html" %}
-{% load management_extras %}
+{% load humanize %}
 {% block header %}
 {{ block.super }}
 <script>
@@ -64,14 +64,14 @@
 			<td><a href="/nhbranch/{{nhm.nhbranch.id}}/sales/?year={{nhm.year}}&month={{nhm.month}}" target="_blank">{{nhm.nhsales.count}}</td>
 			<td>{{nhm.avg_signed_commission|floatformat:-2}}</td>
 			<td>{{nhm.avg_actual_commission|floatformat:-2}}</td>
-			<td>{{nhm.total_income|commaise}}</td>
-			<td>{{nhm.total_lawyer_pay|commaise}}</td>
-			<td>{{nhm.total_net_income|commaise}}</td>
+			<td>{{nhm.total_income|intcomma}}</td>
+			<td>{{nhm.total_lawyer_pay|intcomma}}</td>
+			<td>{{nhm.total_net_income|intcomma}}</td>
 			{% for nhe in nhm.employees %}
-			<td>{{nhe.month_total|commaise}}</td>
+			<td>{{nhe.month_total|intcomma}}</td>
 			{% endfor %}
-			<td>{{nhm.total_commission|commaise}} ({{nhm.commission_to_net_income_precentage|floatformat:-2}}%)</td>
-			<td>{{nhm.net_income_no_commission|commaise}}</td>
+			<td>{{nhm.total_commission|intcomma}} ({{nhm.commission_to_net_income_precentage|floatformat:-2}}%)</td>
+			<td>{{nhm.net_income_no_commission|intcomma}}</td>
 		</tr>
 	{% endfor %}
 	<tr class="rowSumGreen">
@@ -79,53 +79,53 @@
 		<td>{{totals.sale_count}}</td>
 		<td>{{avg.signed_commission|floatformat:-2}}</td>
 		<td>{{avg.actual_commission|floatformat:-2}}</td>
-		<td>{{totals.income|commaise}}</td>
+		<td>{{totals.income|intcomma}}</td>
 		<td></td>
-		<td>{{totals.net_income|commaise}}</td>
+		<td>{{totals.net_income|intcomma}}</td>
 		{% for nhe in employees %}
-		<td>{{nhe.season_total|commaise}}</td>
+		<td>{{nhe.season_total|intcomma}}</td>
 		{% endfor %}
 		<td></td>
-		<td>{{totals.net_income_no_commission|commaise}}</td>
+		<td>{{totals.net_income_no_commission|intcomma}}</td>
 	</tr>
 	<tr class="rowSum">
 		<td colspan="5">סה"כ ללא מע"מ</td>
-		<td>{{totals_notax.income|commaise}}</td>
+		<td>{{totals_notax.income|intcomma}}</td>
 		<td></td>
-		<td>{{totals_notax.net_income|commaise}}</td>
+		<td>{{totals_notax.net_income|intcomma}}</td>
 		{% for nhe in employees %}
-		<td>{{nhe.season_total_notax|commaise}}</td>
+		<td>{{nhe.season_total_notax|intcomma}}</td>
 		{% endfor %}
 		<td></td>
-		<td>{{totals_notax.net_income_no_commission|commaise}}</td>
+		<td>{{totals_notax.net_income_no_commission|intcomma}}</td>
 	</tr>
 	<tr class="rowSum">
 		<td colspan="5">סה"כ ללא מע"מ (ממוצע)</td>
-		<td>{{avg_notax.income|commaise}}</td>
+		<td>{{avg_notax.income|intcomma}}</td>
 		<td></td>
-		<td>{{avg_notax.net_income|commaise}}</td>
+		<td>{{avg_notax.net_income|intcomma}}</td>
 		{% for nhe in employees %}
-		<td>{{nhe.season_avg_notax|commaise}}</td>
+		<td>{{nhe.season_avg_notax|intcomma}}</td>
 		{% endfor %}	
 		<td></td>
-		<td>{{avg_notax.net_income_no_commission|commaise}}</td>
+		<td>{{avg_notax.net_income_no_commission|intcomma}}</td>
 	</tr>
 	<tr class="rowSumGreen">
 		<td colspan="8">סה"כ יצור הכנסה לפי סוכן לסניף ממוכרים ללא מע"מ</td>
 		{% for nhe in employees %}
-		<td>{{nhe.season_branch_income_sellers_notax|commaise}} ({{nhe.season_branch_income_sellers_ratio_notax|floatformat:-2}}%)</td>
+		<td>{{nhe.season_branch_income_sellers_notax|intcomma}} ({{nhe.season_branch_income_sellers_ratio_notax|floatformat:-2}}%)</td>
 		{% endfor %}		
 	</tr>
 	<tr class="rowSumGreen">
 		<td colspan="8">סה"כ יצור הכנסה לפי סוכן לסניף מקונים ללא מע"מ</td>
 		{% for nhe in employees %}
-		<td>{{nhe.season_branch_income_buyers_notax|commaise}} ({{nhe.season_branch_income_buyers_ratio_notax|floatformat:-2}}%)</td>
+		<td>{{nhe.season_branch_income_buyers_notax|intcomma}} ({{nhe.season_branch_income_buyers_ratio_notax|floatformat:-2}}%)</td>
 		{% endfor %}		
 	</tr>
 	<tr class="rowSumGreen">
 		<td colspan="8">סה"כ יצור הכנסה לפי סוכן לסניף ללא מע"מ</td>
 		{% for nhe in employees %}
-		<td>{{nhe.season_branch_income_notax|commaise}} ({{nhe.season_branch_income_ratio_notax|floatformat:-2}}%)</td>
+		<td>{{nhe.season_branch_income_notax|intcomma}} ({{nhe.season_branch_income_ratio_notax|floatformat:-2}}%)</td>
 		{% endfor %}		
 	</tr>
 </table>

@@ -1,4 +1,4 @@
-﻿{% load management_extras %}
+﻿{% load humanize %}
 {% if invoices %}
 <table class="formTable">
 	<caption>חשבוניות שהוקלדו</caption>
@@ -10,7 +10,7 @@
 	<tr>
 		<td>{{i.num}}</td>
 		<td>{{i.date}}</td>
-		<td>{{i.amount|commaise}} ש"ח</td>
+		<td>{{i.amount|intcomma}} ש"ח</td>
 		<td>{{i.remarks|default_if_none:""}}</td>
 	</tr>
 	{% endfor %}

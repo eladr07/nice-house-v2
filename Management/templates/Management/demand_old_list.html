@@ -1,7 +1,7 @@
 ﻿{% extends "../base.html" %}
 
 {% load static %}
-{% load management_extras %}
+{% load humanize %}
 
 {% block header %}
 {{ block.super }}
@@ -204,13 +204,13 @@
 			<td><a href="/projects/{{d.project.id}}">{{ d.project.name }}</a></td>
 			<td><a href="/demandsales/?demand_id={{d.id}}" class="bigfancybox">{{ d.get_sales.count|default:"אין מכירות" }}</a></td>
 			<td>{{d.sale_count}}</td>
-			<td>{% if d.get_sales.total_price_final %} {{ d.get_sales.total_price_final|commaise }} ש"ח {% else %}----{% endif %}</td>
-			<td>{% if d.sales_commission %} {{ d.sales_commission|commaise }} ש"ח {% else %}----{% endif %}</td>
-			<td style="color:#08A600;">{% if d.fixed_diff %} {{ d.fixed_diff.amount|commaise }} ש"ח {% endif %}</td>
-			<td style="color:#08A600;">{% if d.var_diff %} {{ d.var_diff.amount|commaise }} ש"ח - {{ d.var_diff.reason }} {% endif %}</td>
-			<td style="color:#08A600; width:150px;">{% if d.bonus_diff %} {{ d.bonus_diff.amount|commaise }} ש"ח - {{ d.bonus_diff.reason }} {% endif %}</td>
-			<td style="color:#D50808;">{% if d.fee_diff %} {{ d.fee_diff.amount|commaise }} ש"ח - {{ d.fee_diff.reason }} {% endif %}</td>
-			<td><b>{% if d.get_total_amount %} {{ d.get_total_amount|commaise }} ש"ח {% else %}----{% endif %}</b></td>
+			<td>{% if d.get_sales.total_price_final %} {{ d.get_sales.total_price_final|intcomma }} ש"ח {% else %}----{% endif %}</td>
+			<td>{% if d.sales_commission %} {{ d.sales_commission|intcomma }} ש"ח {% else %}----{% endif %}</td>
+			<td style="color:#08A600;">{% if d.fixed_diff %} {{ d.fixed_diff.amount|intcomma }} ש"ח {% endif %}</td>
+			<td style="color:#08A600;">{% if d.var_diff %} {{ d.var_diff.amount|intcomma }} ש"ח - {{ d.var_diff.reason }} {% endif %}</td>
+			<td style="color:#08A600; width:150px;">{% if d.bonus_diff %} {{ d.bonus_diff.amount|intcomma }} ש"ח - {{ d.bonus_diff.reason }} {% endif %}</td>
+			<td style="color:#D50808;">{% if d.fee_diff %} {{ d.fee_diff.amount|intcomma }} ש"ח - {{ d.fee_diff.reason }} {% endif %}</td>
+			<td><b>{% if d.get_total_amount %} {{ d.get_total_amount|intcomma }} ש"ח {% else %}----{% endif %}</b></td>
 			<td
 			{% if d.is_fixed %}<img src="{% static "images/update_48.png" %}" width="20" height="20"  alt="תיקון" />{% endif %}
 			</td>
@@ -229,10 +229,10 @@
 		<td colspan="4" align="center"></td>
 		<td>{{total_sales_count}} מכירות</td>
 		<td>{{demands.total_sale_count}} מכירות</td>
-		<td>{{total_sales_amount|commaise}} ש"ח</td>
-		<td>{{demands.total_sales_commission|commaise}} ש"ח</td>
+		<td>{{total_sales_amount|intcomma}} ש"ח</td>
+		<td>{{demands.total_sales_commission|intcomma}} ש"ח</td>
 		<td colspan="4"></td>
-		<td colspan="2">{{total_amount|commaise}} ש"ח</td>
+		<td colspan="2">{{total_amount|intcomma}} ש"ח</td>
 	</tr>
 </table>
 {% endblock content %}

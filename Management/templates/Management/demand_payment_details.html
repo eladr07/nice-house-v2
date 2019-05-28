@@ -1,4 +1,4 @@
-﻿{% load management_extras %}
+﻿{% load humanize %}
 {% if payments %}
 <table class="formTable">
 	<caption>צ'קים שהוקלדו</caption>
@@ -14,7 +14,7 @@
 		<td>{{p.support_num}}</td>
 		<td>{{p.payment_type}}</td>
 		<td>{{p.payment_date}}</td>
-		<td>{{p.amount|commaise}} ש"ח</td>
+		<td>{{p.amount|intcomma}} ש"ח</td>
 		<td>{{p.remarks|default_if_none:""}}</td>
 	</tr>
 	{% endfor %}

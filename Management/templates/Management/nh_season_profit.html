@@ -1,5 +1,5 @@
 ﻿{% extends "../base.html" %}
-{% load management_extras %}
+{% load humanize %}
 {% block header %}
 {{ block.super }}
 <script>
@@ -62,28 +62,28 @@
 			<td>{{month.nhmonth.month}}/{{month.nhmonth.year}}</a></td>
 			<td>{{month.nhmonth.nhbranch}}</td>
 			<td><a target="_blank" href="/nhbranch/{{month.nhmonth.nhbranch.id}}/sales/?year={{month.nhmonth.year}}&month={{month.nhmonth.month}}">{{month.sales_count}}</a></td>
-			<td>{{month.sales_worth_no_tax|commaise}}</td>
-			<td>{{month.income_no_tax|commaise}}</td>
-			<td>{{month.lawyers_pay|commaise}}</td>
-			<td>{{month.net_income_no_tax|commaise}}</td>
+			<td>{{month.sales_worth_no_tax|intcomma}}</td>
+			<td>{{month.income_no_tax|intcomma}}</td>
+			<td>{{month.lawyers_pay|intcomma}}</td>
+			<td>{{month.net_income_no_tax|intcomma}}</td>
 			<td>{{month.relative_net_income|floatformat:-2}}</td>
-			<td><a target="_blank" href="/nhemployeesalaries/?year={{month.nhmonth.year}}&month={{month.nhmonth.month}}">{{month.salary_expenses|commaise}}</a></td>
+			<td><a target="_blank" href="/nhemployeesalaries/?year={{month.nhmonth.year}}&month={{month.nhmonth.month}}">{{month.salary_expenses|intcomma}}</a></td>
 			<td></td>
-			<td>{{month.profit|commaise}}</td>
+			<td>{{month.profit|intcomma}}</td>
 			<td>{{month.relative_profit|floatformat:-2}}</td>
 			<td></td>
 		</tr>
 	{% endfor %}
 	<tr class="rowSum">
 		<td colspan="3">סה"כ</td>
-		<td>{{totals.sales_worth_no_tax|commaise}}</td>
-		<td>{{totals.income_no_tax|commaise}}</td>
-		<td>{{totals.lawyers_pay|commaise}}</td>
-		<td>{{totals.net_income_no_tax|commaise}}</td>
+		<td>{{totals.sales_worth_no_tax|intcomma}}</td>
+		<td>{{totals.income_no_tax|intcomma}}</td>
+		<td>{{totals.lawyers_pay|intcomma}}</td>
+		<td>{{totals.net_income_no_tax|intcomma}}</td>
 		<td></td>
-		<td>{{totals.salary_expenses|commaise}}</td>
+		<td>{{totals.salary_expenses|intcomma}}</td>
 		<td></td>
-		<td>{{totals.profit|commaise}}</td>
+		<td>{{totals.profit|intcomma}}</td>
 	</tr>
 </table>
 {% endblock content %}

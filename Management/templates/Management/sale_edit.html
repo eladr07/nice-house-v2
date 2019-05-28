@@ -1,7 +1,7 @@
 ﻿{% extends "../base.html" %}
 
 {% load static %}
-{% load management_extras %}
+{% load humanize %}
 
 {% block header %}
 {{ block.super }}
@@ -349,9 +349,9 @@
 			<ul>
 				{% if s.salepricemod %}
 					<li>המחיר שונה מ- 
-					{{s.salepricemod.old_price|commaise}} 
+					{{s.salepricemod.old_price|intcomma}} 
 					ל - 
-					<b>{{s.price|commaise}}</b>. 
+					<b>{{s.price|intcomma}}</b>. 
 					<a href="{{ s.salepricemod.get_absolute_url }}">פרטים</a>
 					</li>
 				{% endif %}
@@ -383,7 +383,7 @@
 				{% endif %}
 				{% if s.salecancel %}
 					<li>המכירה בוטלה. הקיזוז מהדרישה - 
-					<b>{{s.cancel.fee|commaise}}</b>
+					<b>{{s.cancel.fee|intcomma}}</b>
 					<a href="{{ s.salecancel.get_absolute_url }}">פרטים</a>
 					</li>			
 				{% endif %}

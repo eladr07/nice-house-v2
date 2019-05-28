@@ -1,5 +1,5 @@
 ﻿{% extends "../base.html" %}
-{% load management_extras %}
+{% load humanize %}
 {% block header %}
 {{ block.super }}
 <script>
@@ -99,35 +99,35 @@ $(document).ready(function() {
 				<td>{{ss.sale_type}}</td>
 				<td>{{ss.signed_commission|floatformat:-2}}%</td>
 				<td>{{ss.actual_commission|floatformat:-2}}%</td>
-				<td>{{ss.income|commaise}}</td>
+				<td>{{ss.income|intcomma}}</td>
 				<td>{{ss.signing_advisor}}</td>
 				<td>
 					{% for p in ss.lawyer1_pays %}
-						<a href="{{p.lawyer.get_absolute_url}}" class="fancybox">{{p.lawyer}} - {{p.amount|commaise}}</a><br>
+						<a href="{{p.lawyer.get_absolute_url}}" class="fancybox">{{p.lawyer}} - {{p.amount|intcomma}}</a><br>
 					{% endfor %}
 					{% for p in ss.lawyer2_pays %}
-						<a href="{{p.lawyer.get_absolute_url}}" class="fancybox">{{p.lawyer}} - {{p.amount|commaise}}</a><br>
+						<a href="{{p.lawyer.get_absolute_url}}" class="fancybox">{{p.lawyer}} - {{p.amount|intcomma}}</a><br>
 					{% endfor %}
 				</td>
-				<td>{{ss.net_income|commaise}}</td>
+				<td>{{ss.net_income|intcomma}}</td>
 				<td></td>
 				<td>{{ss.temp_receipt_num}}</td>
 				<td>{{ss.invoices.all.0.num}}</td>
 				{% for nhe in employees %}
 				<td>
 					{% if nhe == ss.employee1 %}
-						{{ss.employee1_pay|commaise}}<br>{{ss.employee1_commission}}%
+						{{ss.employee1_pay|intcomma}}<br>{{ss.employee1_commission}}%
 					{% endif %}
 					{% if nhe == ss.employee2 %}
-						{{ss.employee2_pay|commaise}}<br>{{ss.employee2_commission}}%
+						{{ss.employee2_pay|intcomma}}<br>{{ss.employee2_commission}}%
 					{% endif %}
 					{% if nhe == ss.director %}
-						{{ss.director_pay|commaise}}<br>{{ss.director_commission}}%
+						{{ss.director_pay|intcomma}}<br>{{ss.director_commission}}%
 					{% endif %}
 				</td>
 				{% endfor %}
 				<td>
-					{{ss.all_employee_commission|commaise}}<br>{{ss.all_employee_commission_precentage}}%
+					{{ss.all_employee_commission|intcomma}}<br>{{ss.all_employee_commission_precentage}}%
 				</td>
 				{% if forloop.first %}
 					</tr>
@@ -139,12 +139,12 @@ $(document).ready(function() {
 		<td colspan="4"></td>
 		<td>{{nhmonth.avg_signed_commission|floatformat:-2}}</td>
 		<td>{{nhmonth.avg_actual_commission|floatformat:-2}}</td>
-		<td>{{nhmonth.total_net_income|commaise}}</td>
+		<td>{{nhmonth.total_net_income|intcomma}}</td>
 		<td colspan="6"></td>
 		{% for e in employees %}
-			<td>{{e.month_total|commaise}}</td>
+			<td>{{e.month_total|intcomma}}</td>
 		{% endfor %}
-		<td>{{nhmonth.total_commission|commaise}}</td>
+		<td>{{nhmonth.total_commission|intcomma}}</td>
 	</tr>
 </table>
 {% endblock content %}

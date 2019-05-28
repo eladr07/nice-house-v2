@@ -1,5 +1,5 @@
 ﻿{% extends "../base.html" %}
-{% load management_extras %}
+{% load humanize %}
 {% block header %}
 {{ block.super }}
 <script>
@@ -82,7 +82,7 @@
 			<td>{{ s.clients }}</td>
 			<td>{{ s.house.building.num }}</td>
 			<td>{{ s.house.num }}</td>
-			<td>{{ s.price|commaise }}</td>
+			<td>{{ s.price|intcomma }}</td>
 			<td>{{ s.sale_date }}</td>
 			<td>{{ s.house.get_sale.sale_date }}</td>
 			<td>{{ s.cancel.date }}</td>

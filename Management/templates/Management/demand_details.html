@@ -1,8 +1,8 @@
-﻿{% load management_extras %}
+﻿{% load humanize %}
 <table class="formTable">
 	<caption>פרטי הדרישה</caption>
 	<tr>
 		<th>סכום הדרישה</th>
-		<td>{{demand.get_total_amount|commaise}} ש"ח</td>
+		<td>{{demand.get_total_amount|intcomma}} ש"ח</td>
 	</tr>
 </table>

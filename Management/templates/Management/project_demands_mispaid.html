@@ -1,6 +1,6 @@
 ﻿{% extends "../template.html" %}
 {% load static %}
-{% load management_extras %}
+{% load humanize %}
 {% block page %}
 <div id="content">
 	<div class="title">
@@ -33,20 +33,20 @@
 				</td>
 				<td>{{ d.month }}/{{ d.year }}</td>
 				<td><a href="/demandsales/?demand_id={{d.id}}">{{d.get_sales.count}}</a></td>
-				<td>{{ d.get_sales_amount|commaise }} ש"ח</td>
-				<td>{{ d.get_total_amount|commaise }} ש"ח</td>
+				<td>{{ d.get_sales_amount|intcomma }} ש"ח</td>
+				<td>{{ d.get_total_amount|intcomma }} ש"ח</td>
 				<td>
 				{% for i in d.invoices.all %}
-					<a href="/invoices/{{i.id}}" target="_blank">{{i.amount|commaise}}</a><br>
+					<a href="/invoices/{{i.id}}" target="_blank">{{i.amount|intcomma}}</a><br>
 				{% endfor %}
 				</td>
 				<td>
 				{% for p in d.payments.all %}
-					<a href="/payments/{{p.id}}" target="_blank">{{p.amount|commaise}}</a><br>
+					<a href="/payments/{{p.id}}" target="_blank">{{p.amount|intcomma}}</a><br>
 				{% endfor %}
 				</td>
-				<td>{{d.diff_invoice_payment|commaise}}</td>
-				<td>{{d.diff_invoice|commaise}}</td>
+				<td>{{d.diff_invoice_payment|intcomma}}</td>
+				<td>{{d.diff_invoice|intcomma}}</td>
 				<td>
 				{% if d.is_fixed %}
 				<img src="{% static "images/update_48.png" %}" width="20" height="20"  alt="תיקון" />

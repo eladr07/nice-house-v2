@@ -1,5 +1,5 @@
 ﻿{% extends "../base.html" %}
-{% load management_extras %}
+{% load humanize %}
 {% block header %}	
 {{ block.super }}
 <script>
@@ -113,7 +113,7 @@
 					</th>
 					<th>{{signup.clients}}</th>
 					<td>{{signup.house}}/{{signup.house.building}}</td>
-					<td>{{signup.price|commaise}}</td>
+					<td>{{signup.price|intcomma}}</td>
 					<td>{{signup.date|date:"j/m/y"}}</td>
 					<td>{{signup.sale_date|date:"j/m/y"}}</td>
 					<td><a href="{{signup.get_absolute_url}}/cancel" class="fancybox">בטל</a></td>
@@ -143,7 +143,7 @@
 					</th>
 					<th>{{signup.clients}}</th>
 					<td>{{signup.house}}/{{signup.house.building}}</td>
-					<td>{{signup.price|commaise}}</td>
+					<td>{{signup.price|intcomma}}</td>
 					<td>{{signup.cancel.date|date:"j/m/y"}}</td>
 					<td>{{signup.cancel.reason}}</td>
 				</tr>
@@ -169,7 +169,7 @@
 					</th>
 					<th>{{sale.clients}}</th>
 					<td>{{sale.house}}/{{signup.house.building}}</td>
-					<td>{{sale.price|commaise}}</td>
+					<td>{{sale.price|intcomma}}</td>
 					<td>{{sale.date|date:"j/m/y"}}</td>
 				</tr>
 			{% endfor %}
@@ -198,7 +198,7 @@
 					</th>
 					<th>{{saleprocess.clients}}</th>
 					<td>{{saleprocess.house}}/{{signup.house.building}}</td>
-					<td>{{saleprocess.price|commaise}}</td>
+					<td>{{saleprocess.price|intcomma}}</td>
 					<td>{{saleprocess.objection}}</td>
 					<td>{{saleprocess.remarks}}</td>
 				</tr>

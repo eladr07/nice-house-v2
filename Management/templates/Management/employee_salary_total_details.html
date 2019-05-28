@@ -1,5 +1,5 @@
 ﻿{% extends "../template.html" %}
-{% load management_extras %}
+{% load humanize %}
 {% block page %}
 <div id="content">
 	<div class="title">
@@ -9,16 +9,16 @@
 	<table id="sales_table" class="formTable">
 		<tr>
 			<th>בסיס</th>
-			<td>{{salary.base|commaise}}</td>
+			<td>{{salary.base|intcomma}}</td>
 		</tr>
 		<tr>
 			<th>עמלות</th>
-			<td>{{salary.commissions|commaise}}</td>
+			<td>{{salary.commissions|intcomma}}</td>
 		</tr>
 		{% if salary.admin_commission %}
 		<tr>
 			<th>עמלת ניהול</th>
-			<td>{{salary.admin_commission|commaise}}</td>
+			<td>{{salary.admin_commission|intcomma}}</td>
 		</tr>
 		{% endif %}
 		<tr>
@@ -35,7 +35,7 @@
 		</tr>
 		<tr>
 			<th>סה"כ</th>
-			<td>{{salary.total_amount|commaise}}</td>
+			<td>{{salary.total_amount|intcomma}}</td>
 		</tr>
 	</table>
 </div>

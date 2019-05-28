@@ -1,5 +1,5 @@
 ﻿{% extends "../base.html" %}
-{% load management_extras %}
+{% load humanize %}
 {% block header %}
 {{ block.super }}
 <script>
@@ -128,7 +128,7 @@
 			</td>
 			<td>{{ d.month }}/{{d.year}}</td>
 			<td><a href="/demandsales/?demand_id={{d.id}}" class="bigfancybox">{{ d.get_sales.count|default:"אין מכירות" }}</a></td>
-			<td><b>{% if d.get_total_amount %} {{ d.get_total_amount|commaise }} ש"ח {% else %}----{% endif %}</b></td>
+			<td><b>{% if d.get_total_amount %} {{ d.get_total_amount|intcomma }} ש"ח {% else %}----{% endif %}</b></td>
 			<td>
 				{% for i in d.invoices.all %}
 					{{i.num}}<br>
@@ -136,7 +136,7 @@
 			</td>
 			<td>
 				{% for i in d.invoices.all %}
-					<a href="/demandinvoice/{{i.id}}">{{i.amount|commaise}}</a><br>
+					<a href="/demandinvoice/{{i.id}}">{{i.amount|intcomma}}</a><br>
 				{% endfor %}
 			</td>
 			<td>
@@ -146,7 +146,7 @@
 			</td>
 			<td>
 				{% for p in d.payments.all %}
-					<a href="/demandpayment/{{p.id}}">{{p.amount|commaise}}</a><br>
+					<a href="/demandpayment/{{p.id}}">{{p.amount|intcomma}}</a><br>
 				{% endfor %}
 			</td>
 			<td>
@@ -154,13 +154,13 @@
 					{{p.payment_date|date:"j/m/y"}}<br>
 				{% endfor %}
 			</td>
-			<td>{{d.diff_invoice|commaise}}</td>
-			<td>{{d.diff_invoice_payment|commaise}}</td>
+			<td>{{d.diff_invoice|intcomma}}</td>
+			<td>{{d.diff_invoice_payment|intcomma}}</td>
 			<td>
 				{% for i in d.invoices.all %}
 					{% if i.offset %}
 						<a href="{{i.offset.get_absolute_url}}" class="fancybox">
-							{{i.offset.amount|commaise}}
+							{{i.offset.amount|intcomma}}
 						</a>
 					{% endif %}
 				{% endfor %}
@@ -188,14 +188,14 @@
 	{% endfor %}
 	<tr height="30px" class="rowSum">
 		<td colspan="4" align="center">סיכום</td>
-		<td>{{total_amount|commaise}} ש"ח</td>
+		<td>{{total_amount|intcomma}} ש"ח</td>
 		<td></td>
-		<td>{{total_invoices|commaise}}</td>
+		<td>{{total_invoices|intcomma}}</td>
 		<td></td>
-		<td>{{total_payments|commaise}}</td>
+		<td>{{total_payments|intcomma}}</td>
 		<td></td>
-		<td>{{total_diff_invoice|commaise}}</td>
-		<td>{{total_diff_invoice_payment|commaise}}</td>
+		<td>{{total_diff_invoice|intcomma}}</td>
+		<td>{{total_diff_invoice_payment|intcomma}}</td>
 	</tr>
 </table>
 {% endblock content %}

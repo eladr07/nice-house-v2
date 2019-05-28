@@ -1,6 +1,6 @@
 ﻿{% extends "../base.html" %}
 {% load static %}
-{% load management_extras %}
+{% load humanize %}
 {% block header %}
 {{ block.super }}
 <script>
@@ -182,7 +182,7 @@
 			<td>{% if h.garden_size %}{{h.garden_size}} מ"ר{% endif %}</td>
 			<td>
 				{% if h.price %}
-					<a href="../house/{{h.id}}/type{{type.id}}/versionlog" class="fancybox">{{h.price|commaise}} ש"ח</a>
+					<a href="../house/{{h.id}}/type{{type.id}}/versionlog" class="fancybox">{{h.price|intcomma}} ש"ח</a>
 				{% endif %}
 			</td>
 			<td>

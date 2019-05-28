@@ -1,7 +1,7 @@
 ﻿{% extends "../base.html" %}
 
 {% load static %}
-{% load management_extras %}
+{% load humanize %}
 
 {% block content %}
 {% if demand.id %}
@@ -73,11 +73,11 @@
 	<table class="formTable">
 		<tr>
 			<th>עמלה בגין מכירות</th>
-			<td>{{demand.sales_commission|commaise}} ש"ח</td>
+			<td>{{demand.sales_commission|intcomma}} ש"ח</td>
 		</tr>
 		<tr>
 			<th>סה"כ תשלום לחברה</th>
-			<td>{{demand.get_total_amount|commaise}} ש"ח</td>
+			<td>{{demand.get_total_amount|intcomma}} ש"ח</td>
 		</tr>
 	</table>
 	<fieldset class="cardFieldset" >
@@ -97,9 +97,9 @@
 				<li>המחיר עבור מכירה מס'
 				<a href="/sale/{{s.id}}">{{s.id}}</a>
 				שונה מ- 
-				{{s.salepricemod.old_price|commaise}} 
+				{{s.salepricemod.old_price|intcomma}} 
 				ל - 
-				<b>{{s.price|commaise}}</b>. 
+				<b>{{s.price|intcomma}}</b>. 
 				<a href="{{ s.salepricemod.get_absolute_url }}">פרטים</a>
 				</li>
 			{% endfor %}
@@ -151,14 +151,14 @@
 			- בתאריך
 			<b>{{i.date|date:"j/m/y"}}</b>
 			על סך
-			<b>{{i.amount|commaise}} ש"ח</b>  				
+			<b>{{i.amount|intcomma}} ש"ח</b>  				
 			<a href="/demandinvoice/{{i.id}}" ><img src="{% static "images/edit_48.png" %}" width="20" height="20" border="0" alt="עריכה" /></a>
 			<a href="/invoices/{{i.id}}/del"><img src="{% static "images/delete_48.png" %}" width="20" height="20" border="0" alt="מחיקה" /></a>
 			{% if i.offset %}
 				בתאריך 
 				{{i.offset.date|date:"j/m/y"}}
 				זיכוי על סך של 
-				{{i.offset.amount|commaise}} ש"ח
+				{{i.offset.amount|intcomma}} ש"ח
 				בגלל 
 				{{i.offset.reason}} 
 				<a href="{{i.offset.get_absolute_url}}" class="fancybox"><img src="{% static "images/edit_48.png" %}" width="20" height="20" border="0" alt="עריכה" /></a>
@@ -177,7 +177,7 @@
 			- לתאריך
 			<b>{{p.payment_date|date:"j/m/y"}}</b>
 			על סך
-			<b>{{p.amount|commaise}} ש"ח</b>  				
+			<b>{{p.amount|intcomma}} ש"ח</b>  				
 			<a href="/demandpayment/{{p.id}}" ><img src="{% static "images/edit_48.png" %}" width="20" height="20" border="0" alt="עריכה" /></a>
 			<a href="/payments/{{p.id}}/del"><img src="{% static "images/delete_48.png" %}" width="20" height="20" border="0" alt="מחיקה" /></a>
 			<br>

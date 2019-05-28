@@ -1,5 +1,5 @@
 ﻿{% extends "../base.html" %}
-{% load management_extras %}
+{% load humanize %}
 {% block content %}
 <div class="title">
 	<div class="pageTitle">דוח רווח והפסד לחטיבה ללא מע"מ</div>
@@ -47,7 +47,7 @@
 							{%endif%}
 						</td>
 						<td>{{ incomeRow.name }}</td>
-						<td>{{ incomeRow.amount|commaise }}</td>
+						<td>{{ incomeRow.amount|intcomma }}</td>
 						<td>{{ incomeRow.relative|floatformat:-2 }}</td>
 					</tr>
 				{% endfor %}
@@ -68,28 +68,28 @@
 							{%endif%}
 						</td>
 						<td>{{ lossRow.name }}</td>
-						<td>{{ lossRow.amount|commaise }}</td>
+						<td>{{ lossRow.amount|intcomma }}</td>
 						<td>{{ lossRow.relative|floatformat:-2 }}</td>
 					</tr>
 				{% endfor %}
 			</table>
 		</div>
 		<div class="clearBoth"></div>
-		<h4 style="text-align:center; background-color:#96F2A4;">רווח - {{row.profit|commaise}} ש"ח</h4>
+		<h4 style="text-align:center; background-color:#96F2A4;">רווח - {{row.profit|intcomma}} ש"ח</h4>
 		<br>
 	{% endfor %}
 	<table class="formTable" border="1">
 		<tr>
 			<th>סה"כ הכנסות</th>
-			<td>{{global_income|commaise}}</td>
+			<td>{{global_income|intcomma}}</td>
 		</tr>
 		<tr>
 			<th>סה"כ הוצאות</th>
-			<td>{{global_loss|commaise}}</td>
+			<td>{{global_loss|intcomma}}</td>
 		</tr>
 		<tr>
 			<th>סה"כ רווח</th>
-			<td>{{global_profit|commaise}}</td>
+			<td>{{global_profit|intcomma}}</td>
 		</tr>
 	</table>
 {% endblock content %}

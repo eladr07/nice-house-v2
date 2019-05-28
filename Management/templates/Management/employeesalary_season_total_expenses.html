@@ -1,5 +1,5 @@
 ﻿{% extends "../base.html" %}
-{% load management_extras %}
+{% load humanize %}
 {% block header %}
 {{ block.super }}
 <script>
@@ -75,20 +75,20 @@
 				</a>
 			</td>
 			<td><a href="{{employee.get_absolute_url}}" target="_blank">{{ employee }}</a></td>			
-			<td>{{ employee.total_neto|commaise }}</td>
-			<td>{{ employee.total_loan_pay|commaise }}</td>
-			<td>{{ employee.total_check_amount|commaise }}</td>
-			<td>{{ employee.total_income_tax|commaise }}</td>
-			<td>{{ employee.total_national_insurance|commaise }}</td>
-			<td>{{ employee.total_health|commaise }}</td>
-			<td>{{ employee.total_pension_insurance|commaise }}</td>
-			<td>{{ employee.total_vacation|commaise }}</td>
-			<td>{{ employee.total_convalescence_pay|commaise }}</td>
-			<td>{{ employee.total_bruto|commaise }}</td>
-			<td>{{ employee.total_employer_national_insurance|commaise }}</td>
-			<td>{{ employee.total_employer_benefit|commaise }}</td>
-			<td>{{ employee.total_compensation_allocation|commaise }}</td>
-			<td>{{ employee.total_bruto_with_employer|commaise }}</td>
+			<td>{{ employee.total_neto|intcomma }}</td>
+			<td>{{ employee.total_loan_pay|intcomma }}</td>
+			<td>{{ employee.total_check_amount|intcomma }}</td>
+			<td>{{ employee.total_income_tax|intcomma }}</td>
+			<td>{{ employee.total_national_insurance|intcomma }}</td>
+			<td>{{ employee.total_health|intcomma }}</td>
+			<td>{{ employee.total_pension_insurance|intcomma }}</td>
+			<td>{{ employee.total_vacation|intcomma }}</td>
+			<td>{{ employee.total_convalescence_pay|intcomma }}</td>
+			<td>{{ employee.total_bruto|intcomma }}</td>
+			<td>{{ employee.total_employer_national_insurance|intcomma }}</td>
+			<td>{{ employee.total_employer_benefit|intcomma }}</td>
+			<td>{{ employee.total_compensation_allocation|intcomma }}</td>
+			<td>{{ employee.total_bruto_with_employer|intcomma }}</td>
 			<td></td>
 			<td></td>
 		</tr>

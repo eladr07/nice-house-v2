@@ -1,5 +1,5 @@
 ﻿{% extends "../base.html" %}
-{% load management_extras %}
+{% load humanize %}
 {% block header %}
 {{ block.super }}
 <script>
@@ -91,21 +91,21 @@
 			<td>{{ p.end_date|default_if_none:"" }}</td>
 			<td>{{ p.total_sale_count }}</td>
 			<td>{{ p.avg_sale_count|floatformat:-2 }}</td>
-			<td>{{p.total_amount|commaise}}</td>
-			<td style="color:A90000;">{{p.total_amount_notax|commaise}}</td>
+			<td>{{p.total_amount|intcomma}}</td>
+			<td style="color:A90000;">{{p.total_amount_notax|intcomma}}</td>
 		</tr>
 	{% endfor %}
 	<tr height="30px" class="rowSum">
 		<td colspan="7" align="center">סיכום</td>
 		<td>{{total_sale_count}}</td>
-		<td>{{total_amount|commaise}} ש"ח</td>
-		<td>{{total_amount_notax|commaise}} ש"ח</td>
+		<td>{{total_amount|intcomma}} ש"ח</td>
+		<td>{{total_amount_notax|intcomma}} ש"ח</td>
 	</tr>
 	<tr height="30px" class="rowSum">
 		<td colspan="7" align="center">ממוצע לחודש</td>
 		<td>{{avg_sale_count|floatformat:-2}}</td>
-		<td>{{avg_amount|commaise}} ש"ח</td>
-		<td>{{avg_amount_notax|commaise}} ש"ח</td>
+		<td>{{avg_amount|intcomma}} ש"ח</td>
+		<td>{{avg_amount_notax|intcomma}} ש"ח</td>
 	</tr>
 </table>
 {% endblock content %}

@@ -1,5 +1,5 @@
 ﻿{% extends "./template.html" %}
-{% load management_extras %}
+{% load humanize %}
 {% block page %}
 <div id="content">
 	<div class="title">
@@ -27,14 +27,14 @@
 				<td>{{o.month}}/{{o.year}}</td>
 				{% if o.pay_num %}
 					<td>הלוואה</td>
-					<td>{{o.amount|commaise}}</td>
+					<td>{{o.amount|intcomma}}</td>
 					<td></td>
 				{% else %}
 					<td>קיזוז</td>
 					<td></td>
-					<td>{{o.amount|commaise}}</td>
+					<td>{{o.amount|intcomma}}</td>
 				{% endif %}
-				<td>{{o.left|commaise}} ש"ח</td>
+				<td>{{o.left|intcomma}} ש"ח</td>
 				<td>{% if o.deduct_from_salary %} {{o.deduct_from_salary|yesno}} {% endif %}</td>
 				<td>{{o.remarks|default_if_none:""}}</td>
 			</tr>

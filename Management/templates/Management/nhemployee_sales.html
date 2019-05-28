@@ -1,5 +1,5 @@
 ﻿{% extends "./template.html" %}
-{% load management_extras %}
+{% load humanize %}
 {% block page %}
 <div id="content">
 	<div class="title">
@@ -29,7 +29,7 @@
 				<td><a target="_parent" href="/buildings/{{b.id}}/pricelist/type1">{{sale.house.building.num}}</a></td>
 				<td><a target="_parent" href="/buildings/{{b.id}}/house/{{sale.house.id}}/type1">{{sale.house.num}}</a></td>
 				{% endwith %}
-				<td>{{sale.price|commaise}}</td>
+				<td>{{sale.price|intcomma}}</td>
 				<td>{{sale.price_include_lawyer|yesno:"כולל, לא כולל"}}</td>
 			</tr>
 		{% endfor %}
