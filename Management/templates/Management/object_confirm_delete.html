@@ -1,0 +1,20 @@
+﻿{% extends "../template.html" %}
+{% load static %}
+{% block header %}
+<script>
+	$(document).ready(function() {		
+		$("input[type!='submit']").attr("class", "inputText");
+		$("input[type='submit']").click(function (event) {
+			parent.$("#fancy_close").click(function(event) {
+					parent.location.reload();
+				});	
+			});
+	});
+</script>
+{% endblock header %}
+{% block page %}
+<form method="post">{% csrf_token %}
+    <p>Are you sure you want to delete "{{ object }}"?</p>
+    <input type="submit" value="Confirm">
+</form>
+{% endblock page %}

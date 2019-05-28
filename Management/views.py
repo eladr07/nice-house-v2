@@ -11,7 +11,7 @@ from django.forms.models import inlineformset_factory, modelformset_factory, mod
 from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.contrib.auth.decorators import login_required, permission_required
@@ -282,6 +282,32 @@ def employeecheck_list(request):
 
     return render(request, 'Management/employeecheck_list.html', context)
 
+### Advance Payment Views ###
+
+class AdvancePaymentListView(LoginRequiredMixin, ListView):
+    model = AdvancePayment
+
+    def get_queryset(self):
+        return AdvancePayment.objects.filter(is_paid=None)
+
+class AdvancePaymentCreate(PermissionRequiredMixin, CreateView):
+    model = AdvancePayment
+    form_class = AdvancePaymentForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.add_advancepayments'
+
+class AdvancePaymentUpdate(PermissionRequiredMixin, UpdateView):
+    model = AdvancePayment
+    form_class = AdvancePaymentForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.change_advancepayments'
+
+class AdvancePaymentDelete(PermissionRequiredMixin, DeleteView):
+    model = AdvancePayment
+    success_url = '/advancepayments'
+    template_name = 'Management/object_confirm_delete.html'
+    permission_required = 'Management.delete_advancepayments'
+
 @permission_required('Management.delete_advancepayment')
 def advance_payment_toloan(request, id):
     ap = AdvancePayment.objects.get(pk=id)
@@ -294,6 +320,137 @@ def advance_payment_toloan(request, id):
         form = LoanForm(initial={'employee':ap.employee.id, 'amount':ap.amount, 'year':ap.date.year, 'month':ap.date.month})
    
     return render(request, 'Management/object_edit.html', {'form':form})
+
+### Loan Views ###
+
+class LoanListView(PermissionRequiredMixin, ListView):
+    model = Loan
+    permission_required = 'Management.list_loan'
+
+    def get_queryset(self):
+        return Loan.objects.all()
+
+class LoanCreate(PermissionRequiredMixin, CreateView):
+    model = Loan
+    form_class = LoanForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.add_loan'
+
+class LoanUpdate(PermissionRequiredMixin, UpdateView):
+    model = Loan
+    form_class = LoanForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.change_loan'
+
+class LoanDelete(PermissionRequiredMixin, DeleteView):
+    model = Loan
+    success_url = '/loans'
+    template_name = 'Management/object_confirm_delete.html'
+    permission_required = 'Management.delete_loan'
+
+### Lawer Views ###
+
+class LawyerListView(LoginRequiredMixin, ListView):
+    model = Lawyer
+
+    def get_queryset(self):
+        return Lawyer.objects.all()
+
+class LawyerCreate(PermissionRequiredMixin, CreateView):
+    model = Lawyer
+    fields = ('first_name','last_name','cell_phone','mail','address','role','phone')
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.add_lawyer'
+
+class LawyerUpdate(PermissionRequiredMixin, UpdateView):
+    model = Lawyer
+    fields = ('first_name','last_name','cell_phone','mail','address','role','phone')
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.change_lawyer'
+
+class LawyerDelete(PermissionRequiredMixin, DeleteView):
+    model = Lawyer
+    success_url = '/lawyers'
+    template_name = 'Management/object_confirm_delete.html'
+    permission_required = 'Management.delete_lawyer'
+
+### Madad BI Views ###
+
+class MadadBIListView(LoginRequiredMixin, ListView):
+    model = MadadBI
+
+    def get_queryset(self):
+        return MadadBI.objects.all()
+
+class MadadBICreate(PermissionRequiredMixin, CreateView):
+    model = MadadBI
+    form_class = MadadBIForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.add_madadbi'
+
+class MadadBIUpdate(PermissionRequiredMixin, UpdateView):
+    model = MadadBI
+    form_class = MadadBIForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.change_madadbi'
+
+class MadadBIDelete(PermissionRequiredMixin, DeleteView):
+    model = MadadBI
+    success_url = '/madadbi'
+    template_name = 'Management/object_confirm_delete.html'
+    permission_required = 'Management.delete_madadbi'
+
+### Madad CP Views ###
+
+class MadadCPListView(LoginRequiredMixin, ListView):
+    model = MadadCP
+
+    def get_queryset(self):
+        return MadadCP.objects.all()
+
+class MadadCPCreate(PermissionRequiredMixin, CreateView):
+    model = MadadCP
+    form_class = MadadCPForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.add_madadcp'
+
+class MadadCPUpdate(PermissionRequiredMixin, UpdateView):
+    model = MadadCP
+    form_class = MadadCPForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.change_madadcp'
+
+class MadadCPDelete(PermissionRequiredMixin, DeleteView):
+    model = MadadCP
+    success_url = '/madadcp'
+    template_name = 'Management/object_confirm_delete.html'
+    permission_required = 'Management.delete_madadcp'
+
+### Tax Views ###
+
+class TaxListView(LoginRequiredMixin, ListView):
+    model = Tax
+
+    def get_queryset(self):
+        return Tax.objects.all()
+
+class TaxCreate(PermissionRequiredMixin, CreateView):
+    model = Tax
+    form_class = TaxForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.add_tax'
+
+class TaxUpdate(PermissionRequiredMixin, UpdateView):
+    model = Tax
+    form_class = TaxForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.change_tax'
+
+class TaxDelete(PermissionRequiredMixin, DeleteView):
+    model = Tax
+    success_url = '/tax'
+    template_name = 'Management/object_confirm_delete.html'
+    permission_required = 'Management.delete_tax'
 
 @permission_required('Management.list_check')
 def check_list(request):
@@ -397,6 +554,12 @@ def check_edit(request, id):
     return render(request, 'Management/check_edit.html', 
                               { 'accountForm':accountForm, 'form':form,'title':u"הזנת צ'ק אחר" },
                               )
+
+class PaymentCheckDelete(PermissionRequiredMixin, DeleteView):
+    model = PaymentCheck
+    success_url = '/checks'
+    template_name = 'Management/object_confirm_delete.html'
+    permission_required = 'Management.delete_paymentcheck'
 
 def apply_employee_check(ec):
     if ec.purpose_type.id == PurposeType.AdvancePayment:
@@ -906,6 +1069,12 @@ def salaries_bank(request):
     return render(request, 'Management/salaries_bank.html', 
                               {'salaries':salaries,'filterForm':form, 'month':datetime(year, month, 1)},
                                )  
+
+class EmployeeSalaryUpdate(PermissionRequiredMixin, UpdateView):
+    model = EmployeeSalary
+    form_class = EmployeeSalaryForm
+    template_name = 'Management/employee_salary_edit.html'
+    permission_required = 'Management.change_employeesalary'
 
 def employee_salary_pdf(request, year, month):
     filename = common.generate_unique_media_filename('pdf')

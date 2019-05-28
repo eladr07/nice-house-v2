@@ -818,6 +818,7 @@ class AdvancePayment(models.Model):
     amount = models.IntegerField(gettext('amount'))
     date_paid = models.DateField(editable=False, null=True)
     is_paid = models.NullBooleanField(editable=False)
+
     def pay(self):
         self.is_paid = True
         self.date_paid = datetime.now()
@@ -825,6 +826,9 @@ class AdvancePayment(models.Model):
     def to_loan(self):
         self.is_paid=False
         self.save()
+    def get_absolute_url(self):
+        return '/advancepayments/%s' % self.id
+
     class Meta:
         db_table='AdvancePayment'
         ordering = ['year', 'month']
@@ -837,8 +841,10 @@ class Loan(models.Model):
     date = models.DateField(gettext('date'), help_text = gettext('loan_date_help'), null=True)
     pay_num = models.PositiveSmallIntegerField(gettext('pay_num'))
     remarks = models.TextField(gettext('remarks'), blank=True, null=True)
+
     def get_absolute_url(self):
         return '/loans/%s' % self.id
+
     class Meta:
         db_table = 'Loan'
         permissions = (('list_loan', 'Loans list'), )
@@ -2222,6 +2228,8 @@ class Signup(models.Model):
 class Tax(models.Model):
     date = models.DateField(gettext('date'))
     value = models.FloatField(gettext('value'))
+    def get_absolute_url(self):
+        return '/tax/%s' % self.id
     class Meta:
         db_table = 'Tax'
         get_latest_by = 'date'
@@ -2241,6 +2249,8 @@ class MadadBI(models.Model):
             return 0
         prev_madad = q[0]
         return (self.value - prev_madad.value) / (prev_madad.value / 100)
+    def get_absolute_url(self):
+        return '/madadbi/%s' % self.id
     class Meta:
         db_table = 'MadadBI'
         get_latest_by = 'publish_date'
@@ -2260,6 +2270,8 @@ class MadadCP(models.Model):
             return 0
         prev_madad = q[0]
         return (self.value - prev_madad.value) / (prev_madad.value / 100)
+    def get_absolute_url(self):
+        return '/madadcp/%s' % self.id
     class Meta:
         db_table = 'MadadCP'
         get_latest_by = 'publish_date'
