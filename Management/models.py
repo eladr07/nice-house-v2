@@ -2486,6 +2486,8 @@ class NHSaleSide(models.Model):
             nhp = q.count() == 1 and q[0] or NHPay(employee=d, nhsaleside = self, year = y, month = m)
             nhp.amount = self.director_pay
             nhp.save()
+    def get_absolute_url(self):
+        return '/nhsaleside/%s' % self.id
     class Meta:
         db_table = 'NHSaleSide'
 
@@ -2611,6 +2613,8 @@ class SalePriceMod(SaleMod):
     @property
     def current_price(self):
         return self.sale.price
+    def get_absolute_url(self):
+        return '/salepricemod/%s' % self.id
     class Meta:
         db_table = 'SalePriceMod'
 
@@ -2625,6 +2629,8 @@ class SaleHouseMod(SaleMod):
     @property
     def current_house(self):
         return self.sale.house
+    def get_absolute_url(self):
+        return '/salehousemod/%s' % self.id
     class Meta:
         db_table = 'SaleHouseMod'
 

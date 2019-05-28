@@ -526,6 +526,29 @@ class NHCommissionDelete(PermissionRequiredMixin, DeleteView):
     template_name = 'Management/object_confirm_delete.html'
     permission_required = 'Management.delete_nhcommission'
 
+### Demand Views ###
+
+class DemandRemarksUpdate(PermissionRequiredMixin, UpdateView):
+    model = Demand
+    form_class = DemandRemarksForm
+    template_name = 'Management/object_edit.html'
+    success_url = 'remarks'
+    permission_required = 'Management.demand_remarks'
+    
+class DemandSaleCountUpdate(PermissionRequiredMixin, UpdateView):
+    model = Demand
+    form_class = DemandSaleCountForm
+    template_name = 'Management/object_edit.html'
+    success_url = 'salecount'
+    permission_required = 'Management.demand_sale_count'
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        
+        context['title'] = u"עדכון מס' מכירות צפוי"
+        return context
+
 ### Account ###
 
 class AccountUpdate(PermissionRequiredMixin, UpdateView):
@@ -1770,6 +1793,18 @@ def demand_sale_del(request, id):
         sc.save()
         return HttpResponseRedirect('/salecancel/%s' % sc.id)
 
+class SalePriceModUpdate(PermissionRequiredMixin, UpdateView):
+    model = SalePriceMod
+    form_class = SalePriceModForm
+    template_name = 'Management/sale_mod_edit.html'
+    permission_required = 'Management.change_salepricemod'
+    
+class SaleHouseModUpdate(PermissionRequiredMixin, UpdateView):
+    model = SaleHouseMod
+    form_class = SaleHouseModForm
+    template_name = 'Management/sale_mod_edit.html'
+    permission_required = 'Management.change_salehousemod'
+
 def salepaymod_edit(request, model, object_id):
     object = model.objects.select_related('sale__demand__project', 'sale__house').get(pk = object_id)
     form_class = modelform_factory(model)
@@ -2343,6 +2378,24 @@ class ProjectArchiveListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return Project.objects.archive()
+
+class NHSaleDetailView(LoginRequiredMixin, DetailView):
+    model = NHSale
+    context_object_name = 'nhs'
+    template_name = 'Management/nhsale_edit.html'
+
+class NHSaleUpdate(PermissionRequiredMixin, UpdateView):
+    model = NHSale
+    form_class = NHSaleForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.change_nhsale'
+
+    
+class NHSaleSideUpdate(PermissionRequiredMixin, UpdateView):
+    model = NHSaleSide
+    form_class = NHSaleSideForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.change_nhsaleside'
 
 @permission_required('Management.change_nhsale')
 def nhsale_edit(request, object_id):
