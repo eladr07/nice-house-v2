@@ -1,6 +1,7 @@
 ﻿{% extends "../base.html" %}
-{% load management_extras %}
+{% load static %}
 {% load i18n %}
+{% load management_extras %}
 {% block header %}
 {{ block.super }}
 <script>
@@ -102,10 +103,6 @@
 	</form>
 </div>
 <div class="clearBoth"></div>
-<div class="someIcon" style="width:110px;">
-	<img src="{% static "images/documentinfo-48.png" %}" width="20" height="20"  alt="שינוי" /> 
-	<a href="{{project.get_absolute_url}}">כרטיס פרויקט</a>
-</div>
 <div class="someIcon" style="width:100px;">
 	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="שינוי" /> 
 	<a id="demandEdit">שינוי דרישה</a>
@@ -133,7 +130,7 @@
 <div class="someIcon"style="width:130px;">
 	<img src="{% static "images/reload-48.png" %}" width="20" height="20"  alt="שליחה" />
 	<a id="demandNotYetPaid">מאושר או טרם שולם</a>
-<div>
+</div>
 <div class="clearBoth"></div>
 <br>
 <table id="demandTable" class="dataTable" border="1">
