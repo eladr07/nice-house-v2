@@ -114,7 +114,6 @@
 		<th>מספר</th>
 		<th>שם פרטי</th>
 		<th>שם משפחה</th>
-		<th>טלפון</th>
 		<th>כתובת</th>
 		<th>תחילת העסקה</th>
 		<th>סוג העסקה</th>
@@ -129,13 +128,14 @@
 					<td>{{ e.id }}</td>
 					<td>{{ e.first_name }}</td>
 					<td>{{ e.last_name }}</td>
-					<td>{{ e.phone }}</td>
 					<td>{{ e.address }}</td>
 					<td>{{ e.work_start }}</td>
-					<td {% if e.employment_terms.hire_type.id == 1 %}style="color:#1AA337;"{%endif%}>
-					{{e.employment_terms.hire_type}}
-					{% if e.employment_terms.hire_type.id == 2 %} - {{e.employment_terms.salary_net|yesno:"נטו, ברוטו"}} {%endif%}
+					{% with e.employment_terms as terms %}
+					<td {% if terms.hire_type.id == 1 %}style="color:#1AA337;"{%endif%}>
+						{% if terms %} {{terms.hire_type}} {% endif %}
+						{% if terms.hire_type.id == 2 %} - {{terms.salary_net|yesno:"נטו, ברוטו"}} {%endif%}
 					</td>
+					{% endwith %}
 					<td>
 					{% for p in e.projects.all %}
 						<a href="/projects/{{p.id}}">{{p.name}}</a><br>
@@ -148,12 +148,10 @@
 	</table>
 	<br><br>
 	<table id="nhemployee_table" class="dataTable" border="1">
-		<caption>מציג סה"כ {{nhemployee_list.count}} עובדים בנייס האוס</caption>
 		<th/>
 		<th>מספר</th>
 		<th>שם פרטי</th>
 		<th>שם משפחה</th>
-		<th>טלפון</th>
 		<th>כתובת</th>
 		<th>תחילת העסקה</th>
 		<th>סוג העסקה</th>
@@ -166,13 +164,14 @@
 					<td>{{ e.id }}</td>
 					<td>{{ e.first_name }}</td>
 					<td>{{ e.last_name }}</td>
-					<td>{{ e.phone }}</td>
 					<td>{{ e.address }}</td>
 					<td>{{ e.work_start }}</td>
-					<td {% if e.employment_terms.hire_type.id == 1 %}style="color:#1AA337;"{%endif%}>
-					{{e.employment_terms.hire_type}}
-					{% if e.employment_terms.hire_type.id == 2 %} - {{e.employment_terms.salary_net|yesno:"נטו, ברוטו"}} {%endif%}
+					{% with e.employment_terms as terms %}
+					<td {% if terms.hire_type.id == 1 %}style="color:#1AA337;"{%endif%}>
+						{% if terms %} {{terms.hire_type}} {% endif %}
+						{% if terms.hire_type.id == 2 %} - {{terms.salary_net|yesno:"נטו, ברוטו"}} {%endif%}
 					</td>
+					{% endwith %}
 					<td>{{ e.remarks }}</td>
 				</tr>
 			{% endfor %}
