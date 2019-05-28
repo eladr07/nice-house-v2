@@ -56,16 +56,13 @@ urlpatterns += [
     path('projects/<int:project_id>/paymentcontact', project_contact, {'payment':True}),
     path('projects/\d+/contacts/<int:id>/del', contact_delete),
     path('projects/<int:id>/', project_edit),
-    path('projectcommission/<int:object_id>', limited_update_object,
-     {'form_class' : Management.forms.ProjectCommissionForm, 'template_name' : 'Management/object_edit.html', 'post_save_redirect' : '%(id)s'}),
+    path('projectcommission/<int:pk>', ProjectCommissionUpdate.as_view()),
     path('projects/add/', project_add),
-    path('projects/end/<int:object_id>', limited_update_object,
-     {'form_class' : Management.forms.ProjectEndForm, 'template_name' : 'Management/object_edit.html', 'post_save_redirect' : '%(id)s'}),
+    path('projects/end/<int:pk>', ProjectEndUpdate.as_view()),
     path('projects/<int:project_id>/buildings', project_buildings),
     path('projects/<int:project_id>/buildings/add', building_add),
     
-    path('buildings/<int:object_id>', limited_update_object,
-     {'form_class' : Management.forms.BuildingForm, 'template_name' : 'Management/object_edit.html', 'post_save_redirect' : '%(id)s'}),
+    path('buildings/<int:pk>', BuildingUpdate.as_view()),
     path('buildings/<int:object_id>/clients/', building_clients),
     path('buildings/<int:object_id>/clients/pdf', building_clients_pdf),
     path('buildings/<int:building_id>/addparking', building_addparking),
@@ -130,14 +127,13 @@ urlpatterns += [
      {'model':EmployeeBase}),
     path('employees/<int:id>/account', employee_account,
      {'model':EmployeeBase}),
-     
-    path('accounts/<int:object_id>/', limited_update_object,
-     {'form_class' : Management.forms.AccountForm, 'post_save_redirect' : '%(id)s'}),
-     
-     path('epcommission/<int:object_id>', limited_update_object,
-     {'model' : EPCommission, 'template_name' : 'Management/object_edit.html', 'post_save_redirect' : '%(id)s'}),
 
-     path('nhemployees/<int:obj_id>/attachment/add', obj_add_attachment,
+    # NOT USED 
+    path('accounts/<int:pk>/', AccountUpdate.as_view()),
+     
+    path('epcommission/<int:pk>', EPCommissionUpdate.as_view()),
+
+    path('nhemployees/<int:obj_id>/attachment/add', obj_add_attachment,
      {'model':EmployeeBase}),
     path('nhemployees/<int:obj_id>/attachments', obj_attachments,
      {'model':EmployeeBase}),
@@ -150,21 +146,18 @@ urlpatterns += [
     path('nhemployees/<int:employee_id>/addloan', nhemployee_addloan),
     path('nhemployees/<int:employee_id>/loanpay', nhemployee_loanpay),
     path('nhemployees/add/', nhemployee_add),
-    path('nhemployees/<int:object_id>/', limited_update_object,
-     {'form_class' : Management.forms.NHEmployeeForm, 'post_save_redirect' : '/nhemployees/%(id)s'}),
-    path('nhemployees/end/<int:id>/', limited_update_object,
-     {'form_class' : Management.forms.EmployeeEndForm, 'template_name' : 'Management/object_edit.html', 'post_save_redirect' : '%(id)s'}),
+    # NOT USED 
+    path('nhemployees/<int:pk>/', NHEmployeeUpdate.as_view()),
+    # NOT USED 
+    path('nhemployees/end/<int:pk>/', NHEmployeeEndUpdate.as_view()),
     path('nhemployees/<int:id>/employmentterms', employee_employmentterms,
      {'model':EmployeeBase}),
     path('nhemployees/<int:id>/account', employee_account,
      {'model':EmployeeBase}),
      
-    path('nhcbi/add', limited_create_object,
-     {'form_class' : Management.forms.NHCommissionForm, 'template_name' : 'Management/object_edit.html', 'post_save_redirect' : '%(id)s'}),
-    path('nhcbi/<int:object_id>', limited_update_object,
-     {'form_class' : Management.forms.NHCommissionForm, 'template_name' : 'Management/object_edit.html', 'post_save_redirect' : '%(id)s'}),
-    path('nhcbi/<int:object_id>/del', limited_delete_object,
-     {'form_class' : Management.forms.NHCommissionForm, 'post_delete_redirect':'/nhemployee/%(nhemployee_id)'}),
+    path('nhcbi/add', NHCommissionCreate.as_view()),
+    path('nhcbi/<int:pk>', NHCommissionUpdate.as_view()),
+    path('nhcbi/<int:pk>/del', NHCommissionDelete.as_view()),
           
     path('reminder/<int:object_id>', limited_update_object,
      {'form_class' : Management.forms.ReminderForm, 'template_name' : 'Management/object_edit.html', 'post_save_redirect' : '%(id)s'}),

@@ -1875,7 +1875,8 @@ class ProjectCommission(models.Model):
             logger.exception('exception during calculate commission for project %(project)s.', {'project':self.project})
         else:
             logger.info('finished to calculate commission for project %(project)s.', {'project':self.project})
-            
+    def get_absolute_url(self):
+        return '/projectcommission/%s' % self.id
     class Meta:
         db_table = 'ProjectCommission'
 

@@ -506,6 +506,55 @@ class CarDelete(PermissionRequiredMixin, DeleteView):
     template_name = 'Management/object_confirm_delete.html'
     permission_required = 'Management.delete_car'
 
+### NHCommission Views ###
+
+class NHCommissionCreate(PermissionRequiredMixin, CreateView):
+    model = NHCommission
+    form_class = NHCommissionForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.add_nhcommission'
+
+class NHCommissionUpdate(PermissionRequiredMixin, UpdateView):
+    model = NHCommission
+    form_class = NHCommissionForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.change_nhcommission'
+
+class NHCommissionDelete(PermissionRequiredMixin, DeleteView):
+    model = NHCommission
+    success_url = '/nhcommissions'
+    template_name = 'Management/object_confirm_delete.html'
+    permission_required = 'Management.delete_nhcommission'
+
+### Account ###
+
+class AccountUpdate(PermissionRequiredMixin, UpdateView):
+    model = Account
+    form_class = AccountForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.change_account'
+
+### EPCommission ###
+
+class EPCommissionUpdate(PermissionRequiredMixin, UpdateView):
+    model = EPCommission
+    fields = ('start_date','end_date','max')
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.change_epcommission'
+
+### NHEmployee ###
+
+class NHEmployeeUpdate(PermissionRequiredMixin, UpdateView):
+    model = NHEmployee
+    form_class = NHEmployeeForm
+    permission_required = 'Management.change_nhemployee'
+
+class NHEmployeeEndUpdate(PermissionRequiredMixin, UpdateView):
+    model = NHEmployee
+    form_class = EmployeeEndForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.change_nhemployee'
+
 @permission_required('Management.list_check')
 def check_list(request):
     month = date.today()
@@ -2477,6 +2526,12 @@ def building_pricelist_pdf(request, object_id, type_id):
     p.close()
     return response
 
+class BuildingUpdate(PermissionRequiredMixin, UpdateView):
+    model = Building
+    form_class = BuildingForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.change_building'
+
 @permission_required('Management.building_clients')
 def building_clients(request, object_id):
     b = Building.objects.get(pk = object_id)
@@ -2599,6 +2654,18 @@ def project_edit(request, id):
 
     return render(request, 'Management/project_edit.html', context)
   
+class ProjectCommissionUpdate(PermissionRequiredMixin, UpdateView):
+    model = ProjectCommission
+    form_class = ProjectCommissionForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.change_projectcommission'
+
+class ProjectEndUpdate(PermissionRequiredMixin, UpdateView):
+    model = Project
+    form_class = ProjectEndForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.change_project'
+
 @login_required  
 def project_commission_del(request, project_id, commission):
     project = Project.objects.get(pk = project_id)
