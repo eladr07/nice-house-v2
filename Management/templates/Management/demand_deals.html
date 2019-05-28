@@ -17,7 +17,7 @@
 			if (selectedID > 0)
 			{//sync links
 				$("#saleEdit").attr("href", "/demands/sale/" + selectedID);
-				$("#saleCommissionEdit").attr("href", "/demands/sale/" + selectedID + "/commission");
+				$("#saleCommissionEdit").attr("href", "/sale/" + selectedID + "/commission");
 				$("#saleDelete").attr("href", "/demands/{{demand.id}}/sale/" + selectedID + "/cancel");
 				$("#salePre").attr("href", "/demands/{{demand.id}}/sale/" + selectedID + "/pre");
 				$("#saleReject").attr("href", "/demands/{{demand.id}}/sale/" + selectedID + "/reject");
