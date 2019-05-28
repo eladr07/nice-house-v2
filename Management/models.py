@@ -476,6 +476,8 @@ class Contact(Person):
     fax = models.CharField(gettext('fax'), max_length=10, null=True, blank=True)
     company = models.CharField(gettext('company'), max_length=20, null=True, blank=True)
     remarks = models.TextField(gettext('remarks'), null=True, blank=True)
+    def get_absolute_url(self):
+        return '/contact/%s' % self.id
     class Meta:
         db_table = 'Contact'
         unique_together = ('first_name','last_name')
