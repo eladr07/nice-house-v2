@@ -73,7 +73,10 @@ class Attachment(models.Model):
     def get_related_object(self):
         obj = self.content_type.get_object_for_this_type(pk = self.object_id)
         return obj
-    
+
+    def get_absolute_url(self):
+        return '/attachment/%s' % self.id
+
     class Meta:
         db_table = 'Attachment'
         permissions = (('list_attachment', 'Can list attachments'),)
