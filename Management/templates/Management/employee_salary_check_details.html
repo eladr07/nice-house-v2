@@ -3,7 +3,11 @@
 {% block page %}
 <div id="content">
 	<div class="title">
+		{% if salary.employee %}
 		<div class="pageTitle">פירוט שווי צ'ק לעובד {{salary.employee}} לחודש {{salary.month}}/{{salary.year}}</div>
+		{% elif salary.nhemployee %}
+		<div class="pageTitle">פירוט שווי צ'ק לעובד {{salary.nhemployee}} לחודש {{salary.month}}/{{salary.year}}</div>
+		{% endif %}
 	</div>
 	<div class="clearBoth"></div>
 	<table id="sales_table" class="formTable">
