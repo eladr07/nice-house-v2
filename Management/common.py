@@ -37,13 +37,20 @@ def clone(from_object, save):
     
 def restore_object(instance, date):
     from reversion.models import Version
-    versions = list(Version.objects.get_for_object(instance).filter(revision__revisionext__date__lte = date))
-    if len(versions):
+
+    # get all versions of the given instance
+    instance_versions = Version.objects.get_for_object(obj=instance)
+
+    # filter by data in RevisionExt object
+    versions = instance_versions.filter(revision__revisionext__date__lte = date)
+
+    if versions.count() > 0:
         versions.sort(key = lambda v: v.revision.revisionext.date)
-        version = versions[-1]
+        version = versions.latest('revision__revisionext__date')
     else:
         try:
-            version = Version.objects.get_for_date(instance, date)
+            # filter by date_created in Revision object
+            version = instance_versions.filter(revision__date_created__lte=date).latest('revision__date_created')
         except ObjectDoesNotExist:
             return instance
     return version.object_version.object
