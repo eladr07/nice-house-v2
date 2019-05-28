@@ -452,6 +452,60 @@ class TaxDelete(PermissionRequiredMixin, DeleteView):
     template_name = 'Management/object_confirm_delete.html'
     permission_required = 'Management.delete_tax'
 
+### Link Views ###
+
+class LinkListView(LoginRequiredMixin, ListView):
+    model = Link
+
+    def get_queryset(self):
+        return Link.objects.all()
+
+class LinkCreate(PermissionRequiredMixin, CreateView):
+    model = Link
+    fields = ('name','url')
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.add_link'
+
+class LinkUpdate(PermissionRequiredMixin, UpdateView):
+    model = Link
+    fields = ('name','url')
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.change_link'
+
+class LinkDelete(PermissionRequiredMixin, DeleteView):
+    model = Link
+    success_url = '/links'
+    template_name = 'Management/object_confirm_delete.html'
+    permission_required = 'Management.delete_link'
+
+### Car Views ###
+
+class CarListView(LoginRequiredMixin, ListView):
+    model = Car
+
+    def get_queryset(self):
+        return Car.objects.all()
+
+class CarCreate(PermissionRequiredMixin, CreateView):
+    model = Car
+    fields = ('number','owner','insurance_expire_date','insurance_man','insurance_phone',
+        'tow_company','tow_phone','compulsory_insurance_cost','comprehensive_insurance_cost')
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.add_car'
+
+class CarUpdate(PermissionRequiredMixin, UpdateView):
+    model = Car
+    fields = ('number','owner','insurance_expire_date','insurance_man','insurance_phone',
+        'tow_company','tow_phone','compulsory_insurance_cost','comprehensive_insurance_cost')
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.change_car'
+
+class CarDelete(PermissionRequiredMixin, DeleteView):
+    model = Car
+    success_url = '/cars'
+    template_name = 'Management/object_confirm_delete.html'
+    permission_required = 'Management.delete_car'
+
 @permission_required('Management.list_check')
 def check_list(request):
     month = date.today()

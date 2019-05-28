@@ -87,7 +87,11 @@ class Car(models.Model):
     tow_company = models.CharField(gettext('tow_company'), max_length = 20)
     tow_phone = models.CharField(gettext('tow_phone'), max_length = 10)
     compulsory_insurance_cost = models.IntegerField(gettext('compulsory_insurance_cost'))
-    comprehensive_insurance_cost = models.IntegerField(gettext('comprehensive_insurance_cost'))    
+    comprehensive_insurance_cost = models.IntegerField(gettext('comprehensive_insurance_cost'))
+
+    def get_absolute_url(self):
+        return '/car/%s' % self.id
+
     class Meta:
         db_table = 'Car'
 
@@ -144,6 +148,10 @@ class Reminder(models.Model):
 class Link(models.Model):
     name = models.CharField(gettext('name'), max_length=30)
     url = models.URLField(gettext('url'))
+    
+    def get_absolute_url(self):
+        return '/link/%s' % self.id
+
     class Meta:
         db_table = 'Link'
         ordering = ['name']
