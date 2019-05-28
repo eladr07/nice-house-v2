@@ -7,13 +7,14 @@ from django.db.models import Count
 from django.forms.formsets import formset_factory
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
-from django.forms.models import inlineformset_factory, modelformset_factory, modelform_factory
+from django.forms.models import inlineformset_factory
 from django.core import serializers
-from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
+
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
+
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.contenttypes.models import ContentType
@@ -94,6 +95,8 @@ def index(request):
   
 @login_required  
 def locate_house(request):
+    from django.core.exceptions import ObjectDoesNotExist
+
     if request.method == 'GET':
         form = LocateHouseForm(request.GET)
         if form.is_valid():
@@ -1806,8 +1809,10 @@ class SaleHouseModUpdate(PermissionRequiredMixin, UpdateView):
     permission_required = 'Management.change_salehousemod'
 
 def salepaymod_edit(request, model, object_id):
+    from django.forms.models import modelform_factory
+
     object = model.objects.select_related('sale__demand__project', 'sale__house').get(pk = object_id)
-    form_class = modelform_factory(model)
+    form_class = modelform_factory(model, fields=('to_month','to_year','employee_pay_month','employee_pay_year','remarks'))
     
     if request.method == 'POST':
         form = form_class(request.POST, instance = object)
@@ -2426,9 +2431,13 @@ def nhsale_move_nhmonth(request, object_id):
 
 @permission_required('Management.add_nhsale')
 def nhsale_add(request, branch_id):
+    from django.forms.models import modelformset_factory
+
     if not request.user.has_perm('Management.nhbranch_' + str(branch_id)):
         return HttpResponse('No Permission. Contact Elad.') 
+    
     PaymentFormset = modelformset_factory(Payment, PaymentForm, extra=5)
+
     if request.method=='POST':
         monthForm = NHMonthForm(request.POST, prefix='month')
         saleForm = NHSaleForm(request.POST, prefix='sale')
