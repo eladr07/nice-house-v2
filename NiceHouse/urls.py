@@ -159,21 +159,18 @@ urlpatterns += [
     path('nhcbi/<int:pk>', NHCommissionUpdate.as_view()),
     path('nhcbi/<int:pk>/del', NHCommissionDelete.as_view()),
           
-    path('reminder/<int:object_id>', limited_update_object,
-     {'form_class' : Management.forms.ReminderForm, 'template_name' : 'Management/object_edit.html', 'post_save_redirect' : '%(id)s'}),
+    path('reminder/<int:pk>', ReminderUpdate.as_view()),
     path('reminder/<int:id>/del', reminder_del),
     path('reminder/<int:id>/do', reminder_do),
 
     path('attachments', attachment_list),
     path('attachment/add', attachment_add),
-    path('attachment/<int:object_id>', limited_update_object,
-     {'form_class' : Management.forms.AttachmentForm, 'template_name' : 'Management/object_edit.html', 'post_save_redirect' : '%(id)s'}),
-    path('attachment/<int:id>/del', attachment_delete),
+    path('attachment/<int:pk>', AttachmentUpdate.as_view()),
+    path('attachment/<int:pk>/del', AttachmentDelete.as_view()),
 
     path('tasks/', task_list),
     path('task/add', task_add),
-    path('task/<int:object_id>/del', limited_delete_object,
-     {'model':Task, 'post_delete_redirect':'/tasks'}),
+    path('task/<int:pk>/del', TaskDelete.as_view()),
     path('task/<int:id>/do', task_do),
 
     path('links/', LinkListView.as_view()),
@@ -304,8 +301,7 @@ urlpatterns += [
     path('employeechecks/', employeecheck_list),
     path('employeechecks/add', employeecheck_add),
     path('employeechecks/<int:id>', employeecheck_edit),
-    path('employeechecks/<int:id>/del', limited_delete_object,
-     {'model':EmployeeCheck, 'post_delete_redirect':'/employeechecks'}),
+    path('employeechecks/<int:id>/del', EmployeeCheckDelete.as_view()),
     
     path('reports/project_month/<int:project_id>/<int:year>/<int:month>', report_project_month),
     path('reports/projects_month/<int:year>/<int:month>', report_projects_month),
@@ -332,8 +328,7 @@ urlpatterns += [
     path('salehousemod/<int:pk>', SaleHouseModUpdate.as_view()),
     path('salepre/<int:object_id>', salepaymod_edit, {'model' : SalePre}),
     path('salereject/<int:object_id>', salepaymod_edit, {'model' : SaleReject}),
-    path('salecancel/<int:object_id>', limited_update_object,
-     {'model' : Management.models.SaleCancel, 'template_name' : 'Management/sale_mod_edit.html', 'post_save_redirect' : '%(id)s'}),
+    path('salecancel/<int:pk>', SaleCancelUpdate.as_view()),
       
     path('nhbranch/<int:branch_id>/nhsale/add', nhsale_add),
     path('nhbranch/<int:nhbranch_id>/addnhemployee', nhbranch_add_nhemployee),
@@ -384,9 +379,8 @@ urlpatterns += [
     path('demands/<int:pk>/salecount', DemandSaleCountUpdate.as_view()),
     path('demands/<int:object_id>/adddiff', demand_adddiff),
     path('demands/<int:object_id>/adddiffadjust', demand_adddiff_adjust),
-    path('demanddiff/<int:object_id>', limited_update_object,
-     {'form_class' : Management.forms.DemandDiffForm, 'template_name' : 'Management/object_edit.html', 'post_save_redirect' : '%(id)s'}),
-    path('demanddiff/<int:object_id>/del', demanddiff_del),
+    path('demanddiff/<int:pk>', DemandDiffUpdate.as_view()),
+    path('demanddiff/<int:pk>/del', demanddiff_del),
           
     path('demandinvoices/', demand_invoice_list),
     path('demandpayments/', demand_payment_list),

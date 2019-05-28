@@ -743,6 +743,12 @@ def employeecheck_edit(request, id):
                               { 'form':form,'title':u"הזנת צ'ק לעובד" },
                               )
 
+class EmployeeCheckDelete(PermissionRequiredMixin, DeleteView):
+    model = EmployeeCheck
+    success_url = '/employeechecks'
+    template_name = 'Management/object_confirm_delete.html'
+    permission_required = 'Management.delete_employeecheck'
+
 def signup_list(request, project_id):
     month = date.today()
     y = int(request.GET.get('year', month.year))
@@ -1808,6 +1814,12 @@ class SaleHouseModUpdate(PermissionRequiredMixin, UpdateView):
     template_name = 'Management/sale_mod_edit.html'
     permission_required = 'Management.change_salehousemod'
 
+class SaleCancelUpdate(PermissionRequiredMixin, UpdateView):
+    model = SaleCancel
+    fields = ('deduct_from_demand','remarks')
+    template_name = 'Management/sale_mod_edit.html'
+    permission_required = 'Management.change_salecancel'
+
 def salepaymod_edit(request, model, object_id):
     from django.forms.models import modelform_factory
 
@@ -2298,9 +2310,15 @@ def demand_not_yet_paid(request, id):
 def demand_adddiff_adjust(request, object_id):
     return demand_adddiff(request, object_id, u'התאמה')
 
+class DemandDiffUpdate(PermissionRequiredMixin, UpdateView):
+    model = DemandDiff
+    form_class = DemandDiffForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.change_demanddiff'
+
 @permission_required('Management.delete_demanddiff')
-def demanddiff_del(request, object_id):
-    diff = DemandDiff.objects.get(pk=object_id)
+def demanddiff_del(request, pk):
+    diff = DemandDiff.objects.get(pk=pk)
     url = diff.demand.get_absolute_url()
     diff.delete()
     return HttpResponseRedirect(url)
@@ -3021,6 +3039,12 @@ def obj_reminders(request, obj_id, model):
     return render(request, 'Management/reminder_list.html',
                               {'reminders': obj.reminders}, )
 
+class ReminderUpdate(PermissionRequiredMixin, UpdateView):
+    model = Reminder
+    form_class = ReminderForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.change_reminder'
+
 @permission_required('Management.delete_reminder')
 def reminder_del(request, id):
     r = Reminder.objects.get(pk= id)
@@ -3602,6 +3626,13 @@ def task_add(request):
     return render(request, 'Management/object_edit.html',
                               {'form' : form}, )
     
+
+class TaskDelete(PermissionRequiredMixin, DeleteView):
+    model = Task
+    success_url = '/tasks'
+    template_name = 'Management/object_confirm_delete.html'
+    permission_required = 'Management.delete_task'
+
 @permission_required('Management.change_task')
 def task_do(request, id):
     t = Task.objects.get(pk = id)
@@ -3620,11 +3651,17 @@ def task_del(request, id):
         t.delete()
         return HttpResponseRedirect('/tasks')
 
-@permission_required('Management.delete_attachment')
-def attachment_delete(request, id):
-    a = Attachment.objects.get(pk= id)
-    a.delete()
-    return HttpResponseRedirect('/attachments')
+class AttachmentUpdate(PermissionRequiredMixin, UpdateView):
+    model = Attachment
+    dorm_class = AttachmentForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.change_attachment'
+
+class AttachmentDelete(PermissionRequiredMixin, DeleteView):
+    model = Attachment
+    success_url = '/attachments'
+    template_name = 'Management/object_confirm_delete.html'
+    permission_required = 'Management.delete_attachment'
 
 @permission_required('Management.list_attachment')
 def attachment_list(request):
