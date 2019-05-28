@@ -1163,6 +1163,23 @@ def employee_salary_delete(request, model, id):
     elif model == NHEmployeeSalary:
         return HttpResponseRedirect('/nhemployeesalaries/?year=%s&month=%s' % (es.year, es.month))
 
+
+class EmployeeSalaryCommissionDetailView(LoginRequiredMixin, DetailView):
+    model = EmployeeSalary
+    context_object_name = 'salary'
+    template_name = 'Management/employee_commission_details.html'
+
+class EmployeeSalaryCheckDetailView(LoginRequiredMixin, DetailView):
+    model = EmployeeSalary
+    context_object_name = 'salary'
+    template_name = 'Management/employee_salary_check_details.html'
+
+class EmployeeSalaryTotalDetailView(LoginRequiredMixin, DetailView):
+    model = EmployeeSalary
+    context_object_name = 'salary'
+    template_name = 'Management/employee_salary_total_details.html'
+    
+
 @permission_required('Management.list_demand')
 def demands_all(request):
     error = None
@@ -1376,6 +1393,18 @@ def nh_season_income(request):
                                'nhbranch':nhbranch, 'avg':avg, 'avg_notax':avg_notax },
                               )
     
+class NHBranchCreate(PermissionRequiredMixin, CreateView):
+    model = NHBranch
+    fields = ('name','address','phone','mail','fax','url')
+    template_name = 'Management/nhbranch_edit.html'
+    permission_required = 'Management.add_nhbranch'
+
+class NHBranchUpdate(PermissionRequiredMixin, UpdateView):
+    model = NHBranch
+    fields = ('name','address','phone','mail','fax','url')
+    template_name = 'Management/nhbranch_edit.html'
+    permission_required = 'Management.change_nhbranch'
+
 def nhmonth_sales(request, nhbranch_id):
     if not request.user.has_perm('Management.nhbranch_' + nhbranch_id):
         return HttpResponse('No Permission. Contact Elad.') 

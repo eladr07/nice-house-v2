@@ -766,6 +766,8 @@ class NHBranch(models.Model):
     def prefix(self):
         return self.name.replace(u'נייס האוס ','') \
                [0]
+    def get_absolute_url(self):
+        return '/nhbranch/%s' % self.id
     def __str__(self):
         return str(self.name)
     class Meta:
