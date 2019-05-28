@@ -1783,7 +1783,7 @@ def demand_closeall(request):
     return HttpResponseRedirect('/demands')
         
 @permission_required('Management.delete_sale')
-def demand_sale_del(request, id):
+def demand_sale_del(request, demand_id, id):
     sale = Sale.objects.get(pk=id)
     if sale.demand.statuses.latest().type.id != DemandStatusType.Sent:
         sale.delete()
@@ -1842,7 +1842,7 @@ def salepaymod_edit(request, model, object_id):
         
 
 @permission_required('Management.reject_sale')
-def demand_sale_reject(request, id):
+def demand_sale_reject(request, demand_id, id):
     sale = Sale.objects.get(pk=id)
     y,m = sale.contractor_pay_year, sale.contractor_pay_month
     demands_to_calc = []
@@ -1868,7 +1868,7 @@ def demand_sale_reject(request, id):
     return HttpResponseRedirect('/salereject/%s' % sr.id)
 
 @permission_required('Management.pre_sale')
-def demand_sale_pre(request, id):
+def demand_sale_pre(request, demand_id, id):
     sale = Sale.objects.get(pk=id)
     y,m = request.GET.get('year'), request.GET.get('month')
     demands_to_calc = []
@@ -1894,7 +1894,7 @@ def demand_sale_pre(request, id):
     return HttpResponseRedirect('/salepre/%s' % sr.id)
 
 @permission_required('Management.cancel_sale')
-def demand_sale_cancel(request, id):
+def demand_sale_cancel(request, demand_id, id):
     sale = Sale.objects.get(pk=id)
     try:
         sc = sale.salecancel
@@ -2950,7 +2950,7 @@ def project_deletecontact(request, id, project_id):
     return HttpResponseRedirect('/projects/%s' % p.id)
     
 @permission_required('Management.delete_contact')
-def contact_delete(request, id):
+def contact_delete(request, project_id, id):
     contact = Contact.objects.get(pk=id)
     contact.projects.clear()
     contact.projects_demand.clear()
@@ -3213,7 +3213,7 @@ def building_addhouse(request, type_id, building_id):
                               )
 
 @permission_required('Management.house_versionlog')
-def house_version_log(request,id , type_id):
+def house_version_log(request, building_id, id ,type_id):
     house = House.objects.get(pk=id)
     pricelist_type = PricelistType.objects.get(pk=type_id)
     query = HouseVersion.objects.filter(house__id = id, type__id = type_id)
@@ -3230,7 +3230,7 @@ def house_version_log(request,id , type_id):
                                'versions':versions })
     
 @permission_required('Management.change_house')
-def house_edit(request,id , type_id):
+def house_edit(request, building_id, id ,type_id):
     h = House.objects.get(pk=id)
     b = h.building
     if request.method == 'POST':
