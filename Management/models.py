@@ -426,7 +426,7 @@ class Pricelist(models.Model):
         db_table = 'Pricelist'
 
 class Building(models.Model):
-    pricelist = models.ForeignKey('Pricelist', on_delete=models.PROTECT, editable=False, related_name='building')
+    pricelist = models.OneToOneField('Pricelist', on_delete=models.PROTECT, editable=False, related_name='building')
     project = models.ForeignKey('Project', on_delete=models.PROTECT, related_name = 'buildings', verbose_name=gettext('project'))
     num = models.CharField(gettext('building_num'), max_length = 4)
     name = models.CharField(gettext('name'), max_length=10, null=True, blank=True)
