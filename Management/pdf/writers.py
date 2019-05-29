@@ -63,7 +63,7 @@ def tableCaption(caption=log2vis(u'ולהלן פירוט העסקאות')):
                      ParagraphStyle(name='tableCaption', fontName='David-Bold', fontSize=15,
                                     alignment=TA_CENTER))
 def nhLogo():
-    return Image(os.path.join(STATIC_URL, 'images/nh_logo_new.jpg'), 170, 75)
+    return Image('Management/pdf/images/nh_logo_new.png', 170, 75)
 
 def sigPara():
     s = log2vis('ברגשי כבוד,') + '<br/>'
@@ -125,7 +125,6 @@ class DocumentBase(object):
     def build(self, filename):
         doc = SimpleDocTemplate(filename, pagesize = self.get_pagesize(), topMargin=100, bottomMargin=100)
         doc.build(self.get_story(), self.addFirst, self.addLater, NumberedCanvas)
-        return doc.canv
     def get_story(self):
         pass
 
@@ -792,7 +791,7 @@ class EmployeeSalariesBookKeepingWriter(DocumentBase):
             rows.append(row)
             
             if es.pdf_remarks:
-                remarks_str += '<u><b>' + log2vis(str(employee) + '</b></u>' + ' ' + (es.pdf_remarks)) + '<br/>'
+                remarks_str += '<u><b>' + log2vis(str(employee)) + '</b></u>' + ' ' + (es.pdf_remarks) + '<br/>'
         
         sum_row = [None, None, None, 
                    commaise(sum([s.check_amount or 0 for s in self.salaries])),
