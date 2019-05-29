@@ -194,13 +194,10 @@ class HouseDetailView(LoginRequiredMixin, DetailView):
     context_object_name = 'house'
     template_name = 'Management/house_details.html'
     
-@login_required
-def signup_details(request, house_id):
-    signup = House.objects.get(pk=house_id).get_signup()
-    if not signup:
-        return HttpResponse('')
-    else:
-        return render(request, 'Management/signup_details.html', {'signup':signup})
+class SignupDetailView(LoginRequiredMixin, DetailView):
+    model = Signup
+    context_object_name = 'signup'
+    template_name = 'Management/signup_details.html'
 
 @login_required
 def employeecheck_list(request):
@@ -1082,27 +1079,55 @@ def employee_salary_list(request):
                                'filterForm':MonthForm(initial={'year':year,'month':month})},
                                )
 
-@permission_required('Management.list_salaryexpenses')
-def salary_expenses_list(request):
-    current = common.current_month()
-    year = int(request.GET.get('year', current.year))
-    month = int(request.GET.get('month', current.month))
-    salaries = list(EmployeeSalary.objects.nondeleted().filter(year = year, month= month))
-    return render(request, 'Management/salaries_expenses.html', 
-                              {'salaries':salaries, 'month': date(int(year), int(month), 1),
-                               'filterForm':MonthForm(initial={'year':year,'month':month})},
-                               )
+class SalaryExpensesListView(PermissionRequiredMixin, ListView):
+    model = EmployeeSalary
+    template_name = 'Management/salaries_expenses.html'
+    context_object_name = 'salaries'
+    permission_required = 'Management.list_salaryexpenses'
 
-@permission_required('Management.list_salaryexpenses')
-def nh_salary_expenses_list(request):
-    current = common.current_month()
-    year = int(request.GET.get('year', current.year))
-    month = int(request.GET.get('month', current.month))
-    salaries = list(NHEmployeeSalary.objects.nondeleted().filter(year = year, month= month))
-    return render(request, 'Management/nh_salaries_expenses.html', 
-                              {'salaries':salaries, 'month': date(int(year), int(month), 1),
-                               'filterForm':MonthForm(initial={'year':year,'month':month})},
-                               )
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        current = common.current_month()
+        self.year = int(self.request.GET.get('year', current.year))
+        self.month = int(self.request.GET.get('month', current.month))
+
+    def get_queryset(self):
+        return EmployeeSalary.objects.nondeleted().filter(year = self.year, month = self.month)
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        
+        context['month'] = date(int(self.year), int(self.month), 1)
+        context['filterForm'] = MonthForm(initial={'year':self.year,'month':self.month})
+
+        return context
+
+class NHSalaryExpensesListView(PermissionRequiredMixin, ListView):
+    model = EmployeeSalary
+    template_name = 'Management/salaries_expenses.html'
+    context_object_name = 'salaries'
+    permission_required = 'Management.nh_salaries_expenses'
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        current = common.current_month()
+        self.year = int(self.request.GET.get('year', current.year))
+        self.month = int(self.request.GET.get('month', current.month))
+
+    def get_queryset(self):
+        return NHEmployeeSalary.objects.nondeleted().filter(year = self.year, month = self.month)
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        
+        context['month'] = date(int(self.year), int(self.month), 1)
+        context['filterForm'] = MonthForm(initial={'year':self.year,'month':self.month})
+
+        return context
 
 @permission_required('Management.list_nhemployeesalary')
 def nhemployee_salary_list(request):
@@ -1306,14 +1331,6 @@ def demands_all(request):
                                'error':error },
                               )
 
-@login_required
-def employee_list(request):
-    employee_list = Employee.objects.active().select_related('employment_terms__hire_type')
-    nhbranch_list = NHBranch.objects.all()
-    return render(request, 'Management/employee_list.html', 
-                              {'employee_list':employee_list, 'nhbranch_list':nhbranch_list},
-                              )
-    
 def employee_list_pdf(request):
     filename = common.generate_unique_media_filename('pdf')
     
@@ -1326,6 +1343,20 @@ def employee_list_pdf(request):
     response.write(p.read())
     p.close()
     return response
+
+class EmployeeListView(LoginRequiredMixin, ListView):
+    model = Employee
+    template_name = 'Management/employee_list.html'
+    context_object_name = 'employee_list'
+
+    def get_queryset(self):
+        return Employee.objects.active().select_related('employment_terms__hire_type')
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        
+        context['nhbranch_list'] = NHBranch.objects.all()
+        return context
 
 class EmployeeArchiveListView(LoginRequiredMixin, ListView):
     model = Employee

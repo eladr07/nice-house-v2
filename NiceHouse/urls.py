@@ -117,7 +117,7 @@ urlpatterns += [
     path('employees/<int:employee_id>/<commission>/project/<int:project_id>/del', employee_commission_del),    
     path('employees/<int:employee_id>/addproject', employee_project_add),
     path('employees/<int:employee_id>/removeproject/<int:project_id>', employee_project_remove),
-    path('employees/', employee_list),
+    path('employees/', EmployeeListView.as_view()),
     path('employees/pdf', employee_list_pdf),
     path('employees/archive', EmployeeArchiveListView.as_view()),
     path('employees/add/', EmployeeCreate.as_view()),
@@ -208,8 +208,8 @@ urlpatterns += [
 
     path('salariesbank/', salaries_bank),
 
-    path('salaryexpenses/', salary_expenses_list),
-    path('nhsalaryexpenses/', nh_salary_expenses_list),
+    path('salaryexpenses/', SalaryExpensesListView.as_view()),
+    path('nhsalaryexpenses/', NHSalaryExpensesListView.as_view()),
     path('salaryexpenses/<int:id>/approve', salary_expenses_approve),
     path('salaryexpenses/<int:object_id>', limited_update_object,
      {'model' : Management.models.SalaryExpenses, 'template_name' : 'Management/salaryexpenses_edit.html', 'post_save_redirect' : '%(id)s'}),
@@ -401,7 +401,8 @@ urlpatterns += [
     path('invoice_details/<int:project>/<int:year>/<int:month>', invoice_details),
     path('payment_details/<int:project>/<int:year>/<int:month>', payment_details),
     path('house_details/<int:pk>', HouseDetailView.as_view()),
-    path('signup_details/<int:house_id>', signup_details),
+    # NOT USED
+    path('signup_details/<int:pk>', SignupDetailView.as_view()),
     path('profitloss', global_profit_lost),
 ]
 
