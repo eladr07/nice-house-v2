@@ -2107,10 +2107,10 @@ def income_core(request, instance):
             instance.deal, instance.invoice, instance.payment = dealForm.save(), invoiceForm.save(), paymentForm.save()
             incomeForm.save()
     else:
-        incomeForm, dealForm, invoiceForm, paymentForm = (IncomeForm(instance = instance), 
-                                                          DealForm(instance = instance.deal), 
-                                                          InvoiceForm(instance = instance.invoice), 
-                                                          PaymentForm(instance = instance.payment))
+        incomeForm = IncomeForm(instance = instance)
+        dealForm = DealForm(instance = instance.deal)
+        invoiceForm = InvoiceForm(instance = instance.invoice)
+        paymentForm = PaymentForm(instance = instance.payment)
     
     context = {
         'incomeForm':incomeForm, 
