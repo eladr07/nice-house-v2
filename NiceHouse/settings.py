@@ -25,7 +25,7 @@ SECRET_KEY = 'b1&^9&3e48hs#1p+mtypy^8-ho)r%-3^inrp0d9haz0$-xml0o'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['nicehouse.herokuapp.com']
+ALLOWED_HOSTS = ['127.0.0.1','localhost','nicehouse.herokuapp.com']
 
 
 # Application definition
