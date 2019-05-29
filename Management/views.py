@@ -134,17 +134,6 @@ def locate_demand(request):
     return HttpResponseRedirect('/')
     
 @login_required
-def limited_delete_object(request, model, object_id, post_delete_redirect, permission=None):
-    if not permission:
-        permission = 'Management.change_' + model.__name__.lower()
-    if request.user.has_perm(permission):
-        obj = model.objects.get(pk=object_id)
-        obj.delete()
-        return HttpResponseRedirect(post_delete_redirect)
-    else:
-        return HttpResponse('No permission. contact Elad.')
-    
-@login_required
 def limited_object_detail(request, permission=None, *args, **kwargs):
     if not permission or request.user.has_perm('Management.' + permission):
         if request.GET.get('t') == 'pdf' :
@@ -200,11 +189,11 @@ def limited_update_object(request, permission=None, *args, **kwargs):
     else:
         return HttpResponse('No permission. contact Elad.')
 
-@login_required
-def house_details(request, id):
-    house = House.objects.get(pk=id)
-    return render(request, 'Management/house_details.html', {'house': house})
-
+class HouseDetailView(LoginRequiredMixin, DetailView):
+    model = House
+    context_object_name = 'house'
+    template_name = 'Management/house_details.html'
+    
 @login_required
 def signup_details(request, house_id):
     signup = House.objects.get(pk=house_id).get_signup()
@@ -2145,6 +2134,12 @@ def income_list(request):
     context = { 'filterForm':form, 'incomes':incomes, 'from_date':from_date, 'to_date':to_date }
 
     return render(request, 'Management/income_list.html', context) 
+
+class IncomeDelete(PermissionRequiredMixin, DeleteView):
+    model = Income
+    success_url = '/incomes'
+    template_name = 'Management/object_confirm_delete.html'
+    permission_required = 'Management.delete_income'
 
 @permission_required('Management.add_payment')
 def split_payment_add(request):

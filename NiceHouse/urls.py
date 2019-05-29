@@ -295,8 +295,7 @@ urlpatterns += [
     path('incomes/', income_list),
     path('incomes/add', income_add),
     path('incomes/<int:id>', income_edit),
-    path('incomes/<int:id>/del', limited_delete_object,
-     {'model':Income, 'post_delete_redirect':'/incomes'}),
+    path('incomes/<int:pk>/del', IncomeDelete.as_view()),
      
     path('employeechecks/', employeecheck_list),
     path('employeechecks/add', employeecheck_add),
@@ -401,7 +400,7 @@ urlpatterns += [
     path('demand_sales/<int:project_id>/<int:year>/<int:month>', demand_sales),
     path('invoice_details/<int:project>/<int:year>/<int:month>', invoice_details),
     path('payment_details/<int:project>/<int:year>/<int:month>', payment_details),
-    path('house_details/<int:id>', house_details),
+    path('house_details/<int:pk>', HouseDetailView.as_view()),
     path('signup_details/<int:house_id>', signup_details),
     path('profitloss', global_profit_lost),
 ]
