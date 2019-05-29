@@ -132,19 +132,6 @@ def locate_demand(request):
                 return render(request, 'Management/error.html', {'error': error})
 
     return HttpResponseRedirect('/')
-
-@login_required
-def limited_create_object(request, permission=None, *args, **kwargs):
-    if 'model' in kwargs:
-        model = kwargs['model']
-    elif 'form_class' in kwargs:
-        model = kwargs['form_class']._meta.model
-    if not permission:
-        permission = 'Management.change_' + model.__name__.lower()
-    if request.user.has_perm(permission):
-        return CreateView.as_view(*args, **kwargs)
-    else:
-        return HttpResponse('No permission. contact Elad.')
     
 @login_required
 def limited_delete_object(request, model, object_id, post_delete_redirect, permission=None):
@@ -210,13 +197,6 @@ def limited_update_object(request, permission=None, *args, **kwargs):
         permission = 'Management.change_' + model_name
     if request.user.has_perm(permission):
         return UpdateView.as_view(*args, **kwargs)
-    else:
-        return HttpResponse('No permission. contact Elad.')
-
-@login_required
-def limited_object_list(request, permission=None, *args, **kwargs):
-    if not permission or request.user.has_perm('Management.' + permission):
-        return ListView.as_view(*args, **kwargs)
     else:
         return HttpResponse('No permission. contact Elad.')
 
