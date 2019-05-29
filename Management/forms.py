@@ -675,7 +675,7 @@ class DivisionTypeSeasonForm(SeasonForm):
     division_type = forms.ModelChoiceField(queryset = DivisionType.objects.all(), label=gettext('division_type'))
 
 class GloablProfitLossForm(SeasonForm):
-    division_choices = [(division.id, str(division)) for division in DivisionType.objects.all()]
+    division_choices = []
     division_choices.extend([(-1, gettext('all_divisions')),
                              (-2, gettext('all_nh'))])
     divisions = forms.ChoiceField(label = gettext('division_type'), choices = division_choices)
