@@ -2,6 +2,7 @@
 
 {% load static %}
 {% load humanize %}
+{% load management_extras %}
 
 {% block header %}
 {{ block.super }}
@@ -212,14 +213,14 @@
 	<tr class="rowSum">
 		<td colspan="4" align="center">סיכום</td>
 		<td>{{salaries|attrsum:"sales_count"}}</td>
-		<td>{{salaries|attrsum:"base"|intcomma}} + {{salaries|attrsum:"commissions"|intcomma}} </td>
+		<td>{{salaries|attrsum:"base"|floatformat:"0"|intcomma}} + {{salaries|attrsum:"commissions"|floatformat:"0"|intcomma}} </td>
 		<td>{{salaries|attrsum:"safety_net"|intcomma}}</td>
-		<td>{{salaries|attrsum:"var_pay"|intcomma}}</td>
+		<td>{{salaries|attrsum:"var_pay"|floatformat:"0"|intcomma}}</td>
 		<td>{{salaries|attrsum:"deduction"|intcomma}}</td>
 		<td>{{salaries|attrsum:"neto"|intcomma}}</td>
 		<td></td>
 		<td>{{salaries|attrsum:"check_amount"|intcomma}}</td>
-		<td>{{salaries|attrsum:"bruto"|intcomma}}</td>
+		<td>{{salaries|attrsum:"bruto"|floatformat:"0"|intcomma}}</td>
 		<td></td>
 		<td>{{salaries|attrsum:"invoice_amount"|intcomma}}</td>
 		<td>{{salaries|attrsum:"refund"|intcomma}}</td>
