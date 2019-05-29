@@ -54,6 +54,8 @@ def build_and_return_pdf(writer):
 
     writer.build(buffer)
 
+    buffer.seek(io.SEEK_SET)
+
     # FileResponse sets the Content-Disposition header so that browsers
     # present the option to save the file.
     return FileResponse(buffer, as_attachment=True, filename='hello.pdf')  
