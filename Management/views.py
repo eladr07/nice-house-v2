@@ -47,6 +47,17 @@ def object_edit_core(request, form_class, instance,
         
     return render(request, template_name, {'form':form })
 
+
+def build_and_return_pdf(writer):
+    # Create a file-like buffer to receive PDF data.
+    buffer = io.BytesIO()
+
+    writer.build(buffer)
+
+    # FileResponse sets the Content-Disposition header so that browsers
+    # present the option to save the file.
+    return FileResponse(buffer, as_attachment=True, filename='hello.pdf')  
+    
 def revision_list(request):
     if len(request.GET):
         filterForm = RevisionFilterForm(request.GET)
@@ -1199,16 +1210,6 @@ class NHEmployeeSalaryUpdate(PermissionRequiredMixin, UpdateView):
     form_class = NHEmployeeSalaryForm
     template_name = 'Management/nhemployee_salary_edit.html'
     permission_required = 'Management.change_nhemployeesalary'
-
-def build_and_return_pdf(writer):
-    # Create a file-like buffer to receive PDF data.
-    buffer = io.BytesIO()
-
-    writer.build(buffer)
-
-    # FileResponse sets the Content-Disposition header so that browsers
-    # present the option to save the file.
-    return FileResponse(buffer, as_attachment=True, filename='hello.pdf')  
 
 def employee_salary_pdf(request, year, month):
     salaries = [es for es in EmployeeSalary.objects.nondeleted().filter(year = year, month= month)
@@ -2600,7 +2601,7 @@ def building_pricelist_pdf(request, object_id, type_id):
             h.price = None
     
     title = u'מחירון לפרוייקט %s' % str(b.project)
-    subtitle = u'בניין %s - %s' % (b.num, str(pricelist_type)
+    subtitle = u'בניין %s - %s' % (b.num, str(pricelist_type))
     
     q = HouseVersion.objects.filter(house__building = b, type=pricelist_type)
     
