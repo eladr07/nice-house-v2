@@ -1893,6 +1893,8 @@ class Invoice(models.Model):
     
     objects = InvoiceManager()
     
+    def get_absolute_url(self):
+        return '/invoices/%s' % self.id
     def __str__(self):
         return u'חשבונית על סך %s ש"ח בתאריך %s' % (commaise(self.amount), self.date.strftime('%d/%m/%Y'))
     class Meta:
@@ -1935,6 +1937,8 @@ class Payment(models.Model):
         return u'תשלום על סך %s ש"ח בתאריך %s' % (commaise(self.amount), self.payment_date.strftime('%d/%m/%Y'))
     def is_split(self):
         return self.demands.count() > 1
+    def get_absolute_url(self):
+        return '/payments/%s' % self.id
     class Meta:
         db_table = 'Payment'
         get_latest_by = 'creation_date'
