@@ -1,4 +1,4 @@
-﻿import reversion, itertools, time, threading
+﻿import reversion, itertools, time, threading, io
 from datetime import datetime, date
 
 import django.core.paginator
@@ -6,7 +6,7 @@ from django.db import models, transaction
 from django.db.models import Count
 from django.forms.formsets import formset_factory
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError, FileResponse
 from django.forms.models import inlineformset_factory
 from django.core import serializers
 from django.urls import reverse
@@ -137,17 +137,14 @@ def locate_demand(request):
 def limited_object_detail(request, permission=None, *args, **kwargs):
     if not permission or request.user.has_perm('Management.' + permission):
         if request.GET.get('t') == 'pdf' :
-            filename = common.generate_unique_media_filename('pdf')
+            queryset = kwargs.get('queryset')
+            object_id = kwargs.get('object_id')
 
-            response = HttpResponse(mimetype='application/pdf')
-            response['Content-Disposition'] = 'attachment; filename=' + filename
+            obj = queryset.get(pk=object_id)
 
-            EmployeesLoans(kwargs.get('queryset').filter(pk = kwargs.get('object_id')).get()).build(filename)
-            p = open(filename,'r')
-            response.write(p.read())
-            p.close()
+            writer = EmployeesLoans(obj)
 
-            return response
+            return build_and_return_pdf(writer)
 
         return DetailView.as_view(*args, **kwargs)
     else:
@@ -999,21 +996,15 @@ def nhemployee_salary_send(request, nhbranch_id, year, month):
     pass
     
 def nhemployee_salary_pdf(request, nhbranch_id, year, month):
-    filename = common.generate_unique_media_filename('pdf')
-    
-    response = HttpResponse(mimetype='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename=' + filename
-    
     nhb = NHBranch.objects.get(pk = nhbranch_id)
     salaries = [salary for salary in NHEmployeeSalary.objects.nondeleted().filter(nhbranch = nhb, month = month, year = year) if salary.approved_date]
 
     nhsales = NHSale.objects.filter(nhmonth__year__exact = year, nhmonth__month__exact = month, nhmonth__nhbranch = nhb)
     title = u'שכר עבודה לסניף %s לחודש %s\%s' % (nhb, year, month)
-    EmployeeSalariesBookKeepingWriter(salaries, title, nhsales).build(filename)
-    p = open(filename,'r')
-    response.write(p.read())
-    p.close()
-    return response
+
+    writer = EmployeeSalariesBookKeepingWriter(salaries, title, nhsales)
+    
+    return build_and_return_pdf(writer)
 
 @permission_required('Management.change_salaryexpenses')
 def employee_salary_expenses(request, salary_id):
@@ -1169,17 +1160,9 @@ def salaries_bank(request):
             if 'pdf' in request.POST:
                 salaries = EmployeeSalaryBase.objects.filter(pk__in = salary_ids)
                 
-                filename = common.generate_unique_media_filename('pdf')
-        
-                response = HttpResponse(mimetype='application/pdf')
-                response['Content-Disposition'] = 'attachment; filename=' + filename
-            
-                SalariesBankWriter(salaries, month, year).build(filename)
-                p = open(filename,'r')
-                response.write(p.read())
-                p.close()
+                writer = SalariesBankWriter(salaries, month, year)
                 
-                return response  
+                return build_and_return_pdf(writer)
             elif 'filter' in request.POST:
                 salaries = EmployeeSalaryBase.objects.filter(month=month, year=year)
         else:
@@ -1217,19 +1200,25 @@ class NHEmployeeSalaryUpdate(PermissionRequiredMixin, UpdateView):
     template_name = 'Management/nhemployee_salary_edit.html'
     permission_required = 'Management.change_nhemployeesalary'
 
-def employee_salary_pdf(request, year, month):
-    filename = common.generate_unique_media_filename('pdf')
-    
-    response = HttpResponse(mimetype='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename=' + filename
+def build_and_return_pdf(writer):
+    # Create a file-like buffer to receive PDF data.
+    buffer = io.BytesIO()
 
-    EmployeeSalariesBookKeepingWriter([es for es in EmployeeSalary.objects.nondeleted().filter(year = year, month= month)
-                                       if es.approved_date], u'שכר עבודה למנהלי פרויקטים לחודש %s\%s' % (year, month),
-                                       ).build(filename)
-    p = open(filename,'r')
-    response.write(p.read())
-    p.close()
-    return response    
+    writer.build(buffer)
+
+    # FileResponse sets the Content-Disposition header so that browsers
+    # present the option to save the file.
+    return FileResponse(buffer, as_attachment=True, filename='hello.pdf')  
+
+def employee_salary_pdf(request, year, month):
+    salaries = [es for es in EmployeeSalary.objects.nondeleted().filter(year = year, month= month)
+                if es.approved_date]
+
+    title = u'שכר עבודה למנהלי פרויקטים לחודש %s\%s' % (year, month)
+
+    writer = EmployeeSalariesBookKeepingWriter(salaries, title)
+
+    return build_and_return_pdf(writer)
 
 def employee_salary_calc(request, model, id):
     es = model.objects.get(pk=id)
@@ -1338,17 +1327,10 @@ def demands_all(request):
                               )
 
 def employee_list_pdf(request):
-    filename = common.generate_unique_media_filename('pdf')
-    
-    response = HttpResponse(mimetype='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename=' + filename
-
-    EmployeeListWriter(employees = Employee.objects.active(),
-                       nhemployees = NHEmployee.objects.active()).build(filename)
-    p = open(filename,'r')
-    response.write(p.read())
-    p.close()
-    return response
+    writer = EmployeeListWriter(
+        employees = Employee.objects.active(),
+        nhemployees = NHEmployee.objects.active())
+    return build_and_return_pdf(writer)
 
 class EmployeeListView(LoginRequiredMixin, ListView):
     model = Employee
@@ -2420,16 +2402,8 @@ class ProjectListView(LoginRequiredMixin, ListView):
 
 @permission_required('Management.project_list_pdf')
 def project_list_pdf(request):
-    filename = common.generate_unique_media_filename('pdf')
-    
-    response = HttpResponse(mimetype='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename=' + filename
-
-    ProjectListWriter(projects = Project.objects.active()).build(filename)
-    p = open(filename,'r')
-    response.write(p.read())
-    p.close()
-    return response
+    writer = ProjectListWriter(projects = Project.objects.active())
+    return build_and_return_pdf(writer)
 
 class ProjectArchiveListView(LoginRequiredMixin, ListView):
     model = Project
@@ -2625,22 +2599,17 @@ def building_pricelist_pdf(request, object_id, type_id):
         except HouseVersion.DoesNotExist:
             h.price = None
     
-    filename = common.generate_unique_media_filename('pdf')
-    
-    response = HttpResponse(mimetype='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename=' + filename
-
     title = u'מחירון לפרוייקט %s' % str(b.project)
-    subtitle = u'בניין %s' % b.num
-    subtitle += ' - %s' % str(pricelist_type)
+    subtitle = u'בניין %s - %s' % (b.num, str(pricelist_type)
+    
     q = HouseVersion.objects.filter(house__building = b, type=pricelist_type)
+    
     if q.count() > 0:
         subtitle += u' לתאריך ' + q.latest().date.strftime('%d/%m/%Y')
-    PricelistWriter(b.pricelist, houses, title, subtitle).build(filename)
-    p = open(filename,'r')
-    response.write(p.read())
-    p.close()
-    return response
+
+    writer = PricelistWriter(b.pricelist, houses, title, subtitle)
+    
+    return build_and_return_pdf(writer)
 
 class BuildingUpdate(PermissionRequiredMixin, UpdateView):
     model = Building
@@ -2674,18 +2643,12 @@ def building_clients_pdf(request, object_id):
         except HouseVersion.DoesNotExist:
             h.price = None
     
-    filename = common.generate_unique_media_filename('pdf')
-    
-    response = HttpResponse(mimetype='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename=' + filename
-
     title = u'מצבת רוכשים לפרוייקט %s' % str(b.project)
     subtitle = u'בניין %s' % b.num
-    BuildingClientsWriter(houses, title, subtitle).build(filename)
-    p = open(filename,'r')
-    response.write(p.read())
-    p.close()
-    return response
+    
+    writer = BuildingClientsWriter(houses, title, subtitle)
+
+    return build_and_return_pdf(writer)
 
 @permission_required('Management.add_project')
 def project_add(request):
@@ -3942,18 +3905,10 @@ def report_employee_sales(request):
                 cleaned_data['from_year'], cleaned_data['to_month'], cleaned_data['to_year']
                 
             demands = Demand.objects.range(from_year, from_month, to_year, to_month).filter(project = project)
-
-            filename = common.generate_unique_media_filename('pdf')
-    
-            response = HttpResponse(mimetype='application/pdf')
-            response['Content-Disposition'] = 'attachment; filename=' + filename
             
-            EmployeeSalesWriter(project, from_month, from_year, to_month, to_year, demands).build(filename)
+            writer = EmployeeSalesWriter(project, from_month, from_year, to_month, to_year, demands)
             
-            p = open(filename,'r')
-            response.write(p.read())
-            p.close()
-            return response
+            return build_and_return_pdf(writer)
 
     error = u'לא ניתן להפיק את הדו"ח. אנא ודא שכל הנתונים הוזנו כראוי.'
     return render(request, 'Management/error.html', {'error': error}, )
@@ -3971,32 +3926,20 @@ def report_project_month(request, project_id = 0, year = 0, month = 0, demand = 
     if demand.get_sales().count() == 0:
         return render(request, 'Management/error.html', {'error':u'לדרישה שנבחרה אין מכירות'}, )
     
-    filename = common.generate_unique_media_filename('pdf')
+    writer = MonthDemandWriter(demand, to_mail=False)
     
-    response = HttpResponse(mimetype='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename=' + filename
-    
-    MonthDemandWriter(demand, to_mail=False).build(filename)
-    
-    p = open(filename,'r')
-    response.write(p.read())
-    p.close()
-    return response
+    return build_and_return_pdf(writer)
 
 @permission_required('Management.report_projects_month')
 def report_projects_month(request, year, month):
-    filename = common.generate_unique_media_filename('pdf')
-    
-    response = HttpResponse(mimetype='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename=' + filename
 
     demands = Demand.objects.filter(year = year, month=month).all()
-    MultipleDemandWriter(demands, u'ריכוז דרישות לפרוייקטים לחודש %s\%s' % (year, month),
-                         show_month=False, show_project=True).build(filename)
-    p = open(filename,'r')
-    response.write(p.read())
-    p.close()
-    return response
+
+    title = u'ריכוז דרישות לפרוייקטים לחודש %s\%s' % (year, month)
+
+    writer = MultipleDemandWriter(demands, title, show_month=False, show_project=True)
+
+    return build_and_return_pdf(writer)
 
 @permission_required('demand_season_pdf')
 def report_project_season(request, project_id=None, from_year=common.current_month().year, from_month=common.current_month().month, 
@@ -4006,17 +3949,13 @@ def report_project_season(request, project_id=None, from_year=common.current_mon
     
     demands = Demand.objects.range(from_date.year, from_date.month, to_date.year, to_date.month).filter(project__id = project_id)
     
-    filename = common.generate_unique_media_filename('pdf')
-    
-    response = HttpResponse(mimetype='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename=' + filename
+    project = Project.objects.get(pk=project_id)
 
-    MultipleDemandWriter(demands, u'ריכוז דרישות תקופתי לפרוייקט %s' % Project.objects.get(pk=project_id),
-                         show_month=True, show_project=False).build(filename)
-    p = open(filename,'r')
-    response.write(p.read())
-    p.close()
-    return response
+    title = u'ריכוז דרישות תקופתי לפרוייקט %s' % project
+
+    writer = MultipleDemandWriter(demands, title, show_month=True, show_project=False)
+
+    return build_and_return_pdf(writer)
 
 @permission_required('demand_followup_pdf')
 def report_project_followup(request, project_id=None, from_year=common.current_month().year, from_month=common.current_month().month, 
@@ -4026,17 +3965,10 @@ def report_project_followup(request, project_id=None, from_year=common.current_m
     
     project = Project.objects.get(pk = project_id)
     demands = Demand.objects.range(from_date.year, from_date.month, to_date.year, to_date.month).filter(project__id = project_id)
-    
-    filename = common.generate_unique_media_filename('pdf')
-    
-    response = HttpResponse(mimetype='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename=' + filename
 
-    DemandFollowupWriter(project, from_month, from_year, to_month, to_year, demands).build(filename)
-    p = open(filename,'r')
-    response.write(p.read())
-    p.close()
-    return response
+    writer = DemandFollowupWriter(project, from_month, from_year, to_month, to_year, demands)
+    
+    return build_and_return_pdf(writer)
 
 @permission_required('Management.demand_season')
 def demand_season_list(request):
@@ -4120,23 +4052,15 @@ def demand_pay_balance_list(request):
                                           { 'filterForm': form, 'project_demands': project_demands},
                                           )
             elif 'pdf' in request.GET:
-                filename = common.generate_unique_media_filename('pdf')
-    
-                response = HttpResponse(mimetype='application/pdf')
-                response['Content-Disposition'] = 'attachment; filename=' + filename
-                
                 # build arguments to the writer
                 kwargs = {}
                 for key in 'all_times', 'from_month', 'from_year', 'to_month', 'to_year', 'demand_pay_balance':
                     kwargs[key] = cleaned_data[key]
                 kwargs['project_demands'] = project_demands
                 
-                DemandPayBalanceWriter(**kwargs).build(filename)
+                writer = DemandPayBalanceWriter(**kwargs)
                 
-                p = open(filename,'r')
-                response.write(p.read())
-                p.close()
-                return response
+                return build_and_return_pdf(writer)
     else:
         return render(request, 'Management/demand_pay_balance_list.html', 
                                   { 'filterForm': DemandPayBalanceForm(), 'project_demands': {}},
@@ -4247,17 +4171,9 @@ def employeesalary_season_list(request):
                         attr_value = getattr(salary, attr)
                         totals['total_' + attr] += attr_value or 0
             elif 'pdf' in request.GET:
-                filename = common.generate_unique_media_filename('pdf')
-                
-                response = HttpResponse(mimetype='application/pdf')
-                response['Content-Disposition'] = 'attachment; filename=' + filename
-            
-                EmployeeSalariesWriter(salaries, u'ריכוז שכר תקופתי לעובד - %s' % employee_base,
-                                       show_month=True, show_employee=False).build(filename)
-                p = open(filename,'r')
-                response.write(p.read())
-                p.close()
-                return response
+                title = u'ריכוז שכר תקופתי לעובד - %s' % employee_base
+                writer = EmployeeSalariesWriter(salaries, title, show_month=True, show_employee=False)
+                return build_and_return_pdf(writer)
     else:
         form = EmployeeSeasonForm()
     
@@ -4411,17 +4327,8 @@ def sale_analysis(request):
                         prev_row['avg_price_taxed_for_perfect_size']
                     
             elif 'pdf' in request.GET:
-                filename = common.generate_unique_media_filename('pdf')
-    
-                response = HttpResponse(mimetype='application/pdf')
-                response['Content-Disposition'] = 'attachment; filename=' + filename
-                
-                SaleAnalysisWriter(project, from_month, from_year, to_month, to_year, all_sales, include_clients).build(filename)
-                
-                p = open(filename,'r')
-                response.write(p.read())
-                p.close()
-                return response
+                writer = SaleAnalysisWriter(project, from_month, from_year, to_month, to_year, all_sales, include_clients)
+                return build_and_return_pdf(writer)
     else:
         form = SaleAnalysisForm()
         
