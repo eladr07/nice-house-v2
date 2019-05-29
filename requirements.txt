@@ -1,3 +1,4 @@
+gunicorn
 Django==2.2.1
 django-reversion==3.0.4
 mysqlclient==1.4.2.post1
