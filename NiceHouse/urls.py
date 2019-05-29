@@ -211,8 +211,7 @@ urlpatterns += [
     path('salaryexpenses/', SalaryExpensesListView.as_view()),
     path('nhsalaryexpenses/', NHSalaryExpensesListView.as_view()),
     path('salaryexpenses/<int:id>/approve', salary_expenses_approve),
-    path('salaryexpenses/<int:object_id>', limited_update_object,
-     {'model' : Management.models.SalaryExpenses, 'template_name' : 'Management/salaryexpenses_edit.html', 'post_save_redirect' : '%(id)s'}),
+    path('salaryexpenses/<int:pk>', SalaryExpensesUpdate.as_view()),
      path('salary/<int:salary_id>/expenses', employee_salary_expenses),
      
     path('employeesalaries/', employee_salary_list),
@@ -253,19 +252,16 @@ urlpatterns += [
     path('nhemployee/refund/<int:year>/<int:month>', nhemployee_refund),
         
     path('payments/add', payment_add),
-    path('payments/<int:object_id>', limited_update_object,
-     {'form_class' : Management.forms.PaymentForm, 'template_name' : 'Management/payment_edit.html', 'post_save_redirect' : '%(id)s'}),
+    path('payments/<int:pk>', PaymentUpdate.as_view()),
     path('payments/<int:id>/del', payment_del),
     
     path('invoices/add', invoice_add),      
-    path('invoices/<int:object_id>', limited_update_object,
-     {'form_class' : Management.forms.InvoiceForm, 'template_name' : 'Management/invoice_edit.html', 'post_save_redirect' : '%(id)s'}),
+    path('invoices/<int:pk>', InvoiceUpdate.as_view()),
     path('invoices/<int:id>/del', invoice_del),
      
     path('invoices/<int:id>/offset', invoice_offset),   
     path('invoices/offset', invoice_offset),      
-    path('invoiceoffset/<int:object_id>', limited_update_object,
-     {'model' : InvoiceOffset, 'template_name' : 'Management/object_edit.html', 'post_save_redirect' : '%(id)s'}),
+    path('invoiceoffset/<int:pk>', InvoiceOffsetUpdate.as_view()),
     path('invoiceoffset/<int:id>/del', invoice_offset_del),
     
     path('checks/', check_list),
@@ -284,8 +280,7 @@ urlpatterns += [
     path('loans/<int:pk>', LoanUpdate.as_view()),
     path('loans/<int:pk>/del', LoanDelete.as_view()),
      
-    path('loanpays/<int:object_id>', limited_update_object,
-     {'form_class' : Management.forms.LoanPayForm, 'template_name' : 'Management/object_edit.html', 'post_save_redirect' : '%(id)s'}),
+    path('loanpays/<int:pk>', LoanPayUpdate.as_view()),
     
     path('lawyers/', LawyerListView.as_view()),
     path('lawyers/add', LawyerCreate.as_view()),

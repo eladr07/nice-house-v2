@@ -1048,6 +1048,12 @@ def salary_expenses_approve(request, id):
     se.save()
     return HttpResponseRedirect('/salaryexpenses/?year=%s&month=%s' % (se.year, se.month))
     
+class SalaryExpensesUpdate(PermissionRequiredMixin, UpdateView):
+    model = SalaryExpenses
+    exclude = ('approved_date',)
+    template_name = 'Management/salaryexpenses_edit.html'
+    permission_required = 'Management.change_salaryexpenses'
+
 @permission_required('Management.list_employeesalary')
 def employee_salary_list(request):
     current = common.current_month()
@@ -1944,6 +1950,12 @@ def invoice_add(request, initial=None):
         form = DemandInvoiceForm(initial=initial)
     return render(request, 'Management/invoice_edit.html', {'form':form, 'sales':sales, 'demand': initial.get('demand')}, )
 
+class InvoiceUpdate(PermissionRequiredMixin, UpdateView):
+    model = Invoice
+    form_class = InvoiceForm
+    template_name = 'Management/invoice_edit.html'
+    permission_required = 'Management.change_invoice'
+
 @permission_required('Management.add_invoice')
 def demand_invoice_add(request, id):
     demand = Demand.objects.select_related('project').get(pk=id)
@@ -2071,6 +2083,18 @@ def invoice_offset(request, id=None):
         form = InvoiceOffsetForm(instance = offset, initial={'invoice_num':invoice_num})
     
     return render(request, 'Management/object_edit.html', {'form': form, 'title':u'זיכוי חשבונית'})    
+
+class InvoiceOffsetUpdate(PermissionRequiredMixin, UpdateView):
+    model = InvoiceOffset
+    fields = ('date','amount','reason','remarks')
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.change_invoiceoffset'
+
+class LoanPayUpdate(PermissionRequiredMixin, UpdateView):
+    model = LoanPay
+    form_class = LoanPayForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.change_loanpay'
 
 @permission_required('Management.delete_invoiceoffset')
 def invoice_offset_del(request, id):
@@ -2217,6 +2241,12 @@ def payment_add(request, initial=None):
         form = DemandPaymentForm(initial=initial)
     return render(request, 'Management/payment_edit.html', 
                               { 'form':form }, )
+
+class PaymentUpdate(PermissionRequiredMixin, UpdateView):
+    model = Payment
+    form_class = PaymentForm
+    template_name = 'Management/payment_edit.html'
+    permission_required = 'Management.change_payment'
 
 @permission_required('Management.change_payment')
 def demand_payment_edit(request, id):
