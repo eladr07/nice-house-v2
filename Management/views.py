@@ -29,24 +29,6 @@ from Management.pdf.writers import EmployeeSalesWriter, SaleAnalysisWriter, Dema
 from Management.mail import mail
 from pprint import pprint
 
-def object_edit_core(request, form_class, instance,
-                     template_name = 'Management/object_edit.html', 
-                     before_save = None, 
-                     after_save = None):
-    
-    if request.method == 'POST':
-        form = form_class(request.POST, instance = instance)
-        if form.is_valid():
-            if before_save:
-                before_save(form, instance)
-            form.save()
-            if after_save:
-                after_save(form, instance)
-    else:
-        form = form_class(instance = instance)
-        
-    return render(request, template_name, {'form':form })
-
 
 def build_and_return_pdf(writer):
     # Create a file-like buffer to receive PDF data.
@@ -4460,7 +4442,26 @@ def global_profit_lost(request):
     return render(request, 'Management/global_profit_loss.html', context)
     
 #################################################### ACTIVITY VIEWS ##########################################
+
+def object_edit_core(request, form_class, instance,
+                     template_name = 'Management/object_edit.html', 
+                     before_save = None, 
+                     after_save = None):
     
+    if request.method == 'POST':
+        form = form_class(request.POST, instance = instance)
+        if form.is_valid():
+            if before_save:
+                before_save(form, instance)
+            form.save()
+            if after_save:
+                after_save(form, instance)
+    else:
+        form = form_class(instance = instance)
+        
+    return render(request, template_name, {'form':form })
+
+
 @permission_required('Management.add_activity')
 def activity_add(request):
     activity = Activity()
