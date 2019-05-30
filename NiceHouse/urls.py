@@ -326,8 +326,7 @@ urlpatterns += [
       
     path('nhbranch/<int:branch_id>/nhsale/add', nhsale_add),
     path('nhbranch/<int:nhbranch_id>/addnhemployee', nhbranch_add_nhemployee),
-    path('nhbranchemployee/<int:object_id>', limited_update_object,
-     {'form_class' : Management.forms.NHBranchEmployeeForm, 'template_name' : 'Management/object_edit.html', 'post_save_redirect' : '%(id)s'}),
+    path('nhbranchemployee/<int:pk>', NHBranchEmployeeUpdate.as_view()),
     path('nhsale/<int:pk>/', NHSaleDetailView.as_view()),
     path('nhsale/<int:object_id>/move', nhsale_move_nhmonth),
     path('nhsale/<int:pk>/edit', NHSaleUpdate.as_view()),
@@ -414,8 +413,6 @@ urlpatterns += [
     path('saleprocess/<int:object_id>', saleprocess_edit),
     
     path('activity/add', activity_add),
-    path('activity/<int:object_id>/', limited_object_detail,
-     {'queryset':Activity.objects.all(), 'template_name':'Management/activity_detail.html'}),
-    path('activity/<int:object_id>/edit', limited_update_object,
-     {'form_class' : Management.forms.ActivityForm, 'template_name' : 'Management/activity_edit.html', 'post_save_redirect' : 'edit'}),    
+    path('activity/<int:pk>/', ActivityDetailView.as_view()),
+    path('activity/<int:pk>/edit', ActivityUpdate.as_view()),    
 ]

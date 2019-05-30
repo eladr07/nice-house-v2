@@ -3541,7 +3541,13 @@ def nhbranch_add_nhemployee(request, nhbranch_id):
     return render(request, 'Management/object_edit.html', 
                               { 'form':form },
                               )
-    
+
+class NHBranchEmployeeUpdate(PermissionRequiredMixin, UpdateView):
+    model = NHBranchEmployee
+    form_class = NHBranchEmployeeForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.change_nhbranchemployee'
+
 @login_required
 def json_buildings(request, project_id):
     data = serializers.serialize('json', Project.objects.get(pk= project_id).non_deleted_buildings(), 
@@ -3637,7 +3643,7 @@ def task_del(request, id):
 
 class AttachmentUpdate(PermissionRequiredMixin, UpdateView):
     model = Attachment
-    dorm_class = AttachmentForm
+    form_class = AttachmentForm
     template_name = 'Management/object_edit.html'
     permission_required = 'Management.change_attachment'
 
@@ -4467,6 +4473,17 @@ def activity_add(request):
     activity = Activity()
     return object_edit_core(request, ActivityForm, activity, 'Management/activity_edit.html')
     
+class ActivityDetailView(LoginRequiredMixin, DetailView):
+    model = Activity
+    template_name = 'Management/activity_detail.html'
+
+class ActivityUpdate(PermissionRequiredMixin, UpdateView):
+    model = Activity
+    form_class = 'ActivityForm'
+    success_url = 'edit'
+    template_name = 'Management/activity_edit.html'
+    permission_required = 'Management.change_activity'
+
 @permission_required('Management.add_citycallers')
 def activitybase_citycallers_add(request, activitybase_id):
     activity_base = ActivityBase.objects.get(pk = activitybase_id)
