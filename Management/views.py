@@ -3529,18 +3529,17 @@ def employee_bdsp(request, employee_id, project_id):
                               { 'form':form },
                               )
 
-@permission_required('Management.change_nhbranchemployee')
-def nhbranch_add_nhemployee(request, nhbranch_id):
-    if request.method == 'POST':
-        form = NHBranchEmployeeForm(request.POST)
-        if form.is_valid():
-            form.save()
-    else:
-        form = NHBranchEmployeeForm(initial = {'nhbranch':nhbranch_id})
-    
-    return render(request, 'Management/object_edit.html', 
-                              { 'form':form },
-                              )
+class NHBranchEmployeeCreate(PermissionRequiredMixin, CreateView):
+    model = NHBranchEmployee
+    form_class = NHBranchEmployeeForm
+    template_name = 'Management/object_edit.html'
+    permission_required = 'Management.add_nhbranchemployee'
+
+    def get_initial(self):
+        initial = super().get_initial()
+        branch_id = self.kwargs.get('nhbranch_id')
+        initial['nhbranch'] = branch_id
+        return initial
 
 class NHBranchEmployeeUpdate(PermissionRequiredMixin, UpdateView):
     model = NHBranchEmployee

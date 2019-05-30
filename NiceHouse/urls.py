@@ -325,7 +325,7 @@ urlpatterns += [
     path('salecancel/<int:pk>', SaleCancelUpdate.as_view()),
       
     path('nhbranch/<int:branch_id>/nhsale/add', nhsale_add),
-    path('nhbranch/<int:nhbranch_id>/addnhemployee', nhbranch_add_nhemployee),
+    path('nhbranch/<int:nhbranch_id>/addnhemployee', NHBranchEmployeeCreate.as_view()),
     path('nhbranchemployee/<int:pk>', NHBranchEmployeeUpdate.as_view()),
     path('nhsale/<int:pk>/', NHSaleDetailView.as_view()),
     path('nhsale/<int:object_id>/move', nhsale_move_nhmonth),
