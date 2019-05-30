@@ -13,7 +13,7 @@ from django.utils.translation import gettext
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 
-from Management.templatetags.management_extras import *
+from Management.templatetags.management_extras import commaise
 from Management.decorators import cache_method
 from Management.managers import *
 
@@ -2922,8 +2922,12 @@ class EmployeeCheck(CheckBase):
             query = EmployeeSalary.objects.filter(year = self.year, month = self.month, employee = self.employee.derived)
         elif isinstance(self.employee.derived, NHEmployee):
             query = NHEmployeeSalary.objects.filter(year = self.year, month = self.month, nhemployee = self.employee.derived)
-        if query.count() == 0: return None
-        if query.count() > 1: raise InvalidOperation % 'more than 1 salary for employee for the month'
+        
+        if query.count() == 0: 
+            return None
+        if query.count() > 1: 
+            raise InvalidOperation % 'more than 1 salary for employee for the month'
+        
         return query[0]
     def diff_amount_salary(self):
         salary = self.salary()
