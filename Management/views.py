@@ -801,49 +801,44 @@ def demand_return_to_calc(request, id):
 def demand_calc(request, id):
     # end the revision created by the middleware - i want manual control of the revision
     reversion.revision.end()
-    
-    logger = logging.getLogger('views')
-    
-    try:
-        d = Demand.objects.get(pk=id)
-        c = d.project.commissions
-        if c.commission_by_signups or c.c_zilber:
-            if c.commission_by_signups:
-                demands = list(Demand.objects.filter(project = d.project))
-            elif c.c_zilber:
-                demand = d
-                demands = []
-                while demand.zilber_cycle_index() > 1:
-                    demands.insert(0, demand)
-                    demand = demand.get_previous_demand()
+        
+    d = Demand.objects.get(pk=id)
+    c = d.project.commissions
+    if c.commission_by_signups or c.c_zilber:
+        if c.commission_by_signups:
+            demands = list(Demand.objects.filter(project = d.project))
+        elif c.c_zilber:
+            demand = d
+            demands = []
+            while demand.zilber_cycle_index() > 1:
                 demands.insert(0, demand)
+                demand = demand.get_previous_demand()
+            demands.insert(0, demand)
+        
+        # exclude all demands that were already sent! to include them you must manually change their status!!!!!
+        demands = [demand for demand in demands if demand.statuses.count() == 0 or (demand.statuses.count() > 0 and
+                    demand.statuses.latest().type.id not in (DemandStatusType.Sent, DemandStatusType.Finished))]
             
-            # exclude all demands that were already sent! to include them you must manually change their status!!!!!
-            demands = [demand for demand in demands if demand.statuses.count() == 0 or (demand.statuses.count() > 0 and
-                       demand.statuses.latest().type.id not in (DemandStatusType.Sent, DemandStatusType.Finished))]
-                
-            #delete all commissions and sale commission details before re-calculating
-            for demand in demands:
-                for s in demand.statuses.all():
-                    s.delete()
-                for s in demand.get_sales():
-                    for scd in s.project_commission_details.all():
-                        scd.delete()
-            for d2 in demands:
-                d2.calc_sales_commission()
-                demand = Demand.objects.get(pk=d2.id)
-                if demand.get_next_demand() != None:
-                    demand.finish()
-                    time.sleep(1)
-        else:
-            for s in d.get_sales():
+        #delete all commissions and sale commission details before re-calculating
+        for demand in demands:
+            for s in demand.statuses.all():
+                s.delete()
+            for s in demand.get_sales():
                 for scd in s.project_commission_details.all():
                     scd.delete()
-            d.calc_sales_commission()
-        return HttpResponseRedirect('/demandsold/?year=%s&month=%s' % (d.year,d.month))
-    except:
-        logger.exception("exception in view demand_calc with id: %s" % id)
-        return HttpResponseServerError('500.html')
+        for d2 in demands:
+            d2.calc_sales_commission()
+            demand = Demand.objects.get(pk=d2.id)
+            if demand.get_next_demand() != None:
+                demand.finish()
+                time.sleep(1)
+    else:
+        for s in d.get_sales():
+            for scd in s.project_commission_details.all():
+                scd.delete()
+        d.calc_sales_commission()
+        
+    return HttpResponseRedirect('/demandsold/?year=%s&month=%s' % (d.year,d.month))
 
 @permission_required('Management.projects_profit')
 def projects_profit(request):
