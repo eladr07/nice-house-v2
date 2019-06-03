@@ -96,3 +96,6 @@ db.sqlite3
 
 # Node Modules
 node_modules
+
+# static files
+staticfiles
