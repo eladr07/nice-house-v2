@@ -1,0 +1,21 @@
+{
+  "name": "Management",
+  "version": "1.0.0",
+  "devDependencies": {
+    "del": "^1.2.0",
+    "gulp": "^4.0.0",
+    "gulp-sourcemaps": "^2.6.4",
+    "gulp-concat": "^2.6.1",
+    "gulp-minify-css": "^1.2.4",
+    "gulp-less": "3.0.3"
+  },
+  "dependencies": {
+    "bootstrap": "~3.3.4",
+    "bootstrap-datepicker": "~1.6.4",
+    "bootstrap-rtl": "~3.3.4",
+    "font-awesome": "~4.4.0",
+    "jquery": "~2.2.3",
+    "jquery-ui-dist": "1.12.1",
+    "npm": "^6.4.1"
+  }
+}
