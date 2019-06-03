@@ -29,7 +29,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
     'nicehouse.herokuapp.com',
-    'nicehouse-env.uxsqy3mgcw.us-west-2.elasticbeanstalk.com'
+    'nicehouse-env.emfymi2hpr.eu-central-1.elasticbeanstalk.com'
     ]
 
 
