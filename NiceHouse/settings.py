@@ -29,7 +29,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
     'nicehouse.herokuapp.com',
-    'django-env.rmwby4rk6i.eu-central-1.elasticbeanstalk.com'
+    'nicehouse-env.uxsqy3mgcw.us-west-2.elasticbeanstalk.com'
     ]
 
 
