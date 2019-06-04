@@ -28,8 +28,6 @@ DEBUG = True
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
-    'nicehouse.herokuapp.com',
-    'nicehouse-env-2.piih2mkuip.eu-central-1.elasticbeanstalk.com'
     ]
 
 
@@ -134,7 +132,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
-STATIC_ROOT = 'staticfiles'
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATIC_URL = '/static/'
 
 # Extra places for collectstatic to find static files.
