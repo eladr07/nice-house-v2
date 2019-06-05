@@ -84,7 +84,7 @@
 		<legend>תוספות וקיזוזים</legend>
 		{% for d in demand.diffs.all %}
 			{{ d }}				
-			<a href="{{d.get_absolute_url}}" class="fancybox"><img src="{% static "images/edit_48.png" %}" width="20" height="20" border="0" alt="עריכה" /></a>
+			<a href="{{d.get_absolute_url}}" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
 			<a href="{{d.get_absolute_url}}/del"><img src="{% static "images/delete_48.png" %}" width="20" height="20" border="0" alt="מחיקה" /></a>
 			<br>
 		{% endfor %}
@@ -152,7 +152,7 @@
 			<b>{{i.date|date:"j/m/y"}}</b>
 			על סך
 			<b>{{i.amount|intcomma}} ש"ח</b>  				
-			<a href="/demandinvoice/{{i.id}}" ><img src="{% static "images/edit_48.png" %}" width="20" height="20" border="0" alt="עריכה" /></a>
+			<a href="/demandinvoice/{{i.id}}" ><i class="fa fa-edit" title='עריכה'></i></a>
 			<a href="/invoices/{{i.id}}/del"><img src="{% static "images/delete_48.png" %}" width="20" height="20" border="0" alt="מחיקה" /></a>
 			{% if i.offset %}
 				בתאריך 
@@ -161,7 +161,7 @@
 				{{i.offset.amount|intcomma}} ש"ח
 				בגלל 
 				{{i.offset.reason}} 
-				<a href="{{i.offset.get_absolute_url}}" class="fancybox"><img src="{% static "images/edit_48.png" %}" width="20" height="20" border="0" alt="עריכה" /></a>
+				<a href="{{i.offset.get_absolute_url}}" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
 				<a href="{{i.offset.get_absolute_url}}/del"><img src="{% static "images/delete_48.png" %}" width="20" height="20" border="0" alt="מחיקה" /></a>
 			{% else %}
 				<a href="/invoices/{{i.id}}/offset" class="fancybox">הזנת זיכוי לחשבונית</a>
@@ -178,7 +178,7 @@
 			<b>{{p.payment_date|date:"j/m/y"}}</b>
 			על סך
 			<b>{{p.amount|intcomma}} ש"ח</b>  				
-			<a href="/demandpayment/{{p.id}}" ><img src="{% static "images/edit_48.png" %}" width="20" height="20" border="0" alt="עריכה" /></a>
+			<a href="/demandpayment/{{p.id}}" ><i class="fa fa-edit" title='עריכה'></i></a>
 			<a href="/payments/{{p.id}}/del"><img src="{% static "images/delete_48.png" %}" width="20" height="20" border="0" alt="מחיקה" /></a>
 			<br>
 		{% endfor %}

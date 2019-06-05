@@ -46,7 +46,7 @@
 </form>
 <br>
 <div class="someIcon">
-	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="שינוי" /> 
+	<i class="fa fa-edit" title='שינוי'></i> 
 	<a id="edit" class="fancybox">עדכון</a>
 </div>
 <div style="float:left;">
@@ -106,7 +106,7 @@
 		{% if s.expenses.approved_date %}
 			<tr class="rowLightBlue" objid={{s.id}} employeeid={{s.get_employee.id}}>
 		{% endif %}
-			<td><a class="fancybox" href="/salary/{{s.id}}/expenses"><img src="{% static "images/edit_48.png" %}" width="20" height="20" alt="עדכון" border="0" /></a></td>
+			<td><a class="fancybox" href="/salary/{{s.id}}/expenses"><i class="fa fa-edit" title='עדכון'></i></a></td>
 			<td>{{ s.month }}/{{s.year}}</a></td>
 			<td>{{s.nhemployee.employment_terms.hire_type}}</td>
 			<td><a href="{{s.get_absolute_url}}/totaldetails" class="fancybox">{{s.neto|default_if_none:""|intcomma}}</a></td>

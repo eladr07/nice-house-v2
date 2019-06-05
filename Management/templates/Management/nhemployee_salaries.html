@@ -62,19 +62,19 @@
 </form>
 <br>
 <div class="someIcon" style="width:100px;">
-	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="החזר הלוואה" /> 
+	<i class="fa fa-edit" title='החזר הלוואה'></i> 
 	<a id="loanAdd" class="fancybox">הלוואה חדשה</a>
 </div>
 <div class="someIcon" style="width:100px;">
-	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="החזר הלוואה" /> 
+	<i class="fa fa-edit" title='החזר הלוואה'></i> 
 	<a id="loanPay" class="fancybox">קיזוז הלוואה</a>
 </div>
 <div class="someIcon" style="width:170px;">
-	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="שינוי" /> 
+	<i class="fa fa-edit" title='שינוי'></i> 
 	<a id="edit" class="fancybox">שינוי מרכיבי שכר - חד פעמי</a>
 </div>
 <div class="someIcon" style="width:100px;">
-	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="שינוי" /> 
+	<i class="fa fa-edit" title='שינוי'></i> 
 	<a id="expenses" class="fancybox">הוצאות שכר</a>
 </div>
 <div class="someIcon"style="width:130px;">
@@ -82,11 +82,11 @@
 	<a id="calcSalary">חישוב עמלות מחדש</a>
 </div>
 <div class="someIcon" style="width:120px;">
-	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="שינוי" /> 
+	<i class="fa fa-edit" title='שינוי'></i> 
 	<a id="approve" >אישור שכר לתשלום</a>
 </div>
 <div class="someIcon" style="width:100px;">
-	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="שינוי" /> 
+	<i class="fa fa-edit" title='שינוי'></i> 
 	<a id="approve" >תיק עובד</a>
 </div>
 <div class="clearBoth"></div>
@@ -134,7 +134,7 @@
 		{% else %}
 		<tr class="{% cycle 'row1' 'row2' %}" objid={{s.id}} employeeid={{s.nhemployee.id}}>
 		{% endif %}
-			<td><a class="fancybox" href="{{s.id}}"><img src="{% static "images/edit_48.png" %}" width="20" height="20" alt="שינוי מרכיבי שכר" border="0" /></a></td>
+			<td><a class="fancybox" href="{{s.id}}"><i class="fa fa-edit" title='שינוי מרכיבי שכר'></i></a></td>
 			<td><a href="{{s.nhemployee.get_absolute_url}}" target="_blank">{{ s.nhemployee }}</a></td>
 			<td>
 				{{s.nhemployee.employment_terms.hire_type}}

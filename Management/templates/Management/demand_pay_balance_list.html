@@ -104,23 +104,23 @@
 </div>
 <div class="clearBoth"></div>
 <div class="someIcon" style="width:100px;">
-	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="שינוי" /> 
+	<i class="fa fa-edit" title='שינוי'></i> 
 	<a id="demandEdit">שינוי דרישה</a>
 </div>
 <div class="someIcon" style="width:100px;">
-	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="שינוי" /> 
+	<i class="fa fa-edit" title='שינוי'></i> 
 	<a class="fancybox" id="demandAdjust">התאמת דרישה</a>
 </div>
 <div class="someIcon" style="width:100px;">
-	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="שינוי" /> 
+	<i class="fa fa-edit" title='שינוי'></i> 
 	<a id="demandForceFullyPaid">התאמה כפויה</a>
 </div>
 <div class="someIcon" style="width:100px;">
-	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="שינוי" /> 
+	<i class="fa fa-edit" title='שינוי'></i> 
 	<a id="demandAddInvoice">הזנת חשבונית</a>
 </div>
 <div class="someIcon" style="width:100px;">
-	<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="שינוי" /> 
+	<i class="fa fa-edit" title='שינוי'></i> 
 	<a id="demandAddPayment">הזנת תשלום</a>
 </div>
 <div class="someIcon"style="width:130px;">
@@ -234,7 +234,7 @@
 				</td>
 				<td>
 					{% if d.adjust_diff %}
-						<a href="{{d.adjust_diff.get_absolute_url}}" class="fancybox"><img src="{% static "images/edit_48.png" %}" width="20" height="20" border="0" alt="עריכה" /></a>
+						<a href="{{d.adjust_diff.get_absolute_url}}" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
 					{% endif %}
 				</td>
 				<td

@@ -101,7 +101,7 @@
 					</table>
 					<a href="/employees/{{form.instance.id}}/employmentterms" class="fancybox" style="text-decoration:none;">
 						שינוי תנאי העסקה 
-						<img src="{% static "images/edit_48.png" %}" width="15" height="15" border="0" alt="שינוי" />
+						<i class="fa fa-edit" title='שינוי'></i>
 					</a>
 				{% else %}
 					<a href="/employees/{{form.instance.id}}/employmentterms" class="fancybox" style="text-decoration:none;">
@@ -142,7 +142,7 @@
 					{% if perms.Management.change_account %}
 					<a href="account" class="fancybox" style="text-decoration:none;">
 						שינוי פרטי חשבון
-						<img src="{% static "images/edit_48.png" %}" width="15" height="15" border="0" alt="שינוי" />
+						<i class="fa fa-edit" title='שינוי'></i>
 					</a>
 					{% endif %}
 				{% else %}
@@ -197,7 +197,7 @@
 								</tr>
 							</table>
 							{% if not c.end_date %}
-							<a id="edit_cv" href="cv/project/{{c.project.id}}" class="fancybox"><img src="{% static "images/edit_48.png" %}" width="15" height="15" border="0" alt="עריכה" /></a>
+							<a id="edit_cv" href="cv/project/{{c.project.id}}" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
 							
 							<a id="commission_delete_cv" href="cv/project/{{c.project.id}}/del"><img src="{% static "images/delete_48.png" %}" width="15" height="15" border="0" alt="מחיקה" /></a>
 							{% endif %}
@@ -226,7 +226,7 @@
 								</tr>
 							</table>
 							{% if not c.end_date %}	
-							<a id="edit_cvp" href="cvp/project/{{c.project.id}}" class="fancybox"><img src="{% static "images/edit_48.png" %}" width="15" height="15" border="0" alt="עריכה" /></a>
+							<a id="edit_cvp" href="cvp/project/{{c.project.id}}" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
 							<a id="commission_delete_cvp" href="cvp/project/{{c.project.id}}/del"><img src="{% static "images/delete_48.png" %}" width="15" height="15" border="0" alt="מחיקה" /></a>
 							{% endif %}
 						</div>
@@ -244,7 +244,7 @@
 								{% endfor %}
 							</table>
 							{% if not c.end_date %}	
-							<a id="edit_cbp" href="cbp/project/{{c.project.id}}" class="fancybox"><img src="{% static "images/edit_48.png" %}" width="15" height="15" border="0" alt="עריכה" /></a>
+							<a id="edit_cbp" href="cbp/project/{{c.project.id}}" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
 							<a id="commission_delete_cbp" href="cbp/project/{{c.project.id}}/del"><img src="{% static "images/delete_48.png" %}" width="15" height="15" border="0" alt="מחיקה" /></a>
 							{% endif %}
 						</div>
@@ -262,7 +262,7 @@
 								{% endfor %}
 							</table>
 							{% if not c.end_date %}	
-							<a id="edit_bsr" href="bsr/project/{{c.project.id}}" class="fancybox"><img src="{% static "images/edit_48.png" %}" width="15" height="15" border="0" alt="עריכה" /></a>
+							<a id="edit_bsr" href="bsr/project/{{c.project.id}}" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
 							<a id="commission_delete_bsr" href="bsr/project/{{c.project.id}}/del"><img src="{% static "images/delete_48.png" %}" width="15" height="15" border="0" alt="מחיקה" /></a>
 							{% endif %}
 						</div>
@@ -280,7 +280,7 @@
 								{% endfor %}
 							</table>	
 							{% if not c.end_date %}	
-							<a id="edit_bht" href="bht/project/{{c.project.id}}" class="fancybox"><img src="{% static "images/edit_48.png" %}" width="15" height="15" border="0" alt="עריכה" /></a>
+							<a id="edit_bht" href="bht/project/{{c.project.id}}" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
 							<a id="commission_delete_bht" href="bht/project/{{c.project.id}}/del"><img src="{% static "images/delete_48.png" %}" width="15" height="15" border="0" alt="מחיקה" /></a>
 							{% endif %}
 						</div>
@@ -294,7 +294,7 @@
 								{{c.b_discount_save.max_for_bonus}}%
 							{% endif %}
 							{% if not c.end_date %}
-							<a id="edit_bds" href="bds/project/{{c.project.id}}" class="fancybox"><img src="{% static "images/edit_48.png" %}" width="15" height="15" border="0" alt="עריכה" /></a>
+							<a id="edit_bds" href="bds/project/{{c.project.id}}" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
 							<a id="commission_delete_bds" href="bds/project/{{c.project.id}}/del"><img src="{% static "images/delete_48.png" %}" width="15" height="15" border="0" alt="מחיקה" /></a>
 							{% endif %}
 						</div>
@@ -308,7 +308,7 @@
 								{{c.b_discount_save_precentage.max_for_bonus}}%
 							{% endif %}
 							{% if not c.end_date %}
-							<a id="edit_bdsp" href="bdsp/project/{{c.project.id}}" class="fancybox"><img src="{% static "images/edit_48.png" %}" width="15" height="15" border="0" alt="עריכה" /></a>
+							<a id="edit_bdsp" href="bdsp/project/{{c.project.id}}" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
 							<a href="bdsp/project/{{c.project.id}}/del"><img src="{% static "images/delete_48.png" %}" width="15" height="15" border="0" alt="מחיקה" /></a>
 							{% endif %}
 						</div>

@@ -106,7 +106,7 @@
 			<a href="../addhouse/type{{type.id}}">הוספת דירה חדשה למחירון</a>
 	</div>	
 	<div class="someIcon">
-		<img src="{% static "images/edit_48.png" %}" width="20" height="20"  alt="עריכה" /> 
+		<i class="fa fa-edit" title='עריכה'></i> 
 		<a id="houseEdit">שינוי</a>
 	</div>
 	<div class="someIcon">
@@ -367,7 +367,7 @@
 				<td>{{s.num}}</td>
 				<td>{{s.size|default_if_none:""}}</td>
 				<td style="text-align:center;">{{s.house.num}}</td>
-				<td><a href="/storages/{{s.id}}" class="fancybox"><img src="{% static "images/edit_48.png" %}" width="20" height="20" border="0" alt="עריכה" /></a></td>
+				<td><a href="/storages/{{s.id}}" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a></td>
 			</tr>
 			{% endfor %}
 		</table>
@@ -388,7 +388,7 @@
 				<td>{{p.num}}</td>
 				<td>{{p.type}}</td>
 				<td style="text-align:center;">{{p.house.num}}</td>
-				<td><a href="/parkings/{{p.id}}" class="fancybox"><img src="{% static "images/edit_48.png" %}" width="20" height="20" border="0" alt="עריכה" /></a></td>
+				<td><a href="/parkings/{{p.id}}" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a></td>
 			</tr>
 			{% endfor %}
 		</table>
