@@ -34,7 +34,7 @@ var config = {
         root + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.he.min.js'
     ],
 
-    bootstrap_less: "Content/bootstrap-custom.less",
+    bootstrap_less: root + "/bootstrap/less/bootstrap.less",
 
     //Bootstrap CSS and Fonts
     bootstrap_datepicker: root + '/bootstrap-datepicker/dist/css/bootstrap-datepicker.css',
