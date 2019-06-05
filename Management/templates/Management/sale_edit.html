@@ -151,7 +151,7 @@
 				<th>{{ form.project.label_tag }}</th>
 				<td>
 					{{ form.project }}
-					{% if form.project.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.project.errors|join:""}}'/>{% endif %}
+					{% if form.project.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.project.errors|join:""}}'></i>{% endif %}
 				</td>
 			</tr>
 			<tr>
@@ -159,28 +159,28 @@
 				<th>{{ form.building.label_tag }}</th>
 				<td>
 					{{ form.building }}
-					{% if form.building.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.building.errors|join:""}}'/>{% endif %}
+					{% if form.building.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.building.errors|join:""}}'></i>{% endif %}
 				</td>
 			</tr>
 			<tr>
 				<th>{{ form.house.label_tag }}</th>
 				<td>
 					{{ form.house }}
-					{% if form.house.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.house.errors|join:""}}'/>{% endif %}
+					{% if form.house.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.house.errors|join:""}}'></i>{% endif %}
 				</td>
 			</tr>
 			<tr>
 				<th>{{ form.employee.label_tag }}</th>
 				<td>
 					{{ form.employee }}
-					{% if form.employee.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.employee.errors|join:""}}'/>{% endif %}
+					{% if form.employee.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.employee.errors|join:""}}'></i>{% endif %}
 				</td>
 			</tr>
 			<tr>
 				<th>{{ form.joined_sale.label_tag }}</th>
 				<td>
 					{{ form.joined_sale }}
-					{% if form.joined_sale.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.joined_sale.errors|join:""}}'/>{% endif %}
+					{% if form.joined_sale.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.joined_sale.errors|join:""}}'></i>{% endif %}
 				</td>
 			</tr>
 			<tr>
@@ -191,56 +191,56 @@
 				<th>{{ form.clients.label_tag }}</th>
 				<td>
 					{{ form.clients }}
-					{% if form.clients.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.clients.errors|join:""}}'/>{% endif %}
+					{% if form.clients.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.clients.errors|join:""}}'></i>{% endif %}
 				</td>
 			</tr>
 			<tr>
 				<th>{{ form.clients_phone.label_tag }}</th>
 				<td>
 					{{ form.clients_phone }}
-					{% if form.clients_phone.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.clients_phone.errors|join:""}}'/>{% endif %}
+					{% if form.clients_phone.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.clients_phone.errors|join:""}}'></i>{% endif %}
 				</td>
 			</tr>
 			<tr>
 				<th>{{ form.sale_date.label_tag }}</th>
 				<td>
 					{{ form.sale_date }}
-					{% if form.sale_date.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.sale_date.errors|join:""}}'/>{% endif %}
+					{% if form.sale_date.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.sale_date.errors|join:""}}'></i>{% endif %}
 				</td>
 			</tr>
 			<tr>
 				<th>{{ form.price.label_tag }}</th>
 				<td>
 					{{ form.price }}
-					{% if form.price.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.price.errors|join:""}}'/>{% endif %}
+					{% if form.price.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.price.errors|join:""}}'></i>{% endif %}
 				</td>
 			</tr>
 			<tr>
 				<th>{{ form.min_price.label_tag }}</th>
 				<td>
 					{{ form.min_price }}
-					{% if form.min_price.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.min_price.errors|join:""}}'/>{% endif %}
+					{% if form.min_price.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.min_price.errors|join:""}}'></i>{% endif %}
 				</td>
 			</tr>
 			<tr>
 				<th>{{ form.price_include_lawyer.label_tag }}</th>
 				<td>
 					{{ form.price_include_lawyer }}
-					{% if form.price_include_lawyer.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.price_include_lawyer.errors|join:""}}'/>{% endif %}
+					{% if form.price_include_lawyer.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.price_include_lawyer.errors|join:""}}'></i>{% endif %}
 				</td>
 			</tr>
 			<tr>
 				<th>{{ form.price_no_lawyer.label_tag }}</th>
 				<td>
 					{{ form.price_no_lawyer }}
-					{% if form.price_no_lawyer.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.price_no_lawyer.errors|join:""}}'/>{% endif %}
+					{% if form.price_no_lawyer.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.price_no_lawyer.errors|join:""}}'></i>{% endif %}
 				</td>
 			</tr>
 			<tr>
 				<th>{{ form.include_tax.label_tag }}</th>
 				<td>
 					{{ form.include_tax }}
-					{% if form.include_tax.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.include_tax.errors|join:""}}'/>{% endif %}
+					{% if form.include_tax.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.include_tax.errors|join:""}}'></i>{% endif %}
 				</td>
 			</tr>
 			<tr>
@@ -251,21 +251,21 @@
 				<th>{{ form.contract_num.label_tag }}</th>
 				<td>
 					{{ form.contract_num }}
-					{% if form.contract_num.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.contract_num.errors|join:""}}'/>{% endif %}
+					{% if form.contract_num.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.contract_num.errors|join:""}}'></i>{% endif %}
 				</td>
 			</tr>
 			<tr>
 				<th>{{ form.discount.label_tag }}</th>
 				<td>
 					{{ form.discount }}
-					{% if form.discount.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.discount.errors|join:""}}'/>{% endif %}
+					{% if form.discount.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.discount.errors|join:""}}'></i>{% endif %}
 				</td>
 			</tr>
 			<tr>
 				<th>{{ form.allowed_discount.label_tag }}</th>
 				<td>
 					{{ form.allowed_discount }}
-					{% if form.allowed_discount.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.allowed_discount.errors|join:""}}'/>{% endif %}
+					{% if form.allowed_discount.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.allowed_discount.errors|join:""}}'></i>{% endif %}
 				</td>
 			</tr>
 			<tr>
@@ -276,35 +276,35 @@
 				<th>{{ form.company_price.label_tag }}</th>
 				<td>
 					{{ form.company_price }}
-					{% if form.company_price.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.company_price.errors|join:""}}'/>{% endif %}
+					{% if form.company_price.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.company_price.errors|join:""}}'></i>{% endif %}
 				</td>
 			</tr>
 			<tr>
 				<th>{{ form.commission_madad_bi.label_tag }}</th>
 				<td>
 					{{ form.commission_madad_bi }}
-					{% if form.commission_madad_bi.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.commission_madad_bi.errors|join:""}}'/>{% endif %}
+					{% if form.commission_madad_bi.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.commission_madad_bi.errors|join:""}}'></i>{% endif %}
 				</td>
 			</tr>
 			<tr>
 				<th>{{ form.include_registration.label_tag }}</th>
 				<td>
 					{{ form.include_registration }}
-					{% if form.include_registration.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.include_registration.errors|join:""}}'/>{% endif %}
+					{% if form.include_registration.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.include_registration.errors|join:""}}'></i>{% endif %}
 				</td>
 			</tr>
 			<tr>
 				<th>{{ form.specification_expense.label_tag }}</th>
 				<td>
 					{{ form.specification_expense }}
-					{% if form.specification_expense.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.specification_expense.errors|join:""}}'/>{% endif %}
+					{% if form.specification_expense.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.specification_expense.errors|join:""}}'></i>{% endif %}
 				</td>
 			</tr>
 			<tr>
 				<th>{{ form.other_expense.label_tag }}</th>
 				<td>
 					{{ form.other_expense }}
-					{% if form.other_expense.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.other_expense.errors|join:""}}'/>{% endif %}
+					{% if form.other_expense.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.other_expense.errors|join:""}}'></i>{% endif %}
 				</td>
 			</tr>
 			<tr>
@@ -315,7 +315,7 @@
 				<th>{{ form.signup_date.label_tag }}</th>
 				<td>
 					{{ form.signup_date }}
-					{% if form.signup_date.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.signup_date.errors|join:""}}'/>{% endif %}
+					{% if form.signup_date.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.signup_date.errors|join:""}}'></i>{% endif %}
 				</td>
 			</tr>
 			<tr>
@@ -326,14 +326,14 @@
 				<th>{{ form.remarks.label_tag }}</th>
 				<td>
 					{{ form.remarks }}
-					{% if form.remarks.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.remarks.errors|join:""}}'/>{% endif %}
+					{% if form.remarks.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.remarks.errors|join:""}}'></i>{% endif %}
 				</td>
 			</tr>
 			<tr>
 				<th>{{ form.commission_include.label_tag }}</th>
 				<td>
 					{{ form.commission_include }}
-					{% if form.commission_include.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.commission_include.errors|join:""}}'/>{% endif %}
+					{% if form.commission_include.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.commission_include.errors|join:""}}'></i>{% endif %}
 				</td>
 			</tr>
 		</table>

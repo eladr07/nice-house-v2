@@ -51,7 +51,7 @@
 			<th>{{ field.label_tag }}</th>
 			<td>
 				{{field}}
-				{% if field.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{field.errors|join:""}}'/>{% endif %}
+				{% if field.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{field.errors|join:""}}'></i>{% endif %}
 			</td>
 		</tr>
 	{% endfor %}

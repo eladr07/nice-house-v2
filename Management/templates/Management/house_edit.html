@@ -42,91 +42,91 @@
 					<th>{{form.num.label_tag}}</th>
 					<td>
 						{{form.num}}
-						{% if form.num.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.num.errors|join:""}}'/>{% endif %}
+						{% if form.num.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.num.errors|join:""}}'></i>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{form.type.label_tag}}</th>
 					<td>
 						{{form.type}}
-						{% if form.type.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.type.errors|join:""}}'/>{% endif %}
+						{% if form.type.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.type.errors|join:""}}'></i>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{form.floor.label_tag}}</th>
 					<td>
 						{{form.floor}}
-						{% if form.floor.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.floor.errors|join:""}}'/>{% endif %}
+						{% if form.floor.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.floor.errors|join:""}}'></i>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{form.rooms.label_tag}}</th>
 					<td>
 						{{form.rooms}}
-						{% if form.rooms.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.rooms.errors|join:""}}'/>{% endif %}
+						{% if form.rooms.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.rooms.errors|join:""}}'></i>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{form.net_size.label_tag}}</th>
 					<td>
 						{{form.net_size}}
-						{% if form.net_size.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.net_size.errors|join:""}}'/>{% endif %}
+						{% if form.net_size.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.net_size.errors|join:""}}'></i>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{form.garden_size.label_tag}}</th>
 					<td>
 						{{form.garden_size}}
-						{% if form.garden_size.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.garden_size.errors|join:""}}'/>{% endif %}
+						{% if form.garden_size.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.garden_size.errors|join:""}}'></i>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{form.is_sold.label_tag}}</th>
 					<td>
 						{{form.is_sold}}
-						{% if form.is_sold.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.is_sold.errors|join:""}}'/>{% endif %}
+						{% if form.is_sold.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.is_sold.errors|join:""}}'></i>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{form.parking1.label_tag}}</th>
 					<td>
 						{{form.parking1}}
-						{% if form.parking1.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.parking1.errors|join:""}}'/>{% endif %}
+						{% if form.parking1.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.parking1.errors|join:""}}'></i>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{form.parking2.label_tag}}</th>
 					<td>
 						{{form.parking2}}
-						{% if form.parking2.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.parking2.errors|join:""}}'/>{% endif %}
+						{% if form.parking2.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.parking2.errors|join:""}}'></i>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{form.parking3.label_tag}}</th>
 					<td>
 						{{form.parking3}}
-						{% if form.parking3.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.parking3.errors|join:""}}'/>{% endif %}
+						{% if form.parking3.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.parking3.errors|join:""}}'></i>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{form.storage1.label_tag}}</th>
 					<td>
 						{{form.storage1}}
-						{% if form.storage1.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.storage1.errors|join:""}}'/>{% endif %}
+						{% if form.storage1.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.storage1.errors|join:""}}'></i>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{form.storage2.label_tag}}</th>
 					<td>
 						{{form.storage2}}
-						{% if form.storage2.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.storage2.errors|join:""}}'/>{% endif %}
+						{% if form.storage2.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.storage2.errors|join:""}}'></i>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{form.remarks.label_tag}}</th>
 					<td>
 						{{form.remarks}}
-						{% if form.remarks.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.remarks.errors|join:""}}'/>{% endif %}
+						{% if form.remarks.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.remarks.errors|join:""}}'></i>{% endif %}
 					</td>
 				</tr>
 			</table>
@@ -138,21 +138,21 @@
 					<th>{{form.bruto_size.label_tag}}</th>
 					<td>
 						{{form.bruto_size}}
-						{% if form.bruto_size.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.bruto_size.errors|join:""}}'/>{% endif %}
+						{% if form.bruto_size.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.bruto_size.errors|join:""}}'></i>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{form.load_precentage.label_tag}}</th>
 					<td>
 						{{form.load_precentage}}
-						{% if form.load_precentage.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.load_precentage.errors|join:""}}'/>{% endif %}
+						{% if form.load_precentage.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.load_precentage.errors|join:""}}'></i>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{form.parking_size.label_tag}}</th>
 					<td>
 						{{form.parking_size}}
-						{% if form.parking_size.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.parking_size.errors|join:""}}'/>{% endif %}
+						{% if form.parking_size.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.parking_size.errors|join:""}}'></i>{% endif %}
 					</td>
 				</tr>
 			</table>
@@ -166,14 +166,14 @@
 					<th>{{form.price.label_tag}}</th>
 					<td>
 						{{form.price}}
-						{% if form.price.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.price.errors|join:""}}'/>{% endif %}
+						{% if form.price.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.price.errors|join:""}}'></i>{% endif %}
 					</td>
 				</tr>
 				<tr>
 					<th>{{form.price_date.label_tag}}</th>
 					<td>
 						{{form.price_date}}
-						{% if form.price_date.errors %}<img src="{% static "images/error-48.png" %}" width="15" height="15" title='{{form.price_date.errors|join:""}}'/>{% endif %}
+						{% if form.price_date.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.price_date.errors|join:""}}'></i>{% endif %}
 					</td>
 				</tr>
 			</table>
