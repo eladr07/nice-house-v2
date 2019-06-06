@@ -118,25 +118,8 @@ BODY {
 	text-align: right;
 }
 
-#content a {
-	color: #0065BD;
-}
-
 #content img {
 	border: 0;
-}
-
-#content li {
-	list-style-type	: circle;
-}
-
-#content ul {
-	margin-top : 1px;
-	margin-bottom : 1px;
-}
-
-#content a:hover {
-	color: #AF0007;
 }
 
 #content .inputText {
