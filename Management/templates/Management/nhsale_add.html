@@ -114,16 +114,14 @@ function updateValues() {
 </script>
 {% endblock header %}
 {% block content %}
-	<div class="title">
-		<div class="pageTitle">
+	<h3 class="text-center text-danger">
 			{% if form.instance.id %}
 				עדכון מכירה מס' 
 				{{form.instance.id}}
 			{% else %}
 				מכירה חדשה
 			{% endif %}
-		</div>
-	</div>
+		</h3>
 	<br>
 	<form method="POST">
 	<div style="width:90%; margin:auto;">

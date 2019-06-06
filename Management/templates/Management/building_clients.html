@@ -2,9 +2,7 @@
 {% load humanize %}
 {% block content %}
 <div id="content">
-	<div class="title">
-		<div class="pageTitle">מצבת רוכשים לבניין {{object.num}} בפרוייקט {{object.project}}</div>
-	</div>
+	<h3 class="text-center text-danger">מצבת רוכשים לבניין {{object.num}} בפרוייקט {{object.project}}</h3>
 	<div class="someIcon" style="width:100px;">
 		<img src="{% static "images/print-48.png" %}" width="20" height="20" /> 
 		<a href="pdf" >גרסת הדפסה</a>

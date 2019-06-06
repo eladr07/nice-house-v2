@@ -14,9 +14,7 @@
 {% block page %}
 <div id="content">
 {% if obj %}
-	<div class="title">
-		<div class="pageTitle">הוספת מסמך עבור - {{obj}}</div>
-	</div>
+	<h3 class="text-center text-danger">הוספת מסמך עבור - {{obj}}</h3>
 {% endif %}
 	<form method="POST" enctype="multipart/form-data">
 		<table class="formTable">

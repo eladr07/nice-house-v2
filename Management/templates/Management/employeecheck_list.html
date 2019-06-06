@@ -28,9 +28,7 @@
 </script>
 {% endblock header %}
 {% block content %}
-<div class="title">
-	<div class="pageTitle">פירוט צ'קים לעובדים מחודש {{from_date|date:"M Y"}} עד חודש {{to_date|date:"M Y"}}</div>
-</div>
+<h3 class="text-center text-danger">פירוט צ'קים לעובדים מחודש {{from_date|date:"M Y"}} עד חודש {{to_date|date:"M Y"}}</h3>
 <div class="someIcon">
 	<img src="{% static "images/add_48.png" %}" width="20" height="20"  alt="הוספה" /> 
 	<a href="add" class="fancybox" >חדש</a>

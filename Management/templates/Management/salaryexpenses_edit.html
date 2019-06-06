@@ -67,9 +67,7 @@
 {% endblock header %}
 {% block page %}
 <div id="content">	
-	<div class="title">
-		<div class="pageTitle">{% if form.instance.id %}עדכון הוצאות שכר{% else %}הזנת הוצאות שכר{% endif %}</div>
-	</div>
+	<h3 class="text-center text-danger">{% if form.instance.id %}עדכון הוצאות שכר{% else %}הזנת הוצאות שכר{% endif %}</h3>
 	<div class="clearBoth"></div>
 	<form method="POST" enctype="multipart/form-data">
 		<table class="formTable">
