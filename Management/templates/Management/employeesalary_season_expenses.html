@@ -48,13 +48,11 @@
 </script>
 {% endblock header %}
 {% block content %}
-<div class="title">
-	<div class="pageTitle">
+	<h3 class="text-center text-danger">
 		{% if employee %}
-ריכוז שכר לעובד כולל הוצאות מעביד תקופתי<br><a href="{{employee.get_absolute_url}}">{{employee}}</a>
+			ריכוז שכר לעובד כולל הוצאות מעביד תקופתי<br><a href="{{employee.get_absolute_url}}">{{employee}}</a>
 		{% endif %}
-	</div>
-</div>
+	</h3>
 <div class="clearBoth"></div>
 <form method="GET">
 	<table class="dataTable" style="width: 70%;" border="1">

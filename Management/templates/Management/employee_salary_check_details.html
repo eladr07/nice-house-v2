@@ -2,13 +2,13 @@
 {% load humanize %}
 {% block page %}
 <div id="content">
-	<div class="title">
+	<h3 class="text-center text-danger">
 		{% if salary.employee %}
-		<div class="pageTitle">פירוט שווי צ'ק לעובד {{salary.employee}} לחודש {{salary.month}}/{{salary.year}}</div>
+			פירוט שווי צ'ק לעובד {{salary.employee}} לחודש {{salary.month}}/{{salary.year}}
 		{% elif salary.nhemployee %}
-		<div class="pageTitle">פירוט שווי צ'ק לעובד {{salary.nhemployee}} לחודש {{salary.month}}/{{salary.year}}</div>
+			פירוט שווי צ'ק לעובד {{salary.nhemployee}} לחודש {{salary.month}}/{{salary.year}}
 		{% endif %}
-	</div>
+	</h3>
 	<div class="clearBoth"></div>
 	<table id="sales_table" class="formTable">
 		<tr>

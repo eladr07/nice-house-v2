@@ -5,26 +5,24 @@
 
 {% block content %}
 {% if demand.id %}
-	<div class="title">
-		<div class="pageTitle">
-			{% if demand.get_previous_demand %}
-			<a href="/demands/{{demand.get_previous_demand.id}}" style="text-decoration:none;">
-				<img src="{% static "images/1rightarrow-48.png" %}" width="24" height="24" border="0" alt="דרישה קודמת" />
-			</a>
-			{% endif %}
-			ריכוז מכירות {{demand.month}}/{{demand.year}}
-			לפרוייקט
-			{{demand.project}}
-			{% if demand.get_next_demand %}
-			<a href="/demands/{{demand.get_next_demand.id}}" style="text-decoration:none;">
-				<img src="{% static "images/1leftarrow-48.png" %}" width="24" height="24" border="0" alt="דרישה הבאה" />
-			</a>
-			{% endif %}
-			<br>
-			מצב - 
-			{{demand.statuses.latest.type}}
-		</div>
-	</div>
+	<h3 class="text-center text-danger">
+		{% if demand.get_previous_demand %}
+		<a href="/demands/{{demand.get_previous_demand.id}}" style="text-decoration:none;">
+			<img src="{% static "images/1rightarrow-48.png" %}" width="24" height="24" border="0" alt="דרישה קודמת" />
+		</a>
+		{% endif %}
+		ריכוז מכירות {{demand.month}}/{{demand.year}}
+		לפרוייקט
+		{{demand.project}}
+		{% if demand.get_next_demand %}
+		<a href="/demands/{{demand.get_next_demand.id}}" style="text-decoration:none;">
+			<img src="{% static "images/1leftarrow-48.png" %}" width="24" height="24" border="0" alt="דרישה הבאה" />
+		</a>
+		{% endif %}
+		<br>
+		מצב - 
+		{{demand.statuses.latest.type}}
+	</h3>
 	<div class="clearBoth"></div>
 	<table class="pageSubTitle" align="center">
 		<tr>

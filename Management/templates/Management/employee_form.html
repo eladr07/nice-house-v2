@@ -19,13 +19,13 @@
 </script>
 {% endblock header %}
 {% block content %}	
-	<div class="title">
-	{% if form.instance.id %}
-		<div class="pageTitle">כרטיס עובד - {{form.instance}} ({{form.instance.id}})</div>	
-	{% else %}
-		<div class="pageTitle">הוספת עובד</div>	
-	{% endif %}
-	</div>
+	<h3 class="text-center text-danger">
+		{% if form.instance.id %}
+			כרטיס עובד - {{form.instance}} ({{form.instance.id}})
+		{% else %}
+			הוספת עובד
+		{% endif %}
+	</h3>
 	<div id="rightSide">
 		<form method="POST">
 		<fieldset class="cardFieldset">

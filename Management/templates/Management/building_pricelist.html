@@ -55,13 +55,13 @@
 {% block content %}
 
 {% with form.instance.building as b %}
-<div class="title">
-{% if b.is_cottage %}
-	<div class="pageTitle">מחירון קוטג'ים - {{type}}</div>
-{% else %}
-	<div class="pageTitle">מחירון לבניין - {{type}}</div>
-{% endif %}
-</div>
+<h3 class="text-center text-danger">
+	{% if b.is_cottage %}
+		מחירון קוטג'ים - {{type}}
+	{% else %}
+		מחירון לבניין - {{type}}
+	{% endif %}
+</h3>
 <form method="POST">
 <table class="pageSubTitle" cellspacing="5" align="center" style="text-align:right;cellpadding:5px;" >
 	<tr>
