@@ -49,18 +49,17 @@
 		</table>
 	</form>
 	<br /> 		
-	<div class="someIcon">
-		<img src="{% static "images/add_48.png" %}" width="20" height="20"  alt="חדש" /> 
-		<a href="/task/add" class="fancybox">חדש</a>
-	</div>
-	<div class="someIcon">
-		<img src="{% static "images/delete_48.png" %}" width="20" height="20"  alt="מחיקה" /> 
-		<a id="taskDelete">מחיקה</a>
-	</div>	
-	<div class="someIcon">
-		<img src="{% static "images/thumbs_up_48.png" %}" width="20" height="20"  alt="בצע" /> 
-		<a id="taskDo">בצע</a>
-	</div>
+	
+	<a href="/task/add" class="btn btn-default fancybox" role="button">
+		<i class="fa fa-fw fa-plus-circle"></i> חדש
+	</a>
+	<a id="taskDelete" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-times-circle"></i> מחיקה
+	</a>
+	<a id="taskDo" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-thumbs-up"></i> בצע
+	</a>
+
 	<div class="clearBoth"> </div>
 	<table id="taskTable" class="dataTable" border="1">
 		<tr>

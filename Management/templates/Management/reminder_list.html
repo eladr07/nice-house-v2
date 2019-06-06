@@ -42,22 +42,20 @@
 <div id="content">
 	<h3 class="text-center text-danger">ניהול תזכורות</h3>
 	<br /> 
-	<div class="someIcon">
-		<img src="{% static "images/add_48.png" %}" width="20" height="20"  alt="הוספה" /> 
-		<a id="reminderAdd" href="addreminder">הוספה</a>
-	</div>
-	<div class="someIcon">
-		<i class="fa fa-edit" title='עריכה'></i> 
-		<a id="reminderEdit">עריכה</a>
-	</div>
-	<div class="someIcon">
-		<img src="{% static "images/delete_48.png" %}" width="20" height="20"  alt="מחיקה" /> 
-		<a id="reminderDelete">מחיקה</a>
-	</div>	
-	<div class="someIcon">
-		<img src="{% static "images/thumbs_up_48.png" %}" width="20" height="20"  alt="בצע" /> 
-		<a id="reminderDo">בצע</a>
-	</div>
+
+	<a id="reminderAdd" href="addreminder" class="btn btn-default fancybox" role="button">
+		<i class="fa fa-fw fa-plus-circle"></i> הוספה
+	</a>
+	<a id="reminderEdit" class="btn btn-default fancybox" role="button">
+		<i class="fa fa-fw fa-edit"></i> עריכה
+	</a>
+	<a id="reminderDelete" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-times-circle"></i> מחיקה
+	</a>
+	<a id="reminderDo" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-thumbs-up"></i> בצע
+	</a>
+
 	<div class="clearBoth"> </div>
 	<table id="remindersTable" class="dataTable" border="1">
 		<tr>

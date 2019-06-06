@@ -29,18 +29,17 @@
 		ריכוז הרשמות לחודש {{ month|date:"M Y" }}<br>
 		{{project}}
 	</h3>
-	<div class="someIcon" style="width:100px;">
-		<img src="{% static "images/add_48.png" %}" width="20" height="20"  alt="חדש" /> 
-		<a href="add">הרשמה חדשה</a>
-	</div>
-	<div class="someIcon" style="width:120px;">
-		<i class="fa fa-edit" title='שינוי'></i> 
-		<a id="signupEdit">שינוי פרטי הרשמה</a>
-	</div>
-	<div class="someIcon" style="width:90px;">
-		<img src="{% static "images/delete_48.png" %}" width="20" height="20"  alt="מחיקה" /> 
-		<a id="signupCancel" class="fancybox">ביטול הרשמה</a>
-	</div>
+
+	<a href="add" class="btn btn-default fancybox" role="button">
+		<i class="fa fa-fw fa-plus-circle"></i> הרשמה חדשה
+	</a>
+	<a id="signupEdit" class="btn btn-default fancybox" role="button">
+		<i class="fa fa-fw fa-edit"></i> שינוי פרטי הרשמה
+	</a>
+	<a id="signupCancel" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-times-circle"></i> ביטול הרשמה
+	</a>
+
 	<div class="clearBoth"></div>	
 	<br>	
 	<form method="GET">
