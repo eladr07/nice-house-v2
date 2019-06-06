@@ -49,22 +49,20 @@
 		</form>
 	</div>
 	<div class="clearBoth"></div>
-	<div class="someIcon">
-		<img src="{% static "images/add_48.png" %}" width="20" height="20"  alt="חדש" /> 
-		<a href="/payments/add">חדש</a>
-	</div>
-	<div class="someIcon" style="width:110px;">
-		<img src="{% static "images/add_48.png" %}" width="20" height="20"  alt="חדש" /> 
-		<a href="/splitpayment/add">תשלום מפוצל</a>
-	</div>
-	<div class="someIcon">
-		<i class="fa fa-edit" title='שינוי'></i> 
-		<a id="objEdit">שינוי</a>
-	</div>
-	<div class="someIcon">
-		<img src="{% static "images/delete_48.png" %}" width="20" height="20"  alt="מחיקה" /> 
-		<a id="objDelete">מחיקה</a>
-	</div>
+
+	<a href="/payments/add" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-plus-circle"></i> הוספה
+	</a>
+	<a href="/splitpayment/add" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-plus-circle"></i> תשלום מפוצל
+	</a>
+	<a id="objEdit" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-edit"></i> שינוי
+	</a>
+	<a id="objDelete" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-times-circle"></i> מחיקה
+	</a>
+
 	<div class="clearBoth"> </div>
 	<br /> 		
 	<table class="dataTable" border="1">

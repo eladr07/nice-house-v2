@@ -50,22 +50,20 @@
 		</form>
 	</div>
 	<div class="clearBoth"></div>
-	<div class="someIcon">
-		<img src="{% static "images/add_48.png" %}" width="20" height="20"  alt="חדש" /> 
-		<a href="/invoices/add" >חדש</a>
-	</div>
-	<div class="someIcon">
-		<i class="fa fa-edit" title='שינוי'></i> 
-		<a id="objEdit" >שינוי</a>
-	</div>
-	<div class="someIcon">
-		<i class="fa fa-edit" title='זיכוי'></i> 
-		<a id="objOffset" class="fancybox">זיכוי</a>
-	</div>
-	<div class="someIcon">
-		<img src="{% static "images/delete_48.png" %}" width="20" height="20"  alt="מחיקה" /> 
-		<a id="objDelete">מחיקה</a>
-	</div>
+
+	<a href="/invoices/add" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-plus-circle"></i> הוספה
+	</a>
+	<a id="objEdit" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-edit"></i> עריכה
+	</a>
+	<a id="objOffset" class="btn btn-default fancybox" role="button">
+		זיכוי
+	</a>
+	<a id="objDelete" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-times-circle"></i> מחיקה
+	</a>
+
 	<div class="clearBoth"> </div>
 	<br /> 		
 	<table class="dataTable" border="1">

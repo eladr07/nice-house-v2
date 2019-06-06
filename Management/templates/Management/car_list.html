@@ -32,18 +32,17 @@
 {% block content %}
 <div id="content">
 	<h3 class="text-center text-danger">ניהול מכוניות</h3>
-	<div class="someIcon">
-		<img src="{% static "images/add_48.png" %}" width="20" height="20"  alt="הוספה" /> 
-		<a href="/car/add" class="fancybox" >הוספה</a>
-	</div>
-	<div class="someIcon">
-		<i class="fa fa-edit" title='עריכה'></i> 
-		<a id="carEdit" class="fancybox">עריכה</a>
-	</div>
-	<div class="someIcon">
-		<img src="{% static "images/delete_48.png" %}" width="20" height="20"  alt="מחיקה" /> 
-		<a id="carDelete">מחיקה</a>
-	</div>
+
+	<a href="/car/add" class="btn btn-default fancybox" role="button">
+		<i class="fa fa-fw fa-plus-circle"></i> הוספה
+	</a>
+	<a id="carEdit" class="btn btn-default fancybox" role="button">
+		<i class="fa fa-fw fa-edit"></i> עריכה
+	</a>
+	<a id="carDelete" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-times-circle"></i> מחיקה
+	</a>
+
 	<div class="clearBoth"> </div>
 	<br /> 		
 	<table class="dataTable" border="1">
