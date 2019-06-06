@@ -65,47 +65,43 @@
 	</table>
 </form>
 <br>
-<div class="someIcon" style="width:100px;">
-	<i class="fa fa-edit" title='החזר הלוואה'></i> 
-	<a id="loanAdd" class="fancybox">הלוואה חדשה</a>
+
+<div class="btn-group" role="group">
+	<a id="loanAdd" class="btn btn-default fancybox" role="button">
+		<i class="fa fa-fw fa-plus-circle"></i> הלוואה חדשה
+	</a>
+	<a id="loanPay" class="btn btn-default fancybox" role="button">
+		<i class="fa fa-fw fa-edit"></i> קיזוז הלוואה
+	</a>
 </div>
-<div class="someIcon" style="width:100px;">
-	<i class="fa fa-edit" title='החזר הלוואה'></i> 
-	<a id="loanPay" class="fancybox">קיזוז הלוואה</a>
+
+<div class="btn-group" role="group">
+	<a id="edit" class="btn btn-default fancybox" role="button">
+		<i class="fa fa-fw fa-edit"></i> שינוי מרכיבי שכר - חד פעמי
+	</a>
+	<a id="expenses" class="btn btn-default fancybox" role="button">
+		<i class="fa fa-fw fa-edit"></i> הוצאות שכר
+	</a>
 </div>
-<div class="someIcon" style="width:170px;">
-	<i class="fa fa-edit" title='שינוי'></i> 
-	<a id="edit" class="fancybox">שינוי מרכיבי שכר - חד פעמי</a>
+
+<div class="btn-group" role="group">
+	<a id="calcSalary" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-calculator"></i> חישוב עמלות מחדש
+	</a>
+	<a id="approve" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-check"></i> אישור שכר לתשלום
+	</a>
+	<a id="deleteSalary" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-times-circle"></i> מחיקה
+	</a>
 </div>
-<div class="someIcon" style="width:100px;">
-	<i class="fa fa-edit" title='הוצאות שכר'></i> 
-	<a id="expenses" class="fancybox">הוצאות שכר</a>
-</div>
-<div class="someIcon"style="width:130px;">
-	<img src="{% static "images/advanced-48.png" %}" width="20" height="20"  alt="חישוב עמלות מחדש" /> 
-	<a id="calcSalary">חישוב עמלות מחדש</a>
-</div>
-<div class="someIcon" style="width:120px;">
-	<i class="fa fa-edit" title='אישור שכר לתשלום'></i> 
-	<a id="approve" >אישור שכר לתשלום</a>
-</div>
-<div class="someIcon" >
-	<img src="{% static "images/delete_48.png" %}" width="20" height="20"  alt="מחיקה" /> 
-	<a id="deleteSalary" >מחיקה</a>
-</div>
-<div class="someIcon" style="width:100px;">
-	<i class="fa fa-edit" title='שינוי'></i> 
-	<a id="#" >תיק עובד</a>
-</div>
-<div class="someIcon" style="width:100px;">
-	<img src="{% static "images/print-48.png" %}" width="20" height="20"  alt="שלח להנהח" /> 
-	<a id="#" >שלח להנה"ח</a>
-</div>
-<div class="someIcon" style="width:100px;">
-	<img src="{% static "images/print-48.png" %}" width="20" height="20"  alt="שינוי" /> 
-	<a href="{{month.year}}/{{month.month}}/pdf" >גרסת הדפסה</a>
-</div>
+
+<a href='href="{{month.year}}/{{month.month}}/pdf"' class="btn btn-default" role="button">
+	<i class="fa fa-fw fa-print"></i> גרסת הדפסה
+</a>
+
 <div class="clearBoth"></div>
+
 <table id="salaryTable" class="dataTable" border="1">
 <caption>מציג סה"כ {{salaries|length}} עובדים</caption>
 	<tr>
