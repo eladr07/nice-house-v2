@@ -149,13 +149,6 @@ BODY {
 	text-align: center
 }
 
-#content .titleIcon {
-	width: 48px; 
-	height: 48px; 
-	float: right;
-	padding-right: 10px;
-}
-
 #content .pageTitle {
 	float: right;
 	width: 100%;
