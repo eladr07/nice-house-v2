@@ -102,42 +102,44 @@
 	</table>
 </div>
 <div class="clearBoth"></div>
-<div class="someIcon" style="width:90px;">
-	<img src="{% static "images/add_48.png" %}" width="20" height="20"  alt="חדש" /> 
-	<a id="saleAdd">הזנת מכירות</a>
+
+<div class="btn-group" role="group">
+	<a id="saleAdd" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-plus-circle"></i> הזנת מכירות
+	</a>
+	<a id="saleZero" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-edit"></i> אין מכירות
+	</a>
+	<a id="demandSaleCount" class="btn btn-default fancybox" role="button">
+		<i class="fa fa-fw fa-edit"></i> מס' מכירות
+	</a>
 </div>
-<div class="someIcon" style="width:90px;">
-	<i class="fa fa-edit" title='חדש'></i> 
-	<a id="saleZero">אין מכירות</a>
+
+<a id="demandRemarks" class="btn btn-default fancybox" role="button">
+	<i class="fa fa-fw fa-sticky-note"></i> הערות לדרישה
+</a>
+
+<div class="btn-group" role="group">
+	<a id="demandClose" class="btn btn-default fancybox" role="button">
+		<i class="fa fa-fw fa-thumbs-up"></i> אשר דרישה
+	</a>
+	<a id="demandCloseAll" href="/demands/closeall" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-thumbs-up"></i> אשר הכל
+	</a>
 </div>
-<div class="someIcon" style="width:90px;">
-	<i class="fa fa-edit" title='חדש'></i> 
-	<a id="demandSaleCount" class="fancybox">מס' מכירות</a>
+
+<div class="btn-group" role="group">
+	<a href="/employee/remarks/{{month.year}}/{{month.month}}" class="btn btn-default fancybox" role="button">
+		<i class="fa fa-fw fa-sticky-note"></i> הערות לעובד
+	</a>
+	<a href="/employee/refund/{{month.year}}/{{month.month}}" class="btn btn-default fancybox" role="button">
+		<i class="fa fa-fw fa-edit"></i> החזר הוצאות לעובד
+	</a>
+	<a href="#" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-edit"></i> ימי חופש ומחלה לעובד
+	</a>
 </div>
-<div class="someIcon" style="width:100px;">
-	<img src="{% static "images/Note_48.png" %}" width="20" height="20"  alt="שינוי" /> 
-	<a id="demandRemarks" class="fancybox">הערות לדרישה</a>
-</div>
-<div class="someIcon" style="width:90px;">
-	<img src="{% static "images/thumbs_up_48.png" %}" width="20" height="20"  alt="סגירה" /> 
-	<a id="demandClose" class="fancybox">אשר דרישה</a>
-</div>
-<div class="someIcon" style="width: 80px;">
-	<img src="{% static "images/thumbs_up_48.png" %}" width="20" height="20"  alt="סגירה" /> 
-	<a id="demandCloseAll" href="/demands/closeall">אשר הכל</a>
-</div>
-<div class="someIcon" style="width:100px; float:left;">
-	<img src="{% static "images/Note_48.png" %}" width="20" height="20"  alt="שינוי" /> 
-	<a href="/employee/remarks/{{month.year}}/{{month.month}}" class="fancybox">הערות לעובד</a>
-</div>
-<div class="someIcon" style="width:130px; float:left;">
-	<i class="fa fa-edit" title='שינוי'></i> 
-	<a href="/employee/refund/{{month.year}}/{{month.month}}" class="fancybox">החזר הוצאות לעובד</a>
-</div>
-<div class="someIcon" style="width:140px; float:left;">
-	<i class="fa fa-edit" title='שינוי'></i> 
-	<a href="#" >ימי חופש ומחלה לעובד</a>
-</div>
+
 <div class="clearBoth"></div>	
 <p>
 לתשומת לבך, ל-
