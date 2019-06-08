@@ -29,18 +29,17 @@
 {% endblock header %}
 {% block content %}
 <h3 class="text-center text-danger">פירוט צ'קים לעובדים מחודש {{from_date|date:"M Y"}} עד חודש {{to_date|date:"M Y"}}</h3>
-<div class="someIcon">
-	<img src="{% static "images/add_48.png" %}" width="20" height="20"  alt="הוספה" /> 
-	<a href="add" class="fancybox" >חדש</a>
-</div>
-<div class="someIcon">
-	<i class="fa fa-edit" title='עריכה'></i> 
-	<a id="checkEdit" class="fancybox" >שינוי</a>
-</div>
-<div class="someIcon">
-	<img src="{% static "images/delete_48.png" %}" width="20" height="20"  alt="מחיקה" /> 
-	<a id="checkDelete">מחיקה</a>
-</div>
+
+<a href="add" class="btn btn-default fancybox" role="button">
+	<i class="fa fa-fw fa-plus-circle"></i> חדש
+</a>
+<a id="checkEdit" class="btn btn-default fancybox" role="button">
+	<i class="fa fa-fw fa-edit"></i> שינוי
+</a>
+<a id="checkDelete" class="btn btn-default" role="button">
+	<i class="fa fa-fw fa-times-circle"></i> מחיקה
+</a>
+
 <div class="clearBoth"> </div>
 <div style="float:right;width:70%;">
 	<form method="GET">

@@ -74,30 +74,27 @@
 		</table>
 	</div>
 	<div class="clearBoth"> </div>
-	<div class="someIcon" style="width:140px;">
-		<img src="{% static "images/add_48.png" %}" width="20" height="20"  alt="חדש" /> 
-		<a href="add">הוספת פרוייקט חדש</a>
+
+	<a href="add" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-plus-circle"></i> הוספת פרוייקט חדש
+	</a>
+	<a id="projectEdit" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-edit"></i> לכרטיס פרוייקט
+	</a>
+
+	<div class="btn-group" role="group">
+		<a id="employeeEnd" class="btn btn-default fancybox" role="button">
+			<i class="fa fa-fw fa-check-circle"></i> העבר לארכיון
+		</a>
+		<a href="archive" class="btn btn-default" role="button">
+			<i class="fa fa-fw fa-archive"></i> ארכיון פרוייקטים
+		</a>
 	</div>
-	<div class="someIcon" style="width:120px;">
-		<i class="fa fa-edit" title='שינוי'></i> 
-		<a id="projectEdit">לכרטיס פרוייקט</a>
-	</div>
-	<div class="someIcon" style="width:100px;">
-		<img src="{% static "images/Briefcase_48.png" %}" width="20" height="20"  alt="שינוי" /> 
-		<a id="projectEdit">תיק פרוייקט</a>
-	</div>
-	<div class="someIcon" style="width:100px">
-		<img src="{% static "images/Archive-Add-48.png" %}" width="20" height="20"  alt="מחיקה" /> 
-		<a id="projectEnd" class="fancybox">העבר לארכיון</a>
-	</div>
-	<div class="someIcon" style="width:120px">
-		<img src="{% static "images/Archive-48.png" %}" width="20" height="20"  alt="מחיקה" /> 
-		<a href="archive">ארכיון פרוייקטים</a>
-	</div>
-	<div class="someIcon" style="width:100px">
-		<img src="{% static "images/print-48.png" %}" width="20" height="20"  alt="מחיקה" /> 
-		<a href="pdf">גרסת הדפסה</a>
-	</div>
+
+	<a href="pdf" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-print"></i> גרסה להדפסה
+	</a>
+
 	<div class="clearBoth"></div>
 	<br /> 
 	<table id="projectTable" class="dataTable" border="1">
