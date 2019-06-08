@@ -117,34 +117,33 @@
 	</table>
 </div>
 <div class="clearBoth"></div>
-<div class="someIcon" style="width:100px;">
-	<i class="fa fa-edit" title='שינוי'></i> 
-	<a id="demandEdit">שינוי דרישה</a>
+
+<div class="btn-group" role="group">
+	<a id="demandEdit" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-edit"></i> שינוי דרישה
+	</a>
+	<a id="demandRemarks" class="btn btn-default fancybox" role="button">
+		<i class="fa fa-fw fa-sticky-note"></i> הערות לדרישה
+	</a>
 </div>
-<div class="someIcon" style="width:100px;">
-	<img src="{% static "images/Note_48.png" %}" width="20" height="20"  alt="שינוי" /> 
-	<a id="demandRemarks" class="fancybox">הערות לדרישה</a>
+
+<a href="/demands/sendall" class="btn btn-default" role="button">
+	<i class="fa fa-fw fa-thumbs-up"></i> אשר ושלח דרישות
+</a>
+
+<div class="btn-group" role="group">
+	<a id="demandReturnToCalc" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-undo"></i> החזר לחישוב עמלות
+	</a>
+	<a id="demandCalc" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-calculator"></i> חישוב עמלות מחדש
+	</a>
 </div>
-<div class="someIcon"style="width:120px;">
-	<img src="{% static "images/thumbs_up_48.png" %}" width="20" height="20"  alt="שליחה" /> 
-	<a href="/demands/sendall">אשר ושלח דרישות</a>
-</div>
-<div class="someIcon"style="width:130px;">
-	<img src="{% static "images/advanced-48.png" %}" width="20" height="20"  /> 
-	<a id="demandReturnToCalc">החזר לחישוב עמלות</a>
-</div>
-<div class="someIcon"style="width:130px;">
-	<img src="{% static "images/advanced-48.png" %}" width="20" height="20" /> 
-	<a id="demandCalc">חישוב עמלות מחדש</a>
-</div>
-<div class="someIcon" style="width:100px;">
-	<img src="{% static "images/print-48.png" %}" width="20" height="20" /> 
-	<a href="#">שלח להנה"ח</a>
-</div>
-<div class="someIcon" style="width:100px;">
-	<img src="{% static "images/print-48.png" %}" width="20" height="20"  alt="הדפסה" /> 
-	<a href="/reports/projects_month/{{month.year}}/{{month.month}}">גרסה להדפסה</a>
-</div>
+
+<a href="/reports/projects_month/{{month.year}}/{{month.month}}" class="btn btn-default" role="button">
+	<i class="fa fa-fw fa-print"></i> גרסה להדפסה
+</a>
+
 <div class="clearBoth"></div>
 <p>
 לתשומת לבך, ל-
