@@ -76,34 +76,38 @@
 		</table>
 	</div>
 	<div class="clearBoth"> </div>
-	<div class="someIcon" style="width:100px;">
-		<img src="{% static "images/add_48.png" %}" width="20" height="20"  alt="חדש" /> 
-		<a href="/employees/add">עובד חדש</a>
+
+	<div class="btn-group" role="group">
+		<a href="/employees/add" class="btn btn-default" role="button">
+			<i class="fa fa-fw fa-plus-circle"></i> עובד חדש
+		</a>
+		<a href="/nhemployees/add" class="btn btn-default" role="button">
+			<i class="fa fa-fw fa-plus-circle"></i> עובד נייסהאוס חדש
+		</a>
 	</div>
-	<div class="someIcon" style="width:130px;">
-		<img src="{% static "images/add_48.png" %}" width="20" height="20"  alt="חדש" /> 
-		<a href="/nhemployees/add">עובד נייסהאוס חדש</a>
+
+	<div class="btn-group" role="group">
+		<a id="employeeEdit" class="btn btn-default" role="button">
+			<i class="fa fa-fw fa-info-circle"></i> כרטיס עובד
+		</a>
+		<a id="employeeBag" class="btn btn-default" role="button">
+			<i class="fa fa-fw fa-briefcase"></i> תיק עובד
+		</a>
 	</div>
-	<div class="someIcon" style="width:100px;">
-		<i class="fa fa-edit" title='שינוי'></i> 
-		<a id="employeeEdit">כרטיס עובד</a>
+
+	<div class="btn-group" role="group">
+		<a id="employeeEnd" class="btn btn-default fancybox" role="button">
+			<i class="fa fa-fw fa-user-times"></i> העבר לארכיון
+		</a>
+		<a href="archive" class="btn btn-default" role="button">
+			<i class="fa fa-fw fa-archive"></i> ארכיון עובדים
+		</a>
 	</div>
-	<div class="someIcon" style="width:80px;">
-		<img src="{% static "images/Briefcase_48.png" %}" width="20" height="20"  alt="שינוי" /> 
-		<a id="employeeBag">תיק עובד</a>
-	</div>
-	<div class="someIcon" style="width:100px;">
-		<img src="{% static "images/Archive-Add-48.png" %}" width="20" height="20"  alt="מחיקה" /> 
-		<a id="employeeEnd" class="fancybox">העבר לארכיון</a>
-	</div>
-	<div class="someIcon" style="width:100px;">
-		<img src="{% static "images/Archive-48.png" %}" width="20" height="20"  alt="מחיקה" /> 
-		<a href="archive">ארכיון עובדים</a>
-	</div>
-	<div class="someIcon" style="width:100px;">
-		<img src="{% static "images/print-48.png" %}" width="20" height="20"  alt="הדפסה" /> 
-		<a href="pdf">גרסת הדפסה</a>
-	</div>
+
+	<a href="pdf" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-briefcase"></i> גרסה להדפסה
+	</a>
+
 	<div class="clearBoth"> </div>
 	<br />
 	<table id="employee_table" class="dataTable" border="1">

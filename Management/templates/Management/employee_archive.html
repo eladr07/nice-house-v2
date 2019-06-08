@@ -63,18 +63,20 @@
 			<button id="filterClearBtn" class="button">הצג הכל</button>
 		</fieldset>
 	</div>
-	<div class="someIcon" style="width:100px;">
-		<i class="fa fa-edit" title='שינוי'></i> 
-		<a id="employeeEdit">כרטיס עובד</a>
+
+	<div class="btn-group" role="group">
+		<a id="employeeEdit" class="btn btn-default" role="button">
+			<i class="fa fa-fw fa-info-circle"></i> כרטיס עובד
+		</a>
+		<a id="employeeBag" class="btn btn-default" role="button">
+			<i class="fa fa-fw fa-briefcase"></i> תיק עובד
+		</a>
 	</div>
-	<div class="someIcon" style="width:80px;">
-		<i class="fa fa-edit" title='שינוי'></i> 
-		<a id="employeeBag">תיק עובד</a>
-	</div>
-	<div class="someIcon" style="width:100px;">
-		<img src="{% static "images/print-48.png" %}" width="20" height="20"  alt="הדפסה" /> 
-		<a id="print">גרסת הדפסה</a>
-	</div>
+
+	<a id="print" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-print"></i> גרסה להדפסה
+	</a>
+
 	<div class="clearBoth"> </div>
 	<br />
 	<table id="employee_table" class="dataTable" border="1">

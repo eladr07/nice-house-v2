@@ -32,22 +32,20 @@
 {% endblock header %}
 {% block content %}
 	<h3 class="text-center text-danger">ריכוז מקדמות שלא שולמו לעובדים</h3>
-	<div class="someIcon">
-		<img src="{% static "images/add_48.png" %}" width="20" height="20"  alt="חדש" /> 
-		<a href="/advancepayments/add" class="fancybox" >חדש</a>
-	</div>
-	<div class="someIcon">
-		<i class="fa fa-edit" title='שינוי'></i> 
-		<a id="apEdit" class="fancybox" >שינוי</a>
-	</div>
-	<div class="someIcon" style="width:95px;">
-		<i class="fa fa-edit" title='הפוך להלוואה'></i> 
-		<a id="apToLoan" class="fancybox">הפוך להלוואה</a>
-	</div>
-	<div class="someIcon">
-		<img src="{% static "images/delete_48.png" %}" width="20" height="20"  alt="מחיקה" /> 
-		<a id="apDelete">מחיקה</a>
-	</div>
+
+	<a href="/advancepayments/add" class="btn btn-default fancybox" role="button">
+		<i class="fa fa-fw fa-plus-circle"></i> חדש
+	</a>
+	<a id="apEdit" class="btn btn-default fancybox" role="button">
+		<i class="fa fa-fw fa-edit"></i> שינוי
+	</a>
+	<a id="apToLoan" class="btn btn-default fancybox" role="button">
+		<i class="fa fa-fw fa-edit"></i> הפוך להלוואה
+	</a>
+	<a id="apDelete" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-times-circle"></i> מחיקה
+	</a>
+
 	<div class="clearBoth"> </div>
 	<br /> 		
 	<table class="dataTable" border="1">
