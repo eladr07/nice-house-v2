@@ -51,10 +51,11 @@
 	</form>
 </div>
 <div class="clearBoth"></div>
-<div class="someIcon" style="width:100px;">
-	<img src="{% static "images/print-48.png" %}" width="20" height="20"  alt="הדפסה" /> 
-	<a href="#">גרסה להדפסה</a>
-</div>
+
+<a href="#" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-print"></i> גרסת הדפסה
+	</a>
+
 <div class="clearBoth"></div>
 <br>
 <table id="Table" class="dataTable" border="1">
@@ -74,7 +75,11 @@
 	</tr>
     {% for p in projects %}
 		<tr class="{% cycle 'row1' 'row2' %}" objid={{d.id}}>
-			<td><a href="{{p.get_absolute_url}}"><img src="{% static "images/documentinfo-48.png" %}" width="20" height="20" alt="פרטים" border="0" /></a></td>
+			<td>
+				<a href="{{p.get_absolute_url}}">
+					<i class="fa fa-fw fa-info-circle"></i>
+				</a>
+			</td>
 			<td>{{ p.initiator }}</td>
 			<td>{{ p.name }}</td>
 			<td><a class="bigfancybox" href="/demandsales/?project_id={{p.id}}&from_year={{from_year}}&from_month={{from_month}}&to_year={{to_year}}&to_month={{to_month}}">

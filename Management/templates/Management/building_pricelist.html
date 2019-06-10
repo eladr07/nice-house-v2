@@ -101,30 +101,25 @@
 {% endwith %}
 <fieldset class="cardFieldset">
 	<legend>פירוט יחידות</legend>
-	<div class="someIcon"  style="width:165px;">
-		<img src="{% static "images/add_48.png" %}" width="20" height="20"  alt="הוספה" /> 
-			<a href="../addhouse/type{{type.id}}">הוספת דירה חדשה למחירון</a>
-	</div>	
-	<div class="someIcon">
-		<i class="fa fa-edit" title='עריכה'></i> 
-		<a id="houseEdit">שינוי</a>
-	</div>
-	<div class="someIcon">
-		<img src="{% static "images/delete_48.png" %}" width="20" height="20"  alt="מחיקה" /> 
-		<a id="houseDelete">מחיקה</a>
-	</div>
-	<div class="someIcon" style="width:100px;">
-		<img src="{% static "images/agt_forum-48.png" %}" width="20" height="20" /> 
-		<a href="../clients" >מצבת רוכשים</a>
-	</div>
-	<div class="someIcon" style="width:100px;">
-		<img src="{% static "images/print-48.png" %}" width="20" height="20" /> 
-		<a href="type{{type.id}}/pdf?type=avaliable" >גרסת הדפסה</a>
-	</div>
-	<div class="someIcon" style="width:120px;">
-		<img src="{% static "images/print-48.png" %}" width="20" height="20" /> 
-		<a href="type{{type.id}}/pdf?type=full" >גרסת הדפסה מלאה</a>
-	</div>
+
+	<a href="../addhouse/type{{type.id}}" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-plus-circle"></i> הוספת דירה חדשה למחירון
+	</a>
+	<a id="houseEdit" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-edit"></i> שינוי
+	</a>
+	<a id="houseDelete" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-times-circle"></i> מחיקה
+	</a>
+	<a href="../clients" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-users"></i> מצבת רוכשים
+	</a>
+	<a href="type{{type.id}}/pdf?type=avaliable" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-print"></i> גרסת הדפסה
+	</a>
+	<a href="type{{type.id}}/pdf?type=full" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-print"></i> גרסת הדפסה מלאה
+	</a>
 		<table class="formTable" style="float:left;">
 			<tr>
 				<th>מס' יחידות פנויות</th>

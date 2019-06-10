@@ -89,19 +89,18 @@
 <div class="clearBoth"></div>
 
 {% for branch, salaries in branch_list.items %}
-	<div class="someIcon" style="width:100px;">
-		<img src="{% static "images/agt_home-48.png" %}" width="20" height="20"  alt="שינוי" /> 
-		<a href="/nhbranch/{{branch.id}}/sales?year={{month.year}}&month={{month.month}}" >ריכוז עסקאות</a>
-	</div>
-	<div class="someIcon" style="width:100px;">
-		<img src="{% static "images/print-48.png" %}" width="20" height="20"  alt="שינוי" /> 
-		<a href="{{branch.id}}/{{month.year}}/{{month.month}}/pdf" >גרסת הדפסה</a>
-	</div>
-	<div class="someIcon" style="width:100px;">
-		<img src="{% static "images/print-48.png" %}" width="20" height="20"  alt="שינוי" /> 
-		<a href="{{branch.id}}/{{month.year}}/{{month.month}}/send">שלח להנה"ח</a>
-	</div>
+	<a href="/nhbranch/{{branch.id}}/sales?year={{month.year}}&month={{month.month}}" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-home"></i> ריכוז עסקאות
+	</a>
+	<a href="{{branch.id}}/{{month.year}}/{{month.month}}/pdf" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-print"></i> גרסת הדפסה
+	</a>
+	<a href="{{branch.id}}/{{month.year}}/{{month.month}}/send" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-print"></i> שלח להנה"ח
+	</a>
+
 	<div class="clearBoth"></div>
+
 	<table class="dataTable" border="1">
 	<caption>{{branch}}</caption>
 		<tr>

@@ -3,10 +3,9 @@
 {% block content %}
 <div id="content">
 	<h3 class="text-center text-danger">מצבת רוכשים לבניין {{object.num}} בפרוייקט {{object.project}}</h3>
-	<div class="someIcon" style="width:100px;">
-		<img src="{% static "images/print-48.png" %}" width="20" height="20" /> 
-		<a href="pdf" >גרסת הדפסה</a>
-	</div>
+	<a href="pdf" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-print"></i> גרסת הדפסה
+	</a>
 	<div class="clearBoth"></div>
 	<br /> 		
 	<table class="dataTable" border="1">
