@@ -65,18 +65,17 @@
 <div class="clearBoth"></div>
 	<fieldset class="cardFieldset">
 		<legend>פירוט מכירות - {{demand.project}} לחודש {{demand.month}}/{{demand.year}}</legend>
-		<div class="someIcon" style="width:100px;">
-			<img src="{% static "images/add_48.png" %}" width="20" height="20"  alt="הוספה" />
-				<a href="/demands/{{demand.id}}/sale/add" >הזנת מכירה</a>
-		</div>
-		<div class="someIcon" style="width:100px;">
-			<i class="fa fa-edit" title='עריכה'></i>
-			<a id="saleEdit" >עדכון מכירה</a>
-		</div>
-		<div class="someIcon" style="width:120px;">
-			<i class="fa fa-edit" title='עדכון עמלה'></i>
-			<a id="saleCommissionEdit" class="fancybox">עדכון עמלה ידנית</a>
-		</div>
+
+		<a href="/demands/{{demand.id}}/sale/add" class="btn btn-default" role="button">
+			<i class="fa fa-fw fa-plus-circle"></i> הזנת מכירה
+		</a>
+		<a id="saleEdit" class="btn btn-default" role="button">
+			<i class="fa fa-fw fa-edit"></i> שינוי
+		</a>
+		<a id="saleCommissionEdit" class="btn btn-default fancybox" role="button">
+			<i class="fa fa-fw fa-edit"></i> עדכון עמלה ידנית
+		</a>
+
 		<div class="someIcon" style="width:100px;">
 			<img src="{% static "images/agt_forward-48.png" %}" width="20" height="20" alt="הקדמה" border="0" />
 			<a id="salePre">הקדמת מכירה</a>
@@ -115,14 +114,15 @@
 				</form>
 			</div>
 		</div>
-		<div class="someIcon" style="width:100px;">
-			<img src="{% static "images/delete_48.png" %}" width="20" height="20"  alt="מחיקה" />
-			<a id="saleDelete">ביטול מכירה</a>
-		</div>
-		<div class="someIcon" style="width:120px;">
-			<img src="{% static "images/print-48.png" %}" width="20" height="20"  alt="הדפסה" />
-			<a href="/reports/project_month/{{demand.project.id}}/{{demand.year}}/{{demand.month}}">לגרסת ההדפסה</a>
-		</div>
+
+		<a id="saleDelete" class="btn btn-default" role="button">
+			<i class="fa fa-fw fa-times-circle"></i> ביטול מכירה
+		</a>
+
+		<a href="/reports/project_month/{{demand.project.id}}/{{demand.year}}/{{demand.month}}" class="btn btn-default" role="button">
+			<i class="fa fa-fw fa-print"></i> גרסה להדפסה
+		</a>
+			
 		<table class="formTable" style="float:left;">
 			<tr>
 				<th>נתון שהשתנה</th>
