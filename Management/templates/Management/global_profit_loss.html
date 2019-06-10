@@ -22,10 +22,11 @@
 	</form>
 </div>
 <div class="clearBoth"></div>
-<div class="someIcon" style="width:100px;">
-	<img src="{% static "images/print-48.png" %}" width="20" height="20"  alt="הדפסה" /> 
-	<a href="#">גרסה להדפסה</a>
-</div>
+
+<a href="#" class="btn btn-default" role="button">
+	<i class="fa fa-fw fa-print"></i> גרסת הדפסה
+</a>
+
 <div class="clearBoth"></div>
 <br>
 	{% for row in data %}
