@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  # db:
+  #   image: postgres
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=mysql://elad:200639219@nicehosue.chy7p6mqhc1r.eu-central-1.rds.amazonaws.com/Management
+    # depends_on:
+    #   - db
