@@ -4,10 +4,9 @@
 <div id="content">
 	<h3 class="text-center text-danger">פירוט הלוואות - {{employee}}</h3>
 	<div class="clearBoth"> </div>
-	<div class="someIcon" style="width:100px; margin-bottom: 10px">
-		<img src="{% static "images/print-48.png" %}" width="20" height="20"  alt="שינוי" />
-		<a href="?t=pdf" >גרסת הדפסה</a>
-	</div>
+	<a href="?t=pdf" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-print"></i> גרסה להדפסה
+	</a>
 	<br>
 	<form method="POST">
 		<table class="dataTable" border="1">
