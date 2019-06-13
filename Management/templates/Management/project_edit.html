@@ -228,19 +228,19 @@
 			<div id="new_commissions">
 				{% if not c.c_var_precentage %}
 					עמלה משתנה (באחוזים)
-					<a id="add_cvp" href="cvp" class="fancybox"><img src="{% static "images/add_48.png" %}" width="15" height="15" border="0" alt="הוספה" /></a> 
+					<a id="add_cvp" href="cvp" class="fancybox"><i class="fa fa-fw fa-plus-circle"></i></a> 
 				{% endif %}
 				{% if not c.c_var_precentage_fixed %}
 					<br>עמלה משתנה בקצב קבוע (באחוזים)
-					<a id="add_cvpf" href="cvpf" class="fancybox"><img src="{% static "images/add_48.png" %}" width="15" height="15" border="0" alt="הוספה" /></a> 
+					<a id="add_cvpf" href="cvpf" class="fancybox"><i class="fa fa-fw fa-plus-circle"></i></a> 
 				{% endif %}
 				{% if not c.c_zilber %}
 					<br>עמלת זילברמינץ
-					<a id="add_cz" href="cz" class="fancybox"><img src="{% static "images/add_48.png" %}" width="15" height="15" border="0" alt="הוספה" /></a> 
+					<a id="add_cz" href="cz" class="fancybox"><i class="fa fa-fw fa-plus-circle"></i></a> 
 				{% endif %}
 				{% if not c.b_discount_save_precentage %}
 					<br>בונוס חיסכון בהנחה (באחוזים)
-					<a id="add_bdsp" href="bdsp" class="fancybox"><img src="{% static "images/add_48.png" %}" width="15" height="15" border="0" alt="הוספה" /></a> 
+					<a id="add_bdsp" href="bdsp" class="fancybox"><i class="fa fa-fw fa-plus-circle"></i></a> 
 				{% endif %}
 			</div>
 			{% if c.agreement %}

@@ -133,7 +133,7 @@
 				<a href="/demands/{{d.id}}/reminders" class="fancybox">{{d.get_open_reminders|length}} תזכורות</a>
 			{% endif %}
 				<a href="/demands/{{d.id}}/addreminder" class="fancybox">
-					<img src="{% static "images/add_48.png" %}" width="15" height="15" border="0" alt="הוספה" />
+					<i class="fa fa-fw fa-plus-circle"></i>
 				</a>
 			</td>
 			<td>{{ d.remarks|default_if_none:"" }}</td>
