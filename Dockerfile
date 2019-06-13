@@ -11,4 +11,4 @@ RUN pip install -r requirements.txt
 
 COPY . /code/
 
-RUN python manage.py compilemessages
+RUN django-admin compilemessages --locale=he
