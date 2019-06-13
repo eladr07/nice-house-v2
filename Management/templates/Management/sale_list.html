@@ -71,11 +71,11 @@
 						<a href="/salereject/{{s.salereject.id}}" target="_parent"><img src="{% static "images/agt_back-48.png" %}" width="15" height="15" /></a>
 					{% endif %}
 					{% if s.salecancel %}
-						<a href="/salecancel/{{s.salecancel.id}}" target="_parent"><img src="{% static "images/delete_48.png" %}" width="15" height="15" /></a>
+						<a href="/salecancel/{{s.salecancel.id}}" target="_parent"><i class="fa fa-fw fa-times-circle"></i></a>
 					{% endif %}
 				</td>
 				<td><a id="reject{{s.id}}" href="/demands/{{s.demand.id}}/sale/{{s.id}}/reject" target="_parent"><img src="{% static "images/agt_back-48.png" %}" width="15" height="15" alt="דחייה" border="0" /></a></td>
-				<td><a id="cancel{{s.id}}" href="/demands/{{s.demand.id}}/sale/{{s.id}}/cancel" target="_parent"><img src="{% static "images/delete_48.png" %}" width="15" height="15" alt="דחייה" border="0" /></a></td>
+				<td><a id="cancel{{s.id}}" href="/demands/{{s.demand.id}}/sale/{{s.id}}/cancel" target="_parent"><i class="fa fa-fw fa-times-circle"></i></a></td>
 			</tr>
 		{% endfor %}
 		<tr class="sumRow">

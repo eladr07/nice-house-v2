@@ -138,7 +138,7 @@
 					{{nhc.right_filter}}
 				{% endif %}
 				<a href="{{nhc.get_absolute_url}}" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
-				<a href="{{nhc.get_absolute_url}}/del"><img src="{% static "images/delete_48.png" %}" width="15" height="15" border="0" alt="מחיקה" /></a>
+				<a href="{{nhc.get_absolute_url}}/del"><i class="fa fa-fw fa-times-circle"></i></a>
 				<br>
 			{% endfor %}
 			<a href="/nhcbi/add" class="fancybox"><i class="fa fa-fw fa-plus-circle"></i></a>

@@ -221,7 +221,7 @@
 						<a href="/salereject/{{s.salereject.id}}"><img src="{% static "images/agt_back-48.png" %}" width="20" height="20" /></a>
 					{% endif %}
 					{% if s.salecancel %}
-						<a href="/salecancel/{{s.salecancel.id}}"><img src="{% static "images/delete_48.png" %}" width="20" height="20" /></a>
+						<a href="/salecancel/{{s.salecancel.id}}"><i class="fa fa-fw fa-times-circle"></i></a>
 					{% endif %}
 				</td>
 				<td>{{s.remarks}}</td>
@@ -274,7 +274,7 @@
 							<a href="/salereject/{{s.salereject.id}}"><img src="{% static "images/agt_back-48.png" %}" width="20" height="20" /></a>
 						{% endif %}
 						{% if s.salecancel %}
-							<a href="/salecancel/{{s.salecancel.id}}"><img src="{% static "images/delete_48.png" %}" width="20" height="20" /></a>
+							<a href="/salecancel/{{s.salecancel.id}}"><i class="fa fa-fw fa-times-circle"></i></a>
 						{% endif %}
 					</td>
 					<td>{{s.remarks}}</td>
