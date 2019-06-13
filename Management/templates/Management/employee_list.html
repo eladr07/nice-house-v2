@@ -126,7 +126,7 @@
 			<tr style="text-align:center; color:#4669D6; font-size:14px"><td colspan="10"><b>{{rank.grouper|default:"-- לא הוגדר דרג --"}}</b></td></tr>
 			{% for e in rank.list %}
 				<tr class="{% cycle 'row1' 'row2' %}" objid={{e.id}}>
-					<td><a href="/employees/{{e.id}}"><img src="{% static "images/documentinfo-48.png" %}" width="20" height="20" alt="פרטים" border="0" /></a></td>
+					<td><a href="/employees/{{e.id}}"><i class="fa fa-fw fa-info-circle"></i></a></td>
 					<td>{{ e.id }}</td>
 					<td>{{ e.first_name }}</td>
 					<td>{{ e.last_name }}</td>
@@ -162,7 +162,7 @@
 			<tr style="text-align:center; color:#4669D6; font-size:14px"><td colspan="10"><b>{{nhbranch}}</b></td></tr>
 			{% for e in nhbranch.nhemployees %}
 				<tr class="{% cycle 'row1' 'row2' %}" objid={{e.id}}>
-					<td><a href="/nhemployees/{{e.id}}"><img src="{% static "images/documentinfo-48.png" %}" width="20" height="20" alt="פרטים" border="0" /></a></td>
+					<td><a href="/nhemployees/{{e.id}}"><i class="fa fa-fw fa-info-circle"></i></a></td>
 					<td>{{ e.id }}</td>
 					<td>{{ e.first_name }}</td>
 					<td>{{ e.last_name }}</td>

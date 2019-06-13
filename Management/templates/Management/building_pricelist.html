@@ -168,7 +168,7 @@
 			<tr class="{% cycle 'row1' 'row2' %}" objid={{h.id}}>
 		{% endif %}
 			<td><input type="checkbox" name="house-{{h.id}}"/></td>
-			<td><a href="../house/{{h.id}}/type{{type.id}}"><img src="{% static "images/documentinfo-48.png" %}" width="20" height="20" alt="פרטים" border="0" /></a></td>
+			<td><a href="../house/{{h.id}}/type{{type.id}}"><i class="fa fa-fw fa-info-circle"></i></a></td>
 			<td>{{h.num}}</td>
 			<td>{{h.floor}}</td>
 			<td>{{h.type}}</td>

@@ -25,7 +25,7 @@
 		</tr>
 		{% for d in demands %}
 			<tr class="{% cycle 'row1' 'row2' %}" objid={{a.id}}>
-				<td><a target="_blank" href="/demands/{{d.id}}"><img src="{% static "images/documentinfo-48.png" %}" width="15" height="15" alt="פרטים" border="0" /></a></td>
+				<td><a target="_blank" href="/demands/{{d.id}}"><i class="fa fa-fw fa-info-circle"></i></a></td>
 				<td>
 					<a href="/reports/project_month/{{d.project.id}}/{{d.year}}/{{d.month}}">
 					<img src="{% static "images/PDF-48.png" %}" width="15" height="15"/>
@@ -55,7 +55,7 @@
 				<td>
 				{% for r in d.get_open_reminders %}
 					{{ r.content|truncatewords:5 }}
-					<a href="{{r.get_absolute_url}}"><img src="{% static "images/documentinfo-48.png" %}" width="15" height="15" alt="פרטים" border="0" /></a>
+					<a href="{{r.get_absolute_url}}"><i class="fa fa-fw fa-info-circle"></i></a>
 					<a href="{{r.get_absolute_url}}/do"><img src="{% static "images/thumbs_up_48.png" %}" width="15" height="15" alt="בצע" border="0" /></a>
 					<br>
 				{% endfor %}

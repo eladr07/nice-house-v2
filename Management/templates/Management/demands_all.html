@@ -49,7 +49,7 @@
 	</tr>
     {% for p in projects %}
     	<tr class="{% cycle 'row1' 'row2' %}" >			
-			<td><a href="/projects/{{p.id}}"><img src="{% static "images/documentinfo-48.png" %}" width="20" height="20" alt="פרטים" border="0" /></a></td>
+			<td><a href="/projects/{{p.id}}"><i class="fa fa-fw fa-info-circle"></i></a></td>
 			<td>{{p.name}}</td>
 			<td>{{ p.initiator }}</td>
 			<td>

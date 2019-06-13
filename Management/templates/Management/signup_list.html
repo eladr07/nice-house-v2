@@ -74,7 +74,7 @@
 	</tr>
     {% for s in signups %}
     	<tr class="{% cycle 'row1' 'row2' %}" objid={{s.id}}>			
-			<td><a href="{{s.id}}"><img src="{% static "images/documentinfo-48.png" %}" width="20" height="20" alt="פרטים" border="0" /></a></td>
+			<td><a href="{{s.id}}"><i class="fa fa-fw fa-info-circle"></i></a></td>
 			<td>{{ s.date }}</td>
 			<td>{{ s.clients }}</td>
 			<td>{{ s.house.building.num }}</td>

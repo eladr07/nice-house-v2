@@ -77,7 +77,7 @@
 </tr>
 {% for i in object_list %}
 	<tr class="{% cycle 'row1' 'row2' %}" objid={{i.id}}>
-		<td><a href="{{i.id}}"><img src="{% static "images/documentinfo-48.png" %}" width="20" height="20" alt="פרטים" border="0" /></a></td>
+		<td><a href="{{i.id}}"><i class="fa fa-fw fa-info-circle"></i></a></td>
 		<td>{{ i.initiator }}</td>
 		<td>{{ i.name }}</td>
 		<td>{{ i.city }}</td>

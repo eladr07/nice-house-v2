@@ -21,7 +21,7 @@
 	{% if sales.0.allowed_discount %}<th>% הנחה מותר</th>{% endif %}
 	{% for s in sales %}
 		<tr>
-			<td><a href="{{s.get_absolute_url}}"><img src="{% static "images/documentinfo-48.png" %}" width="20" height="20" alt="פרטים" border="0" /></a></td>
+			<td><a href="{{s.get_absolute_url}}"><i class="fa fa-fw fa-info-circle"></i></a></td>
 			<td>{{s.id}}</td>
 			{% if s.contract_num %}<td>{{s.contract_num}}</td>{% endif%}
 			<td>{{s.sale_date|date:"j/m"}}</td>

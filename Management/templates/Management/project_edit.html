@@ -76,7 +76,7 @@
 		{% for e in project.employees.all %}
 			<tr>
 				<td>{{ e }}</td>
-				<td><a href="/employees/{{e.id}}"><img src="{% static "images/documentinfo-48.png" %}" width="20" height="20" alt="פרטים" border="0" /></a></td>
+				<td><a href="/employees/{{e.id}}"><i class="fa fa-fw fa-info-circle"></i></a></td>
 			</tr>
 		{% endfor %}
 		</table>
@@ -88,7 +88,7 @@
 				{{project.demand_contact|default_if_none:" --- "}} 
 				<a href="demandcontact" class="fancybox">הגדר</a>
 				{% if project.demand_contact %}
-					<a href="/contact/{{project.demand_contact.id}}" class="fancybox"><img src="{% static "images/documentinfo-48.png" %}" width="20" height="20" alt="פרטים" border="0" /></a>
+					<a href="/contact/{{project.demand_contact.id}}" class="fancybox"><i class="fa fa-fw fa-info-circle"></i></a>
 					<a href="contact/{{project.demand_contact.id}}/remove">מחיקה מהפרוייקט</a>
 					<a href="contact/{{project.demand_contact.id}}/delete">מחיקה מהמערכת</a>
 				{% endif %}
@@ -97,7 +97,7 @@
 				{{project.payment_contact|default_if_none:" --- "}} 
 				<a href="paymentcontact" class="fancybox">הגדר</a>
 				{% if project.payment_contact %}
-					<a href="/contact/{{project.payment_contact.id}}" class="fancybox"><img src="{% static "images/documentinfo-48.png" %}" width="20" height="20" alt="פרטים" border="0" /></a>
+					<a href="/contact/{{project.payment_contact.id}}" class="fancybox"><i class="fa fa-fw fa-info-circle"></i></a>
 					<a href="contact/{{project.payment_contact.id}}/remove">מחיקה מהפרוייקט</a>
 					<a href="contact/{{project.payment_contact.id}}/delete">מחיקה מהמערכת</a>
 				{% endif %}
@@ -105,7 +105,7 @@
 				<u>אנשי קשר נוספים:</u><br>
 				{% for c in project.contacts.all %}
 					{{c}} 
-					<a href="/contact/{{c.id}}" class="fancybox"><img src="{% static "images/documentinfo-48.png" %}" width="20" height="20" alt="פרטים" border="0" /></a>
+					<a href="/contact/{{c.id}}" class="fancybox"><i class="fa fa-fw fa-info-circle"></i></a>
 					<a href="contact/{{c.id}}/remove">מחיקה מהפרוייקט</a>
 					<a href="contact/{{c.id}}/delete">מחיקה מהמערכת</a>
 					<br>
