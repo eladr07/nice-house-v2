@@ -37,7 +37,6 @@
 	<caption>מציג סה"כ {{salaries|length}} עובדים</caption>
 		<tr>
 			<th><input type="checkbox" id="all-checkboxes"/></th>
-			<th></th>
 			<th>מס<BR>העובד</th>
 			<th>שם<br>פרטי</th>
 			<th>שם<BR>משפחה</th>
@@ -58,8 +57,7 @@
 				{% with salary.get_employee as e %}
 				{% with e.account as account %}
 					<td><input type="checkbox" name="salary-{{salary.id}}"/></td>
-					<td><a href="{{e.get_absolute_url}}"><i class="fa fa-fw fa-info-circle"></i></a></td>
-					<td>{{ e.id }}</td>
+					<td><a href="{{e.get_absolute_url}}">{{ e.id }}</a></td>
 					<td>{{ e.first_name }}</td>
 					<td>{{ e.last_name }}</td>
 					<td>{{e.pid}}</td>

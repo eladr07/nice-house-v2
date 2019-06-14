@@ -114,7 +114,7 @@
 	</tr>
     {% for i in object_list %}
     	<tr class="{% cycle 'row1' 'row2' %}" objid={{i.id}}>
-			<td><a href="{{i.id}}"><i class="fa fa-fw fa-info-circle"></i></a></td>
+			<td><a href="{{i.id}}">{{i.id}}</a></td>
 			<td>{{ i.initiator }}</td>
 			<td>{{ i.name }}</td>
 			<td>{{ i.city }}</td>
@@ -142,9 +142,9 @@
 				{% endif%}
 			</td>
 			<td>
-				<a href="{{i.id}}/buildings/add" class="fancybox"><i class="fa fa-fw fa-plus-circle"></i> </a>
+				<a href="{{i.id}}/buildings/add" class="fancybox"><i class="fa fa-fw fa-plus-circle text-success"></i> </a>
 				{% if i.non_deleted_buildings|length %}
-					<a href="{{i.id}}/buildings" class="bigfancybox"><img src="{% static "images/home-48.png" %}" width="20" height="20" alt="פרטים" border="0" /></a>
+					<a href="{{i.id}}/buildings" class="bigfancybox"><i class="fa fa-fw fa-home"></i></a>
 				{% endif %}
 			</td>
 			<td>

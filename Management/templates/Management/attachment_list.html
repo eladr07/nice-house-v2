@@ -98,7 +98,7 @@ $(document).ready(function () {
 		</tr>
 		{% for a in attachments %}
 			<tr class="{% cycle 'row1' 'row2' %}" objid={{a.id}}>
-				<td><a href="{{a.id}}"><i class="fa fa-fw fa-info-circle"></i></a></td>
+				<td><a href="{{a.id}}">{{a.id}}</a></td>
 				<td>{{ a.add_time }}</td>
 				<td>{{ a.user_added }}</td>
 				<td><a href="{{a.file.url}}" target="_blank">{{ a.file.name }}</a></td>

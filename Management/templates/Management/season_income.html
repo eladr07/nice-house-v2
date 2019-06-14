@@ -61,7 +61,7 @@
 <table id="Table" class="dataTable" border="1">
 <caption>מציג סה"כ {{projects|length}} פרוייקטים</caption>
 	<tr>
-		<th></th>
+		<th>מס"ד</th>
 		<th>ריכוז</th>
 		<th>PDF</th>
 		<th>שם היזם</th>
@@ -74,7 +74,7 @@
 	</tr>
     {% for p in projects %}
 		<tr class="{% cycle 'row1' 'row2' %}" objid={{d.id}}>
-			<td><a href="{{p.get_absolute_url}}"><i class="fa fa-fw fa-info-circle"></i></a></td>
+			<td><a href="{{p.get_absolute_url}}">{{p.id}}</a></td>
 			<td>
 				<a target="_blank" href="/demandseason/?project={{p.id}}&from_year={{start.year}}&from_month={{start.month}}&to_year={{end.year}}&to_month={{end.month}}">
 					<img src="{% static "images/viewmag-48.png" %}" width="20" height="20"/>

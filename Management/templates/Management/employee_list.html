@@ -112,7 +112,6 @@
 	<br />
 	<table id="employee_table" class="dataTable" border="1">
 		<caption>מציג סה"כ {{employee_list.count}} עובדים בנווה העיר</caption>
-		<th/>
 		<th>מספר</th>
 		<th>שם פרטי</th>
 		<th>שם משפחה</th>
@@ -126,8 +125,7 @@
 			<tr style="text-align:center; color:#4669D6; font-size:14px"><td colspan="10"><b>{{rank.grouper|default:"-- לא הוגדר דרג --"}}</b></td></tr>
 			{% for e in rank.list %}
 				<tr class="{% cycle 'row1' 'row2' %}" objid={{e.id}}>
-					<td><a href="/employees/{{e.id}}"><i class="fa fa-fw fa-info-circle"></i></a></td>
-					<td>{{ e.id }}</td>
+					<td><a href="/employees/{{e.id}}">{{ e.id }}</a></td>
 					<td>{{ e.first_name }}</td>
 					<td>{{ e.last_name }}</td>
 					<td>{{ e.address }}</td>
@@ -150,7 +148,6 @@
 	</table>
 	<br><br>
 	<table id="nhemployee_table" class="dataTable" border="1">
-		<th/>
 		<th>מספר</th>
 		<th>שם פרטי</th>
 		<th>שם משפחה</th>
@@ -162,8 +159,7 @@
 			<tr style="text-align:center; color:#4669D6; font-size:14px"><td colspan="10"><b>{{nhbranch}}</b></td></tr>
 			{% for e in nhbranch.nhemployees %}
 				<tr class="{% cycle 'row1' 'row2' %}" objid={{e.id}}>
-					<td><a href="/nhemployees/{{e.id}}"><i class="fa fa-fw fa-info-circle"></i></a></td>
-					<td>{{ e.id }}</td>
+					<td><a href="/nhemployees/{{e.id}}">{{ e.id }}</a></td>
 					<td>{{ e.first_name }}</td>
 					<td>{{ e.last_name }}</td>
 					<td>{{ e.address }}</td>

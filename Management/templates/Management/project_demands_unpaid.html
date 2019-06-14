@@ -10,7 +10,7 @@
 	<br /> 		
 	<table id="attachmentTable" class="dataTable" border="1">
 		<tr>
-			<th></th>
+			<th>מס"ד</th>
 			<th>PDF</th>
 			<th>חודש</th>
 			<th>חוזים</th>
@@ -21,7 +21,7 @@
 		</tr>
 		{% for d in demands %}
 			<tr class="{% cycle 'row1' 'row2' %}" objid={{a.id}}>
-				<td><a target="_blank" href="/demands/{{d.id}}"><i class="fa fa-fw fa-info-circle"></i></a></td>
+				<td><a target="_blank" href="/demands/{{d.id}}">{{d.id}}</a></td>
 				<td>
 					<a href="/reports/project_month/{{d.project.id}}/{{d.year}}/{{d.month}}">
 					<img src="{% static "images/PDF-48.png" %}" width="15" height="15"/>

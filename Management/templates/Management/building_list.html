@@ -71,7 +71,7 @@
 			</tr>
 			{% for b in buildings %}
 				<tr class="{% cycle 'row1' 'row2' %}" objid={{b.id}}>
-					<td><a href="/buildings/{{b.id}}"><i class="fa fa-fw fa-info-circle"></i></a></td>
+					<td><a href="/buildings/{{b.id}}">{{b.id}}</a></td>
 					<td>{{ b.num }}</td>
 					<td>{{ b.type }}</td>
 					<td>{{ b.floors }}</td>

@@ -35,7 +35,6 @@
 <br>
 <table id="demandTable" class="dataTable" border="1">
 	<tr>
-		<th></th>
 		<th>פרוייקט</th>
 		<th>יזם</th>
 		<th>אנשי קשר</th>
@@ -49,8 +48,7 @@
 	</tr>
     {% for p in projects %}
     	<tr class="{% cycle 'row1' 'row2' %}" >			
-			<td><a href="/projects/{{p.id}}"><i class="fa fa-fw fa-info-circle"></i></a></td>
-			<td>{{p.name}}</td>
+			<td><a href="/projects/{{p.id}}">{{p.name}}</td>
 			<td>{{ p.initiator }}</td>
 			<td>
 				{% if p.demand_contact %}
@@ -79,14 +77,14 @@
 		</tr>
 	{% endfor %}
 	<tr class="rowSum">
-		<td colspan="5"></td>
+		<td colspan="4"></td>
 		<td>{{total_mispaid}}</td>
 		<td>{{total_unpaid}}</td>
 		<td>{{total_nopayment}}</td>
 		<td>{{total_noinvoice}}</td>
 	</tr>
 	<tr class="rowSum">
-		<td colspan="5"></td>
+		<td colspan="4"></td>
 		<td>{{amount_mispaid|intcomma}}</td>
 		<td>{{amount_unpaid|intcomma}}</td>
 		<td>{{amount_nopayment|intcomma}}</td>
