@@ -172,7 +172,7 @@
 				{% endif %}
 			</td>
 			<td
-			{% if d.is_fixed %}<img src="{% static "images/update_48.png" %}" width="20" height="20"  alt="תיקון" />{% endif %}
+			{% if d.is_fixed %} <i class="fa fa-fw fa-exclamation-triangle text-warning"></i>{% endif %}
 			</td>
 			<td>
 			{% for r in d.get_open_reminders %}

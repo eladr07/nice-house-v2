@@ -209,7 +209,7 @@
 			<td style="color:#D50808;">{% if d.fee_diff %} {{ d.fee_diff.amount|intcomma }} ש"ח - {{ d.fee_diff.reason }} {% endif %}</td>
 			<td><b>{% if d.get_total_amount %} {{ d.get_total_amount|intcomma }} ש"ח {% else %}----{% endif %}</b></td>
 			<td
-			{% if d.is_fixed %}<img src="{% static "images/update_48.png" %}" width="20" height="20"  alt="תיקון" />{% endif %}
+			{% if d.is_fixed %} <i class="fa fa-fw fa-exclamation-triangle text-warning"></i>{% endif %}
 			</td>
 			<td>
 			{% if d.get_open_reminders|length %}
