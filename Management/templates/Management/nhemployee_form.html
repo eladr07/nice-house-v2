@@ -75,7 +75,7 @@
 				{% else %}
 					<a href="/employees/{{form.instance.id}}/employmentterms" class="fancybox" style="text-decoration:none;">
 						הזנת תנאי העסקה 
-						<i class="fa fa-fw fa-plus-circle"></i>
+						<i class="fa fa-fw fa-plus-circle text-success"></i>
 					</a>
 				{% endif %}
 			</fieldset>
@@ -114,7 +114,7 @@
 			{% else %}
 				<a href="account" class="fancybox" style="text-decoration:none;">
 					הזנת פרטי חשבון
-					<i class="fa fa-fw fa-plus-circle"></i>
+					<i class="fa fa-fw fa-plus-circle text-success"></i>
 				</a>
 			{% endif %}
 		</fieldset>
@@ -138,10 +138,10 @@
 					{{nhc.right_filter}}
 				{% endif %}
 				<a href="{{nhc.get_absolute_url}}" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
-				<a href="{{nhc.get_absolute_url}}/del"><i class="fa fa-fw fa-times-circle"></i></a>
+				<a href="{{nhc.get_absolute_url}}/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
 				<br>
 			{% endfor %}
-			<a href="/nhcbi/add" class="fancybox"><i class="fa fa-fw fa-plus-circle"></i></a>
+			<a href="/nhcbi/add" class="fancybox"><i class="fa fa-fw fa-plus-circle text-success"></i></a>
 		</fieldset>
 		<fieldset class="cardFieldset">
 			<legend>הלוואות</legend>

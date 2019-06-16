@@ -103,13 +103,13 @@
 	<legend>פירוט יחידות</legend>
 
 	<a href="../addhouse/type{{type.id}}" class="btn btn-default" role="button">
-		<i class="fa fa-fw fa-plus-circle"></i> הוספת דירה חדשה למחירון
+		<i class="fa fa-fw fa-plus-circle text-success"></i> הוספת דירה חדשה למחירון
 	</a>
 	<a id="houseEdit" class="btn btn-default" role="button">
 		<i class="fa fa-fw fa-edit"></i> שינוי
 	</a>
 	<a id="houseDelete" class="btn btn-default" role="button">
-		<i class="fa fa-fw fa-times-circle"></i> מחיקה
+		<i class="fa fa-fw fa-times-circle text-danger"></i> מחיקה
 	</a>
 	<a href="../clients" class="btn btn-default" role="button">
 		<i class="fa fa-fw fa-users"></i> מצבת רוכשים
@@ -168,7 +168,7 @@
 			<tr class="{% cycle 'row1' 'row2' %}" objid={{h.id}}>
 		{% endif %}
 			<td><input type="checkbox" name="house-{{h.id}}"/></td>
-			<td><a href="../house/{{h.id}}/type{{type.id}}"><i class="fa fa-fw fa-info-circle"></i></a></td>
+			<td><a href="../house/{{h.id}}/type{{type.id}}"><i class="fa fa-fw fa-info-circle text-primary"></i></a></td>
 			<td>{{h.num}}</td>
 			<td>{{h.floor}}</td>
 			<td>{{h.type}}</td>

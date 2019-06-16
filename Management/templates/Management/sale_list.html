@@ -39,7 +39,7 @@
 		<th>ביטול</th>
 		{% for s in sales %}
 			<tr>
-				<td><a target="_parent" href="{{s.get_absolute_url}}"><i class="fa fa-fw fa-info-circle"></i></a></td>
+				<td><a target="_parent" href="{{s.get_absolute_url}}"><i class="fa fa-fw fa-info-circle text-primary"></i></a></td>
 				<td>{{s.id}}</td>
 				{% if s.contract_num %}<td>{{s.contract_num}}</td>{% endif%}
 				<td>{{s.sale_date|date:"j/m/Y"}}</td>
@@ -71,11 +71,11 @@
 						<a href="/salereject/{{s.salereject.id}}" target="_parent"><img src="{% static "images/agt_back-48.png" %}" width="15" height="15" /></a>
 					{% endif %}
 					{% if s.salecancel %}
-						<a href="/salecancel/{{s.salecancel.id}}" target="_parent"><i class="fa fa-fw fa-times-circle"></i></a>
+						<a href="/salecancel/{{s.salecancel.id}}" target="_parent"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
 					{% endif %}
 				</td>
 				<td><a id="reject{{s.id}}" href="/demands/{{s.demand.id}}/sale/{{s.id}}/reject" target="_parent"><img src="{% static "images/agt_back-48.png" %}" width="15" height="15" alt="דחייה" border="0" /></a></td>
-				<td><a id="cancel{{s.id}}" href="/demands/{{s.demand.id}}/sale/{{s.id}}/cancel" target="_parent"><i class="fa fa-fw fa-times-circle"></i></a></td>
+				<td><a id="cancel{{s.id}}" href="/demands/{{s.demand.id}}/sale/{{s.id}}/cancel" target="_parent"><i class="fa fa-fw fa-times-circle text-danger"></i></a></td>
 			</tr>
 		{% endfor %}
 		<tr class="sumRow">

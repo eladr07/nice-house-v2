@@ -20,7 +20,7 @@
 			<th>הערות</th>
 		{% for o in employee.loans_and_pays %}
 			<tr class={% if o.pay_num %}"row1"{% else %}"row2"{% endif %}>
-				<td><a href="{{o.get_absolute_url}}"><i class="fa fa-fw fa-info-circle"></i></a></td>
+				<td><a href="{{o.get_absolute_url}}"><i class="fa fa-fw fa-info-circle text-primary"></i></a></td>
 				<td>{{o.month}}/{{o.year}}</td>
 				{% if o.pay_num %}
 					<td>הלוואה</td>

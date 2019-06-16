@@ -68,7 +68,7 @@
 
 <div class="btn-group" role="group">
 	<a id="loanAdd" class="btn btn-default fancybox" role="button">
-		<i class="fa fa-fw fa-plus-circle"></i> הלוואה חדשה
+		<i class="fa fa-fw fa-plus-circle text-success"></i> הלוואה חדשה
 	</a>
 	<a id="loanPay" class="btn btn-default fancybox" role="button">
 		<i class="fa fa-fw fa-edit"></i> קיזוז הלוואה
@@ -92,7 +92,7 @@
 		<i class="fa fa-fw fa-check"></i> אישור שכר לתשלום
 	</a>
 	<a id="deleteSalary" class="btn btn-default" role="button">
-		<i class="fa fa-fw fa-times-circle"></i> מחיקה
+		<i class="fa fa-fw fa-times-circle text-danger"></i> מחיקה
 	</a>
 </div>
 
@@ -153,7 +153,7 @@
 					<img src="{% static "images/PDF-48.png" %}" width="15" height="15"/>
 				</a>
 				<a href="{{demand.get_absolute_url}}">
-					<i class="fa fa-fw fa-info-circle"></i>
+					<i class="fa fa-fw fa-info-circle text-primary"></i>
 				</a>
 				<br>
 				{% endfor %}

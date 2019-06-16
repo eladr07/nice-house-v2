@@ -76,7 +76,7 @@
 		{% for e in project.employees.all %}
 			<tr>
 				<td>{{ e }}</td>
-				<td><a href="/employees/{{e.id}}"><i class="fa fa-fw fa-info-circle"></i></a></td>
+				<td><a href="/employees/{{e.id}}"><i class="fa fa-fw fa-info-circle text-primary"></i></a></td>
 			</tr>
 		{% endfor %}
 		</table>
@@ -88,7 +88,7 @@
 				{{project.demand_contact|default_if_none:" --- "}} 
 				<a href="demandcontact" class="fancybox">הגדר</a>
 				{% if project.demand_contact %}
-					<a href="/contact/{{project.demand_contact.id}}" class="fancybox"><i class="fa fa-fw fa-info-circle"></i></a>
+					<a href="/contact/{{project.demand_contact.id}}" class="fancybox"><i class="fa fa-fw fa-info-circle text-primary"></i></a>
 					<a href="contact/{{project.demand_contact.id}}/remove">מחיקה מהפרוייקט</a>
 					<a href="contact/{{project.demand_contact.id}}/delete">מחיקה מהמערכת</a>
 				{% endif %}
@@ -97,7 +97,7 @@
 				{{project.payment_contact|default_if_none:" --- "}} 
 				<a href="paymentcontact" class="fancybox">הגדר</a>
 				{% if project.payment_contact %}
-					<a href="/contact/{{project.payment_contact.id}}" class="fancybox"><i class="fa fa-fw fa-info-circle"></i></a>
+					<a href="/contact/{{project.payment_contact.id}}" class="fancybox"><i class="fa fa-fw fa-info-circle text-primary"></i></a>
 					<a href="contact/{{project.payment_contact.id}}/remove">מחיקה מהפרוייקט</a>
 					<a href="contact/{{project.payment_contact.id}}/delete">מחיקה מהמערכת</a>
 				{% endif %}
@@ -105,7 +105,7 @@
 				<u>אנשי קשר נוספים:</u><br>
 				{% for c in project.contacts.all %}
 					{{c}} 
-					<a href="/contact/{{c.id}}" class="fancybox"><i class="fa fa-fw fa-info-circle"></i></a>
+					<a href="/contact/{{c.id}}" class="fancybox"><i class="fa fa-fw fa-info-circle text-primary"></i></a>
 					<a href="contact/{{c.id}}/remove">מחיקה מהפרוייקט</a>
 					<a href="contact/{{c.id}}/delete">מחיקה מהמערכת</a>
 					<br>
@@ -170,7 +170,7 @@
 						</tr>
 					</table>
 					<a id="edit_cvp" href="cvp" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
-					<a href="cvp/del"><i class="fa fa-fw fa-times-circle"></i></a>
+					<a href="cvp/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
 				</div>
 			{% endif %}
 			{% if c.c_var_precentage_fixed %}		
@@ -188,7 +188,7 @@
 						דירות אחרונות.
 					{% endif %}
 					<a id="edit_cvpf" href="cvpf" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
-					<a href="cvpf/del"><i class="fa fa-fw fa-times-circle"></i></a>
+					<a href="cvpf/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
 				</div>
 			{% endif %}
 			{% if c.c_zilber %}		
@@ -207,7 +207,7 @@
 					בתאריך 
 					{{c.c_zilber.third_start|date:"j/m/y"}}.
 					<a id="edit_cz" href="cz" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
-					<a href="cz/del"><i class="fa fa-fw fa-times-circle"></i></a>
+					<a href="cz/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
 				</div>
 			{% endif %}
 			{% if c.b_discount_save_precentage %}	
@@ -219,7 +219,7 @@
 						{{c.b_discount_save_precentage.max_for_bonus}}%
 					{% endif %}
 					<a id="edit_bdsp" href="bdsp" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
-					<a href="bdsp/del"><i class="fa fa-fw fa-times-circle"></i></a>
+					<a href="bdsp/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
 				</div>
 			{% endif %}
 			<div>
@@ -228,19 +228,19 @@
 			<div id="new_commissions">
 				{% if not c.c_var_precentage %}
 					עמלה משתנה (באחוזים)
-					<a id="add_cvp" href="cvp" class="fancybox"><i class="fa fa-fw fa-plus-circle"></i></a> 
+					<a id="add_cvp" href="cvp" class="fancybox"><i class="fa fa-fw fa-plus-circle text-success"></i></a> 
 				{% endif %}
 				{% if not c.c_var_precentage_fixed %}
 					<br>עמלה משתנה בקצב קבוע (באחוזים)
-					<a id="add_cvpf" href="cvpf" class="fancybox"><i class="fa fa-fw fa-plus-circle"></i></a> 
+					<a id="add_cvpf" href="cvpf" class="fancybox"><i class="fa fa-fw fa-plus-circle text-success"></i></a> 
 				{% endif %}
 				{% if not c.c_zilber %}
 					<br>עמלת זילברמינץ
-					<a id="add_cz" href="cz" class="fancybox"><i class="fa fa-fw fa-plus-circle"></i></a> 
+					<a id="add_cz" href="cz" class="fancybox"><i class="fa fa-fw fa-plus-circle text-success"></i></a> 
 				{% endif %}
 				{% if not c.b_discount_save_precentage %}
 					<br>בונוס חיסכון בהנחה (באחוזים)
-					<a id="add_bdsp" href="bdsp" class="fancybox"><i class="fa fa-fw fa-plus-circle"></i></a> 
+					<a id="add_bdsp" href="bdsp" class="fancybox"><i class="fa fa-fw fa-plus-circle text-success"></i></a> 
 				{% endif %}
 			</div>
 			{% if c.agreement %}

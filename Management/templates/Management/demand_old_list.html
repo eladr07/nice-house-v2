@@ -216,7 +216,7 @@
 				<a href="/demands/{{d.id}}/reminders" class="fancybox">{{d.get_open_reminders|length}} תזכורות</a>
 			{% endif %}
 				<a href="/demands/{{d.id}}/addreminder" class="fancybox">
-					<i class="fa fa-fw fa-plus-circle"></i>
+					<i class="fa fa-fw fa-plus-circle text-success"></i>
 				</a>
 			</td>
 			<td>{{ d.remarks|default_if_none:"" }}</td>

@@ -76,7 +76,7 @@
 	<div class="clearBoth"> </div>
 
 	<a href="add" class="btn btn-default" role="button">
-		<i class="fa fa-fw fa-plus-circle"></i> הוספת פרוייקט חדש
+		<i class="fa fa-fw fa-plus-circle text-success"></i> הוספת פרוייקט חדש
 	</a>
 	<a id="projectEdit" class="btn btn-default" role="button">
 		<i class="fa fa-fw fa-edit"></i> לכרטיס פרוייקט
@@ -142,7 +142,7 @@
 				{% endif%}
 			</td>
 			<td>
-				<a href="{{i.id}}/buildings/add" class="fancybox"><i class="fa fa-2x fa-plus-circle text-success"></i> </a>
+				<a href="{{i.id}}/buildings/add" class="fancybox"><i class="fa fa-2x fa-plus-circle text-success text-success"></i> </a>
 				{% if i.non_deleted_buildings|length %}
 					<a href="{{i.id}}/buildings" class="bigfancybox"><i class="fa fa-2x fa-home"></i></a>
 				{% endif %}

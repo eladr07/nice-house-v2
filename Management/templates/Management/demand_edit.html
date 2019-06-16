@@ -81,7 +81,7 @@
 		{% for d in demand.diffs.all %}
 			{{ d }}				
 			<a href="{{d.get_absolute_url}}" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
-			<a href="{{d.get_absolute_url}}/del"><i class="fa fa-fw fa-times-circle"></i></a>
+			<a href="{{d.get_absolute_url}}/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
 			<br>
 		{% endfor %}
 		<br><a class="fancybox" href="{{demand.id}}/adddiff">תוספת\קיזוז חדש</a><br>
@@ -149,7 +149,7 @@
 			על סך
 			<b>{{i.amount|intcomma}} ש"ח</b>  				
 			<a href="/demandinvoice/{{i.id}}" ><i class="fa fa-edit" title='עריכה'></i></a>
-			<a href="/invoices/{{i.id}}/del"><i class="fa fa-fw fa-times-circle"></i></a>
+			<a href="/invoices/{{i.id}}/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
 			{% if i.offset %}
 				בתאריך 
 				{{i.offset.date|date:"j/m/y"}}
@@ -158,7 +158,7 @@
 				בגלל 
 				{{i.offset.reason}} 
 				<a href="{{i.offset.get_absolute_url}}" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
-				<a href="{{i.offset.get_absolute_url}}/del"><i class="fa fa-fw fa-times-circle"></i></a>
+				<a href="{{i.offset.get_absolute_url}}/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
 			{% else %}
 				<a href="/invoices/{{i.id}}/offset" class="fancybox">הזנת זיכוי לחשבונית</a>
 			{% endif %}
@@ -175,7 +175,7 @@
 			על סך
 			<b>{{p.amount|intcomma}} ש"ח</b>  				
 			<a href="/demandpayment/{{p.id}}" ><i class="fa fa-edit" title='עריכה'></i></a>
-			<a href="/payments/{{p.id}}/del"><i class="fa fa-fw fa-times-circle"></i></a>
+			<a href="/payments/{{p.id}}/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
 			<br>
 		{% endfor %}
 		<br><a href="{{demand.id}}/payment/add">הוסף תשלום</a><br>

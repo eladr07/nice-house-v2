@@ -67,7 +67,7 @@
 		<legend>פירוט מכירות - {{demand.project}} לחודש {{demand.month}}/{{demand.year}}</legend>
 
 		<a href="/demands/{{demand.id}}/sale/add" class="btn btn-default" role="button">
-			<i class="fa fa-fw fa-plus-circle"></i> הזנת מכירה
+			<i class="fa fa-fw fa-plus-circle text-success"></i> הזנת מכירה
 		</a>
 		<a id="saleEdit" class="btn btn-default" role="button">
 			<i class="fa fa-fw fa-edit"></i> שינוי
@@ -116,7 +116,7 @@
 		</div>
 
 		<a id="saleDelete" class="btn btn-default" role="button">
-			<i class="fa fa-fw fa-times-circle"></i> ביטול מכירה
+			<i class="fa fa-fw fa-times-circle text-danger"></i> ביטול מכירה
 		</a>
 
 		<a href="/reports/project_month/{{demand.project.id}}/{{demand.year}}/{{demand.month}}" class="btn btn-default" role="button">
@@ -221,7 +221,7 @@
 						<a href="/salereject/{{s.salereject.id}}"><img src="{% static "images/agt_back-48.png" %}" width="20" height="20" /></a>
 					{% endif %}
 					{% if s.salecancel %}
-						<a href="/salecancel/{{s.salecancel.id}}"><i class="fa fa-fw fa-times-circle"></i></a>
+						<a href="/salecancel/{{s.salecancel.id}}"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
 					{% endif %}
 				</td>
 				<td>{{s.remarks}}</td>
@@ -274,7 +274,7 @@
 							<a href="/salereject/{{s.salereject.id}}"><img src="{% static "images/agt_back-48.png" %}" width="20" height="20" /></a>
 						{% endif %}
 						{% if s.salecancel %}
-							<a href="/salecancel/{{s.salecancel.id}}"><i class="fa fa-fw fa-times-circle"></i></a>
+							<a href="/salecancel/{{s.salecancel.id}}"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
 						{% endif %}
 					</td>
 					<td>{{s.remarks}}</td>

@@ -45,12 +45,12 @@
 				<td>
 				{% for r in d.get_open_reminders %}
 					{{ r.content|truncatewords:5 }}
-					<a href="{{r.get_absolute_url}}"><i class="fa fa-fw fa-info-circle"></i></a>
+					<a href="{{r.get_absolute_url}}"><i class="fa fa-fw fa-info-circle text-primary"></i></a>
 					<a href="{{r.get_absolute_url}}/do"><img src="{% static "images/thumbs_up_48.png" %}" width="15" height="15" alt="בצע" border="0" /></a>
 					<br>
 				{% endfor %}
 					<a href="/demands/{{d.id}}/addreminder" class="fancybox">
-						<i class="fa fa-fw fa-plus-circle"></i>
+						<i class="fa fa-fw fa-plus-circle text-success"></i>
 					</a>
 				</td>
 			</tr>

@@ -51,16 +51,16 @@
 	<div class="clearBoth"></div>
 
 	<a href="/payments/add" class="btn btn-default" role="button">
-		<i class="fa fa-fw fa-plus-circle"></i> הוספה
+		<i class="fa fa-fw fa-plus-circle text-success"></i> הוספה
 	</a>
 	<a href="/splitpayment/add" class="btn btn-default" role="button">
-		<i class="fa fa-fw fa-plus-circle"></i> תשלום מפוצל
+		<i class="fa fa-fw fa-plus-circle text-success"></i> תשלום מפוצל
 	</a>
 	<a id="objEdit" class="btn btn-default" role="button">
 		<i class="fa fa-fw fa-edit"></i> שינוי
 	</a>
 	<a id="objDelete" class="btn btn-default" role="button">
-		<i class="fa fa-fw fa-times-circle"></i> מחיקה
+		<i class="fa fa-fw fa-times-circle text-danger"></i> מחיקה
 	</a>
 
 	<div class="clearBoth"> </div>
@@ -97,7 +97,7 @@
 		<th>הערות</th>
 		{% for i in page.object_list %}
 			<tr class="{% cycle 'row1' 'row2' %}" objid={{i.id}}>
-				<td><a href="{{i.demands.all.0.get_absolute_url}}"><i class="fa fa-fw fa-info-circle"></i></a></td>
+				<td><a href="{{i.demands.all.0.get_absolute_url}}"><i class="fa fa-fw fa-info-circle text-primary"></i></a></td>
 				<td>{{ i.demands.all.0.project.initiator }}</td>
 				<td><a href="{{i.demands.0.project.get_absolute_url}}">{{ i.demands.all.0.project }}</td>
 				<td>{{ i.demands.all.0.month }}</td>
