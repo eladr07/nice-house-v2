@@ -21,12 +21,7 @@
 			<td colspan="6" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש</td>
 		</tr>
 		<tr class="row2">
-			{% for field in filterForm %}
-			<td>
-				{{ field.label_tag }} : 
-				{{ field }}
-			</td>
-			{% endfor %}
+				{% include "Management/filter_form_fields.html" with form=filterForm %}
 			<td><input type="submit" value="חפש" class="button"/></td>
 		</tr>
 	</table>
