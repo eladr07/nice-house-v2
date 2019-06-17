@@ -31,15 +31,9 @@
 		<fieldset class="cardFieldset">
 			<legend>פרטים כלליים</legend>
 			<table cellspacing="2" cellpadding="2" class="formTable">
-			{% for field in form %}
-				<tr>
-					<th>{{ field.label_tag }}</th>
-					<td>
-						{{field}}
-						{% if field.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{field.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-			{% endfor %}
+			
+				{% include "Management/form_snippet.html" %}
+				
 			{% if form.instance.id %}
 				<tr>
 					<td></td>

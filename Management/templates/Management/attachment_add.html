@@ -79,9 +79,7 @@
 			<fieldset class="cardFieldset">
 				<legend>קישור לפרויקט</legend>
 				<table class="formTable">
-					{% with project_select_form as form %}
-						{% include "Management/form_fields.html" %}
-					{% endwith %}
+					{% include "Management/form_snippet.html" with form=project_select_form %}
 					<tr>
 						<td></td>
 						<td><input class="button" name="project" type="submit" value="אישור"/></td>
@@ -93,9 +91,7 @@
 			<fieldset class="cardFieldset">
 				<legend>קישור לעובד</legend>
 				<table class="formTable">
-					{% with employee_select_form as form %}
-						{% include "Management/form_fields.html" %}
-					{% endwith %}
+					{% include "Management/form_snippet.html" with form=employee_select_form %}
 					<tr>
 						<td></td>
 						<td><input class="button" name="employee" type="submit" value="אישור"/></td>
@@ -107,9 +103,7 @@
 			<fieldset class="cardFieldset">
 				<legend>קישור לדרישה</legend>
 				<table class="formTable">
-					{% with demand_select_form as form %}
-						{% include "Management/form_fields.html" %}
-					{% endwith %}
+					{% include "Management/form_snippet.html" with form=demand_select_form %}
 					<tr>
 						<td></td>
 						<td><input class="button" name="demand" type="submit" value="אישור"/></td>

@@ -24,15 +24,7 @@
 <div id="rightSide">
 	<form method="POST">
 		<table class="formTable" cellspacing="5" align="center">
-		{% for field in form %}
-		<tr>
-			<th>{{field.label_tag}}</th>
-			<td>
-				{{field}}
-				{% if field.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{field.errors|join:""}}'></i>{% endif %}
-			</td>
-		</tr>
-		{% endfor %}
+			{% include "Management/form_snippet.html" %}
 		<tr>
 			<td></td>
 			<td><input name="finish" type="submit" value="אישור" class="button"/></td>
