@@ -22,15 +22,7 @@
 		<fieldset class="cardFieldset">
 			<table class="formTable">
 				<legend>פרטי חשבון</legend>
-				{% for field in accountForm %}
-				<tr>
-					<th>{{field.label_tag}}</th>
-					<td>
-						{{field}}
-						{% if field.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{field.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				{% endfor %}
+				{% include "Management/form_snippet.html" with form=accountForm %}
 			</table>
 		</fieldset>
 	</div>

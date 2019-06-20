@@ -23,15 +23,7 @@
 		<fieldset class="cardFieldset">
 			<table class="formTable">
 				<legend>פרטי הכנסה</legend>
-				{% for field in incomeForm %}
-				<tr>
-					<th>{{field.label_tag}}</th>
-					<td>
-						{{field}}
-						{% if field.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{field.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				{% endfor %}
+				{% include "Management/form_snippet.html" with form=incomeForm %}
 			</table>
 		</fieldset>
 	</div>
@@ -39,15 +31,7 @@
 		<fieldset class="cardFieldset">
 			<table class="formTable">
 				<legend>פרטי תשלום</legend>
-				{% for field in paymentForm %}
-				<tr>
-					<th>{{field.label_tag}}</th>
-					<td>
-						{{field}}
-						{% if field.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{field.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				{% endfor %}
+				{% include "Management/form_snippet.html" with form=paymentForm %}
 			</table>
 		</fieldset>
 	</div>
@@ -56,15 +40,7 @@
 		<fieldset class="cardFieldset">
 			<table class="formTable">
 				<legend>פרטי חשבונית שלנו</legend>
-				{% for field in invoiceForm %}
-				<tr>
-					<th>{{field.label_tag}}</th>
-					<td>
-						{{field}}
-						{% if field.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{field.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				{% endfor %}
+				{% include "Management/form_snippet.html" with form=invoiceForm %}
 			</table>
 		</fieldset>
 	</div>
@@ -72,15 +48,7 @@
 		<fieldset class="cardFieldset">
 			<table class="formTable">
 				<legend>פרטי עסקה</legend>
-				{% for field in dealForm %}
-				<tr>
-					<th>{{field.label_tag}}</th>
-					<td>
-						{{field}}
-						{% if field.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{field.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				{% endfor %}
+				{% include "Management/form_snippet.html" with form=dealForm %}
 			</table>
 		</fieldset>
 	</div>

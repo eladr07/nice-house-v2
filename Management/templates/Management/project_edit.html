@@ -47,15 +47,7 @@
 	<fieldset class="cardFieldset">
 		<legend>נתוני פרוייקט</legend>
 		<table cellspacing="2" cellpadding="2" class="formTable" >
-			{% for field in detailsForm %}
-			<tr>
-				<th>{{field.label_tag}}</th>
-				<td>
-					{{field}}
-					{% if field.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{field.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			{% endfor %}
+			{% include "Management/form_snippet.html" with form=detailsForm %}
 			<tr>
 				<td></td>
 				<td><input type="submit" value="אישור" class="button" /></td>

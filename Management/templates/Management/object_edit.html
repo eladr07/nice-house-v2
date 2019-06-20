@@ -21,16 +21,7 @@
 	<form method="POST" enctype="multipart/form-data">
 		{% csrf_token %}
 		<table class="formTable">
-			{% for field in form %}
-			<tr>
-				<th>{{field.label_tag}}</th>
-				<td>
-					{{field}}
-					{% if field.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{field.errors|join:""}}'></i>{% endif %}
-				</td>
-				<td class="helpText">{% if field.help_text %}{{field.help_text}}{% endif %}</td>
-			</tr>
-			{% endfor %}
+			{% include "Management/form_snippet.html" %}
 			<tr>
 				<td></td>
 				<td>
