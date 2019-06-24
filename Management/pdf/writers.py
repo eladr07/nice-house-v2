@@ -65,7 +65,8 @@ def tableCaption(caption=log2vis(u'ולהלן פירוט העסקאות')):
                      ParagraphStyle(name='tableCaption', fontName='David-Bold', fontSize=15,
                                     alignment=TA_CENTER))
 def nhLogo():
-    return Image('Management/pdf/images/nh_logo_new.png', 170, 75)
+    logo_path = os.path.join(BASE_DIR, STATIC_URL, 'images/nh_logo_new.png')
+    return Image(logo_path, 170, 75)
 
 def sigPara():
     s = log2vis('ברגשי כבוד,') + '<br/>'
