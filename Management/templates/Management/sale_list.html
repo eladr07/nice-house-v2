@@ -53,7 +53,7 @@
 				<td>
 					{{s.price|intcomma}}<br>
 					{{s.include_tax|yesno:"כולל מע\"מ, לא כולל מע\"מ"}}, 
-					{% if s.house.building.project.commissions.include_lawyer != None %}
+					{% if s.house.building.project.commissions.get.include_lawyer != None %}
 						{{s.price_include_lawyer|yesno:"כולל עו\"ד, לא כולל עו\"ד"}}
 					{% endif %}
 				</td>
