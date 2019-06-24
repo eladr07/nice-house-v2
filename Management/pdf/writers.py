@@ -303,7 +303,8 @@ class MonthDemandWriter(DocumentBase):
     def __init__(self, demand, to_mail=False):
         super(MonthDemandWriter, self).__init__()
         self.demand = demand
-        self.signup_adds = self.demand.project.commissions.commission_by_signups
+        commissions = self.demand.project.commissions.get()
+        self.signup_adds = commissions.commission_by_signups
         self.to_mail = to_mail
     def toPara(self):
         contact = self.demand.project.demand_contact
@@ -323,7 +324,7 @@ class MonthDemandWriter(DocumentBase):
         frame1 = Frame(300, 580, 250, 200)
         frame1.addFromList([self.toPara()], canv)
     def introPara(self):
-        project_commissions = self.demand.project.commissions
+        project_commissions = self.demand.project.commissions.get()
         if project_commissions.include_lawyer == None:
             lawyer_str = u''
         elif project_commissions.include_lawyer == False:
@@ -347,8 +348,10 @@ class MonthDemandWriter(DocumentBase):
         logger = logging.getLogger('pdf')
         logger.info('starting zilberBonusFlows')
         
+        commissions = self.demand.project.commissions.get()
+
         flows = [tableCaption(caption=log2vis(u'נספח ב - דו"ח חסכון בהנחה')), Spacer(0,20),
-                 tableCaption(caption=log2vis(u'מדד בסיס - %s' % self.demand.project.commissions.c_zilber.base_madad)),
+                 tableCaption(caption=log2vis(u'מדד בסיס - %s' % commissions.c_zilber.base_madad)),
                  Spacer(0,30)]
         
         headers = [log2vis(n) for n in [u'מס"ד',u'דרישה\nחודש', u'שם הרוכשים', u'ודירה\nבניין', u'חוזה\nתאריך', u'עמלה\nלחישוב\nמחיר', u'0 דו"ח\nמחירון', 
@@ -361,7 +364,8 @@ class MonthDemandWriter(DocumentBase):
         i = 0
         total_prices, total_adds, total_doh0price, total_memudad, total_diff = 0, 0, 0, 0, 0
         demand = self.demand
-        base_madad = demand.project.commissions.c_zilber.base_madad
+        commissions = demand.project.commissions.get()
+        base_madad = commissions.c_zilber.base_madad
                 
         logger.debug(str({'base_madad':base_madad}))
         
@@ -566,7 +570,10 @@ class MonthDemandWriter(DocumentBase):
                 
         names.extend([u'עמלה\nלחישוב\nמחיר', u'בסיס\nעמלת\n%',u'בסיס\nעמלת\nשווי'])
         colWidths.extend([45,None,None])
-        if self.demand.project.commissions.b_discount_save_precentage:
+
+        commissions = self.demand.project.commissions.get()
+
+        if commissions.b_discount_save_precentage:
             names.extend([u'חסכון\nבונוס\n%',u'חסכון\nבונוס\nשווי', u'סופי\nעמלה\n%',u'סופי\nעמלה\nשווי'])
             colWidths.extend([30,30,None,None])
             final = True
