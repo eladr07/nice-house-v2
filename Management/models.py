@@ -193,7 +193,7 @@ class Project(models.Model):
     objects = ProjectManager()
     
     def is_zilber(self):
-        return self.commissions.c_zilber != None
+        return self.commissions.get().c_zilber != None
     def demands_unpaid(self):
         query = self.demands.annotate(invoices_num = Count('invoices'), payments_num = Count('payments'))
         query = query.filter(invoices_num = 0, payments_num = 0)
