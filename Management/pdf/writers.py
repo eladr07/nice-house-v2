@@ -28,10 +28,12 @@ from Management.pdf.styles import *
 
 #register Hebrew fonts
 
+from Management.settings import BASE_DIR
+
 STATIC_URL = 'Management/pdf/'
 
-pdfmetrics.registerFont(TTFont('David', os.path.join(STATIC_URL, 'fonts/DavidCLM-Medium.ttf')))
-pdfmetrics.registerFont(TTFont('David-Bold', os.path.join(STATIC_URL, 'fonts/DavidCLM-Bold.ttf')))
+pdfmetrics.registerFont(TTFont('David', os.path.join(BASE_DIR, STATIC_URL, 'fonts/DavidCLM-Medium.ttf')))
+pdfmetrics.registerFont(TTFont('David-Bold', os.path.join(BASE_DIR, STATIC_URL, 'fonts/DavidCLM-Bold.ttf')))
 
 pdfmetrics.registerFontFamily('David', normal='David', bold='David-Bold')
 
