@@ -141,3 +141,95 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     #os.path.join(BASE_DIR, 'static'),
 )
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'form01': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+    },
+    'handlers': {
+        'hand01': {
+            'level':'DEBUG',
+            'class':'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/commission.log'), 
+            'formatter': 'form01'
+        },
+        'hand02': {
+            'level':'DEBUG',
+            'class':'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/pdf.log'),
+            'formatter': 'form01'
+        },
+        'hand04': {
+            'level':'DEBUG',
+            'class':'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/salary.log'), 
+            'formatter': 'form01'
+        },
+        'hand05': {
+            'level':'DEBUG',
+            'class':'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/views.log'),
+            'formatter': 'form01'
+        },
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/error.log'),
+        },
+    },
+    'loggers': {
+        'root': {
+            'handlers':['hand01'],
+            'propagate': True,
+            'level':'DEBUG',
+        },
+        'commission': {
+            'handlers':['hand01'],
+            'propagate': True,
+            'level':'DEBUG',
+        },
+        'pdf': {
+            'handlers':['hand02'],
+            'propagate': True,
+            'level':'DEBUG',
+        },
+        'salary': {
+            'handlers':['hand04'],
+            'propagate': True,
+            'level':'DEBUG',
+        },
+        'views': {
+            'handlers':['hand05'],
+            'propagate': True,
+            'level':'DEBUG',
+        },
+        'django.request': {
+            'handlers': ['file'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+    }
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/path/to/django/debug.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
