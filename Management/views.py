@@ -803,7 +803,7 @@ def demand_calc(request, id):
     reversion.revision.end()
         
     d = Demand.objects.get(pk=id)
-    c = d.project.commissions
+    c = d.project.commissions.get()
     if c.commission_by_signups or c.c_zilber:
         if c.commission_by_signups:
             demands = list(Demand.objects.filter(project = d.project))
@@ -2728,7 +2728,7 @@ class ProjectEndUpdate(PermissionRequiredMixin, UpdateView):
 @login_required  
 def project_commission_del(request, project_id, commission):
     project = Project.objects.get(pk = project_id)
-    c = project.commissions    
+    c = project.commissions.get()
     for field in c._meta.fields:
         if abbrevate(field.name) == commission:
             obj = getattr(c, field.name)

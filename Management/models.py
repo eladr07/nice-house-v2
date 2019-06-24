@@ -2807,7 +2807,7 @@ class Sale(models.Model):
             return pricelist.lawyer_fee
         return common.LAWYER_TAX
     def project_price(self):
-        c = self.house.building.project.commissions
+        c = self.house.building.project.commissions.get()
         if c.include_lawyer == None:
             price = self.price
         elif c.include_lawyer == True:
