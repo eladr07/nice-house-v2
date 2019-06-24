@@ -28,7 +28,7 @@ from Management.pdf.styles import *
 
 #register Hebrew fonts
 
-from Management.settings import BASE_DIR
+from NiceHouse.settings import BASE_DIR
 
 STATIC_URL = 'Management/pdf/'
 
