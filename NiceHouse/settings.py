@@ -28,7 +28,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
-    '.elasticbeanstalk.com'
+    '.elasticbeanstalk.com',
+    '195.238.120.210'
     ]
 
 
