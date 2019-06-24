@@ -1,6 +1,9 @@
 ﻿{% extends "../base.html" %}
 {% block header %}
+
 {% load static %}
+{% load widget_tweaks %}
+
 {{ block.super }}
 <script>
 	$(document).ready(function() {
@@ -37,7 +40,7 @@
 {% block content %}
 	<h3 class="text-center text-danger">ברוך הבא לאתר FollowUp</h3> 
 	<br><br>
-	<div style="float: right; width: 40%;"> 
+	<div class="col-md-4"> 
 		<div class="subTitle">הגדרות מערכת</div> 
 		<ul>
 			<li><a href="madadbi">מדד תשומות הבנייה למגורים</a></li>
@@ -113,7 +116,7 @@
 			<li><a href="#">סטטיסטיקות</a></li>
 		</ul>
 	</div> 
-	<div style="float: right; width: 30%;">
+	<div class="col-md-4">
 	<div class="listTitle">הוצאת צ'קים</div>
 		<ul>
 			<li><a href="#">פתיחת פנקס צ'קים</a></li>
@@ -192,52 +195,50 @@
 		{% endfor %}
 		<li><a href="links">שימושון נדל"ן</a></li>
 	</div>
-	<div style="float: right; width: 28%;">
-		<fieldset class="cardFieldset">
-			<legend>כלים</legend>
-			<ul>
-				<li><a href="">איתור דירה</a></li>
-				<form method="GET" action="locatehouse">
-					{% for field in locateHouseForm %}
-						{{ field }}
-					{% endfor%}
-					<input type="submit" class="button" value="חפש" />
-				</form>
-			</ul>
-			<ul>
-				<li><a href="">איתור דרישה</a></li>
-				<form method="GET" action="locatedemand">
-					{% for field in locateDemandForm %}
-						{{ field }}
-					{% endfor%}
-					<input type="submit" class="button" name="find" value="חפש" />
-					<input type="submit" class="button" name="pdf" value="PDF" />
-				</form>
-			</ul>
-			<ul>
-				<li><a href="">דו"ח מכירות לסוכן</a></li>
-				<form method="GET" action="reports/employeesales">
-					{{ employeeSalesForm.project }}
-					{{ employeeSalesForm.from_year }}
-					{{ employeeSalesForm.from_month }}
-					{{ employeeSalesForm.to_year }}
-					{{ employeeSalesForm.to_month }}
-					<input type="submit" class="button" value="PDF" />
-				</form>
-			</ul>
-			<ul>
-				<li><a href="">ריכוז משכורות לפי תקופה</a></li>
-				<form method="GET" action="employeesalaryseason">
-					{{ employeeSalarySeasonForm.employee }}
-					{{ employeeSalarySeasonForm.from_year }}
-					{{ employeeSalarySeasonForm.from_month }}
-					{{ employeeSalarySeasonForm.to_year }}
-					{{ employeeSalarySeasonForm.to_month }}
-					<input type="submit" class="button" value="חפש" name="find" />
-					<input type="submit" class="button" value="PDF" name="pdf"/>
-				</form>
-			</ul>
-		</fieldset>
+	<div class="col-md-4">
+		<div class="panel panel-info">
+			<div class="panel-heading">כלים</div>
+			<div class="panel-body">
+				<ul>
+					<li><a href="">איתור דירה</a></li>
+					<form method="GET" action="locatehouse" class="form-inline">
+						{% for field in locateHouseForm %}
+							{{ field|add_class:'form-control input-sm' }}
+						{% endfor%}
+						<input type="submit" class="btn btn-xs btn-primary" value="חפש" />
+					</form>
+				</ul>
+				<ul>
+					<li><a href="">איתור דרישה</a></li>
+					<form method="GET" action="locatedemand" class="form-inline">
+						{% for field in locateDemandForm %}
+							{{ field|add_class:'form-control input-sm' }}
+						{% endfor%}
+						<input type="submit" class="btn btn-xs btn-primary" name="find" value="חפש" />
+						<input type="submit" class="btn btn-xs btn-primary" name="pdf" value="PDF" />
+					</form>
+				</ul>
+				<ul>
+					<li><a href="">דו"ח מכירות לסוכן</a></li>
+					<form method="GET" action="reports/employeesales" class="form-inline">
+						{% for field in employeeSalesForm %}
+							{{ field|add_class:'form-control input-sm' }}
+						{% endfor%}
+						<input type="submit" class="btn btn-xs btn-primary" value="PDF" />
+					</form>
+				</ul>
+				<ul>
+					<li><a href="">ריכוז משכורות לפי תקופה</a></li>
+					<form method="GET" action="employeesalaryseason" class="form-inline">
+						{% for field in employeeSalarySeasonForm %}
+							{{ field|add_class:'form-control input-sm' }}
+						{% endfor%}
+						<input type="submit" class="btn btn-xs btn-primary" value="חפש" name="find" />
+						<input type="submit" class="btn btn-xs btn-primary" value="PDF" name="pdf"/>
+					</form>
+				</ul>
+			</div>
+		</div>
 	</div>
 	<div class="clearBoth"></div> 
 {% endblock content %}

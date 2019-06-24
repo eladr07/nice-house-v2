@@ -895,11 +895,15 @@ class TaskFilterForm(forms.Form):
 class ProjectSeasonForm(SeasonForm):
     project = forms.ModelChoiceField(Project.objects.all(), empty_label=gettext('choose_project'), label=gettext('project'))
 
+    field_order = ['project', 'from_year', 'from_month', 'to_year', 'to_month']
+
 class NHBranchSeasonForm(SeasonForm):
     nhbranch = forms.ModelChoiceField(NHBranch.objects.all(), label=gettext('nhbranch'))
 
 class EmployeeSeasonForm(SeasonForm):
     employee = forms.ModelChoiceField(EmployeeBase.objects.all(), label=gettext('employee'))
+
+    field_order = ['employee', 'from_year', 'from_month', 'to_year', 'to_month']
     
 class MadadBIForm(forms.ModelForm):
     def __init__(self, *args, **kw):
