@@ -22,55 +22,7 @@
 	<div id="rightSide">
 		<form method="POST">
 			<table class="formTable">
-				<tr>
-					<th>{{spf.num.label_tag}}</th>
-					<td>
-						{{spf.num}}
-						{% if spf.num.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{spf.num.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th>{{spf.support_num.label_tag}}</th>
-					<td>
-						{{spf.support_num}}
-						{% if spf.support_num.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{spf.support_num.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th>{{spf.bank.label_tag}}</th>
-					<td>
-						{{spf.bank}}
-						{% if spf.bank.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{spf.bank.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th>{{spf.branch_num.label_tag}}</th>
-					<td>
-						{{spf.branch_num}}
-						{% if spf.branch_num.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{spf.branch_num.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th>{{spf.payment_type.label_tag}}</th>
-					<td>
-						{{spf.payment_type}}
-						{% if spf.payment_type.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{spf.payment_type.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th>{{spf.payment_date.label_tag}}</th>
-					<td>
-						{{spf.payment_date}}
-						{% if spf.payment_date.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{spf.payment_date.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th>{{spf.remarks.label_tag}}</th>
-					<td>
-						{{spf.remarks}}
-						{% if spf.remarks.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{spf.remarks.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
+				{% include "Management/form_snippet.html" with form=spf %}
 				<tr>
 					<td>
 					<th>דרישות לתשלום</th>
@@ -83,7 +35,12 @@
 				{% for form in spdForms.forms %}
 				<tr>
 					{% for field in form %}
-						<td>{{field}}{% if field.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{field.errors|join:""}}'></i>{% endif %}</td>
+						<td>
+							{{field}}
+							{% if field.errors %}
+								<i class="fa fa-exclamation-circle text-danger" title='{{field.errors|join:""}}'></i>
+							{% endif %}
+						</td>
 					{% endfor %}
 				</tr>
 				{% endfor %}

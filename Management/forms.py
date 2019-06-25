@@ -337,6 +337,7 @@ class CPriceAmountForm(forms.ModelForm):
 class SignupForm(forms.ModelForm):
     project = forms.ModelChoiceField(queryset = Project.objects.all(), label=gettext('project'))
     building = forms.ModelChoiceField(queryset = Building.objects.all(), label=gettext('building'))
+    
     def __init__(self, *args, **kw):
         forms.ModelForm.__init__(self,*args,**kw)
         self.fields['remarks'].widget.attrs = {'cols':'20', 'rows':'3'}
@@ -345,9 +346,13 @@ class SignupForm(forms.ModelForm):
         self.fields['clients_address'].widget.attrs = {'cols':'20', 'rows':'3'}
         self.fields['date'].widget.attrs = {'class':'vDateField'}
         self.fields['sale_date'].widget.attrs = {'class':'vDateField'}
+    
     class Meta:
         model = Signup 
         exclude=('cancel',)
+    
+    field_order=['id','project','building','house','clients','clients_phone','clients_address',
+        'date','sale_date','price','include_lawyer','remarks']
 
 class SignupCancelForm(forms.ModelForm):
     def __init__(self, *args, **kw):
@@ -576,6 +581,8 @@ class SplitPaymentForm(forms.ModelForm):
     class Meta:
         model = Payment
         exclude = ('creation_date','amount')
+
+    field_order = ['num','support_num','bank','branch_num','payment_type','payment_date','remarks']
 
 class SplitPaymentDemandForm(MonthForm):
     project = forms.ModelChoiceField(queryset = Project.objects.all(), label = gettext('project'))
