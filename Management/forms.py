@@ -125,9 +125,13 @@ class ProjectForm(forms.ModelForm):
         self.fields['remarks'].widget = forms.Textarea({'cols':'20', 'rows':'5'})
         self.fields['start_date'].widget = forms.TextInput({'class':'vDateField'})
         self.fields['end_date'].widget = forms.TextInput({'class':'vDateField'})
+
     class Meta:
         model = Project
         exclude=('details','demand_contact','payment_contact','contacts','reminders')
+    
+    field_order = ['initiator','name','city','hood','office_address','phone','cell_phone',
+        'fax','mail','start_date']
 
 class ProjectDetailsForm(forms.ModelForm):
     def __init__(self, *args, **kw):

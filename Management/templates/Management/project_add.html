@@ -20,76 +20,7 @@
 	<fieldset class="cardFieldset">
 		<legend>פרטי משרד מכירות</legend>
 		<table cellspacing="2" cellpadding="2" class="formTable">
-			<tr>
-				<td>{{ form.initiator.label_tag }}</td>
-				<td>
-					{{form.initiator}}
-					{% if form.initiator.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.initiator.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<td>{{ form.name.label_tag }}</td>
-				<td>
-					{{form.name}}
-					{% if form.name.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.name.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<td>{{ form.city.label_tag }}</td>
-				<td>
-					{{form.city}}
-					{% if form.city.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.city.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<td>{{ form.hood.label_tag }}</td>
-				<td>
-					{{form.hood}}
-					{% if form.hood.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.hood.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<td>{{ form.office_address.label_tag }}</td>
-				<td>
-					{{form.office_address}}
-					{% if form.office_address.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.office_address.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<td>{{ form.phone.label_tag }}</td>
-				<td>
-					{{form.phone}}
-					{% if form.phone.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.phone.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<td>{{ form.cell_phone.label_tag }}</td>
-				<td>
-					{{form.cell_phone}}
-					{% if form.cell_phone.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.cell_phone.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<td>{{ form.fax.label_tag }}</td>
-				<td>
-					{{form.fax}}
-					{% if form.fax.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.fax.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<td>{{ form.mail.label_tag }}</td>
-				<td>
-					{{form.mail}}
-					{% if form.mail.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.mail.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<td>{{ form.start_date.label_tag }}</td>
-				<td>
-					{{form.start_date}}
-					{% if form.start_date.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.start_date.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
+			{% include "Management/form_snippet.html" %}
 		</table>
 	</fieldset>
 	<fieldset class="cardFieldset">
@@ -98,15 +29,7 @@
 		{{ecForm.contact}} {{ecForm.contact.errors|escape}}
 		<br><button id="new_contact" class="button">איש קשר חדש</button>
 		<table id="contactTable" cellspacing="2" cellpadding="2" class="formTable">
-			{% for field in contactForm %}
-			<tr>
-				<th>{{field.label_tag}}</th>
-				<td>
-					{{field}}
-					{% if field.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{field.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			{% endfor %}
+			{% include "Management/form_snippet.html" with form=contactForm %}
 		</table>
 	</fieldset>
 	<br><input type="submit" value="אישור" class="button" />
