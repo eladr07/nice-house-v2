@@ -729,6 +729,8 @@ class AttachmentForm(forms.ModelForm):
         model = Attachment
         fields=('tags','file','type','sr_name','is_private','remarks','tag_new')
 
+    field_order = ['file', 'type', 'sr_name', 'is_private', 'tags', 'tag_new', 'remarks']
+
 class NHBranchEmployeeForm(forms.ModelForm):
     def __init__(self, *args, **kw):
         super(NHBranchEmployeeForm, self).__init__(*args, **kw)
