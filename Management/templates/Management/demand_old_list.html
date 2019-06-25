@@ -79,38 +79,36 @@
 {% block content %}
 <h3 class="text-center text-danger">ריכוז דרישות לתשלום לחודש {{month|date:"F Y"}}</h3>
 <div class="clearBoth"></div>
-<div style="float:right;width:30%;">
-	<form method="GET">
-		<table class="dataTable">
-			<tr class="row1">
-				<td colspan="3" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש דרישה</td>
-			</tr>
-			<tr class="row2">
-				{% include "Management/filter_form_fields.html" with form=filterForm %}
-				<td><input type="submit" value="חפש" class="button"/></td>
-			</tr>
-		</table>
-	</form>
+<div class="col-md-4">
+	<div class="panel panel-primary">
+		<div class="panel-heading">חיפוש דרישה</div>
+		<div class="panel-body">
+				<form method="GET" class="form-inline">
+					{% include "Management/filter_form_fields.html" with form=filterForm %}
+					<input type="submit" value="חפש" class="btn btn-sm btn-primary"/>
+				</form>
+		</div>
+	</div>
 </div>
-<div style="float:left; width:60%">
-	<table id="filter" class="dataTable">
-		<tr class="row1">
-			<td colspan="4" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש שורות</td>
-		</tr>
-		<tr class="row2">
-			<td>
-				חיפוש לפי : 
-				<select id="filterSelect" style="width:100px;"></select>
-			</td>
-			<td>
-				ערך : 
-				<input id="filterText" type="text"/>
-			</td>
-			<td><button id="filterBtn" class="button">חפש</button></td>
-			<td><button id="filterClearBtn" class="button">הצג הכל</button></td>
-		</tr>
-	</table>
+
+<div class="col-md-8">
+	<div class="panel panel-primary">
+		<div class="panel-heading">חיפוש שורות</div>
+		<div class="panel-body">
+			<form class="form-inline">
+				<label>חיפוש לפי : </label>
+				<select id="filterSelect" style="width:100px;" class="form-control input-sm"></select>
+
+				<label>ערך : </label>
+				<input id="filterText" type="text" class="form-control input-sm"/>
+				
+				<button id="filterBtn" class="btn btn-sm btn-primary">חפש</button>
+				<button id="filterClearBtn" class="btn btn-sm btn-primary">הצג הכל</button>
+			</form>
+		</div>
+	</div>
 </div>
+
 <div class="clearBoth"></div>
 
 <div class="btn-group" role="group">

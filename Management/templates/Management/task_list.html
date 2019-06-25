@@ -32,18 +32,20 @@
 {% block content %}
 <div id="content">
 	<h3 class="text-center text-danger">ניהול משימות</h3>
-	<form method="GET">
-		<table class="dataTable" style="width: 45%;" border="1">
-			<tr class="row1">
-				<td colspan="3" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">סינון</td>
-			</tr>
-			<tr class="row2">
-					{% include "Management/filter_form_fields.html" with form=filterForm %}
-				<td><input type="submit" value="סנן" class="button"/></td>
-			</tr>
-		</table>
-	</form>
-	<br /> 		
+
+	<div class="col-md-4">
+		<div class="panel panel-primary">
+				<div class="panel-heading">סינון</div>
+				<div class="panel-body">
+					<form method="GET" class="form-inline">
+						{% include "Management/filter_form_fields.html" with form=filterForm %}
+						<input type="submit" value="סנן" class="btn btn-sm btn-primary"/>
+					</form>
+				</div>
+			</div>
+	</div>
+	
+	<div class="clearBoth"></div>
 	
 	<a href="/task/add" class="btn btn-default fancybox" role="button">
 		<i class="fa fa-fw fa-plus-circle text-success"></i> חדש
