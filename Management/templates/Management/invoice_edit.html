@@ -48,55 +48,7 @@
 	<div id="rightSide">
 		<form method="POST">
 			<table class="formTable">
-				<tr>
-					<th>{{form.project.label_tag}}</th>
-					<td>
-						{{form.project}}
-						{% if form.project.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.project.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th>{{form.year.label_tag}}</th>
-					<td>
-						{{form.year}}
-						{% if form.year.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.year.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th>{{form.month.label_tag}}</th>
-					<td>
-						{{form.month}}
-						{% if form.month.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.month.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th>{{form.num.label_tag}}</th>
-					<td>
-						{{form.num}}
-						{% if form.num.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.num.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th>{{form.date.label_tag}}</th>
-					<td>
-						{{form.date}}
-						{% if form.date.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.date.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th>{{form.amount.label_tag}}</th>
-					<td>
-						{{form.amount}}
-						{% if form.amount.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.amount.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th>{{form.remarks.label_tag}}</th>
-					<td>
-						{{form.remarks}}
-						{% if form.remarks.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.remarks.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
+				{% include "Management/form_snippet.html" %}
 				<tr>
 					<td></td>
 					<td>

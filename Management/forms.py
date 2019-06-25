@@ -501,6 +501,8 @@ class DemandInvoiceForm(forms.ModelForm):
         model = Invoice
         exclude=('creation_date','offset')
 
+    field_order = ['project', 'year', 'month', 'num', 'date', 'amount', 'remarks']
+
 class InvoiceForm(forms.ModelForm):
     def __init__(self, *args, **kw):
         forms.ModelForm.__init__(self,*args,**kw)
@@ -601,6 +603,9 @@ class DemandPaymentForm(PaymentBaseForm):
     class Meta:
         model = Payment
         exclude = ('creation_date','amount')
+
+    field_order = ['project','year','month','num','support_num','bank','branch_num',
+        'payment_type','payment_date','amount','remarks']
 
 class NHSaleForm(forms.ModelForm):
     def __init__(self, *args, **kw):
