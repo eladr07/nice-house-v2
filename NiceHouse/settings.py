@@ -178,7 +178,7 @@ LOGGING = {
         'file': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
-            'filename': os.path.join('/var/log/httpd/nice-house-v2', 'error.log'),
+            'filename': os.path.join(BASE_DIR, 'logs/error.log'),
         },
     },
     'loggers': {
@@ -207,7 +207,7 @@ LOGGING = {
             'propagate': True,
             'level':'DEBUG',
         },
-        'django.request': {
+        'django': {
             'handlers': ['file'],
             'level': 'ERROR',
             'propagate': False,
