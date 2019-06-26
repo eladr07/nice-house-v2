@@ -51,27 +51,27 @@ def revision_list(request):
     return render(request, 'revision_list.html', {'filterForm':filterForm })
 
 def calc_salaries(salaries):
-    @reversion.revision.create_on_success
     def calc_salaries_core(salaries):
-        for salary in salaries:
-            try:
-                salary.calculate()
-                salary.save()
-            except:
-                continue
+        with reversion.create_revision():
+            for salary in salaries:
+                try:
+                    salary.calculate()
+                    salary.save()
+                except:
+                    continue
     
     thread = threading.Thread(target = lambda: calc_salaries_core(salaries))
     thread.setDaemon(True)
     thread.start()
 
 def calc_demands(demands):
-    @reversion.revision.create_on_success
     def calc_demands_core(demands):
-        for demand in demands:
-            try:
-                demand.calc_sales_commission()
-            except:
-                continue
+        with reversion.create_revision():
+            for demand in demands:
+                try:
+                    demand.calc_sales_commission()
+                except:
+                    continue
     
     thread = threading.Thread(target = lambda: calc_demands_core(demands))
     thread.setDaemon(True)
