@@ -17,6 +17,7 @@
 {% block page %}
 <div id="content">
 	<form method="POST" class="formTable">
+		{% csrf_token %}
 		{% if form %}
 			<table class="formTable">
 				{{ form }} 
