@@ -193,7 +193,7 @@ class Project(models.Model):
     objects = ProjectManager()
     
     def is_zilber(self):
-        return self.commissions.c_zilber != None
+        return self.commissions.get().c_zilber != None
     def demands_unpaid(self):
         query = self.demands.annotate(invoices_num = Count('invoices'), payments_num = Count('payments'))
         query = query.filter(invoices_num = 0, payments_num = 0)
@@ -2807,7 +2807,7 @@ class Sale(models.Model):
             return pricelist.lawyer_fee
         return common.LAWYER_TAX
     def project_price(self):
-        c = self.house.building.project.commissions
+        c = self.house.building.project.commissions.get()
         if c.include_lawyer == None:
             price = self.price
         elif c.include_lawyer == True:

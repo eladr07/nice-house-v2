@@ -17,6 +17,7 @@
 {% block content %}	
 <h3 class="text-center text-danger">הוספת פרוייקט</h3>
 <form method="POST">
+	{% csrf_token %}
 	<fieldset class="cardFieldset">
 		<legend>פרטי משרד מכירות</legend>
 		<table cellspacing="2" cellpadding="2" class="formTable">

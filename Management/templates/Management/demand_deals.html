@@ -151,7 +151,7 @@
 			{% endif %}
 			<th>% עמלת <br>בסיס</th>
 			<th>שווי עמלת <br>בסיס</th>
-			{% if demand.project.commissions.b_discount_save_precentage or demand.project.commissions.c_zilber %}
+			{% if demand.project.commissions.get.b_discount_save_precentage or demand.project.commissions.get.c_zilber %}
 			<th>% בונוס <br>חסכון</th>
 			<th>שווי בונוס <br>חסכון</th>
 			{% endif %}
@@ -192,17 +192,17 @@
 				<td>{{s.allowed_discount|floatformat:3}}</td>
 				{% endif %}
 				<td>{{s.pc_base}}</td>
-				<td>{{s.pc_base_worth|intcomma}} ש"ח</td>
-				{% if demand.project.commissions.b_discount_save_precentage %}
+				<td>{{s.pc_base_worth|floatformat:3|intcomma}} ש"ח</td>
+				{% if demand.project.commissions.get.b_discount_save_precentage %}
 					<td>{{s.pb_dsp|floatformat:3}}</td>
-					<td>{% if s.pb_dsp_worth %}{{s.pb_dsp_worth|intcomma}} ש"ח{% endif %}</td>
+					<td>{% if s.pb_dsp_worth %}{{s.pb_dsp_worth|floatformat:3|intcomma}} ש"ח{% endif %}</td>
 				{% endif %}
-				{% if demand.project.commissions.c_zilber %}
+				{% if demand.project.commissions.get.c_zilber %}
 					<td>---</td>
-					<td>{% if s.zdb %}{{s.zdb|intcomma}} ש"ח{% endif %}</td>
+					<td>{% if s.zdb %}{{s.zdb|floatformat:3|intcomma}} ש"ח{% endif %}</td>
 				{% endif %}
 				<td>{{s.c_final|floatformat:3}}</td>
-				<td><b>{{s.c_final_worth|intcomma}} ש"ח</b></td>
+				<td><b>{{s.c_final_worth|floatformat:3|intcomma}} ש"ח</b></td>
 				<td>
 					{% if s.salepricemod %}
 						<a href="/salepricemod/{{s.salepricemod.id}}"><img src="{% static "images/money-48.png" %}" width="20" height="20" /></a>
@@ -252,7 +252,7 @@
 					<td colspan="3"></td>
 					{% endif %}
 					<td colspan="2"></td>
-					{% if demand.project.commissions.b_discount_save_precentage %}
+					{% if demand.project.commissions.get.b_discount_save_precentage %}
 					<td colspan="2"></td>
 					{% endif %}
 					<td colspan="2"></td>
@@ -282,7 +282,7 @@
 				<td><b><u>{{sales.total_price|intcomma}} ש"ח</u></b></td>
 				<td><b><u>{{sales.total_price_final|intcomma}} ש"ח</u></b></td>
 				<td colspan={% if sales.0.discount %}"5"{%else%}"2"{%endif%}></td>
-				<td colspan={% if demand.project.commissions.b_discount_save_precentage or demand.project.commissions.c_zilber %}"3"{%else%}"1"{%endif%}></td>
+				<td colspan={% if demand.project.commissions.get.b_discount_save_precentage or demand.project.commissions.get.c_zilber %}"3"{%else%}"1"{%endif%}></td>
 				<td colspan="2"><b><u style="color:#1A339C;">{{demand.sales_commission|intcomma}} ש"ח</u></b></td>
 			</tr>
 		</table>

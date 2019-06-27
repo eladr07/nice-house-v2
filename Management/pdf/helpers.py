@@ -61,7 +61,16 @@ class MassBuilder(object):
                 if i == len(root_table.rows):
                     root_table.rows.append(Row())
                 root_table.rows[i] += table.rows[i]
-                root_table.rows[i].height = max(root_table.rows[i].height, table.rows[i].height)
+
+                root_row_height = root_table.rows[i].height
+                table_row_height = table.rows[i].height
+
+                height = None
+
+                if (root_row_height != None or table_row_height != None):
+                    height = max(root_row_height, table_row_height)
+                
+                root_table.rows[i].height = height
         
         return root_table
 
@@ -137,7 +146,6 @@ class Builder(object):
             
             for field in self.fields:
                 cell_value = field.format(item)
-                row.height = max(row.height, field.get_height(item))
                 
                 col_values[field.name].append(cell_value)
                     
@@ -145,7 +153,15 @@ class Builder(object):
                     cell_value = commaise(cell_value)
     
                 row.append(cell_value)
-                
+
+            # calculate row height as maximum of field heights
+            heights = [field.get_height(item) for field in self.fields if field.get_height(item) != None]
+            
+            if (len(heights) > 0):
+                row.height = max(heights)
+            else:
+                row.height = None
+
             table.rows.append(row)
         
         self.col_values = col_values

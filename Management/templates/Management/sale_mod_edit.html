@@ -43,6 +43,7 @@
 			<legend>פרטי השינוי</legend>
 			<table class="formTable">
 			<form method="POST">
+				{% csrf_token %}
 				{{form}}
 				<tr>
 					<td></td>

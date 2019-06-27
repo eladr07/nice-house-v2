@@ -95,6 +95,7 @@
 		</h3>
 	<div id="rightSide">
 		<form method="POST">
+		{% csrf_token %}
 		<table cellspacing="2" cellpadding="2" class="formTable">
 			<tr>
 				<th>{{ form.id.label_tag }}</th>

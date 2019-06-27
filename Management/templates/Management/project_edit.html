@@ -31,6 +31,7 @@
 {% block content %}
 	<h3 class="text-center text-danger">כרטיס פרוייקט : {{ form.instance.initiator }} - {{ form.instance.name }}</h3>
 <form method="post" enctype="multipart/form-data">
+	{% csrf_token %}
 	<div style="float: right; width: 27%; margin-left: 10px;">
 		<fieldset class="cardFieldset">
 			<legend>פרטי משרד מכירות</legend>

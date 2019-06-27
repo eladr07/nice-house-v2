@@ -16,6 +16,7 @@
 	<h3 class="text-center text-danger">אישור דרישה</h3>
 	<div class="clearBoth"></div>
 	<form method="POST" enctype="multipart/form-data">
+		{% csrf_token %}
 		<table class="formTable">
 			<tr>
 				<th>פרוייקט</th>

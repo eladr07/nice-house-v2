@@ -43,6 +43,7 @@
 {% block content %}	
 <h3 class="text-center text-danger">דו"ח פעילות לאתר</h3>
 <form method="POST">
+	{% csrf_token %}
 	<table cellspacing="2" cellpadding="2" class="formTable">
 		{% include "Management/form_snippet.html" %}
 	<tr>

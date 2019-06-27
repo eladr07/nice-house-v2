@@ -28,7 +28,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
-    '.elasticbeanstalk.com'
+    '.elasticbeanstalk.com',
+    '195.238.120.210'
     ]
 
 
@@ -57,6 +58,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'reversion.middleware.RevisionMiddleware',
 ]
 
 ROOT_URLCONF = 'NiceHouse.urls'
@@ -90,7 +92,8 @@ DATABASES = {
         'HOST': '127.0.0.1',
         'PORT': '3306',
         'USER': 'elad',
-        'PASSWORD': '1234'
+        'PASSWORD': '1234',
+        'ATOMIC_REQUESTS': True
     }
 }
 
@@ -143,3 +146,76 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     #os.path.join(BASE_DIR, 'static'),
 )
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'form01': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+    },
+    'handlers': {
+        'hand01': {
+            'level':'DEBUG',
+            'class':'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/commission.log'), 
+            'formatter': 'form01'
+        },
+        'hand02': {
+            'level':'DEBUG',
+            'class':'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/pdf.log'),
+            'formatter': 'form01'
+        },
+        'hand04': {
+            'level':'DEBUG',
+            'class':'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/salary.log'), 
+            'formatter': 'form01'
+        },
+        'hand05': {
+            'level':'DEBUG',
+            'class':'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/views.log'),
+            'formatter': 'form01'
+        },
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/error.log'),
+        },
+    },
+    'loggers': {
+        'root': {
+            'handlers':['hand01'],
+            'propagate': True,
+            'level':'DEBUG',
+        },
+        'commission': {
+            'handlers':['hand01'],
+            'propagate': True,
+            'level':'DEBUG',
+        },
+        'pdf': {
+            'handlers':['hand02'],
+            'propagate': True,
+            'level':'DEBUG',
+        },
+        'salary': {
+            'handlers':['hand04'],
+            'propagate': True,
+            'level':'DEBUG',
+        },
+        'views': {
+            'handlers':['hand05'],
+            'propagate': True,
+            'level':'DEBUG',
+        },
+        'django': {
+            'handlers': ['file'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+    }
+}

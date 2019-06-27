@@ -23,6 +23,7 @@
 <div class="clearBoth"></div>
 <div id="rightSide">
 	<form method="POST">
+		{% csrf_token %}
 		<table class="formTable" cellspacing="5" align="center">
 			{% include "Management/form_snippet.html" %}
 		<tr>
