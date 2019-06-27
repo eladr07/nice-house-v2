@@ -384,14 +384,14 @@ class MonthDemandWriter(DocumentBase):
             sales_commission_details = {}
             
             for sale, group in itertools.groupby(commission_details, lambda commission_detail: commission_detail.sale):
-                sales_commission_details[sale] = dict([(cd.commission, cd.value) for cd in list(group)])
+                sales_commission_details[sale] = { cd.commission:cd.value for cd in list(group) }
                         
             for s in sales:
                 logger.info('starting to write bonus for sale #%(id)s', {'id':s.id})
                 
                 i += 1
                 actual_demand = s.actual_demand
-                
+
                 if actual_demand:
                     row = ['%s-%s' % (actual_demand.id, i),'%s/%s' % (actual_demand.month, actual_demand.year)]
                 else:
