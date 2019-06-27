@@ -2889,7 +2889,7 @@ def employee_project_add(request, employee_id):
                 employee.projects.add(project)
 
                 # create EPCommission
-                commission = EPCommission(project = project, start_date = start_date)
+                commission = EPCommission(employee=employee, project=project, start_date=start_date)
                 commission.save()
 
                 # add commission to employee
