@@ -2887,7 +2887,13 @@ def employee_project_add(request, employee_id):
             open_commissions = employee.commissions.filter(project = project, end_date = None)
             if len(open_commissions) == 0:
                 employee.projects.add(project)
-                employee.commissions.add(EPCommission(project = project, start_date = start_date))
+
+                # create EPCommission
+                commission = EPCommission(project = project, start_date = start_date)
+                commission.save()
+
+                # add commission to employee
+                employee.commissions.add(commission)
             else:
                 # TODO: something
                 pass
