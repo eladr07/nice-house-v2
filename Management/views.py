@@ -4081,18 +4081,27 @@ def season_income(request):
                         setattr(project, attr, 0)
                         
                 tax = Tax.objects.filter(date__lte=date(d.year, d.month,1)).latest().value / 100 + 1
+                
+                # sum amount
                 amount = d.get_total_amount()
                 project.total_amount += amount
                 project.total_amount_notax += amount / tax
+
+                # sum sale count
                 sales_count = d.get_sales().count()
                 project.total_sale_count += sales_count
                 total_sale_count += sales_count
+
+                # sum totals
                 total_amount += amount
                 total_amount_notax += amount / tax
+
+            # set avg_sale_count
             for p in projects:
                 start_date = max(p.start_date, from_date)
                 active_months = round((to_date - start_date).days/30) + 1
-                p.avg_sale_count = p.total_sale_count / active_months
+                p.avg_sale_count = p.total_sale_count / active_months if active_months > 0 else 0
+
             month_count = round((to_date-from_date).days/30) + 1
     else:
         form = SeasonForm()
