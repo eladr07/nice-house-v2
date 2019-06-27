@@ -33,6 +33,7 @@
 		<div class="pageTitle">כרטיס פרוייקט : {{ form.instance.initiator }} - {{ form.instance.name }}</div>
 	</div>
 <form method="post" enctype="multipart/form-data">
+	{% csrf_token %}
 	<div style="float: right; width: 27%; margin-left: 10px;">
 		<fieldset class="cardFieldset">
 			<legend>פרטי משרד מכירות</legend>

@@ -45,6 +45,7 @@
 	<div class="pageTitle">דו"ח פעילות לאתר</div>	
 </div>
 <form method="POST">
+	{% csrf_token %}
 	<table cellspacing="2" cellpadding="2" class="formTable">
 	{% for field in form %}
 		<tr>

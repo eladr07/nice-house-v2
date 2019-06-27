@@ -22,6 +22,7 @@
 	<div class="clearBoth"> </div>
 	<br /> 	
 	<form method="POST">
+		{% csrf_token %}
 		<table class="formTable">
 		{{form.errors}}
 			<tr>

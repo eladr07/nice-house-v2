@@ -14,6 +14,7 @@
 {% block page %}
 <div id="content">
 	<form method="POST">
+		{% csrf_token %}
 		<table class="formTable">
 			<tr>
 				<th>איש קשר קיים</th>

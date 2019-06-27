@@ -21,6 +21,7 @@
 	</div>
 	<div id="rightSide">
 		<form method="POST">
+		{% csrf_token %}
 		<fieldset class="cardFieldset">
 			<legend>פרטים כלליים</legend>
 			<table cellspacing="2" cellpadding="2" class="formTable">

@@ -19,6 +19,7 @@
 	</div>
 {% endif %}
 	<form method="POST" enctype="multipart/form-data">
+		{% csrf_token %}
 		<table class="formTable">
 			<tr>
 				<th>{{form.file.label_tag}}</th>

@@ -20,6 +20,7 @@
 	<div class="clearBoth"></div>
 	{% endif %}
 	<form method="POST">
+	{% csrf_token %}
 	<div id="leftSide">
 		<fieldset class="cardFieldset">
 			<table class="formTable">

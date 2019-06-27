@@ -18,6 +18,7 @@
 	</div>
 	<div class="clearBoth"></div>
 	<form method="POST" enctype="multipart/form-data">
+		{% csrf_token %}
 		<table class="formTable">
 			<tr>
 				<th>פרוייקט</th>

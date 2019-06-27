@@ -55,6 +55,7 @@
 {% endif %}
 <div id="rightSide">
 	<form method="POST" class="formTable">
+		{% csrf_token %}
 		<table class="formTable" >
 		{% for field in form %}
 			<tr>

@@ -19,6 +19,7 @@
 	<div class="pageTitle">הוספת פרוייקט</div>
 </div>
 <form method="POST">
+	{% csrf_token %}
 	<fieldset class="cardFieldset">
 		<legend>פרטי משרד מכירות</legend>
 		<table cellspacing="2" cellpadding="2" class="formTable">

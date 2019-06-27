@@ -49,6 +49,7 @@
 	</div>
 	<div id="rightSide">
 		<form method="POST">
+			{% csrf_token %}
 			<table class="formTable">
 				<tr>
 					<th>{{form.project.label_tag}}</th>
