@@ -89,7 +89,8 @@ DATABASES = {
         'HOST': '127.0.0.1',
         'PORT': '3306',
         'USER': 'elad',
-        'PASSWORD': '1234'
+        'PASSWORD': '1234',
+        'ATOMIC_REQUESTS': True
     }
 }
 
