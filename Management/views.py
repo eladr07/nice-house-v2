@@ -167,7 +167,7 @@ def limited_update_object(request, permission=None, *args, **kwargs):
                 for item in form_old._meta.fields :
                     name = item.name
 
-                    if form_dict.has_key(name) and name in allow_history :
+                    if name in form_dict and name in allow_history :
                         value     = form_dict.get(name)
                         value_len = value != None and len(str(value)) or 0
 
@@ -3375,7 +3375,7 @@ def employee_employmentterms(request, id, model):
             for item in terms._meta.fields :
                 name = item.name
 
-                if form_dict.has_key(name) and name in allow_history :
+                if name in form_dict and name in allow_history :
                     value     = form_dict.get(name)
                     value_len = value != None and len(str(value)) or 0
 
