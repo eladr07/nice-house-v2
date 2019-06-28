@@ -64,19 +64,19 @@
 {% block content %}
 <h3 class="text-center text-danger">ריכוז הזנת דרישות לתשלום לחודש {{month|date:"M Y"}}</h3>
 <div class="clearBoth"></div>
-<div style="float:right;width:30%;">
-	<form method="GET">
-		<table class="dataTable">
-			<tr class="row1">
-				<td colspan="3" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש דרישה</td>
-			</tr>
-			<tr class="row2">
-				{% include "Management/filter_form_fields.html" with form=filterForm %}
-				<td><input type="submit" value="חפש" class="button"/></td>
-			</tr>
-		</table>
-	</form>
+
+<div class="col-md-4">
+	<div class="panel panel-primary">
+			<div class="panel-heading">חיפוש דרישה</div>
+			<div class="panel-body">
+				<form method="GET" class="form-inline">
+					{% include "Management/filter_form_fields.html" with form=filterForm %}
+					<input type="submit" value="חפש" class="btn btn-sm btn-primary"/>
+				</form>
+			</div>
+		</div>
 </div>
+
 <div style="float:left; width:60%">
 	<table id="filter" class="dataTable">
 		<tr class="row1">

@@ -34,6 +34,18 @@
 {% block content %}
 <h3 class="text-center text-danger">פירוט צ'קים אחרים מחודש {{from_date|date:"M Y"}} עד חודש {{to_date|date:"M Y"}}</h3>
 
+<div class="col-md-12">
+		<div class="panel panel-primary">
+				<div class="panel-heading">חיפוש תקופה</div>
+				<div class="panel-body">
+					<form method="GET" class="form-inline">
+						{% include "Management/filter_form_fields.html" with form=filterForm %}
+						<input type="submit" value="חפש" class="btn btn-sm btn-primary"/>
+					</form>
+				</div>
+			</div>
+	</div>
+
 <a href="add" class="btn btn-default bigfancybox" role="button">
 	<i class="fa fa-fw fa-plus-circle text-success"></i> חדש
 </a>
@@ -45,20 +57,7 @@
 </a>
 
 <div class="clearBoth"></div>
-<div style="float:right;width:70%;">
-	<form method="GET">
-		<table class="dataTable">
-			<tr class="row1">
-				<td colspan="8" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש תקופה</td>
-			</tr>
-			<tr class="row2">
-					{% include "Management/filter_form_fields.html" with form=filterForm %}
-				<td><input type="submit" value="חפש" class="button"/></td>
-			</tr>
-		</table>
-	</form>
-</div>
-<div class="clearBoth"></div>
+
 <table class="dataTable" border="1">	
 	<tr>
 		<th colspan="4">פרטים כלליים</th>

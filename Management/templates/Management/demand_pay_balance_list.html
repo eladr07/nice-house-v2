@@ -81,20 +81,20 @@
 {% block content %}
 <h3 class="text-center text-danger">מצב תשלום דרישות יזמים</h3>
 <div class="clearBoth"></div>
-<div style="float:right;width:70%;">
-	<form method="GET">
-		<table class="dataTable">
-			<tr class="row1">
-				<td colspan="10" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש</td>
-			</tr>
-			<tr class="row2">
-				{% include "Management/filter_form_fields.html" with form=filterForm %}
-				<td><input type="submit" value="חפש" name="html" class="button"/></td>
-				<td><input type="submit" value="גרסה להדפסה" name="pdf" class="button"/></td>
-			</tr>
-		</table>
-	</form>
+
+<div class="col-md-12">
+	<div class="panel panel-primary">
+			<div class="panel-heading">חיפוש</div>
+			<div class="panel-body">
+				<form method="GET" class="form-inline">
+					{% include "Management/filter_form_fields.html" with form=filterForm %}
+					<input type="submit" value="חפש" name="html" class="btn btn-sm btn-primary"/>
+					<input type="submit" value="גרסה להדפסה" name="pdf" class="btn btn-sm btn-primary"/>
+				</form>
+			</div>
+		</div>
 </div>
+
 <div class="clearBoth"></div>
 
 <div class="btn-group" role="group">
