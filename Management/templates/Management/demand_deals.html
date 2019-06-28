@@ -188,21 +188,21 @@
 				<td>{{s.price_final|intcomma}} ש"ח</td>
 				{% if demand.sales_with_discount %}
 				<td>{{s.price_taxed|intcomma}}</td>
-				<td>{{s.discount|floatformat:3}}</td>
-				<td>{{s.allowed_discount|floatformat:3}}</td>
+				<td>{{s.discount|floatformat:-3}}</td>
+				<td>{{s.allowed_discount|floatformat:-3}}</td>
 				{% endif %}
 				<td>{{s.pc_base}}</td>
-				<td>{{s.pc_base_worth|floatformat:3|intcomma}} ש"ח</td>
+				<td>{{s.pc_base_worth|floatformat:-3|intcomma}} ש"ח</td>
 				{% if demand.project.commissions.get.b_discount_save_precentage %}
-					<td>{{s.pb_dsp|floatformat:3}}</td>
-					<td>{% if s.pb_dsp_worth %}{{s.pb_dsp_worth|floatformat:3|intcomma}} ש"ח{% endif %}</td>
+					<td>{{s.pb_dsp|floatformat:-3}}</td>
+					<td>{% if s.pb_dsp_worth %}{{s.pb_dsp_worth|floatformat:-3|intcomma}} ש"ח{% endif %}</td>
 				{% endif %}
 				{% if demand.project.commissions.get.c_zilber %}
 					<td>---</td>
-					<td>{% if s.zdb %}{{s.zdb|floatformat:3|intcomma}} ש"ח{% endif %}</td>
+					<td>{% if s.zdb %}{{s.zdb|floatformat:-3|intcomma}} ש"ח{% endif %}</td>
 				{% endif %}
-				<td>{{s.c_final|floatformat:3}}</td>
-				<td><b>{{s.c_final_worth|floatformat:3|intcomma}} ש"ח</b></td>
+				<td>{{s.c_final|floatformat:-3}}</td>
+				<td><b>{{s.c_final_worth|floatformat:-3|intcomma}} ש"ח</b></td>
 				<td>
 					{% if s.salepricemod %}
 						<a href="/salepricemod/{{s.salepricemod.id}}"><img src="{% static "images/money-48.png" %}" width="20" height="20" /></a>

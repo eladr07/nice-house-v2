@@ -167,7 +167,7 @@ def limited_update_object(request, permission=None, *args, **kwargs):
                 for item in form_old._meta.fields :
                     name = item.name
 
-                    if form_dict.has_key(name) and name in allow_history :
+                    if name in form_dict and name in allow_history :
                         value     = form_dict.get(name)
                         value_len = value != None and len(str(value)) or 0
 
@@ -2887,7 +2887,13 @@ def employee_project_add(request, employee_id):
             open_commissions = employee.commissions.filter(project = project, end_date = None)
             if len(open_commissions) == 0:
                 employee.projects.add(project)
-                employee.commissions.add(EPCommission(project = project, start_date = start_date))
+
+                # create EPCommission
+                commission = EPCommission(employee=employee, project=project, start_date=start_date)
+                commission.save()
+
+                # add commission to employee
+                employee.commissions.add(commission)
             else:
                 # TODO: something
                 pass
@@ -3375,7 +3381,7 @@ def employee_employmentterms(request, id, model):
             for item in terms._meta.fields :
                 name = item.name
 
-                if form_dict.has_key(name) and name in allow_history :
+                if name in form_dict and name in allow_history :
                     value     = form_dict.get(name)
                     value_len = value != None and len(str(value)) or 0
 
@@ -4075,18 +4081,27 @@ def season_income(request):
                         setattr(project, attr, 0)
                         
                 tax = Tax.objects.filter(date__lte=date(d.year, d.month,1)).latest().value / 100 + 1
+                
+                # sum amount
                 amount = d.get_total_amount()
                 project.total_amount += amount
                 project.total_amount_notax += amount / tax
+
+                # sum sale count
                 sales_count = d.get_sales().count()
                 project.total_sale_count += sales_count
                 total_sale_count += sales_count
+
+                # sum totals
                 total_amount += amount
                 total_amount_notax += amount / tax
+
+            # set avg_sale_count
             for p in projects:
                 start_date = max(p.start_date, from_date)
                 active_months = round((to_date - start_date).days/30) + 1
-                p.avg_sale_count = p.total_sale_count / active_months
+                p.avg_sale_count = p.total_sale_count / active_months if active_months > 0 else 0
+
             month_count = round((to_date-from_date).days/30) + 1
     else:
         form = SeasonForm()

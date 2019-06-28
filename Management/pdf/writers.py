@@ -384,23 +384,24 @@ class MonthDemandWriter(DocumentBase):
             sales_commission_details = {}
             
             for sale, group in itertools.groupby(commission_details, lambda commission_detail: commission_detail.sale):
-                sales_commission_details[sale] = dict([(cd.commission, cd.value) for cd in list(group)])
+                sales_commission_details[sale] = { cd.commission:cd.value for cd in list(group) }
                         
             for s in sales:
                 logger.info('starting to write bonus for sale #%(id)s', {'id':s.id})
                 
                 i += 1
                 actual_demand = s.actual_demand
+
                 if actual_demand:
                     row = ['%s-%s' % (actual_demand.id, i),'%s/%s' % (actual_demand.month, actual_demand.year)]
                 else:
                     row = [None, None]
                 
-                if s in sales_commission_details:
-                    latest_doh0price = sales_commission_details[s].get('latest_doh0price', 0)
-                    memudad = sales_commission_details[s].get('memudad', 0)
-                    current_madad = sales_commission_details[s].get('current_madad', 0)
-                    price_memduad_diff = s.price_final - memudad
+                if sale, details in sales_commission_details.items():
+                    latest_doh0price = details.get('latest_doh0price', 0)
+                    memudad = details.get('memudad', 0)
+                    current_madad = details.get('current_madad', 0)
+                    price_memduad_diff = sale.price_final - memudad
                 else:
                     logger.warning('sale #%(sale_id)s has no commission details', {'sale_id': s.id})
                     latest_doh0price, memudad, current_madad, price_memduad_diff = 0,0,0,0
