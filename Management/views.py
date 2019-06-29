@@ -1491,7 +1491,7 @@ class NHBranchUpdate(PermissionRequiredMixin, UpdateView):
     permission_required = 'Management.change_nhbranch'
 
 def nhmonth_sales(request, nhbranch_id):
-    if not request.user.has_perm('Management.nhbranch_' + nhbranch_id):
+    if not request.user.has_perm('Management.nhbranch_' + str(nhbranch_id)):
         return HttpResponse('No Permission. Contact Elad.') 
     today = date.today()
     year = int(request.GET.get('year', today.year))
