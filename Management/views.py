@@ -1040,7 +1040,8 @@ def employee_salary_list(request):
     current = common.current_month()
     year = int(request.GET.get('year', current.year))
     month = int(request.GET.get('month', current.month))
-    salaries = []
+    
+    salary_list = []
     today = date.today()
 
     if date(year, month, 1) <= today:
@@ -1070,10 +1071,10 @@ def employee_salary_list(request):
             salary.calculate()
             new_salaries.append(salary)
 
-        salaries = [salary for salary in salaries if salary.is_deleted=False] + new_salaries
+        salary_list = [salary for salary in salaries if salary.is_deleted == False] + new_salaries
 
     context = {
-        'salaries':salaries, 
+        'salaries':salary_list, 
         'month': date(int(year), int(month), 1),
         'filterForm':MonthForm(initial={'year':year,'month':month})
         }
