@@ -1042,43 +1042,29 @@ def employee_salary_list(request):
     month = int(request.GET.get('month', current.month))
     salaries = []
     today = date.today()
-
     if date(year, month, 1) <= today:
-
-        employees = Employee.objects.exclude(
-            employment_terms__isnull=True,
-            # exclude employees who did not start working by the month selected
-            work_start__gte=date(year,month,1),
-            # exclude employees who finished working by the month selected
-            work_end__lt=date(year,month,1))
-
-        # load existing salaries from storage
-        salaries = EmployeeSalary.objects.filter(
-            employee__in = employees,
-            month = month,
-            year = year)
-
-        employees_with_salaries = [salary.employee for salary in salaries]
-
-        new_salaries = []
-
-        # create new salaries
-        for e in employees:
-            if e in employees_with_salaries:
+        for e in Employee.objects.all():
+            terms = e.employment_terms
+            if not terms:
                 continue
-            salary = EmployeeSalary(employee = e, month = month, year = year)
-            salary.calculate()
-            new_salaries.append(salary)
-
-        salaries = [salary for salary in salaries if salary.is_deleted=False] + new_salaries
-
-    context = {
-        'salaries':salaries, 
-        'month': date(int(year), int(month), 1),
-        'filterForm':MonthForm(initial={'year':year,'month':month})
-        }
-
-    return render(request, 'Management/employee_salaries.html', context)
+            # do not include employees who did not start working by the month selected
+            if year < e.work_start.year or (year == e.work_start.year and month < e.work_start.month):
+                continue
+            # do not include employees who finished working by the month selected
+            if e.work_end and (year > e.work_end.year or (year == e.work_end.year and month > e.work_end.month)):
+                continue
+            es, new = EmployeeSalary.objects.get_or_create(employee = e, month = month, year = year)
+            if new:
+                es.calculate()
+                es.save()
+            else:
+                if es.is_deleted:
+                    continue
+            salaries.append(es)
+    return render(request, 'Management/employee_salaries.html', 
+                              {'salaries':salaries, 'month': date(int(year), int(month), 1),
+                               'filterForm':MonthForm(initial={'year':year,'month':month})},
+                               )
 
 class SalaryExpensesListView(PermissionRequiredMixin, ListView):
     model = EmployeeSalary
