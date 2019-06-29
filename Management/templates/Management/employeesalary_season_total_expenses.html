@@ -14,19 +14,22 @@
 <h3 class="text-center text-danger"> 
 	ריכוז שכר לעובדים כולל הוצאות מעביד תקופתי<br>{{start|date:"m/y"}} - {{end|date:"m/y"}}
 </h3>
+
 <div class="clearBoth"></div>
-<form method="GET">
-	<table class="dataTable" style="width: 70%;" border="1">
-		<tr class="row1">
-			<td colspan="6" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש</td>
-		</tr>
-		<tr class="row2">
-				{% include "Management/filter_form_fields.html" with form=filterForm %}
-			<td><input type="submit" value="חפש" class="button"/></td>
-		</tr>
-	</table>
-</form>
-<br>
+
+<div class="col-md-9">
+	<div class="panel panel-primary">
+			<div class="panel-heading">חיפוש</div>
+			<div class="panel-body">
+				<form method="GET" class="form-inline">
+					{% include "Management/filter_form_fields.html" with form=filterForm %}
+					<input type="submit" value="חפש" class="btn btn-sm btn-primary"/>
+				</form>
+			</div>
+		</div>
+</div>
+
+<div class="clearBoth"></div>
 
 <a href="#" class="btn btn-default" role="button">
 	<i class="fa fa-fw fa-print"></i> גרסת הדפסה

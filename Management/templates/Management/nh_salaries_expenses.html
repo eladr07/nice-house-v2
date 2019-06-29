@@ -26,18 +26,20 @@
 {% block content %}
 <h3 class="text-center text-danger">הוצאות מעביד לשכר {{month|date:"M Y"}}</h3>
 <div class="clearBoth"></div>
-<form method="GET">
-	<table class="dataTable" style="width: 30%;" border="1">
-		<tr class="row1">
-			<td colspan="3" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש</td>
-		</tr>
-		<tr class="row2">
-				{% include "Management/filter_form_fields.html" with form=filterForm %}
-			<td><input type="submit" value="חפש" class="button"/></td>
-		</tr>
-	</table>
-</form>
-<br>
+
+<div class="col-md-8">
+	<div class="panel panel-primary">
+			<div class="panel-heading">חיפוש</div>
+			<div class="panel-body">
+				<form method="GET" class="form-inline">
+					{% include "Management/filter_form_fields.html" with form=filterForm %}
+					<input type="submit" value="חפש" class="btn btn-sm btn-primary"/>
+				</form>
+			</div>
+		</div>
+</div>
+
+<div class="clearBoth"></div>
 
 <div style="float:left;">
 	<table class="formTable" >

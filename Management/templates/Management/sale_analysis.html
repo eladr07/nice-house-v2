@@ -5,23 +5,24 @@
 
 {% block content %}
 <h3 class="text-center text-danger">דו"ח ניתוח וריכוז מכירות לפי תקופה</h3>
+
 <div class="clearBoth"></div>
-<div style="float:right;width:70%;">
-	<form method="GET">
-		<table class="dataTable">
-			<tr class="row1">
-				<td colspan={{filterForm.fields|length|add:"2"}} style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש תקופה</td>
-			</tr>
-			<tr class="row2">
+
+<div class="col-md-12">
+	<div class="panel panel-primary">
+			<div class="panel-heading">חיפוש</div>
+			<div class="panel-body">
+				<form method="GET" class="form-inline">
 					{% include "Management/filter_form_fields.html" with form=filterForm %}
-				<td><input type="submit" value="חפש" name="html" class="button"/></td>
-				<td><input type="submit" value="גרסה להדפסה" name="pdf" class="button"/></td>
-			</tr>
-		</table>
-	</form>
+					<input type="submit" name="html" value="חפש" class="btn btn-sm btn-primary"/>
+					<input type="submit" name="pdf" value="גרסה להדפסה" class="btn btn-sm btn-primary"/>
+				</form>
+			</div>
+		</div>
 </div>
+
 <div class="clearBoth"></div>
-<br>
+
 <table id="table" class="dataTable" border="1">
 <caption>מציג סה"כ {{total_sale_count}} מכירות</caption>
 	<tr>

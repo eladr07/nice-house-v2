@@ -41,19 +41,23 @@
 {% endblock header %}
 {% block content %}
 <h3 class="text-center text-danger">ריכוז שכר עובדי נייס האוס לחודש {{month|date:"M Y"}}</h3>
+
 <div class="clearBoth"></div>
-<form method="GET">
-	<table class="dataTable" style="width: 30%;" border="1">
-		<tr class="row1">
-			<td colspan="3" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש</td>
-		</tr>
-		<tr class="row2">
-				{% include "Management/filter_form_fields.html" with form=filterForm %}
-			<td><input type="submit" value="חפש" class="button"/></td>
-		</tr>
-	</table>
-</form>
-<br>
+
+<div class="col-md-4">
+	<div class="panel panel-primary">
+			<div class="panel-heading">חיפוש</div>
+			<div class="panel-body">
+				<form method="GET" class="form-inline">
+					{% include "Management/filter_form_fields.html" with form=filterForm %}
+					<input type="submit" value="חפש" class="btn btn-sm btn-primary"/>
+				</form>
+			</div>
+		</div>
+</div>
+
+<div class="clearBoth"></div>
+
 <div class="btn-group" role="group">
 	<a id="loanAdd" class="btn btn-default fancybox" role="button">
 		<i class="fa fa-fw fa-plus-circle text-success"></i> הלוואה חדשה

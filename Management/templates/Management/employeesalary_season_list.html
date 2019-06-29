@@ -5,21 +5,22 @@
 	ריכוז שכ"ע לפי תקופה<br><a href="{{employee.derived.get_absolute_url}}" target="_blank">{{employee}}</a>
 </h3>
 <div class="clearBoth"></div>
-<form method="GET">
-	<table class="dataTable" style="width: 70%;" border="1">
-		<tr class="row1">
-			<td colspan={{filterForm.fields|length|add:"2"}} style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש</td>
-		</tr>
-		<tr class="row2">
-			{% include "Management/filter_form_fields.html" with form=filterForm %}
-			<td><input type="submit" value="חפש" class="button" name="list" /></td>
-			<td><input type="submit" value="PDF" class="button" name="pdf" /></td>
-		</tr>
-	</table>
-</form>
-<br>
+
+<div class="col-md-9">
+	<div class="panel panel-primary">
+			<div class="panel-heading">חיפוש</div>
+			<div class="panel-body">
+				<form method="GET" class="form-inline">
+					{% include "Management/filter_form_fields.html" with form=filterForm %}
+					<input type="submit" value="חפש" name="list" class="btn btn-sm btn-primary"/>
+					<input type="submit" value="PDF" name="pdf" class="btn btn-sm btn-primary"/>
+				</form>
+			</div>
+		</div>
+</div>
+
 <div class="clearBoth"></div>
-<br>
+
 <table id="salaryTable" class="dataTable" border="1">
 <caption>מציג סה"כ {{salaries|length}} משכורות</caption>	
 	<tr>

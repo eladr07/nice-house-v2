@@ -30,19 +30,19 @@
 {% block content %}
 	<h3 class="text-center text-danger">ריכוז תשלומים לדרישה</h3>
 	<div class="clearBoth"></div>
-	<div style="float:right;width:70%;">
-		<form method="GET">
-			<table class="dataTable">
-				<tr class="row1">
-					<td colspan="6" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש תקופה</td>
-				</tr>
-				<tr class="row2">
-					{% include "Management/filter_form_fields.html" with form=filterForm %}
-					<td><input type="submit" value="חפש" class="button"/></td>
-				</tr>
-			</table>
-		</form>
+
+	<div class="col-md-10">
+		<div class="panel panel-primary">
+				<div class="panel-heading">חיפוש תקופה</div>
+				<div class="panel-body">
+					<form method="GET" class="form-inline">
+						{% include "Management/filter_form_fields.html" with form=filterForm %}
+						<input type="submit" value="חפש" class="btn btn-sm btn-primary"/>
+					</form>
+				</div>
+			</div>
 	</div>
+	
 	<div class="clearBoth"></div>
 
 	<a href="/payments/add" class="btn btn-default" role="button">
