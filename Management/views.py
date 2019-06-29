@@ -1043,10 +1043,8 @@ def employee_salary_list(request):
     salaries = []
     today = date.today()
     if date(year, month, 1) <= today:
-        for e in Employee.objects.select_related('employment_terms').all():
-            terms = e.employment_terms
-            if not terms:
-                continue
+        employees = Employee.objects.select_related('employment_terms').filter(employment_terms__isnull=False)
+        for e in employees:
             # do not include employees who did not start working by the month selected
             if year < e.work_start.year or (year == e.work_start.year and month < e.work_start.month):
                 continue
@@ -1061,10 +1059,14 @@ def employee_salary_list(request):
                 if es.is_deleted:
                     continue
             salaries.append(es)
-    return render(request, 'Management/employee_salaries.html', 
-                              {'salaries':salaries, 'month': date(int(year), int(month), 1),
-                               'filterForm':MonthForm(initial={'year':year,'month':month})},
-                               )
+
+    context = {
+        'salaries':salaries, 
+        'month': date(int(year), int(month), 1),
+        'filterForm':MonthForm(initial={'year':year,'month':month})
+        }
+    
+    return render(request, 'Management/employee_salaries.html', context)
 
 class SalaryExpensesListView(PermissionRequiredMixin, ListView):
     model = EmployeeSalary
