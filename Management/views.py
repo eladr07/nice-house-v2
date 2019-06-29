@@ -1069,10 +1069,9 @@ def employee_salary_list(request):
                 continue
             salary = EmployeeSalary(employee = e, month = month, year = year)
             salary.calculate()
+            # save new salary to storage
+            salary.save()
             new_salaries.append(salary)
-
-        # create new salaries
-        EmployeeSalary.objects.bulk_create(new_salaries)
 
         salary_list = [salary for salary in salaries if salary.is_deleted == False] + new_salaries
 
