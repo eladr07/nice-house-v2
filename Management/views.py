@@ -1071,6 +1071,9 @@ def employee_salary_list(request):
             salary.calculate()
             new_salaries.append(salary)
 
+        # create new salaries
+        EmployeeSalary.objects.bulk_create(new_salaries)
+
         salary_list = [salary for salary in salaries if salary.is_deleted == False] + new_salaries
 
     context = {
