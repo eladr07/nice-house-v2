@@ -1046,10 +1046,10 @@ def employee_salary_list(request):
 
     if date(year, month, 1) <= today:
 
-        employees = Employee.objects.filter(
-            employment_terms__isnull=False,
+        employees = Employee.objects.exclude(
+            employment_terms__isnull=True,
             # exclude employees who did not start working by the month selected
-            work_start__lt=date(year,month,1)).exclude(
+            work_start__gte=date(year,month,1),
             # exclude employees who finished working by the month selected
             work_end__lt=date(year,month,1))
 
