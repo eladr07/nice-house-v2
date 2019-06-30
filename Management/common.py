@@ -45,7 +45,6 @@ def restore_object(instance, date):
     versions = instance_versions.filter(revision__revisionext__date__lte = date)
 
     if versions.count() > 0:
-        versions.sort(key = lambda v: v.revision.revisionext.date)
         version = versions.latest('revision__revisionext__date')
     else:
         try:
