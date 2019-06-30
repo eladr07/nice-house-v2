@@ -1241,8 +1241,7 @@ class EmployeeSalary(EmployeeSalaryBase):
                     continue
                 
                 amount = epc.calc(sales, self)
-                logger.info('employee commission for project %(project)s is %(amount)s', 
-                    project=project, amount=amount})
+                logger.info('employee commission for project %s is %s', project, amount})
                 
                 self.project_commission[epc.project] = amount
                 self.commissions += amount
