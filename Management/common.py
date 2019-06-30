@@ -45,7 +45,6 @@ def restore_object(instance, date):
     versions = instance_versions.filter(revision__revisionext__date__lte = date)
 
     if versions.count() > 0:
-        versions.sort(key = lambda v: v.revision.revisionext.date)
         version = versions.latest('revision__revisionext__date')
     else:
         try:
@@ -53,7 +52,7 @@ def restore_object(instance, date):
             version = instance_versions.filter(revision__date_created__lte=date).latest('revision__date_created')
         except ObjectDoesNotExist:
             return instance
-    return version.object_version.object
+    return version.object
 
 #def has_versions(obj, additional_fields = None):
 #    # go over the commission model and its childs to find out if it has a versions (history of changes)
