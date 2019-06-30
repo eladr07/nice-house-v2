@@ -1230,10 +1230,6 @@ class EmployeeSalary(EmployeeSalaryBase):
     
             for project, sales in self.sales.items():
                 q = self.employee.commissions.filter(project__id = project.id)
-                
-                logger.debug('%s' % project)
-                logger.debug('%s' % len(sales))
-
                 if q.count() == 0: 
                     logger.warning('no employee commission is defined for project %s, continuing' % project)
                     continue
@@ -1245,9 +1241,6 @@ class EmployeeSalary(EmployeeSalaryBase):
                     continue
                 
                 amount = epc.calc(sales, self)
-
-                logger.debug('%s' % amount)
-
                 logger.info('employee commission for project %(project)s is %(amount)s', {'project':project, 'amount':amount})
                 
                 self.project_commission[epc.project] = amount
