@@ -1251,6 +1251,7 @@ class EmployeeSalary(EmployeeSalaryBase):
                     s.employee_paid = True
                     s.save() 
         except:
+            logger.info('EX')
             logger.exception('exception while trying to calculate salary for employee %(employee)s, year %(year)s, month %(month)s',
                              {'employee':self.employee, 'year':self.year, 'month':self.month})
         else:
