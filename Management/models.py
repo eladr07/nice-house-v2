@@ -1254,8 +1254,8 @@ class EmployeeSalary(EmployeeSalaryBase):
             logger.exception('exception while trying to calculate salary for employee %(employee)s, year %(year)s, month %(month)s',
                              {'employee':self.employee, 'year':self.year, 'month':self.month})
         else:
-            logger.info('succeeded to calculate salary for employee %s, year %s, month %s', 
-                self.employee, self.year, self.month)
+            logger.info('succeeded to calculate salary for employee {}, year {}, month {}'.format(
+                self.employee, self.year, self.month))
             
     def get_absolute_url(self):
         return '/employeesalaries/%s' % self.id
