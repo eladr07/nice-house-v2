@@ -181,6 +181,11 @@ LOGGING = {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
             'filename': os.path.join(BASE_DIR, 'logs/error.log'),
+        },        
+        'query': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/query.log'),
         },
     },
     'loggers': {
@@ -208,6 +213,11 @@ LOGGING = {
             'handlers':['hand05'],
             'propagate': True,
             'level':'DEBUG',
+        },
+        'django.db.backends': {
+            'handlers': ['query'],
+            'level': 'DEBUG',
+            'propagate': False,
         },
         'django': {
             'handlers': ['file'],
