@@ -1206,8 +1206,8 @@ class EmployeeSalary(EmployeeSalaryBase):
         logger = logging.getLogger('salary')
         
         try:
-            logger.info('starting to calculate salary for employee %(employee)s, year %(year)s, month %(month)s',
-                        {'employee':self.employee, 'year':self.year, 'month':self.month})
+            logger.info('starting to calculate salary for employee %s for month (%s/%s)',
+                self.employee, self.year, self.month)
             
             sale_commission_details =  SaleCommissionDetail.objects.filter(employee_salary=self)
             
