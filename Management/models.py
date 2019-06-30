@@ -1230,6 +1230,10 @@ class EmployeeSalary(EmployeeSalaryBase):
     
             for project, sales in self.sales.items():
                 q = self.employee.commissions.filter(project__id = project.id)
+                
+                logger.debug('%s' % project)
+                logger.debug('%s' % len(sales))
+
                 if q.count() == 0: 
                     logger.warning('no employee commission is defined for project %s, continuing' % project)
                     continue
@@ -1241,6 +1245,9 @@ class EmployeeSalary(EmployeeSalaryBase):
                     continue
                 
                 amount = epc.calc(sales, self)
+
+                logger.debug('%s' % amount)
+
                 logger.info('employee commission for project %(project)s is %(amount)s', {'project':project, 'amount':amount})
                 
                 self.project_commission[epc.project] = amount
@@ -1251,11 +1258,11 @@ class EmployeeSalary(EmployeeSalaryBase):
                     s.employee_paid = True
                     s.save() 
         except:
-            logger.info('EX')
             logger.exception('exception while trying to calculate salary for employee %(employee)s, year %(year)s, month %(month)s',
                              {'employee':self.employee, 'year':self.year, 'month':self.month})
         else:
-            logger.info('succeeded to calculate salary for employee %s, year %s, month %s' % (self.employee, self.year, self.month))
+            logger.info('succeeded to calculate salary for employee %(employee)s, year %(year)s, month %(month)s',
+                        {'employee':self.employee, 'year':self.year, 'month':self.month})
             
     def get_absolute_url(self):
         return '/employeesalaries/%s' % self.id
