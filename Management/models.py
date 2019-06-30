@@ -1206,8 +1206,8 @@ class EmployeeSalary(EmployeeSalaryBase):
         logger = logging.getLogger('salary')
         
         try:
-            logger.info('starting to calculate salary for employee %s for month (%s/%s)' %
-                self.employee, self.year, self.month)
+            logger.info('starting to calculate salary for employee %(employee)s, year %(year)s, month %(month)s',
+                        {'employee':self.employee, 'year':self.year, 'month':self.month})
             
             sale_commission_details =  SaleCommissionDetail.objects.filter(employee_salary=self)
             
@@ -1241,7 +1241,7 @@ class EmployeeSalary(EmployeeSalaryBase):
                     continue
                 
                 amount = epc.calc(sales, self)
-                logger.info('employee commission for project %s is %s' % (project, amount))
+                logger.info('employee commission for project %(project)s is %(amount)s', {'project':project, 'amount':amount})
                 
                 self.project_commission[epc.project] = amount
                 self.commissions += amount
