@@ -1035,38 +1035,42 @@ class SalaryExpensesUpdate(PermissionRequiredMixin, UpdateView):
     template_name = 'Management/salaryexpenses_edit.html'
     permission_required = 'Management.change_salaryexpenses'
 
-def set_salary_fields(salaries, employee_by_id, year, month):
+def set_salary_fields(salaries, employee_by_id, from_year, from_month, to_year, to_month):
     employee_ids = employee_by_id.keys()
     
-    salary_expenses = SalaryExpenses.objects.filter(
-        employee_id__in = employee_ids,
-        year = year,
-        month = month)
+    # construct a map between (employee id, year, month) and SalaryExpense object
+    salary_expenses = SalaryExpenses.objects \
+        .range(from_year, from_month, to_year, to_month) \
+        .filter(employee_id__in = employee_ids)
 
-    # construct a map between Employee ID and SalaryExpense object
-    expenses_by_employee_id = {expenses.employee_id: expenses for expenses in salary_expenses}
+    expenses_map = {(e.employee_id, e.year, e.month): e for e in salary_expenses}
     
-    # construct a map between Employee ID and Total Amount of Loan Pay objects
-    loan_pays = LoanPay.objects.filter(
-        employee_id__in = employee_ids,
-        year = year,
-        month = month,
-        deduct_from_salary = True
-    ).values('employee_id').annotate(total_amount = Sum('amount'))
+    # construct a map between (employee id, year, month) and Total Amount of Loan Pay objects
+    loan_pays = LoanPay.objects \
+        .range(from_year, from_month, to_year, to_month) \
+        .filter(employee_id__in = employee_ids, deduct_from_salary = True) \
+        .values('employee_id','year','month') \
+        .annotate(total_amount = Sum('amount'))
 
-    loan_pay_by_employee_id = {row['employee_id']: row['total_amount'] for row in loan_pays}
+    loan_pay_map = {(row['employee_id'], row['year'], row['month']): row['total_amount'] \
+        for row in loan_pays}
 
-    # construct a map between Project ID and Demand of current month
-    demands = Demand.objects.select_related('project').filter(year = year, month = month)
+    # construct a map between (project id, year, month) and Demand object
+    demands = Demand.objects.select_related('project').range(from_year, from_month, to_year, to_month)
 
-    demand_by_project_id = {demand.project_id: demand for demand in demands}
+    demand_map = {(d.project_id, d.year, d.month): d for d in demands}
 
     for salary in salaries:
-        employee_id = salary.employee_id
+        # create the key for the maps constructed above
+        map_key = (salary.employee_id, salary.year, salary.month)
+        (employee_id, year, month) = map_key
+
         employee = employee_by_id[employee_id]
         terms = employee.employment_terms
-        exp = expenses_by_employee_id.get(employee_id)
-        loan_pay = loan_pay_by_employee_id.get(employee_id, 0)
+        
+        # load mapped objects
+        exp = expenses_map.get(map_key)
+        loan_pay = loan_pay_map.get(map_key, 0)
 
         bruto, neto, check_amount, invoice_amount = None, None, None, None
 
@@ -1094,25 +1098,40 @@ def set_salary_fields(salaries, employee_by_id, year, month):
         salary.neto = neto
         salary.check_amount = check_amount
         salary.invoice_amount = invoice_amount
-        salary.loan_pay = loan_pay
-        salary.demands = [demand_by_project_id.get(project.id) for project in employee.projects.all() if project.id in demand_by_project_id]
 
-    set_employee_sales(salaries, employee_by_id, year, month)
+        salary.loan_pay = loan_pay
+
+        salary.demands = [demand_map.get((project.id, year, month)) for project in employee.projects.all() if (project.id, year, month) in demand_map]
+
+        # set 'bruto_employer_expense' field
+        if exp:
+            salary.bruto_employer_expense = sum([
+                bruto,exp.employer_benefit,exp.employer_national_insurance,exp.compensation_allocation])
+        else:
+            salary.bruto_employer_expense = None
+
+    set_employee_sales(salaries, employee_by_id, from_year, from_month, to_year, to_month)
 
     set_salary_status_date(salaries)
 
-def set_employee_sales(salaries, employee_by_id, year, month):
+def set_employee_sales(salaries, employee_by_id, from_year, from_month, to_year, to_month):
     """
     Set 'sales' and 'sales_count' fields for every EmployeeSalary object in 'salaries'
     """
     # construct a map between Porject and Sale list
     sales = Sale.objects.select_related('house__building__project') \
-        .filter(employee_pay_month = month, employee_pay_year = year) \
+        .employee_pay_range(from_year, from_month, to_year, to_month) \
         .order_by('house__building__project','sale_date')
 
-    sales_by_project_id = {project_id:list(project_sales) for (project_id, project_sales) in itertools.groupby(sales, lambda sale: sale.house.building.project_id)}
+    # group sales by (project_id, year, month)
+    sale_groups = itertools.groupby(sales,
+        lambda sale: (sale.house.building.project_id, sale.employee_pay_year, sale.employee_pay_month))
+
+    # create map
+    sales_map = {map_key:list(project_sales) for (map_key, project_sales) in sale_groups}
 
     for salary in salaries:
+        year, month = salary.year, salary.month
         employee = employee_by_id[salary.employee_id]
 
         # construct sales list for salary
@@ -1120,12 +1139,12 @@ def set_employee_sales(salaries, employee_by_id, year, month):
 
         if employee.rank_id == RankType.RegionalSaleManager:
             employee_sales = {
-                project: sales_by_project_id[project.id] \
-                    for project in employee.projects.all() if project.id in sales_by_project_id}
+                project: sales_map[(project.id, year, month)] \
+                    for project in employee.projects.all() if (project.id, year, month) in sales_map}
         else:
             employee_sales = {
-                project: [sale for sale in sales_by_project_id[project.id] if sale.employee_id in (employee.id, None)] \
-                    for project in employee.projects.all() if project.id in sales_by_project_id}
+                project: [sale for sale in sales_map[(project.id, year, month)] if sale.employee_id in (employee.id, None)] \
+                    for project in employee.projects.all() if (project.id, year, month) in sales_map}
 
         salary.sales = employee_sales
         salary.sales_count = sum(len(project_sales) for (project, project_sales) in employee_sales.items())
@@ -1204,7 +1223,7 @@ def employee_salary_list(request):
             .select_related('employment_terms__hire_type','rank') \
             .prefetch_related('projects') \
             .filter(employment_terms__isnull=False)
-            
+
         for e in employees:
             # do not include employees who did not start working by the month selected
             if year < e.work_start.year or (year == e.work_start.year and month < e.work_start.month):
@@ -1227,7 +1246,7 @@ def employee_salary_list(request):
         
         employee_by_id = {employee.id:employee for employee in employees}
 
-        set_salary_fields(salaries, employee_by_id, year, month)
+        set_salary_fields(salaries, employee_by_id, year, month, year, month)
 
         set_loan_fields(employees)
 
