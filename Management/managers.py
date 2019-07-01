@@ -80,6 +80,8 @@ class SaleManager(models.Manager):
     
     def contractor_pay_range(self, from_year, from_month, to_year, to_month):
         return self.get_queryset().contractor_pay_range(from_year, from_month, to_year, to_month)
+    def employee_pay_range(self, from_year, from_month, to_year, to_month):
+        return self.get_queryset().employee_pay_range(from_year, from_month, to_year, to_month)
     def get_queryset(self):
         return SaleQuerySet(self.model, using=self._db)
     
