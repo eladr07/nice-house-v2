@@ -173,7 +173,7 @@
 			<td style="color:#08A600;">{{s.safety_net|default_if_none:""}}</td>
 			<td style="color:#08A600;">{% if s.var_pay %}{{s.var_pay|intcomma}} - {{s.var_pay_type}} {% endif %}</td>
 			<td style="color:#D50808;">{% if s.deduction %}{{s.deduction|intcomma}} - {{s.deduction_type}} {% endif %}</td>
-			<td><a href="{{s.id}}/totaldetails" class="fancybox">{{s.neto|default_if_none:""|intcomma}}</a></td>
+			<td><a href="{{s.id}}/totaldetails" class="fancybox">{{s.neto|default_if_none:""|floatformat:"0"|intcomma}}</a></td>
 			<td>
 				<span style="color:#BF0000;">{{s.loan_pay|intcomma}}</span>
 				<br>
@@ -189,7 +189,7 @@
 				{% if s.employee.employment_terms.salary_net == None %}
 					הנהלת חשבונות
 				{% else %}
-					<a href="{{s.id}}/checkdetails" class="fancybox">{{s.check_amount|default_if_none:""|intcomma}}</a>
+					<a href="{{s.id}}/checkdetails" class="fancybox">{{s.check_amount|default_if_none:""|floatformat:"0"|intcomma}}</a>
 				{% endif %}
 			</td>
 			<td>{{s.bruto|default_if_none:""|intcomma}}</td>
