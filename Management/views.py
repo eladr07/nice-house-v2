@@ -3,7 +3,7 @@ from datetime import datetime, date
 
 import django.core.paginator
 from django.db import models, transaction
-from django.db.models import Count
+from django.db.models import Count, Sum
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError, FileResponse
 from django.forms.models import inlineformset_factory
@@ -1035,6 +1035,163 @@ class SalaryExpensesUpdate(PermissionRequiredMixin, UpdateView):
     template_name = 'Management/salaryexpenses_edit.html'
     permission_required = 'Management.change_salaryexpenses'
 
+def set_salary_fields(salaries, employee_by_id, year, month):
+    employee_ids = employee_by_id.keys()
+    
+    salary_expenses = SalaryExpenses.objects.filter(
+        employee_id__in = employee_ids,
+        year = year,
+        month = month)
+
+    # construct a map between Employee ID and SalaryExpense object
+    expenses_by_employee_id = {expenses.employee_id: expenses for expenses in salary_expenses}
+    
+    # construct a map between Employee ID and Total Amount of Loan Pay objects
+    loan_pays = LoanPay.objects.filter(
+        employee_id__in = employee_ids,
+        year = year,
+        month = month,
+        deduct_from_salary = True
+    ).values('employee_id').annotate(total_amount = Sum('amount'))
+
+    loan_pay_by_employee_id = {row['employee_id']: row['total_amount'] for row in loan_pays}
+
+    # construct a map between Project ID and Demand of current month
+    demands = Demand.objects.select_related('project').filter(year = year, month = month)
+
+    demand_by_project_id = {demand.project_id: demand for demand in demands}
+
+    for salary in salaries:
+        employee_id = salary.employee_id
+        employee = employee_by_id[employee_id]
+        terms = employee.employment_terms
+        exp = expenses_by_employee_id.get(employee_id)
+        loan_pay = loan_pay_by_employee_id.get(employee_id, 0)
+
+        bruto, neto, check_amount, invoice_amount = None, None, None, None
+
+        if terms:
+            total_amount = salary.total_amount
+
+            if terms.salary_net == None:
+                check_amount = total_amount - loan_pay
+                invoice_amount = total_amount - loan_pay
+            else:
+                if terms.salary_net == False:
+                    bruto = total_amount - loan_pay
+                    if exp != None:
+                        neto = total_amount - exp.income_tax - exp.national_insurance - exp.health - exp.pension_insurance
+                elif terms.salary_net == True:
+                    neto = total_amount
+                    if exp != None:
+                        bruto = total_amount + exp.income_tax + exp.national_insurance + exp.health + exp.pension_insurance \
+                            + exp.vacation + exp.convalescence_pay
+                
+                if neto:
+                    check_amount = neto - loan_pay
+        
+        salary.bruto = bruto
+        salary.neto = neto
+        salary.check_amount = check_amount
+        salary.invoice_amount = invoice_amount
+        salary.loan_pay = loan_pay
+        salary.demands = [demand_by_project_id.get(project.id) for project in employee.projects.all() if project.id in demand_by_project_id]
+
+    set_employee_sales(salaries, employee_by_id, year, month)
+
+    set_salary_status_date(salaries)
+
+def set_employee_sales(salaries, employee_by_id, year, month):
+    """
+    Set 'sales' and 'sales_count' fields for every EmployeeSalary object in 'salaries'
+    """
+    # construct a map between Porject and Sale list
+    sales = Sale.objects.select_related('house__building__project') \
+        .filter(employee_pay_month = month, employee_pay_year = year) \
+        .order_by('house__building__project','sale_date')
+
+    sales_by_project_id = {project_id:list(project_sales) for (project_id, project_sales) in itertools.groupby(sales, lambda sale: sale.house.building.project_id)}
+
+    for salary in salaries:
+        employee = employee_by_id[salary.employee_id]
+
+        # construct sales list for salary
+        employee_sales = {}
+
+        if employee.rank_id == RankType.RegionalSaleManager:
+            employee_sales = {
+                project: sales_by_project_id[project.id] \
+                    for project in employee.projects.all() if project.id in sales_by_project_id}
+        else:
+            employee_sales = {
+                project: [sale for sale in sales_by_project_id[project.id] if sale.employee_id in (employee.id, None)] \
+                    for project in employee.projects.all() if project.id in sales_by_project_id}
+
+        salary.sales = employee_sales
+        salary.sales_count = sum(len(project_sales) for (project, project_sales) in employee_sales.items())
+
+def set_salary_status_date(salaries):
+    """
+    Set 'approved_date', 'sent_to_bookkeeping_date', 'sent_to_checks_date' fields 
+    for every EmployeeSalary object in 'salaries'
+    """
+    # construct a map between Salary object and its latest status
+    all_statuses = EmployeeSalaryBaseStatus.objects \
+        .select_related('employeesalarybase') \
+        .filter(employeesalarybase__in=salaries) \
+        .order_by('-date')
+
+    statuses_by_salary_id = {esb.id: list(statuses) for (esb, statuses) in itertools.groupby(all_statuses, lambda status: status.employeesalarybase)}
+
+    for salary in salaries:
+        # set status properties
+        salary_statuses = statuses_by_salary_id.get(salary.id)
+
+        if salary_statuses != None:
+            salary.approved_date = next((status.date for status in salary_statuses if status.type_id == EmployeeSalaryBaseStatusType.Approved), None)
+            salary.sent_to_bookkeeping_date = next((status.date for status in salary_statuses if status.type_id == EmployeeSalaryBaseStatusType.SentBookkeeping), None)
+            salary.sent_to_checks_date = next((status.date for status in salary_statuses if status.type_id == EmployeeSalaryBaseStatusType.SentChecks), None)
+        else:
+            salary.approved_date = None
+            salary.sent_to_bookkeeping_date = None
+            salary.sent_to_checks_date = None
+
+def set_loan_fields(employees):
+    """
+    Set 'loan_left' and 'loans_and_pays' fields for every Employee in 'employees'
+    """
+    loans = Loan.objects.filter(employee__in=employees)
+    loan_pays = LoanPay.objects.filter(employee__in=employees)
+
+    loans_by_employee_id = {employee_id:loans for (employee_id, loans) in itertools.groupby(loans, lambda loan: loan.employee_id)}
+    loan_pays_by_employee_id = {employee_id:loan_pays for (employee_id, loan_pays) in itertools.groupby(loan_pays, lambda loan_pay: loan_pay.employee_id)}
+
+    for employee in employees:
+        employee_id = employee.id
+        # merge loans and loan-pays to a single list
+        loans_and_pays = []
+
+        if employee_id in loans_by_employee_id:
+            loans_and_pays += list(loans_by_employee_id[employee_id])
+        if employee_id in loan_pays_by_employee_id:
+            loans_and_pays += list(loan_pays_by_employee_id[employee_id])
+
+        # sort list by (year, month)
+        loans_and_pays.sort(key=lambda x: date(x.year, x.month, 1))
+
+        left = 0
+
+        for item in loans_and_pays:
+            if isinstance(item, Loan):
+                left += item.amount
+            elif isinstance(item, LoanPay):
+                left -= item.amount
+            item.left = left
+
+        # set fields on employee
+        employee.loan_left = left
+        employee.loans_and_pays = loans_and_pays
+
 @permission_required('Management.list_employeesalary')
 def employee_salary_list(request):
     current = common.current_month()
@@ -1043,7 +1200,11 @@ def employee_salary_list(request):
     salaries = []
     today = date.today()
     if date(year, month, 1) <= today:
-        employees = Employee.objects.select_related('employment_terms').filter(employment_terms__isnull=False)
+        employees = Employee.objects \
+            .select_related('employment_terms__hire_type','rank') \
+            .prefetch_related('projects') \
+            .filter(employment_terms__isnull=False)
+            
         for e in employees:
             # do not include employees who did not start working by the month selected
             if year < e.work_start.year or (year == e.work_start.year and month < e.work_start.month):
@@ -1058,7 +1219,17 @@ def employee_salary_list(request):
             else:
                 if es.is_deleted:
                     continue
+
+            # set employee field with already-loaded fields
+            es.employee = e
+
             salaries.append(es)
+        
+        employee_by_id = {employee.id:employee for employee in employees}
+
+        set_salary_fields(salaries, employee_by_id, year, month)
+
+        set_loan_fields(employees)
 
     context = {
         'salaries':salaries, 
