@@ -574,25 +574,25 @@ class Employee(EmployeeBase):
         for p in self.projects.all():
             if self.commissions.filter(project = p).count() == 0:
                 EPCommission(employee = self, project = p).save()
-    def loan_left(self):
-        n = 0
-        for loan in self.loans.all():
-            n += loan.amount
-        for pay in self.loan_pays.all():
-            n -= pay.amount
-        return n
-    def loans_and_pays(self):
-        l = [l for l in self.loans.all()]
-        l.extend([p for p in self.loan_pays.all()])
-        l.sort(key=lambda elem: date(elem.year, elem.month, 1))
-        left = 0
-        for o in l:
-            if isinstance(o, Loan):
-                left += o.amount
-            elif isinstance(o, LoanPay):
-                left -= o.amount
-            o.left = left
-        return l
+    # def loan_left(self):
+    #     n = 0
+    #     for loan in self.loans.all():
+    #         n += loan.amount
+    #     for pay in self.loan_pays.all():
+    #         n -= pay.amount
+    #     return n
+    # def loans_and_pays(self):
+    #     l = [l for l in self.loans.all()]
+    #     l.extend([p for p in self.loan_pays.all()])
+    #     l.sort(key=lambda elem: date(elem.year, elem.month, 1))
+    #     left = 0
+    #     for o in l:
+    #         if isinstance(o, Loan):
+    #             left += o.amount
+    #         elif isinstance(o, LoanPay):
+    #             left -= o.amount
+    #         o.left = left
+    #     return l
     def get_absolute_url(self):
         return '/employees/%s' % self.id
     class Meta:
@@ -961,84 +961,84 @@ class EmployeeSalaryBase(models.Model):
             return self.employeesalary
         if hasattr(self, 'nhemployeesalary'):
             return self.nhemployeesalary
-    @property
-    @cache_method
-    def bruto(self):
-        terms = self.get_employee().employment_terms
-        if not terms or terms.salary_net == None: 
-            return None
-        if terms.salary_net == False:
-            return self.derived.total_amount - self.loan_pay
-        exp = self.expenses
-        if not exp: return None
-        return self.derived.total_amount + exp.income_tax + exp.national_insurance + exp.health + exp.pension_insurance \
-            + exp.vacation + exp.convalescence_pay
-    @property
-    @cache_method
-    def neto(self):
-        terms = self.get_employee().employment_terms
-        if not terms: 
-            return None
-        if terms.salary_net == True:
-            return self.derived.total_amount
-        if terms.salary_net == False:
-            exp = self.expenses
-            if not exp: 
-                return None
-            return self.derived.total_amount - exp.income_tax - exp.national_insurance - exp.health - exp.pension_insurance
-    @property
-    @cache_method
-    def check_amount(self):
-        terms = self.get_employee().employment_terms
-        if not terms:
-            return None
-        if terms.salary_net == None:
-            return self.derived.total_amount - self.loan_pay
-        if not self.neto:
-            return None
-        else:
-            return self.neto - self.loan_pay
-    @property
-    @cache_method
-    def invoice_amount(self):
-        terms = self.get_employee().employment_terms
-        if terms.salary_net != None:
-            return None
-        return self.derived.total_amount - self.loan_pay
-    @property
-    @cache_method
-    def bruto_employer_expense(self):
-        exp = self.expenses
-        if not exp: return None
-        return self.bruto + exp.employer_benefit + exp.employer_national_insurance + exp.compensation_allocation 
+    # @property
+    # @cache_method
+    # def bruto(self):
+    #     terms = self.get_employee().employment_terms
+    #     if not terms or terms.salary_net == None: 
+    #         return None
+    #     if terms.salary_net == False:
+    #         return self.derived.total_amount - self.loan_pay
+    #     exp = self.expenses
+    #     if not exp: return None
+    #     return self.derived.total_amount + exp.income_tax + exp.national_insurance + exp.health + exp.pension_insurance \
+    #         + exp.vacation + exp.convalescence_pay
+    # @property
+    # @cache_method
+    # def neto(self):
+    #     terms = self.get_employee().employment_terms
+    #     if not terms: 
+    #         return None
+    #     if terms.salary_net == True:
+    #         return self.derived.total_amount
+    #     if terms.salary_net == False:
+    #         exp = self.expenses
+    #         if not exp: 
+    #             return None
+    #         return self.derived.total_amount - exp.income_tax - exp.national_insurance - exp.health - exp.pension_insurance
+    # @property
+    # @cache_method
+    # def check_amount(self):
+    #     terms = self.get_employee().employment_terms
+    #     if not terms:
+    #         return None
+    #     if terms.salary_net == None:
+    #         return self.derived.total_amount - self.loan_pay
+    #     if not self.neto:
+    #         return None
+    #     else:
+    #         return self.neto - self.loan_pay
+    # @property
+    # @cache_method
+    # def invoice_amount(self):
+    #     terms = self.get_employee().employment_terms
+    #     if terms.salary_net != None:
+    #         return None
+    #     return self.derived.total_amount - self.loan_pay
+    # @property
+    # @cache_method
+    # def bruto_employer_expense(self):
+    #     exp = self.expenses
+    #     if not exp: return None
+    #     return self.bruto + exp.employer_benefit + exp.employer_national_insurance + exp.compensation_allocation 
     def approve(self):
         self.statuses.create(type = EmployeeSalaryBaseStatusType.objects.get(pk = EmployeeSalaryBaseStatusType.Approved)).save()
     def send_to_checks(self):
         self.statuses.create(type = EmployeeSalaryBaseStatusType.objects.get(pk = EmployeeSalaryBaseStatusType.SentChecks)).save()
     def send_to_bookkeeping(self):
         self.statuses.create(type = EmployeeSalaryBaseStatusType.objects.get(pk = EmployeeSalaryBaseStatusType.SentBookkeeping)).save()
-    @property
-    @cache_method
-    def approved_date(self):
-        q = self.statuses.filter(type__id = EmployeeSalaryBaseStatusType.Approved)
-        return q.count() > 0 and q.latest().date or None
-    @property
-    @cache_method
-    def sent_to_bookkeeping_date(self):
-        q = self.statuses.filter(type__id = EmployeeSalaryBaseStatusType.SentBookkeeping)
-        return q.count() > 0 and q.latest().date or None
-    @property
-    @cache_method
-    def sent_to_checks_date(self):
-        q = self.statuses.filter(type__id = EmployeeSalaryBaseStatusType.SentChecks)
-        return q.count() > 0 and q.latest().date or None
-    @property
-    @cache_method
-    def loan_pay(self):
-        amount = 0
-        for lp in self.get_employee().loan_pays.filter(year = self.year, month = self.month, deduct_from_salary = True):
-            amount += lp.amount
-        return amount
+    # @property
+    # @cache_method
+    # def approved_date(self):
+    #     q = self.statuses.filter(type__id = EmployeeSalaryBaseStatusType.Approved)
+    #     return q.count() > 0 and q.latest().date or None
+    # @property
+    # @cache_method
+    # def sent_to_bookkeeping_date(self):
+    #     q = self.statuses.filter(type__id = EmployeeSalaryBaseStatusType.SentBookkeeping)
+    #     return q.count() > 0 and q.latest().date or None
+    # @property
+    # @cache_method
+    # def sent_to_checks_date(self):
+    #     q = self.statuses.filter(type__id = EmployeeSalaryBaseStatusType.SentChecks)
+    #     return q.count() > 0 and q.latest().date or None
+    # @property
+    # @cache_method
+    # def loan_pay(self):
+    #     amount = 0
+    #     for lp in self.get_employee().loan_pays.filter(year = self.year, month = self.month, deduct_from_salary = True):
+    #         amount += lp.amount
+    #     return amount
     @property
     @cache_method
     def loan(self):
@@ -1145,44 +1145,44 @@ class EmployeeSalary(EmployeeSalaryBase):
     def __init__(self, *args, **kw):
         super(EmployeeSalary, self).__init__(*args, **kw)
         self.project_commission = {}
-    @property
-    @cache_method
-    def demands(self):
-        '''
-        gets the demands that are related to this salary. these are simply all demands for the projects the employee
-        is hired in, for the salary's month
-        '''
-        return Demand.objects.filter(project__in = self.employee.projects.all(), year = self.year, month = self.month)
-    @property
-    @cache_method
-    def sales(self):
-        '''
-        Returns a dictionary of project-->sales
-        '''
-        if self.employee.rank.id == RankType.RegionalSaleManager:
-            query = Sale.objects.filter(house__building__project__in = self.employee.projects.all(), 
-                                        employee_pay_month = self.month, employee_pay_year = self.year)
-        else:
-            q = models.Q(employee = self.employee) | models.Q(employee__isnull = True)
-            query = Sale.objects.filter(q, house__building__project__in = self.employee.projects.all(), 
-                                        employee_pay_month = self.month,
-                                        employee_pay_year = self.year)
+    # @property
+    # @cache_method
+    # def demands(self):
+    #     '''
+    #     gets the demands that are related to this salary. these are simply all demands for the projects the employee
+    #     is hired in, for the salary's month
+    #     '''
+    #     return Demand.objects.filter(project__in = self.employee.projects.all(), year = self.year, month = self.month)
+    # @property
+    # @cache_method
+    # def sales(self):
+    #     '''
+    #     Returns a dictionary of project-->sales
+    #     '''
+    #     if self.employee.rank.id == RankType.RegionalSaleManager:
+    #         query = Sale.objects.filter(house__building__project__in = self.employee.projects.all(), 
+    #                                     employee_pay_month = self.month, employee_pay_year = self.year)
+    #     else:
+    #         q = models.Q(employee = self.employee) | models.Q(employee__isnull = True)
+    #         query = Sale.objects.filter(q, house__building__project__in = self.employee.projects.all(), 
+    #                                     employee_pay_month = self.month,
+    #                                     employee_pay_year = self.year)
             
-        query = query.select_related('house__building__project').order_by('house__building__project','sale_date')
-        sales = {}
+    #     query = query.select_related('house__building__project').order_by('house__building__project','sale_date')
+    #     sales = {}
         
-        for project, sale_group in itertools.groupby(query, lambda sale: sale.house.building.project):
-            sales[project] = list(sale_group)
+    #     for project, sale_group in itertools.groupby(query, lambda sale: sale.house.building.project):
+    #         sales[project] = list(sale_group)
             
-        return sales
-    @property
-    @cache_method
-    def sales_count(self):
-        i=0
-        for v in self.sales.values():
-            if v:
-                i += len(v)
-        return i
+    #     return sales
+    # @property
+    # @cache_method
+    # def sales_count(self):
+    #     i=0
+    #     for v in self.sales.values():
+    #         if v:
+    #             i += len(v)
+    #     return i
     @property
     @cache_method
     def total_amount(self):
