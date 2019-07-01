@@ -803,7 +803,7 @@ class EmployeeSalariesBookKeepingWriter(DocumentBase):
             rows.append(row)
             
             if es.pdf_remarks:
-                remarks_str += '<u><b>' + log2vis(str(employee) + '</b></u>' + ' ' + es.pdf_remarks) + '<br/>'
+                remarks_str += log2vis('<u><b>' + str(employee) + '</b></u>' + ' ' + es.pdf_remarks) + '<br/>'
         
         sum_row = [None, None, None, 
                    commaise(sum([s.check_amount or 0 for s in self.salaries])),
