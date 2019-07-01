@@ -2667,7 +2667,7 @@ class SaleReject(SalePayMod):
         db_table = 'SaleReject'
         
 class SaleCancel(SaleMod):
-    deduct_from_demand = models.BooleanField(gettext('deduct_from_demand'), blank=True)
+    deduct_from_demand = models.BooleanField(gettext('deduct_from_demand'), blank=True, null=True)
     def save(self, *args, **kw):
         super(SaleCancel, self).save(*args, **kw)
         sale = self.sale
