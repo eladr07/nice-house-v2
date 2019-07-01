@@ -1609,7 +1609,11 @@ class CZilber(models.Model):
         try:
             logger = logging.getLogger('commission.czilber')
             
-            d = Demand.objects.get(project = self.projectcommission.project, year = month.year, month = month.month)
+            projectcommission = self.projectcommission.get()
+            project = projectcommission.project
+
+            d = Demand.objects.get(project = project, year = month.year, month = month.month)
+            
             if d.var_diff: 
                 d.var_diff.delete()
             if d.bonus_diff: 
