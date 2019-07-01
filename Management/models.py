@@ -870,6 +870,9 @@ class LoanPay(models.Model):
     deduct_from_salary = models.BooleanField(gettext('deduct_from_salary'), choices = Boolean, blank = True,
                                              help_text = gettext('deduct_from_salary_help'))
     remarks = models.TextField(gettext('remarks'), blank=True, null=True)
+
+    objects = SeasonManager()
+
     def get_absolute_url(self):
         return '/loanpays/%s' % self.id
     class Meta:
@@ -919,6 +922,9 @@ class SalaryExpenses(models.Model):
     employer_benefit = models.FloatField(gettext('employer_benefit'))
     compensation_allocation = models.FloatField(gettext('compensation_allocation'))
     approved_date = models.DateTimeField(editable=False, null=True)
+
+    objects = SeasonManager()
+
     @property
     def salary(self):
         if isinstance(self.employee, Employee):
