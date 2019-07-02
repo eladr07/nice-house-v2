@@ -73,7 +73,7 @@
 	{% for employee in employees %}
 		<tr class="{% cycle 'row1' 'row2' %}" objid={{s.id}} employeeid={{employee.id}}>
 			<td>
-				<a href="/esseasonexpenses/?employee={{employee.id}}&from_year={{start.year}}&from_month={{start.month}}&to_year={{end.year}}&to_month={{end.month}}">
+				<a href="{% url 'salary-season-expenses' %}?employee={{employee.id}}&from_year={{start.year}}&from_month={{start.month}}&to_year={{end.year}}&to_month={{end.month}}">
 					<img src="{% static "images/viewmag-48.png" %}" width="20" height="20"/>
 				</a>
 			</td>

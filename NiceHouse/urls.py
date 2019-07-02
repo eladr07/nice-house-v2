@@ -214,8 +214,8 @@ urlpatterns += [
      
     path('employeesalaries/', employee_salary_list),
     path('employeesalaryseason/', employeesalary_season_list),
-    path('esseasontotalexpenses/', employeesalary_season_total_expenses),
-    path('esseasonexpenses/', employeesalary_season_expenses),
+    path('esseasontotalexpenses/', employeesalary_season_total_expenses, name='salary-season-total-expenses'),
+    path('esseasonexpenses/', employeesalary_season_expenses, name='salary-season-expenses'),
 
     path('employeesalaries/<int:year>/<int:month>/pdf', employee_salary_pdf),
     path('employeesalaries/<int:pk>', EmployeeSalaryUpdate.as_view()),

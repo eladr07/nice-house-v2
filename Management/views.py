@@ -4777,12 +4777,17 @@ def global_profit_lost(request):
                     for salary in salaries:
                         salaries_amount += salary.bruto or salary.check_amount or 0
 
-                    income_rows.append({'name':division,'amount':demands_amount,
-                                        'details_link':'/seasonincome/?from_year=%s;from_month=%s;to_year=%s;to_month=%s' 
-                                        % (from_date.year, from_date.month, to_date.year, to_date.month)})
-                    loss_rows.append({'name':u'הוצאות שכר', 'amount':salaries_amount,
-                                      'details_link':'/esseasontotalexpenses/?division_type=%s;from_year=%s;from_month=%s;to_year=%s;to_month=%s' 
-                                      % (division.id, from_date.year, from_date.month, to_date.year, to_date.month)})
+                    income_rows.append({
+                        'name':division,
+                        'amount':demands_amount,
+                        'details_link':'/seasonincome/?from_year=%s;from_month=%s;to_year=%s;to_month=%s' 
+                                        % (from_date.year, from_date.month, to_date.year, to_date.month)
+                    })
+                    loss_rows.append({
+                        'name':u'הוצאות שכר', 
+                        'amount':salaries_amount,
+                        'details_link': reverse('salary-season-total-expenses') + 'division_type=%s;from_year=%s;from_month=%s;to_year=%s;to_month=%s'
+                            % (division.id, from_date.year, from_date.month, to_date.year, to_date.month)})
                         
                     total_income += demands_amount
                     total_loss += salaries_amount
@@ -4806,11 +4811,15 @@ def global_profit_lost(request):
                     for salary in salaries:
                         salary_amount += salary.bruto or salary.check_amount or 0
                         
-                    income_rows.append({'name':nhbranch, 'amount':nhmonths_amount,
-                                        'details_link':'/nhseasonincome/?nhbranch=%s;from_year=%s;from_month=%s;to_year=%s;to_month=%s' 
+                    income_rows.append({
+                        'name':nhbranch, 
+                        'amount':nhmonths_amount,
+                        'details_link':'/nhseasonincome/?nhbranch=%s;from_year=%s;from_month=%s;to_year=%s;to_month=%s' 
                                         % (nhbranch.id, from_date.year, from_date.month, to_date.year, to_date.month)})
-                    loss_rows.append({'name':u'הוצאות שכר', 'amount':salary_amount,
-                                      'details_link':'/esseasontotalexpenses/?division_type=%s;from_year=%s;from_month=%s;to_year=%s;to_month=%s' 
+                    loss_rows.append({
+                        'name':u'הוצאות שכר', 
+                        'amount':salary_amount,
+                        'details_link': reverse('salary-season-total-expenses') + '?division_type=%s;from_year=%s;from_month=%s;to_year=%s;to_month=%s' 
                                     % (division.id, from_date.year, from_date.month, to_date.year, to_date.month)})
                     
                     total_income += nhmonths_amount
