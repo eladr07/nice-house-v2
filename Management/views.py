@@ -1060,6 +1060,9 @@ def set_salary_fields(salaries, employee_by_id, from_year, from_month, to_year, 
 
     demand_map = {(d.project_id, d.year, d.month): d for d in demands}
 
+    # construct a map between employee id and project list
+    employee_projects_map = {employee_id: list(employee.projects.all()) for (employee_id, employee) in employee_by_id.items()}
+
     for salary in salaries:
         # create the key for the maps constructed above
         map_key = (salary.employee_id, salary.year, salary.month)
@@ -1101,7 +1104,10 @@ def set_salary_fields(salaries, employee_by_id, from_year, from_month, to_year, 
 
         salary.loan_pay = loan_pay
 
-        salary.demands = [demand_map.get((project.id, year, month)) for project in employee.projects.all() if (project.id, year, month) in demand_map]
+        # set 'demands' property
+        project_ids = [project.id for project in employee_projects_map[employee_id]]
+
+        salary.demands = [demand_map.get((project_id, year, month)) for project_id in project_ids if (project_id, year, month) in demand_map]
 
         # set 'bruto_employer_expense' field
         if exp:
@@ -1110,18 +1116,21 @@ def set_salary_fields(salaries, employee_by_id, from_year, from_month, to_year, 
         else:
             salary.bruto_employer_expense = None
 
-    set_employee_sales(salaries, employee_by_id, from_year, from_month, to_year, to_month)
+    set_employee_sales(salaries, employee_by_id, employee_projects_map, from_year, from_month, to_year, to_month)
 
     set_salary_status_date(salaries)
 
-def set_employee_sales(salaries, employee_by_id, from_year, from_month, to_year, to_month):
+def set_employee_sales(
+    salaries, 
+    employee_by_id, employee_projects_map, 
+    from_year, from_month, to_year, to_month):
     """
     Set 'sales' and 'sales_count' fields for every EmployeeSalary object in 'salaries'
     """
     # construct a map between Porject and Sale list
-    sales = Sale.objects.select_related('house__building__project') \
+    sales = Sale.objects.select_related('house__building') \
         .employee_pay_range(from_year, from_month, to_year, to_month) \
-        .order_by('house__building__project','sale_date')
+        .order_by('house__building__project_id','sale_date')
 
     # group sales by (project_id, year, month)
     sale_groups = itertools.groupby(sales,
@@ -1132,7 +1141,9 @@ def set_employee_sales(salaries, employee_by_id, from_year, from_month, to_year,
 
     for salary in salaries:
         year, month = salary.year, salary.month
+
         employee = employee_by_id[salary.employee_id]
+        employee_projects = employee_projects_map[salary.employee_id]
 
         # construct sales list for salary
         employee_sales = {}
@@ -1140,11 +1151,11 @@ def set_employee_sales(salaries, employee_by_id, from_year, from_month, to_year,
         if employee.rank_id == RankType.RegionalSaleManager:
             employee_sales = {
                 project: sales_map[(project.id, year, month)] \
-                    for project in employee.projects.all() if (project.id, year, month) in sales_map}
+                    for project in employee_projects if (project.id, year, month) in sales_map}
         else:
             employee_sales = {
                 project: [sale for sale in sales_map[(project.id, year, month)] if sale.employee_id in (employee.id, None)] \
-                    for project in employee.projects.all() if (project.id, year, month) in sales_map}
+                    for project in employee_projects if (project.id, year, month) in sales_map}
 
         salary.sales = employee_sales
         salary.sales_count = sum(len(project_sales) for (project, project_sales) in employee_sales.items())
@@ -1154,13 +1165,14 @@ def set_salary_status_date(salaries):
     Set 'approved_date', 'sent_to_bookkeeping_date', 'sent_to_checks_date' fields 
     for every EmployeeSalary object in 'salaries'
     """
+    salary_ids = [salary.id for salary in salaries]
+
     # construct a map between Salary object and its latest status
     all_statuses = EmployeeSalaryBaseStatus.objects \
-        .select_related('employeesalarybase') \
-        .filter(employeesalarybase__in=salaries) \
+        .filter(employeesalarybase_id__in=salary_ids) \
         .order_by('-date')
 
-    statuses_by_salary_id = {esb.id: list(statuses) for (esb, statuses) in itertools.groupby(all_statuses, lambda status: status.employeesalarybase)}
+    statuses_by_salary_id = {esb_id: list(statuses) for (esb_id, statuses) in itertools.groupby(all_statuses, lambda status: status.employeesalarybase_id)}
 
     for salary in salaries:
         # set status properties
@@ -4394,7 +4406,7 @@ def employeesalary_season_expenses(request):
             elif isinstance(employee_base.derived, NHEmployee):
                 salaries = NHEmployeeSalary.objects.nondeleted().range(from_date.year, from_date.month, to_date.year, to_date.month).filter(nhemployee__id = employee_base.id)
                 template = 'Management/nhemployeesalary_season_expenses.html'
-                
+
             for salary in salaries:
                 total_neto += salary.neto or 0
                 total_check_amount += salary.check_amount or 0
