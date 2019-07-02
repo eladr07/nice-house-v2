@@ -998,10 +998,23 @@ def nhemployee_salary_pdf(request, nhbranch_id, year, month):
 
 @permission_required('Management.change_salaryexpenses')
 def employee_salary_expenses(request, salary_id):
-    es = EmployeeSalaryBase.objects.get(pk=salary_id)
-    employee = es.get_employee()
+    salary = EmployeeSalaryBase.objects.get(pk=salary_id)
+    
+    # set to EmployeeSalary or NHEmployeeSalary
+    salary = salary.derived
+
+    employee = salary.get_employee()
     terms = employee.employment_terms
-    expenses = es.expenses or SalaryExpenses(employee = employee, year = es.year, month = es.month)
+
+    year, month = salary.year, salary.month
+
+    set_salary_base_fields(
+        [salary],
+        {employee.id:employee},
+        year, month, year, month)
+
+    expenses = salary.expenses or SalaryExpenses(employee = employee, year = year, month = month)
+
     if request.method=='POST':
         form = SalaryExpensesForm(request.POST, instance= expenses)
         if form.is_valid():
@@ -1009,9 +1022,10 @@ def employee_salary_expenses(request, salary_id):
     else:
         vacation = terms.salary_base and (terms.salary_base / 24) or (2500/12)
         form = SalaryExpensesForm(instance= expenses, initial={'vacation':vacation})
-    return render(request, 'Management/salaryexpenses_edit.html', 
-                              {'form':form, 'neto': es.neto or 0},
-                               )
+
+    context = {'form': form, 'neto': salary.neto or 0}
+    
+    return render(request, 'Management/salaryexpenses_edit.html', context)
 
 @permission_required('Management.change_employeesalary')
 def employee_salary_approve(request, id):
@@ -1303,7 +1317,8 @@ class SalaryExpensesListView(PermissionRequiredMixin, ListView):
 
     def get_queryset(self):
         salaries = EmployeeSalary.objects.nondeleted() \
-            .select_related('employee') \
+            .select_related('employee__employment_terms__hire_type', 'employee__rank') \
+            .prefetch_related('employee__projects') \
             .filter(year = self.year, month = self.month)
 
         employee_by_id = {s.employee.id:s.employee for s in salaries}
@@ -1336,7 +1351,7 @@ class NHSalaryExpensesListView(PermissionRequiredMixin, ListView):
 
     def get_queryset(self):
         salaries = NHEmployeeSalary.objects.nondeleted() \
-            .select_related('nhemployee') \
+            .select_related('nhemployee__employment_terms__hire_type') \
             .filter(year = self.year, month = self.month)
 
         employee_by_id = {s.nhemployee.id:s.nhemployee for s in salaries}
