@@ -1413,12 +1413,24 @@ def salaries_bank(request):
         if form.is_valid():
             month, year = form.cleaned_data['month'], form.cleaned_data['year']
 
+            query = EmployeeSalaryBase.objects.select_related(
+                'employeesalary__employee__employment_terms',
+                'employeesalary__employee__account',
+                'nhemployeesalary__nhemployee__employment_terms',
+                'nhemployeesalary__nhemployee__account')
+
             if 'pdf' in request.POST:
                 salary_ids = [key.replace('salary-','') for key in request.POST if key.startswith('salary-')]
-                salaries = EmployeeSalaryBase.objects.filter(pk__in = salary_ids)
+                salaries = query.filter(pk__in = salary_ids)
             elif 'filter' in request.POST:
-                salaries = EmployeeSalaryBase.objects.filter(month=month, year=year)
+                salaries = query.filter(month=month, year=year)
                 
+            salaries.select_related(
+                'employeesalary__employee__employment_terms',
+                'employeesalary__employee__account',
+                'nhemployeesalary__nhemployee__employment_terms',
+                'nhemployeesalary__nhemployee__account')
+
             # replace base objects with derived
             salaries = [s.derived for s in salaries]
 
