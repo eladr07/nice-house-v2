@@ -1055,12 +1055,8 @@ class EmployeeSalaryBase(models.Model):
     def mark_deleted(self):
         self.is_deleted = True
     def get_employee(self):
-        if hasattr(self, 'employee'):
-            return self.employee
-        elif hasattr(self, 'employeesalary'):
+        if hasattr(self, 'employeesalary'):
             return self.employeesalary.employee
-        elif hasattr(self, 'nhemployee'):
-            return self.nhemployee
         elif hasattr(self, 'nhemployeesalary'):
             return self.nhemployeesalary.nhemployee
     class Meta:
@@ -1075,6 +1071,9 @@ class NHEmployeeSalary(EmployeeSalaryBase):
     
     objects = EmployeeSalaryBaseManager()
         
+    def get_employee(self):
+        return self.nhemployee
+
     @property
     @cache_method
     def total_amount(self):
@@ -1155,6 +1154,9 @@ class EmployeeSalary(EmployeeSalaryBase):
     def __init__(self, *args, **kw):
         super(EmployeeSalary, self).__init__(*args, **kw)
         self.project_commission = {}
+        
+    def get_employee(self):
+        return self.employee
     # @property
     # @cache_method
     # def demands(self):
