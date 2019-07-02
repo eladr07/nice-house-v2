@@ -4496,13 +4496,19 @@ def employeesalary_season_list(request):
             from_date = date(from_year, from_month, 1)
             to_date = date(to_year, to_month, 1)
 
+            # set to Employee or NHEmployee
             employee = employee_base.derived
+
+            set_loan_fields([employee])
 
             if isinstance(employee, Employee):
                 salaries = EmployeeSalary.objects.nondeleted() \
                     .range(from_year, from_month, to_year, to_month) \
-                    .select_related('employee__employment_terms__hire_type') \
                     .filter(employee_id = employee_base.id)
+                
+                # set the same employee instance for all salaries
+                for s in salaries:
+                    s.employee = employee
 
                 enrich_employee_salaries(
                     salaries, 
@@ -4512,6 +4518,10 @@ def employeesalary_season_list(request):
             elif isinstance(employee, NHEmployee):
                 salaries = NHEmployeeSalary.objects.nondeleted().range(from_year, from_month, to_year, to_month).filter(nhemployee__id = employee_base.id)
                 
+                # set the same employee instance for all salaries
+                for s in salaries:
+                    s.nhemployee = employee
+
                 enrich_nh_employee_salaries(
                     salaries, 
                     {employee_base.id: employee},
