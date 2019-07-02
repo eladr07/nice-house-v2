@@ -136,6 +136,8 @@ def employee_loans(request, object_id):
     # set to Employee or NHEmployee
     employee = employee_base.derived
 
+    set_loan_fields([employee])
+
     if request.GET.get('t') == 'pdf' :
         writer = EmployeesLoans(employee)
         return build_and_return_pdf(writer)
@@ -984,12 +986,28 @@ def nhemployee_salary_send(request, nhbranch_id, year, month):
     
 def nhemployee_salary_pdf(request, nhbranch_id, year, month):
     nhb = NHBranch.objects.get(pk = nhbranch_id)
-    salaries = [salary for salary in NHEmployeeSalary.objects.nondeleted().filter(nhbranch = nhb, month = month, year = year) if salary.approved_date]
+
+    salaries = NHEmployeeSalary.objects \
+        .select_related('nhemployee__employment_terms__hire_type') \
+        .nondeleted() \
+        .filter(nhbranch = nhb, year = year, month= month) \
+        .order_by('id')
+
+    employee_by_id = {s.nhemployee.id:s.nhemployee for s in salaries}
+
+    set_salary_base_fields(
+        salaries, 
+        employee_by_id, 
+        year, month, year, month)
+
+    set_salary_status_date(salaries)
+
+    approved_salaries = [salary for salary in salaries if salary.approved_date]
 
     nhsales = NHSale.objects.filter(nhmonth__year__exact = year, nhmonth__month__exact = month, nhmonth__nhbranch = nhb)
     title = u'שכר עבודה לסניף %s לחודש %s\%s' % (nhb, year, month)
 
-    writer = EmployeeSalariesBookKeepingWriter(salaries, title, nhsales)
+    writer = EmployeeSalariesBookKeepingWriter(approved_salaries, title, nhsales)
     
     return build_and_return_pdf(writer)
 
@@ -1481,12 +1499,27 @@ class NHEmployeeSalaryUpdate(PermissionRequiredMixin, UpdateView):
     permission_required = 'Management.change_nhemployeesalary'
 
 def employee_salary_pdf(request, year, month):
-    salaries = [es for es in EmployeeSalary.objects.nondeleted().filter(year = year, month= month)
-                if es.approved_date]
+
+    salaries = EmployeeSalary.objects \
+        .select_related('employee__employment_terms__hire_type') \
+        .nondeleted() \
+        .filter(year = year, month= month) \
+        .order_by('id')
+
+    employee_by_id = {s.employee.id:s.employee for s in salaries}
+
+    set_salary_base_fields(
+        salaries, 
+        employee_by_id, 
+        year, month, year, month)
+
+    set_salary_status_date(salaries)
+
+    approved_salaries = [salary for salary in salaries if salary.approved_date]
 
     title = u'שכר עבודה למנהלי פרויקטים לחודש %s\%s' % (year, month)
 
-    writer = EmployeeSalariesBookKeepingWriter(salaries, title)
+    writer = EmployeeSalariesBookKeepingWriter(approved_salaries, title)
 
     return build_and_return_pdf(writer)
 
