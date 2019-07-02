@@ -78,16 +78,16 @@
 				</a>
 			</td>
 			<td><a href="{{employee.get_absolute_url}}" target="_blank">{{ employee }}</a></td>			
-			<td>{{ employee.total_neto|intcomma }}</td>
+			<td>{{ employee.total_neto|floatformat:"0"|intcomma }}</td>
 			<td>{{ employee.total_loan_pay|intcomma }}</td>
-			<td>{{ employee.total_check_amount|intcomma }}</td>
+			<td>{{ employee.total_check_amount|floatformat:"0"|intcomma }}</td>
 			<td>{{ employee.total_income_tax|intcomma }}</td>
 			<td>{{ employee.total_national_insurance|intcomma }}</td>
 			<td>{{ employee.total_health|intcomma }}</td>
 			<td>{{ employee.total_pension_insurance|intcomma }}</td>
 			<td>{{ employee.total_vacation|intcomma }}</td>
 			<td>{{ employee.total_convalescence_pay|intcomma }}</td>
-			<td>{{ employee.total_bruto|intcomma }}</td>
+			<td>{{ employee.total_bruto|floatformat:"0"|intcomma }}</td>
 			<td>{{ employee.total_employer_national_insurance|intcomma }}</td>
 			<td>{{ employee.total_employer_benefit|intcomma }}</td>
 			<td>{{ employee.total_compensation_allocation|intcomma }}</td>
