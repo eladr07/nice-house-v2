@@ -1069,7 +1069,7 @@ def set_salary_base_fields(salaries, employee_by_id, from_year, from_month, to_y
 
     for salary in salaries:
         # create the key for the maps constructed above
-        map_key = (salary.employee_id, salary.year, salary.month)
+        map_key = (salary.get_employee().id, salary.year, salary.month)
         (employee_id, year, month) = map_key
 
         employee = employee_by_id[employee_id]
@@ -1339,18 +1339,31 @@ def nhemployee_salary_list(request):
     year = int(request.GET.get('year', current.year))
     month = int(request.GET.get('month', current.month))
     
+    salaries = []
+
+    # key is NHBranch, value is a list of NHEmployeeSalary objects
     branch_list = {}
-    
+
     for nhbe in NHBranchEmployee.objects.month(year, month):
         es, new = NHEmployeeSalary.objects.get_or_create(nhemployee = nhbe.nhemployee, nhbranch = nhbe.nhbranch,
                                                          month = month, year = year)
         if not new and es.is_deleted:
             continue
-        if (new or not es.commissions or not es.base or not es.admin_commission) and es.approved_date == None: 
+        #if (new or not es.commissions or not es.base or not es.admin_commission) and es.approved_date == None: 
+        if new:
             es.calculate()
             es.save()
+        
+        salaries.append(es)
+
         branch_sales = branch_list.setdefault(nhbe.nhbranch, [])
         branch_sales.append(es)
+
+    employee_by_id = {s.nhemployee.id:s.nhemployee for s in salaries}
+
+    set_salary_base_fields(salaries, employee_by_id, year, month, year, month)
+    set_loan_fields(employee_by_id.values())
+    set_salary_status_date(salaries)
 
     return render(request, 'Management/nhemployee_salaries.html', 
                               {'branch_list':branch_list, 'month': date(int(year), int(month), 1),
