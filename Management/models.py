@@ -2731,11 +2731,15 @@ class Sale(models.Model):
         models.Model.__init__(self, *args, **kw)
         self.custom_cache = {}
         self.restore = True
+    def get_restore_date(self):
+        restore_date = None
+        
         if self.id:
             actual_demand = self.actual_demand
-            self.restore_date = actual_demand and actual_demand.finish_date or None
-        else:
-            self.restore_date = None
+            if actual_demand:
+                restore_date = actual_demand.finish_date
+        
+        return restore_date
     @property
     @cache_method
     def tax(self):
@@ -2768,11 +2772,13 @@ class Sale(models.Model):
         return self.commission_details.filter(employee_salary=None)
     @property
     def pc_base(self):
+        restore_date = self.get_restore_date()
         for c in ['c_var_precentage', 'c_var_precentage_fixed', 'c_zilber_base']:
             q = self.project_commission_details.filter(commission=c)
             if q.count() == 0:
                 continue
-            return self.restore and self.restore_date and common.restore_object(q[0], self.restore_date).value or q[0].value
+            obj = self.restore and restore_date and common.restore_object(q[0], restore_date) or q[0]
+            return obj.value
         return 0
     @property
     def zdb(self):
@@ -2782,14 +2788,20 @@ class Sale(models.Model):
         return q[0].value
     @property
     def pb_dsp(self):
+        restore_date = self.get_restore_date()
         q = self.project_commission_details.filter(commission='b_discount_save_precentage')
-        if q.count() == 0: return 0
-        return self.restore and self.restore_date and common.restore_object(q[0], self.restore_date).value or q[0].value
+        if q.count() == 0: 
+            return 0
+        obj = self.restore and restore_date and common.restore_object(q[0], restore_date) or q[0]
+        return obj.value
     @property
     def c_final(self):
+        restore_date = self.get_restore_date()
         q = self.project_commission_details.filter(commission='final')
-        if q.count() == 0: return 0
-        return self.restore and self.restore_date and common.restore_object(q[0], self.restore_date).value or q[0].value
+        if q.count() == 0: 
+            return 0
+        obj = self.restore and restore_date and common.restore_object(q[0], restore_date) or q[0]
+        return obj.value
     @property
     def pc_base_worth(self):
         return self.pc_base * self.price_final / 100
