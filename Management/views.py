@@ -1035,7 +1035,7 @@ class SalaryExpensesUpdate(PermissionRequiredMixin, UpdateView):
     template_name = 'Management/salaryexpenses_edit.html'
     permission_required = 'Management.change_salaryexpenses'
 
-def set_salary_fields(salaries, employee_by_id, from_year, from_month, to_year, to_month):
+def enrich_employee_salaries(salaries, employee_by_id, from_year, from_month, to_year, to_month):
     set_salary_base_fields(salaries, employee_by_id, from_year, from_month, to_year, to_month)
     
     # construct a map between employee id and project list
@@ -1045,6 +1045,11 @@ def set_salary_fields(salaries, employee_by_id, from_year, from_month, to_year, 
 
     set_employee_sales(salaries, employee_by_id, employee_projects_map, from_year, from_month, to_year, to_month)
 
+    set_salary_status_date(salaries)
+
+def enrich_nh_employee_salaries(salaries, employee_by_id, from_year, from_month, to_year, to_month):
+    set_salary_base_fields(salaries, employee_by_id, from_year, from_month, to_year, to_month)
+    
     set_salary_status_date(salaries)
 
 def set_salary_base_fields(salaries, employee_by_id, from_year, from_month, to_year, to_month):
@@ -1271,7 +1276,7 @@ def employee_salary_list(request):
         
         employee_by_id = {employee.id:employee for employee in employees}
 
-        set_salary_fields(salaries, employee_by_id, year, month, year, month)
+        enrich_employee_salaries(salaries, employee_by_id, year, month, year, month)
 
         set_loan_fields(employees)
 
@@ -1361,9 +1366,9 @@ def nhemployee_salary_list(request):
 
     employee_by_id = {s.nhemployee.id:s.nhemployee for s in salaries}
 
-    set_salary_base_fields(salaries, employee_by_id, year, month, year, month)
+    enrich_nh_employee_salaries(salaries, employee_by_id, year, month, year, month)
+
     set_loan_fields(employee_by_id.values())
-    set_salary_status_date(salaries)
 
     return render(request, 'Management/nhemployee_salaries.html', 
                               {'branch_list':branch_list, 'month': date(int(year), int(month), 1),
@@ -4406,7 +4411,7 @@ def employeesalary_season_list(request):
                     .select_related('employee__employment_terms__hire_type') \
                     .filter(employee_id = employee_base.id)
 
-                set_salary_fields(
+                enrich_employee_salaries(
                     salaries, 
                     {employee_base.id: employee_base.derived},
                     from_year, from_month, to_year, to_month)
@@ -4452,7 +4457,7 @@ def employeesalary_season_expenses(request):
                     .select_related('employee__employment_terms__hire_type') \
                     .filter(employee_id = employee_base.id)
                 
-                set_salary_fields(
+                enrich_employee_salaries(
                     salaries, 
                     {employee_base.id: employee_base.derived},
                     from_date.year, from_date.month, to_date.year, to_date.month)
