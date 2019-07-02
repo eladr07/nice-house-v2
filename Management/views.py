@@ -1419,6 +1419,9 @@ def salaries_bank(request):
             elif 'filter' in request.POST:
                 salaries = EmployeeSalaryBase.objects.filter(month=month, year=year)
                 
+            # replace base objects with derived
+            salaries = [s.derived for s in salaries]
+
             # extract employees from salaries
             employees = [salary.get_employee() for salary in salaries]
 
@@ -1426,7 +1429,7 @@ def salaries_bank(request):
             employee_by_id = {e.id:e for e in employees}
 
             set_salary_base_fields(
-                [s.derived for s in salaries], 
+                salaries, 
                 employee_by_id,
                 year, month, year, month)
 
