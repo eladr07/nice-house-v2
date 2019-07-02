@@ -4465,6 +4465,12 @@ def employeesalary_season_expenses(request):
                 template = 'Management/employeesalary_season_expenses.html'
             elif isinstance(employee_base.derived, NHEmployee):
                 salaries = NHEmployeeSalary.objects.nondeleted().range(from_date.year, from_date.month, to_date.year, to_date.month).filter(nhemployee__id = employee_base.id)
+
+                enrich_nh_employee_salaries(
+                    salaries, 
+                    {employee_base.id: employee_base.derived},
+                    from_date.year, from_date.month, to_date.year, to_date.month)
+
                 template = 'Management/nhemployeesalary_season_expenses.html'
 
             for salary in salaries:
