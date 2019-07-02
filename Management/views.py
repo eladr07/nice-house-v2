@@ -131,7 +131,10 @@ def locate_demand(request):
 @login_required
 def employee_loans(request, object_id):
 
-    employee = EmployeeBase.objects.get(pk=object_id)
+    employee_base = EmployeeBase.objects.get(pk=object_id)
+
+    # set to Employee or NHEmployee
+    employee = employee_base.derived
 
     if request.GET.get('t') == 'pdf' :
         writer = EmployeesLoans(employee)
