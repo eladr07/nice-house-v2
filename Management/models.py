@@ -896,7 +896,7 @@ class SalaryExpenses(models.Model):
     def approve(self):
         self.approved_date = datetime.now()
     def get_absolute_url(self):
-        return '/salaryexpenses/%s' % self.id
+        return '/salaries/expenses/%s' % self.id
     class Meta:
         db_table = 'SalaryExpenses'
         unique_together = ('employee','year','month')
@@ -1028,7 +1028,7 @@ class NHEmployeeSalary(EmployeeSalaryBase):
         '''
         self.ratio = 1
     def get_absolute_url(self):
-        return '/nhemployeesalaries/%s' % self.id
+        return '/nh-salaries/%s' % self.id
     class Meta:
         db_table='NHEmployeeSalary'
         
@@ -1118,7 +1118,7 @@ class EmployeeSalary(EmployeeSalaryBase):
                         {'employee':self.employee, 'year':self.year, 'month':self.month})
             
     def get_absolute_url(self):
-        return '/employeesalaries/%s' % self.id
+        return '/salaries/%s' % self.id
     class Meta:
         db_table = 'EmployeeSalary'
         permissions = (('season_employeesalary','Season employee salary'),)

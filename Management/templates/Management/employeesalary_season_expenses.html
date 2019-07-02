@@ -22,9 +22,9 @@
 			if (selectedID > 0)
 				$("#loanPay").attr("href", "/employees/" + selectedID + "/loanpay");
 				$("#loanAdd").attr("href", "/employees/" + selectedID + "/addloan");
-				$("#calcSalary").attr("href", "/employeesalaries/" + tr.attr("objid") + "/calc");
-				$("#approve").attr("href", "/employeesalaries/" + tr.attr("objid") + "/approve");
-				$("#edit").attr("href",  "/employeesalaries/" + tr.attr("objid"));
+				$("#calcSalary").attr("href", "/salaries/" + tr.attr("objid") + "/calc");
+				$("#approve").attr("href", "/salaries/" + tr.attr("objid") + "/approve");
+				$("#edit").attr("href",  "/salaries/" + tr.attr("objid"));
 			});
 		$(".fancybox").fancybox();
 		$("#loanPay, #loanAdd, #edit").click(function (event) {
