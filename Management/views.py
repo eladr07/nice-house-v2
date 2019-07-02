@@ -1036,8 +1036,20 @@ class SalaryExpensesUpdate(PermissionRequiredMixin, UpdateView):
     permission_required = 'Management.change_salaryexpenses'
 
 def set_salary_fields(salaries, employee_by_id, from_year, from_month, to_year, to_month):
-    employee_ids = employee_by_id.keys()
+    set_salary_base_fields(salaries, employee_by_id, from_year, from_month, to_year, to_month)
     
+    # construct a map between employee id and project list
+    employee_projects_map = {employee_id: list(employee.projects.all()) for (employee_id, employee) in employee_by_id.items()}
+
+    set_demands(salaries, employee_projects_map, from_year, from_month, to_year, to_month)
+
+    set_employee_sales(salaries, employee_by_id, employee_projects_map, from_year, from_month, to_year, to_month)
+
+    set_salary_status_date(salaries)
+
+def set_salary_base_fields(salaries, employee_by_id, from_year, from_month, to_year, to_month):
+    employee_ids = employee_by_id.keys()
+
     # construct a map between (employee id, year, month) and SalaryExpense object
     salary_expenses = SalaryExpenses.objects \
         .range(from_year, from_month, to_year, to_month) \
@@ -1054,14 +1066,6 @@ def set_salary_fields(salaries, employee_by_id, from_year, from_month, to_year, 
 
     loan_pay_map = {(row['employee_id'], row['year'], row['month']): row['total_amount'] \
         for row in loan_pays}
-
-    # construct a map between (project id, year, month) and Demand object
-    demands = Demand.objects.select_related('project').range(from_year, from_month, to_year, to_month)
-
-    demand_map = {(d.project_id, d.year, d.month): d for d in demands}
-
-    # construct a map between employee id and project list
-    employee_projects_map = {employee_id: list(employee.projects.all()) for (employee_id, employee) in employee_by_id.items()}
 
     for salary in salaries:
         # create the key for the maps constructed above
@@ -1106,11 +1110,6 @@ def set_salary_fields(salaries, employee_by_id, from_year, from_month, to_year, 
 
         salary.loan_pay = loan_pay
 
-        # set 'demands' property
-        project_ids = [project.id for project in employee_projects_map[employee_id]]
-
-        salary.demands = [demand_map.get((project_id, year, month)) for project_id in project_ids if (project_id, year, month) in demand_map]
-
         # set 'bruto_employer_expense' field
         if exp:
             salary.bruto_employer_expense = sum([
@@ -1118,9 +1117,21 @@ def set_salary_fields(salaries, employee_by_id, from_year, from_month, to_year, 
         else:
             salary.bruto_employer_expense = None
 
-    set_employee_sales(salaries, employee_by_id, employee_projects_map, from_year, from_month, to_year, to_month)
+def set_demands(salaries, employee_projects_map, from_year, from_month, to_year, to_month):
+    # construct a map between (project id, year, month) and Demand object
+    demands = Demand.objects.select_related('project').range(from_year, from_month, to_year, to_month)
 
-    set_salary_status_date(salaries)
+    demand_map = {(d.project_id, d.year, d.month): d for d in demands}
+
+    for salary in salaries:
+        # create the key for the maps constructed above
+        map_key = (salary.employee_id, salary.year, salary.month)
+        (employee_id, year, month) = map_key
+        
+        # set 'demands' property
+        project_ids = [project.id for project in employee_projects_map[employee_id]]
+
+        salary.demands = [demand_map.get((project_id, year, month)) for project_id in project_ids if (project_id, year, month) in demand_map]
 
 def set_employee_sales(
     salaries, 
