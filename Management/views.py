@@ -1412,15 +1412,27 @@ def salaries_bank(request):
         form = MonthForm(request.POST)
         if form.is_valid():
             month, year = form.cleaned_data['month'], form.cleaned_data['year']
-            salary_ids = [key.replace('salary-','') for key in request.POST if key.startswith('salary-')]
+
             if 'pdf' in request.POST:
+                salary_ids = [key.replace('salary-','') for key in request.POST if key.startswith('salary-')]
                 salaries = EmployeeSalaryBase.objects.filter(pk__in = salary_ids)
-                
-                writer = SalariesBankWriter(salaries, month, year)
-                
-                return build_and_return_pdf(writer)
             elif 'filter' in request.POST:
                 salaries = EmployeeSalaryBase.objects.filter(month=month, year=year)
+                
+            # extract employees from salaries
+            employees = [salary.get_employee() for salary in salaries]
+
+            # create map
+            employee_by_id = {e.id:e for e in employees}
+
+            set_salary_base_fields(
+                [s.derived for s in salaries], 
+                employee_by_id,
+                year, month, year, month)
+
+            if 'pdf' in request.POST:
+                writer = SalariesBankWriter(salaries, month, year)
+                return build_and_return_pdf(writer)
         else:
             raise ValidationError
     else:
@@ -3596,13 +3608,16 @@ def employee_end(request, object_id):
         form = EmployeeEndForm(request.POST, instance = employee)
         if form.is_valid():
             form.save()
-            if isinstance(employee.derived, Employee):
-                for epcommission in employee.derived.commissions.all():
+
+            employee_derived = employee.derived
+
+            if isinstance(employee_derived, Employee):
+                for epcommission in employee_derived.commissions.all():
                     if not epcommission.end_date:
                         epcommission.end_date = employee.work_end
                         epcommission.save()
-            elif isinstance(employee.derived, NHEmployee):
-                for nhbranchemployee in employee.derived.nhbranchemployee_set.all():
+            elif isinstance(employee_derived, NHEmployee):
+                for nhbranchemployee in employee_derived.nhbranchemployee_set.all():
                     if not nhbranchemployee.end_date:
                         nhbranchemployee.end_date = employee.work_end
                         nhbranchemployee.save()
@@ -4436,7 +4451,9 @@ def employeesalary_season_list(request):
             from_date = date(from_year, from_month, 1)
             to_date = date(to_year, to_month, 1)
 
-            if isinstance(employee_base.derived, Employee):
+            employee = employee_base.derived
+
+            if isinstance(employee, Employee):
                 salaries = EmployeeSalary.objects.nondeleted() \
                     .range(from_year, from_month, to_year, to_month) \
                     .select_related('employee__employment_terms__hire_type') \
@@ -4444,15 +4461,15 @@ def employeesalary_season_list(request):
 
                 enrich_employee_salaries(
                     salaries, 
-                    {employee_base.id: employee_base.derived},
+                    {employee_base.id: employee},
                     from_year, from_month, to_year, to_month)
 
-            elif isinstance(employee_base.derived, NHEmployee):
+            elif isinstance(employee, NHEmployee):
                 salaries = NHEmployeeSalary.objects.nondeleted().range(from_year, from_month, to_year, to_month).filter(nhemployee__id = employee_base.id)
                 
                 enrich_nh_employee_salaries(
                     salaries, 
-                    {employee_base.id: employee_base.derived},
+                    {employee_base.id: employee},
                     from_year, from_month, to_year, to_month)
             
             if 'list' in request.GET:    
@@ -4487,7 +4504,9 @@ def employeesalary_season_expenses(request):
             from_date = date(form.cleaned_data['from_year'], form.cleaned_data['from_month'], 1)
             to_date = date(form.cleaned_data['to_year'], form.cleaned_data['to_month'], 1)
 
-            if isinstance(employee_base.derived, Employee):
+            employee = employee_base.derived
+
+            if isinstance(employee, Employee):
                 salaries = EmployeeSalary.objects.nondeleted() \
                     .range(from_date.year, from_date.month, to_date.year, to_date.month) \
                     .select_related('employee__employment_terms__hire_type') \
@@ -4495,16 +4514,16 @@ def employeesalary_season_expenses(request):
                 
                 enrich_employee_salaries(
                     salaries, 
-                    {employee_base.id: employee_base.derived},
+                    {employee_base.id: employee},
                     from_date.year, from_date.month, to_date.year, to_date.month)
                 
                 template = 'Management/employeesalary_season_expenses.html'
-            elif isinstance(employee_base.derived, NHEmployee):
+            elif isinstance(employee, NHEmployee):
                 salaries = NHEmployeeSalary.objects.nondeleted().range(from_date.year, from_date.month, to_date.year, to_date.month).filter(nhemployee__id = employee_base.id)
 
                 enrich_nh_employee_salaries(
                     salaries, 
-                    {employee_base.id: employee_base.derived},
+                    {employee_base.id: employee},
                     from_date.year, from_date.month, to_date.year, to_date.month)
 
                 template = 'Management/nhemployeesalary_season_expenses.html'
