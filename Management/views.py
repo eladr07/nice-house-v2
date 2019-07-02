@@ -1202,7 +1202,7 @@ def set_salary_status_date(salaries):
     # construct a map between Salary object and its latest status
     all_statuses = EmployeeSalaryBaseStatus.objects \
         .filter(employeesalarybase_id__in=salary_ids) \
-        .order_by('-date')
+        .order_by('employeesalarybase_id','-date')
 
     statuses_by_salary_id = {esb_id: list(statuses) for (esb_id, statuses) in itertools.groupby(all_statuses, lambda status: status.employeesalarybase_id)}
 
@@ -1223,8 +1223,8 @@ def set_loan_fields(employees):
     """
     Set 'loan_left' and 'loans_and_pays' fields for every Employee in 'employees'
     """
-    loans = Loan.objects.filter(employee__in=employees)
-    loan_pays = LoanPay.objects.filter(employee__in=employees)
+    loans = Loan.objects.filter(employee__in=employees).order_by('employee_id')
+    loan_pays = LoanPay.objects.filter(employee__in=employees).order_by('employee_id')
 
     loans_by_employee_id = {employee_id:loans for (employee_id, loans) in itertools.groupby(loans, lambda loan: loan.employee_id)}
     loan_pays_by_employee_id = {employee_id:loan_pays for (employee_id, loan_pays) in itertools.groupby(loan_pays, lambda loan_pay: loan_pay.employee_id)}
@@ -4534,48 +4534,83 @@ def employeesalary_season_total_expenses(request):
     if len(request.GET):
         form = DivisionTypeSeasonForm(request.GET)
         if form.is_valid():
+            # extract form values
             division_type = form.cleaned_data['division_type']
-            from_date = date(form.cleaned_data['from_year'], form.cleaned_data['from_month'], 1)
-            to_date = date(form.cleaned_data['to_year'], form.cleaned_data['to_month'], 1)
+
+            from_year, from_month = form.cleaned_data['from_year'], form.cleaned_data['from_month']
+            to_year, to_month = form.cleaned_data['to_year'], form.cleaned_data['to_month']
+
+            from_date = date(from_year, from_month, 1)
+            to_date = date(to_year, to_month, 1)
+
             if division_type.id == DivisionType.Marketing:
-                employees = list(Employee.objects.exclude(work_end__isnull = False, work_end__lt = from_date))
-                model = EmployeeSalary
+                employees = list(Employee.objects \
+                    .select_related('employment_terms') \
+                    .exclude(work_end__isnull = False, work_end__lt = from_date))
+
+                employee_by_id = {e.id:e for e in employees}
+                salaries = EmployeeSalary.objects \
+                    .select_related('employee__employment_terms') \
+                    .range(from_year, from_month, to_year, to_month) \
+                    .order_by('employee_id')
             else:
-                if division_type.id == DivisionType.NHShoham:
-                    query = NHBranchEmployee.objects.filter(nhbranch__id = NHBranch.Shoham)
-                elif division_type.id == DivisionType.NHModiin:
-                    query = NHBranchEmployee.objects.filter(nhbranch__id = NHBranch.Modiin)
-                elif division_type.id == DivisionType.NHNesZiona:
-                    query = NHBranchEmployee.objects.filter(nhbranch__id = NHBranch.NesZiona)
-                query = query.exclude(end_date__isnull=False, end_date__lt = from_date)
+                # NiceHouse division
+
+                # map DivisionType to NHBranch
+                division_to_branch = {
+                    DivisionType.NHShoham: NHBranch.Shoham,
+                    DivisionType.NHModiin: NHBranch.Modiin,
+                    DivisionType.NHNesZiona: NHBranch.NesZiona,
+                }
+
+                branch_id = division_to_branch[division_type.id]
+                
+                query = NHBranchEmployee.objects \
+                    .select_related('nhemployee__employment_terms') \
+                    .filter(nhbranch__id = branch_id) \
+                    .exclude(end_date__isnull=False, end_date__lt = from_date)
+
                 employees = [x.nhemployee for x in query]
-                model = NHEmployeeSalary
+                employee_by_id = {e.id:e for e in employees}
+                salaries = NHEmployeeSalary.objects \
+                    .range(from_year, from_month, to_year, to_month) \
+                    .order_by('nhemployee_id')
+
+            set_salary_base_fields(
+                salaries,
+                employee_by_id,
+                from_year, from_month, to_year, to_month)
 
             attrs = ['neto', 'loan_pay', 'check_amount', 'income_tax', 'national_insurance', 'health', 'pension_insurance', 
                      'vacation', 'convalescence_pay', 'bruto', 'employer_national_insurance', 'employer_benefit',
                      'compensation_allocation', 'bruto_with_employer']
-            for attr in attrs:
-                for e in employees:
-                    setattr(e, 'total_' + attr, 0)
             
-            salaries = model.objects.range(from_date.year, from_date.month, to_date.year, to_date.month)
-            
-            for salary in salaries:
-                if salary.get_employee() not in employees: 
-                    continue
-                employee_index = employees.index(salary.get_employee())
-                employee = employees[employee_index]
+            for employee_id, employee_salaries in itertools.groupby(salaries, lambda salary: salary.get_employee().id):
+                # get the employee object
+                employee = employee_by_id[employee_id]
+                
+                # evaluate and store the iterator
+                employee_salaries_list = list(employee_salaries)
+
                 for attr in attrs:
-                    add = getattr(salary, attr, 0) or 0
-                    old_value = getattr(employee, 'total_' + attr)
-                    setattr(employee, 'total_' + attr, old_value + add)
+                    # extract 'attr' from each salary
+                    attr_list = [getattr(salary, attr, 0) or 0 for salary in employee_salaries_list]
+                    # sum 'attr' over employee_salaries
+                    attr_sum = sum(attr_list)
+                    # set 'total_' attribute on employee object
+                    setattr(employee, 'total_' + attr, attr_sum)
+
     else:
         form = DivisionTypeSeasonForm()
             
-    return render(request, 'Management/employeesalary_season_total_expenses.html', 
-                              { 'employees':employees, 'start':from_date, 'end':to_date,
-                                'filterForm':form},
-                              )
+    context = { 
+        'employees':employees, 
+        'start':from_date, 
+        'end':to_date, 
+        'filterForm':form 
+    }
+
+    return render(request, 'Management/employeesalary_season_total_expenses.html', context)
 
 @permission_required('Management.sale_analysis')
 def sale_analysis(request):
