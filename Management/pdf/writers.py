@@ -964,7 +964,7 @@ class EmployeeSalariesSeasonExpensesWriter:
 
 class EmployeesLoans:
     def __init__(self, employee):
-        self.loans = employee.loans_and_pays()
+        self.loans = employee.loans_and_pays
         self.title = u'פירוט הלוואות לעובד - %s' % ( employee )
     @property
     def pages_count(self):
@@ -1053,7 +1053,7 @@ class SalariesBankWriter:
         self.title = u'שכר להעברה בנקאית לחודש %s/%s' % (month, year)
     @property
     def pages_count(self):
-        return len(self.salaries) / 28 + 1
+        return len(self.salaries) // 28 + 1
     def addTemplate(self, canv, doc):
         frame2 = Frame(0, 680, 650, 150)
         frame2.addFromList([nhLogo(), datePara()], canv)
@@ -1092,7 +1092,7 @@ class SalariesBankWriter:
                 logger.warn('skipping salary for employee #%(employee_id)s - %(employee_name)s because he does not have neto salary',
                             {'employee_id':employee.id, 'employee_name':employee})
                 
-            if len(rows) % 27 == 0 or i == len(self.salaries):
+            if (len(rows) > 0 and len(rows) % 27 == 0) or i == len(self.salaries):
                 data = [headers]
                 data.extend(rows)
                 t = Table(data, colWidths)
