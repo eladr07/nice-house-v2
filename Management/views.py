@@ -1302,7 +1302,15 @@ class SalaryExpensesListView(PermissionRequiredMixin, ListView):
         self.month = int(self.request.GET.get('month', current.month))
 
     def get_queryset(self):
-        return EmployeeSalary.objects.nondeleted().filter(year = self.year, month = self.month)
+        salaries = EmployeeSalary.objects.nondeleted() \
+            .select_related('employee') \
+            .filter(year = self.year, month = self.month)
+
+        employee_by_id = {s.employee.id:s.employee for s in salaries}
+
+        enrich_employee_salaries(salaries, employee_by_id, self.year, self.month, self.year, self.month)
+
+        return salaries
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
@@ -1327,7 +1335,15 @@ class NHSalaryExpensesListView(PermissionRequiredMixin, ListView):
         self.month = int(self.request.GET.get('month', current.month))
 
     def get_queryset(self):
-        return NHEmployeeSalary.objects.nondeleted().filter(year = self.year, month = self.month)
+        salaries = NHEmployeeSalary.objects.nondeleted() \
+            .select_related('nhemployee') \
+            .filter(year = self.year, month = self.month)
+
+        employee_by_id = {s.nhemployee.id:s.nhemployee for s in salaries}
+
+        enrich_nh_employee_salaries(salaries, employee_by_id, self.year, self.month, self.year, self.month)
+
+        return salaries
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
