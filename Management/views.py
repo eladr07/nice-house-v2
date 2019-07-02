@@ -129,21 +129,18 @@ def locate_demand(request):
     return HttpResponseRedirect('/')
     
 @login_required
-def limited_object_detail(request, permission=None, *args, **kwargs):
-    if not permission or request.user.has_perm('Management.' + permission):
-        if request.GET.get('t') == 'pdf' :
-            queryset = kwargs.get('queryset')
-            object_id = kwargs.get('object_id')
+def employee_loans(request, object_id):
 
-            obj = queryset.get(pk=object_id)
+    employee_base = EmployeeBase.objects.get(pk=object_id)
 
-            writer = EmployeesLoans(obj)
+    # set to Employee or NHEmployee
+    employee = employee_base.derived
 
-            return build_and_return_pdf(writer)
-
-        return DetailView.as_view(*args, **kwargs)
+    if request.GET.get('t') == 'pdf' :
+        writer = EmployeesLoans(employee)
+        return build_and_return_pdf(writer)
     else:
-        return HttpResponse('No permission. contact Elad.')
+        return render(request, 'Management/employee_loans.html', {'employee':employee})
 
 @login_required
 def limited_update_object(request, permission=None, *args, **kwargs):
