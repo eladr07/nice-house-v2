@@ -4418,6 +4418,11 @@ def employeesalary_season_list(request):
 
             elif isinstance(employee_base.derived, NHEmployee):
                 salaries = NHEmployeeSalary.objects.nondeleted().range(from_year, from_month, to_year, to_month).filter(nhemployee__id = employee_base.id)
+                
+                enrich_nh_employee_salaries(
+                    salaries, 
+                    {employee_base.id: employee_base.derived},
+                    from_year, from_month, to_year, to_month)
             
             if 'list' in request.GET:    
                 # aggregate to get total values
