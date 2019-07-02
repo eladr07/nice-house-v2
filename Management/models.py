@@ -1055,10 +1055,10 @@ class EmployeeSalaryBase(models.Model):
     def mark_deleted(self):
         self.is_deleted = True
     def get_employee(self):
-        if hasattr(self, 'employeesalary'):
-            return self.employeesalary.employee
-        elif hasattr(self, 'nhemployeesalary'):
-            return self.nhemployeesalary.nhemployee
+        if hasattr(self, 'employee'):
+            return self.employee
+        elif hasattr(self, 'nhemployee'):
+            return self.nhemployee
     class Meta:
         db_table = 'EmployeeSalaryBase'
         ordering = ['year','month']
