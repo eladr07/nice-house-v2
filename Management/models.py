@@ -957,10 +957,10 @@ class EmployeeSalaryBase(models.Model):
     pdf_remarks = models.TextField(gettext('pdf_remarks'),null=True, blank=True)
     is_deleted = models.BooleanField(default = False, editable = False)
        
-    @property
-    def expenses(self):
-        q = SalaryExpenses.objects.filter(employee = self.get_employee())
-        return q.count() == 1 and q[0] or None
+    # @property
+    # def expenses(self):
+    #     q = SalaryExpenses.objects.filter(employee = self.get_employee())
+    #     return q.count() == 1 and q[0] or None
     @property
     def derived(self):
         if hasattr(self, 'employeesalary'):

@@ -1097,6 +1097,8 @@ def set_salary_fields(salaries, employee_by_id, from_year, from_month, to_year, 
                 if neto:
                     check_amount = neto - loan_pay
         
+        salary.expenses = exp
+
         salary.bruto = bruto
         salary.neto = neto
         salary.check_amount = check_amount
@@ -1769,10 +1771,17 @@ def demand_list(request):
                               )
 
 def employee_sales(request, id, year, month):
-    es = EmployeeSalary.objects.get(employee__id = id, year = year, month = month)
-    return render(request, 'Management/employee_sales.html', 
-                              { 'es':es },
-                              )
+    salary = EmployeeSalary.objects.get(employee__id = id, year = year, month = month)
+
+    employee = salary.employee
+
+    set_employee_sales(
+        [salary], 
+        {id:employee}, 
+        {id:list(employee.projects.all())},
+        year, month, year, month)
+
+    return render(request, 'Management/employee_sales.html', { 'es':salary })
 
 @permission_required('Management.add_employeesalary')
 def employee_refund(request, year, month):
@@ -4401,7 +4410,16 @@ def employeesalary_season_expenses(request):
             to_date = date(form.cleaned_data['to_year'], form.cleaned_data['to_month'], 1)
 
             if isinstance(employee_base.derived, Employee):
-                salaries = EmployeeSalary.objects.nondeleted().range(from_date.year, from_date.month, to_date.year, to_date.month).filter(employee__id = employee_base.id)
+                salaries = EmployeeSalary.objects.nondeleted() \
+                    .range(from_date.year, from_date.month, to_date.year, to_date.month) \
+                    .select_related('employee__employment_terms__hire_type') \
+                    .filter(employee_id = employee_base.id)
+                
+                set_salary_fields(
+                    salaries, 
+                    {employee_base.id: employee_base.derived},
+                    from_date.year, from_date.month, to_date.year, to_date.month)
+                
                 template = 'Management/employeesalary_season_expenses.html'
             elif isinstance(employee_base.derived, NHEmployee):
                 salaries = NHEmployeeSalary.objects.nondeleted().range(from_date.year, from_date.month, to_date.year, to_date.month).filter(nhemployee__id = employee_base.id)
