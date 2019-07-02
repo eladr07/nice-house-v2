@@ -4369,13 +4369,26 @@ def employeesalary_season_list(request):
         form = EmployeeSeasonForm(request.GET)
         if form.is_valid():
             employee_base = form.cleaned_data['employee']
-            from_date = date(form.cleaned_data['from_year'], form.cleaned_data['from_month'], 1)
-            to_date = date(form.cleaned_data['to_year'], form.cleaned_data['to_month'], 1)
+
+            from_year, from_month = form.cleaned_data['from_year'], form.cleaned_data['from_month']
+            to_year, to_month = form.cleaned_data['to_year'], form.cleaned_data['to_month']
+
+            from_date = date(from_year, from_month, 1)
+            to_date = date(to_year, to_month, 1)
 
             if isinstance(employee_base.derived, Employee):
-                salaries = EmployeeSalary.objects.nondeleted().range(from_date.year, from_date.month, to_date.year, to_date.month).filter(employee__id = employee_base.id)
+                salaries = EmployeeSalary.objects.nondeleted() \
+                    .range(from_year, from_month, to_year, to_month) \
+                    .select_related('employee__employment_terms__hire_type') \
+                    .filter(employee_id = employee_base.id)
+
+                set_salary_fields(
+                    salaries, 
+                    {employee_base.id: employee_base.derived},
+                    from_year, from_month, to_year, to_month)
+
             elif isinstance(employee_base.derived, NHEmployee):
-                salaries = NHEmployeeSalary.objects.nondeleted().range(from_date.year, from_date.month, to_date.year, to_date.month).filter(nhemployee__id = employee_base.id)
+                salaries = NHEmployeeSalary.objects.nondeleted().range(from_year, from_month, to_year, to_month).filter(nhemployee__id = employee_base.id)
             
             if 'list' in request.GET:    
                 # aggregate to get total values
