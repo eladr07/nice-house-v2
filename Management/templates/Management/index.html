@@ -81,10 +81,10 @@
 		<ul>
 			<li><a href="{% url 'salary-season-expenses' %}">ריכוז שכר לעובד כולל הוצאות מעביד תקופתי</a></li>
 			<li><a href="{% url 'salary-season-total-expenses' %}">ריכוז שכר לעובדים כולל הוצאות מעביד תקופתי</a></li>
-			<li><a href="employeesalaries">דו"ח הנפקת משכורות עובדים</a></li>
-			<li><a href="salariesbank">דו"ח שכר עובדים להעברה בנקאית</a></li>
-			<li><a href="employeesalaryseason">ריכוז משכורות לפי תקופה</a></li>
-			<li><a href="salaryexpenses">ריכוז הזנת הוצאות מעביד לשכר</a></li>
+			<li><a href="{% url 'salary-list' %}">דו"ח הנפקת משכורות עובדים</a></li>
+			<li><a href="{% url 'salary-bank' %}">דו"ח שכר עובדים להעברה בנקאית</a></li>
+			<li><a href="{% url 'salary-season' %}">ריכוז משכורות לפי תקופה</a></li>
+			<li><a href="{% url 'salary-expenses' %}">ריכוז הזנת הוצאות מעביד לשכר</a></li>
 			<li><a href="loans">הלוואות עובדים</a></li>
 		</ul>
 		<div class="listTitle">יזמים</div>
@@ -180,8 +180,8 @@
 		<div class="listTitle">נייס האוס - הנהלה</div>
 		<ul>
 			<li><a href="#">ריכוז מכירות לחודש לכל הסניפים</a></li>
-			<li><a href="nhemployeesalaries">ריכוז שכר עובדי נייס האוס</a></li>
-			<li><a href="nhsalaryexpenses">ריכוז הוצאות שכר עובדי נייס האוס</a></li>
+			<li><a href="{% url 'nh-salary-list' %}">ריכוז שכר עובדי נייס האוס</a></li>
+			<li><a href="{% url 'nh-salary-expenses' %}">ריכוז הוצאות שכר עובדי נייס האוס</a></li>
 		</ul>
 		{% for b in nhbranches %}
 		<div class="listTitle">{{b.name}}</div>
@@ -229,7 +229,7 @@
 			</ul>
 			<ul>
 				<li><a href="">ריכוז משכורות לפי תקופה</a></li>
-				<form method="GET" action="employeesalaryseason">
+				<form method="GET" action="{% url 'salary-season' %}">
 					{{ employeeSalarySeasonForm.employee }}
 					{{ employeeSalarySeasonForm.from_year }}
 					{{ employeeSalarySeasonForm.from_month }}

@@ -1046,17 +1046,21 @@ def employee_salary_expenses(request, salary_id):
 def employee_salary_approve(request, id):
     es = EmployeeSalaryBase.objects.get(pk=id)
     es.approve()
+
     if hasattr(es,'employeesalary'):
-        return HttpResponseRedirect('/employeesalaries/?year=%s&month=%s' % (es.year, es.month))
+        url = reverse('salary-list') + '?year=%s&month=%s' % (es.year, es.month)
     elif hasattr(es,'nhemployeesalary'):
-        return HttpResponseRedirect('/nhemployeesalaries/?year=%s&month=%s' % (es.year, es.month))
+        url = reverse('nh-salary-list') + '?year=%s&month=%s' % (es.year, es.month)
+
+    return HttpResponseRedirect(url)
 
 @permission_required('Management.change_employeesalary')
 def salary_expenses_approve(request, id):
     se = SalaryExpenses.objects.get(pk=id)
     se.approve()
     se.save()
-    return HttpResponseRedirect('/salaryexpenses/?year=%s&month=%s' % (se.year, se.month))
+    url = reverse('salary-expenses') + '?year=%s&month=%s' % (se.year, se.month)
+    return HttpResponseRedirect(url)
     
 class SalaryExpensesUpdate(PermissionRequiredMixin, UpdateView):
     model = SalaryExpenses
@@ -1527,21 +1531,26 @@ def employee_salary_calc(request, model, id):
     es = model.objects.get(pk=id)
     es.calculate()
     es.save()
+    
     if model == EmployeeSalary:
-        return HttpResponseRedirect('/employeesalaries/?year=%s&month=%s' % (es.year, es.month))
+        url = reverse('salary-list') + '?year=%s&month=%s' % (es.year, es.month)
     elif model == NHEmployeeSalary:
-        return HttpResponseRedirect('/nhemployeesalaries/?year=%s&month=%s' % (es.year, es.month))
+        url = reverse('nh-salary-list') + '?year=%s&month=%s' % (es.year, es.month)
+
+    return HttpResponseRedirect(url)
 
 @permission_required('Management.employee_salary_delete')
 def employee_salary_delete(request, model, id):
     es = model.objects.get(pk = id)
     es.mark_deleted()
     es.save()
+    
     if model == EmployeeSalary:
-        return HttpResponseRedirect('/employeesalaries/?year=%s&month=%s' % (es.year, es.month))
+        url = reverse('salary-list') + '?year=%s&month=%s' % (es.year, es.month)
     elif model == NHEmployeeSalary:
-        return HttpResponseRedirect('/nhemployeesalaries/?year=%s&month=%s' % (es.year, es.month))
+        url = reverse('nh-salary-list') + '?year=%s&month=%s' % (es.year, es.month)
 
+    return HttpResponseRedirect(url)
 
 class EmployeeSalaryCommissionDetailView(LoginRequiredMixin, DetailView):
     model = EmployeeSalary

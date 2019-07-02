@@ -204,16 +204,16 @@ urlpatterns += [
 
     path('splitpayment/add', split_payment_add),
 
-    path('salariesbank/', salaries_bank),
+    path('salariesbank/', salaries_bank, name='salary-bank'),
 
-    path('salaryexpenses/', SalaryExpensesListView.as_view()),
-    path('nhsalaryexpenses/', NHSalaryExpensesListView.as_view()),
+    path('salaryexpenses/', SalaryExpensesListView.as_view(), name='salary-expenses'),
+    path('nhsalaryexpenses/', NHSalaryExpensesListView.as_view(), name='nh-salary-expenses'),
     path('salaryexpenses/<int:id>/approve', salary_expenses_approve),
     path('salaryexpenses/<int:pk>', SalaryExpensesUpdate.as_view()),
      path('salary/<int:salary_id>/expenses', employee_salary_expenses),
      
-    path('employeesalaries/', employee_salary_list),
-    path('employeesalaryseason/', employeesalary_season_list),
+    path('employeesalaries/', employee_salary_list, name='salary-list'),
+    path('employeesalaryseason/', employeesalary_season_list, name='salary-season'),
     path('esseasontotalexpenses/', employeesalary_season_total_expenses, name='salary-season-total-expenses'),
     path('esseasonexpenses/', employeesalary_season_expenses, name='salary-season-expenses'),
 
@@ -232,7 +232,7 @@ urlpatterns += [
     path('employee/remarks/<int:year>/<int:month>', employee_remarks),
     path('employee/refund/<int:year>/<int:month>', employee_refund),
     
-    path('nhemployeesalaries/', nhemployee_salary_list),
+    path('nhemployeesalaries/', nhemployee_salary_list, name='nh-salary-list'),
     path('nhemployeesalaries/<int:nhbranch_id>/<int:year>/<int:month>/pdf', nhemployee_salary_pdf),
     path('nhemployeesalaries/<int:nhbranch_id>/<int:year>/<int:month>/send', nhemployee_salary_send),
     path('nhemployeesalaries/<int:pk>', NHEmployeeSalaryUpdate.as_view()),
