@@ -1226,8 +1226,8 @@ def set_loan_fields(employees):
     loans = Loan.objects.filter(employee__in=employees).order_by('employee_id')
     loan_pays = LoanPay.objects.filter(employee__in=employees).order_by('employee_id')
 
-    loans_by_employee_id = {employee_id:loans for (employee_id, loans) in itertools.groupby(loans, lambda loan: loan.employee_id)}
-    loan_pays_by_employee_id = {employee_id:loan_pays for (employee_id, loan_pays) in itertools.groupby(loan_pays, lambda loan_pay: loan_pay.employee_id)}
+    loans_by_employee_id = {employee_id:list(loans) for (employee_id, loans) in itertools.groupby(loans, lambda loan: loan.employee_id)}
+    loan_pays_by_employee_id = {employee_id:list(loan_pays) for (employee_id, loan_pays) in itertools.groupby(loan_pays, lambda loan_pay: loan_pay.employee_id)}
 
     for employee in employees:
         employee_id = employee.id
