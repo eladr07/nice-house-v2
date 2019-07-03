@@ -1,5 +1,8 @@
 ﻿{% extends "../base.html" %}
+
+{% load static %}
 {% load humanize %}
+
 {% block header %}
 {{ block.super }}
 <script>
@@ -17,13 +20,15 @@
 <h3 class="text-center text-danger">שכר להעברה בנקאית לחודש {{month|date:"M Y"}}</h3>
 <div class="clearBoth"></div>
 <form method="POST">
+	{% csrf_token %}
 	<table class="dataTable" style="width: 30%;" border="1">
 		<tr class="row1">
-			<td colspan="3" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש</td>
+			<td colspan="4" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש</td>
 		</tr>
 		<tr class="row2">
 				{% include "Management/filter_form_fields.html" with form=filterForm %}
 			<td><input type="submit" value="חפש" class="button" name="filter"/></td>
+			<td><input type="submit" name="pdf" class="button" value="גרסת הדפסה"></td>
 		</tr>
 	</table>
 	<br>
@@ -57,7 +62,7 @@
 					<td>{{ e.last_name }}</td>
 					<td>{{e.pid}}</td>
 					<td>{{e.payee}}</td>
-					<td>{{salary.neto|default_if_none:""|intcomma}}</td>
+					<td>{{salary.neto|floatformat:"0"|default_if_none:""|intcomma}}</td>
 					<td>{{account.num}}</td>
 					<td>{{account.bank}}</td>
 					<td>{{account.branch}}</td>
@@ -69,6 +74,5 @@
 			{% endfor %}
 		{% endfor %}
 	</table>
-	<input type="submit" name="pdf" class="button" value="גרסת הדפסה">
 </form>
 {% endblock content %}

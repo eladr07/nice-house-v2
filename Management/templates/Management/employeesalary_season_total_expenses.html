@@ -72,21 +72,21 @@
 	{% for employee in employees %}
 		<tr class="{% cycle 'row1' 'row2' %}" objid={{s.id}} employeeid={{employee.id}}>
 			<td>
-				<a href="/esseasonexpenses/?employee={{employee.id}}&from_year={{start.year}}&from_month={{start.month}}&to_year={{end.year}}&to_month={{end.month}}">
+				<a href="{% url 'salary-season-expenses' %}?employee={{employee.id}}&from_year={{start.year}}&from_month={{start.month}}&to_year={{end.year}}&to_month={{end.month}}">
 					<img src="{% static "images/viewmag-48.png" %}" width="20" height="20"/>
 				</a>
 			</td>
 			<td><a href="{{employee.get_absolute_url}}" target="_blank">{{ employee }}</a></td>			
-			<td>{{ employee.total_neto|intcomma }}</td>
+			<td>{{ employee.total_neto|floatformat:"0"|intcomma }}</td>
 			<td>{{ employee.total_loan_pay|intcomma }}</td>
-			<td>{{ employee.total_check_amount|intcomma }}</td>
+			<td>{{ employee.total_check_amount|floatformat:"0"|intcomma }}</td>
 			<td>{{ employee.total_income_tax|intcomma }}</td>
 			<td>{{ employee.total_national_insurance|intcomma }}</td>
 			<td>{{ employee.total_health|intcomma }}</td>
 			<td>{{ employee.total_pension_insurance|intcomma }}</td>
 			<td>{{ employee.total_vacation|intcomma }}</td>
 			<td>{{ employee.total_convalescence_pay|intcomma }}</td>
-			<td>{{ employee.total_bruto|intcomma }}</td>
+			<td>{{ employee.total_bruto|floatformat:"0"|intcomma }}</td>
 			<td>{{ employee.total_employer_national_insurance|intcomma }}</td>
 			<td>{{ employee.total_employer_benefit|intcomma }}</td>
 			<td>{{ employee.total_compensation_allocation|intcomma }}</td>

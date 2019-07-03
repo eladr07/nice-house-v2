@@ -65,7 +65,7 @@
 			<td>{{month.lawyers_pay|intcomma}}</td>
 			<td>{{month.net_income_no_tax|intcomma}}</td>
 			<td>{{month.relative_net_income|floatformat:-2}}</td>
-			<td><a target="_blank" href="/nhemployeesalaries/?year={{month.nhmonth.year}}&month={{month.nhmonth.month}}">{{month.salary_expenses|intcomma}}</a></td>
+			<td><a target="_blank" href="{% url 'nh-salary-list' %}?year={{month.nhmonth.year}}&month={{month.nhmonth.month}}">{{month.salary_expenses|intcomma}}</a></td>
 			<td></td>
 			<td>{{month.profit|intcomma}}</td>
 			<td>{{month.relative_profit|floatformat:-2}}</td>

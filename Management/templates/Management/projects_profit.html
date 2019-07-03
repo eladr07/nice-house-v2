@@ -88,7 +88,7 @@
 			</td>
 			<td>
 			{% for employee, commission in p.employee_expense.items %}
-				<a target="_blank" href="employeesalaryseason/?employee={{employee.id}}&from_year={{from_year}}&from_month={{from_month}}&to_year={{to_year}}&to_month={{to_month}}">
+				<a target="_blank" href="{% url 'salary-season' %}/?employee={{employee.id}}&from_year={{from_year}}&from_month={{from_month}}&to_year={{to_year}}&to_month={{to_month}}">
 				{{commission|intcomma}}</a><br>
 			{% endfor %}
 			</td>

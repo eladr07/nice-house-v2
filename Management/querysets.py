@@ -49,6 +49,14 @@ class SaleQuerySet(models.QuerySet):
             q = q | models.Q(contractor_pay_year__gt = from_year, contractor_pay_year__lt = to_year) 
             q = q | models.Q(contractor_pay_year = to_year, contractor_pay_month__lte = to_month)
         return self.filter(q)
+    def employee_pay_range(self, from_year, from_month, to_year, to_month):
+        q = models.Q(employee_pay_year = from_year, employee_pay_month__gte = from_month)
+        if from_year == to_year:
+            q = q & models.Q(employee_pay_month__lte = to_month)
+        else:
+            q = q | models.Q(employee_pay_year__gt = from_year, employee_pay_year__lt = to_year) 
+            q = q | models.Q(employee_pay_year = to_year, employee_pay_month__lte = to_month)
+        return self.filter(q)
     def total_price(self):
         return self.aggregate(Sum('price'))['price__sum'] or 0
     def total_price_final(self):

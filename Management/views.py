@@ -3,7 +3,7 @@ from datetime import datetime, date
 
 import django.core.paginator
 from django.db import models, transaction
-from django.db.models import Count
+from django.db.models import Count, Sum
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError, FileResponse
 from django.forms.models import inlineformset_factory
@@ -129,21 +129,20 @@ def locate_demand(request):
     return HttpResponseRedirect('/')
     
 @login_required
-def limited_object_detail(request, permission=None, *args, **kwargs):
-    if not permission or request.user.has_perm('Management.' + permission):
-        if request.GET.get('t') == 'pdf' :
-            queryset = kwargs.get('queryset')
-            object_id = kwargs.get('object_id')
+def employee_loans(request, object_id):
 
-            obj = queryset.get(pk=object_id)
+    employee_base = EmployeeBase.objects.get(pk=object_id)
 
-            writer = EmployeesLoans(obj)
+    # set to Employee or NHEmployee
+    employee = employee_base.derived
 
-            return build_and_return_pdf(writer)
+    set_loan_fields([employee])
 
-        return DetailView.as_view(*args, **kwargs)
+    if request.GET.get('t') == 'pdf' :
+        writer = EmployeesLoans(employee)
+        return build_and_return_pdf(writer)
     else:
-        return HttpResponse('No permission. contact Elad.')
+        return render(request, 'Management/employee_loans.html', {'employee':employee})
 
 @login_required
 def limited_update_object(request, permission=None, *args, **kwargs):
@@ -800,7 +799,7 @@ def demand_return_to_calc(request, id):
 @permission_required('Management.list_demand')
 def demand_calc(request, id):
     # end the revision created by the middleware - i want manual control of the revision
-    reversion.revision.end()
+    #reversion.revision.end()
         
     d = Demand.objects.get(pk=id)
     c = d.project.commissions.get()
@@ -987,21 +986,50 @@ def nhemployee_salary_send(request, nhbranch_id, year, month):
     
 def nhemployee_salary_pdf(request, nhbranch_id, year, month):
     nhb = NHBranch.objects.get(pk = nhbranch_id)
-    salaries = [salary for salary in NHEmployeeSalary.objects.nondeleted().filter(nhbranch = nhb, month = month, year = year) if salary.approved_date]
+
+    salaries = NHEmployeeSalary.objects \
+        .select_related('nhemployee__employment_terms__hire_type') \
+        .nondeleted() \
+        .filter(nhbranch = nhb, year = year, month= month) \
+        .order_by('id')
+
+    employee_by_id = {s.nhemployee.id:s.nhemployee for s in salaries}
+
+    set_salary_base_fields(
+        salaries, 
+        employee_by_id, 
+        year, month, year, month)
+
+    set_salary_status_date(salaries)
+
+    approved_salaries = [salary for salary in salaries if salary.approved_date]
 
     nhsales = NHSale.objects.filter(nhmonth__year__exact = year, nhmonth__month__exact = month, nhmonth__nhbranch = nhb)
     title = u'שכר עבודה לסניף %s לחודש %s\%s' % (nhb, year, month)
 
-    writer = EmployeeSalariesBookKeepingWriter(salaries, title, nhsales)
+    writer = EmployeeSalariesBookKeepingWriter(approved_salaries, title, nhsales)
     
     return build_and_return_pdf(writer)
 
 @permission_required('Management.change_salaryexpenses')
 def employee_salary_expenses(request, salary_id):
-    es = EmployeeSalaryBase.objects.get(pk=salary_id)
-    employee = es.get_employee()
+    salary = EmployeeSalaryBase.objects.get(pk=salary_id)
+    
+    # set to EmployeeSalary or NHEmployeeSalary
+    salary = salary.derived
+
+    employee = salary.get_employee()
     terms = employee.employment_terms
-    expenses = es.expenses or SalaryExpenses(employee = employee, year = es.year, month = es.month)
+
+    year, month = salary.year, salary.month
+
+    set_salary_base_fields(
+        [salary],
+        {employee.id:employee},
+        year, month, year, month)
+
+    expenses = salary.expenses or SalaryExpenses(employee = employee, year = year, month = month)
+
     if request.method=='POST':
         form = SalaryExpensesForm(request.POST, instance= expenses)
         if form.is_valid():
@@ -1009,31 +1037,242 @@ def employee_salary_expenses(request, salary_id):
     else:
         vacation = terms.salary_base and (terms.salary_base / 24) or (2500/12)
         form = SalaryExpensesForm(instance= expenses, initial={'vacation':vacation})
-    return render(request, 'Management/salaryexpenses_edit.html', 
-                              {'form':form, 'neto': es.neto or 0},
-                               )
+
+    context = {'form': form, 'neto': salary.neto or 0}
+    
+    return render(request, 'Management/salaryexpenses_edit.html', context)
 
 @permission_required('Management.change_employeesalary')
 def employee_salary_approve(request, id):
     es = EmployeeSalaryBase.objects.get(pk=id)
     es.approve()
+
     if hasattr(es,'employeesalary'):
-        return HttpResponseRedirect('/employeesalaries/?year=%s&month=%s' % (es.year, es.month))
+        url = reverse('salary-list') + '?year=%s&month=%s' % (es.year, es.month)
     elif hasattr(es,'nhemployeesalary'):
-        return HttpResponseRedirect('/nhemployeesalaries/?year=%s&month=%s' % (es.year, es.month))
+        url = reverse('nh-salary-list') + '?year=%s&month=%s' % (es.year, es.month)
+
+    return HttpResponseRedirect(url)
 
 @permission_required('Management.change_employeesalary')
 def salary_expenses_approve(request, id):
     se = SalaryExpenses.objects.get(pk=id)
     se.approve()
     se.save()
-    return HttpResponseRedirect('/salaryexpenses/?year=%s&month=%s' % (se.year, se.month))
+    url = reverse('salary-expenses') + '?year=%s&month=%s' % (se.year, se.month)
+    return HttpResponseRedirect(url)
     
 class SalaryExpensesUpdate(PermissionRequiredMixin, UpdateView):
     model = SalaryExpenses
     exclude = ('approved_date',)
     template_name = 'Management/salaryexpenses_edit.html'
     permission_required = 'Management.change_salaryexpenses'
+
+def enrich_employee_salaries(salaries, employee_by_id, from_year, from_month, to_year, to_month):
+    set_salary_base_fields(salaries, employee_by_id, from_year, from_month, to_year, to_month)
+    
+    # construct a map between employee id and project list
+    employee_projects_map = {employee_id: list(employee.projects.all()) for (employee_id, employee) in employee_by_id.items()}
+
+    set_demands(salaries, employee_projects_map, from_year, from_month, to_year, to_month)
+
+    set_employee_sales(salaries, employee_by_id, employee_projects_map, from_year, from_month, to_year, to_month)
+
+    set_salary_status_date(salaries)
+
+def enrich_nh_employee_salaries(salaries, employee_by_id, from_year, from_month, to_year, to_month):
+    set_salary_base_fields(salaries, employee_by_id, from_year, from_month, to_year, to_month)
+    
+    set_salary_status_date(salaries)
+
+def set_salary_base_fields(salaries, employee_by_id, from_year, from_month, to_year, to_month):
+    employee_ids = employee_by_id.keys()
+
+    # construct a map between (employee id, year, month) and SalaryExpense object
+    salary_expenses = SalaryExpenses.objects \
+        .range(from_year, from_month, to_year, to_month) \
+        .filter(employee_id__in = employee_ids)
+
+    expenses_map = {(e.employee_id, e.year, e.month): e for e in salary_expenses}
+    
+    # construct a map between (employee id, year, month) and Total Amount of Loan Pay objects
+    loan_pays = LoanPay.objects \
+        .range(from_year, from_month, to_year, to_month) \
+        .filter(employee_id__in = employee_ids, deduct_from_salary = True) \
+        .values('employee_id','year','month') \
+        .annotate(total_amount = Sum('amount'))
+
+    loan_pay_map = {(row['employee_id'], row['year'], row['month']): row['total_amount'] \
+        for row in loan_pays}
+
+    for salary in salaries:
+        # create the key for the maps constructed above
+        map_key = (salary.get_employee().id, salary.year, salary.month)
+        (employee_id, year, month) = map_key
+
+        employee = employee_by_id[employee_id]
+        terms = employee.employment_terms
+        
+        # load mapped objects
+        exp = expenses_map.get(map_key)
+        loan_pay = loan_pay_map.get(map_key, 0)
+
+        bruto, neto, check_amount, invoice_amount = None, None, None, None
+
+        if terms:
+            total_amount = salary.total_amount
+
+            if terms.salary_net == None:
+                check_amount = total_amount - loan_pay
+                invoice_amount = total_amount - loan_pay
+            else:
+                if terms.salary_net == False:
+                    bruto = total_amount - loan_pay
+                    if exp != None:
+                        neto = total_amount - exp.income_tax - exp.national_insurance - exp.health - exp.pension_insurance
+                elif terms.salary_net == True:
+                    neto = total_amount
+                    if exp != None:
+                        bruto = total_amount + exp.income_tax + exp.national_insurance + exp.health + exp.pension_insurance \
+                            + exp.vacation + exp.convalescence_pay
+                
+                if neto:
+                    check_amount = neto - loan_pay
+        
+        salary.expenses = exp
+
+        salary.bruto = bruto
+        salary.neto = neto
+        salary.check_amount = check_amount
+        salary.invoice_amount = invoice_amount
+
+        salary.loan_pay = loan_pay
+
+        # set 'bruto_employer_expense' field
+        if exp:
+            salary.bruto_employer_expense = sum([
+                bruto,exp.employer_benefit,exp.employer_national_insurance,exp.compensation_allocation])
+        else:
+            salary.bruto_employer_expense = None
+
+def set_demands(salaries, employee_projects_map, from_year, from_month, to_year, to_month):
+    # construct a map between (project id, year, month) and Demand object
+    demands = Demand.objects.select_related('project').range(from_year, from_month, to_year, to_month)
+
+    demand_map = {(d.project_id, d.year, d.month): d for d in demands}
+
+    for salary in salaries:
+        # create the key for the maps constructed above
+        map_key = (salary.employee_id, salary.year, salary.month)
+        (employee_id, year, month) = map_key
+        
+        # set 'demands' property
+        project_ids = [project.id for project in employee_projects_map[employee_id]]
+
+        salary.demands = [demand_map.get((project_id, year, month)) for project_id in project_ids if (project_id, year, month) in demand_map]
+
+def set_employee_sales(
+    salaries, 
+    employee_by_id, employee_projects_map, 
+    from_year, from_month, to_year, to_month):
+    """
+    Set 'sales' and 'sales_count' fields for every EmployeeSalary object in 'salaries'
+    """
+    # construct a map between Porject and Sale list
+    sales = Sale.objects.select_related('house__building') \
+        .employee_pay_range(from_year, from_month, to_year, to_month) \
+        .order_by('house__building__project_id','sale_date')
+
+    # group sales by (project_id, year, month)
+    sale_groups = itertools.groupby(sales,
+        lambda sale: (sale.house.building.project_id, sale.employee_pay_year, sale.employee_pay_month))
+
+    # create map
+    sales_map = {map_key:list(project_sales) for (map_key, project_sales) in sale_groups}
+
+    for salary in salaries:
+        year, month = salary.year, salary.month
+
+        employee = employee_by_id[salary.employee_id]
+        employee_projects = employee_projects_map[salary.employee_id]
+
+        # construct sales list for salary
+        employee_sales = {}
+
+        if employee.rank_id == RankType.RegionalSaleManager:
+            employee_sales = {
+                project: sales_map[(project.id, year, month)] \
+                    for project in employee_projects if (project.id, year, month) in sales_map}
+        else:
+            employee_sales = {
+                project: [sale for sale in sales_map[(project.id, year, month)] if sale.employee_id in (employee.id, None)] \
+                    for project in employee_projects if (project.id, year, month) in sales_map}
+
+        salary.sales = employee_sales
+        salary.sales_count = sum(len(project_sales) for (project, project_sales) in employee_sales.items())
+
+def set_salary_status_date(salaries):
+    """
+    Set 'approved_date', 'sent_to_bookkeeping_date', 'sent_to_checks_date' fields 
+    for every EmployeeSalary object in 'salaries'
+    """
+    salary_ids = [salary.id for salary in salaries]
+
+    # construct a map between Salary object and its latest status
+    all_statuses = EmployeeSalaryBaseStatus.objects \
+        .filter(employeesalarybase_id__in=salary_ids) \
+        .order_by('employeesalarybase_id','-date')
+
+    statuses_by_salary_id = {esb_id: list(statuses) for (esb_id, statuses) in itertools.groupby(all_statuses, lambda status: status.employeesalarybase_id)}
+
+    for salary in salaries:
+        # set status properties
+        salary_statuses = statuses_by_salary_id.get(salary.id)
+
+        if salary_statuses != None:
+            salary.approved_date = next((status.date for status in salary_statuses if status.type_id == EmployeeSalaryBaseStatusType.Approved), None)
+            salary.sent_to_bookkeeping_date = next((status.date for status in salary_statuses if status.type_id == EmployeeSalaryBaseStatusType.SentBookkeeping), None)
+            salary.sent_to_checks_date = next((status.date for status in salary_statuses if status.type_id == EmployeeSalaryBaseStatusType.SentChecks), None)
+        else:
+            salary.approved_date = None
+            salary.sent_to_bookkeeping_date = None
+            salary.sent_to_checks_date = None
+
+def set_loan_fields(employees):
+    """
+    Set 'loan_left' and 'loans_and_pays' fields for every Employee in 'employees'
+    """
+    loans = Loan.objects.filter(employee__in=employees).order_by('employee_id')
+    loan_pays = LoanPay.objects.filter(employee__in=employees).order_by('employee_id')
+
+    loans_by_employee_id = {employee_id:list(loans) for (employee_id, loans) in itertools.groupby(loans, lambda loan: loan.employee_id)}
+    loan_pays_by_employee_id = {employee_id:list(loan_pays) for (employee_id, loan_pays) in itertools.groupby(loan_pays, lambda loan_pay: loan_pay.employee_id)}
+
+    for employee in employees:
+        employee_id = employee.id
+        # merge loans and loan-pays to a single list
+        loans_and_pays = []
+
+        if employee_id in loans_by_employee_id:
+            loans_and_pays += list(loans_by_employee_id[employee_id])
+        if employee_id in loan_pays_by_employee_id:
+            loans_and_pays += list(loan_pays_by_employee_id[employee_id])
+
+        # sort list by (year, month)
+        loans_and_pays.sort(key=lambda x: date(x.year, x.month, 1))
+
+        left = 0
+
+        for item in loans_and_pays:
+            if isinstance(item, Loan):
+                left += item.amount
+            elif isinstance(item, LoanPay):
+                left -= item.amount
+            item.left = left
+
+        # set fields on employee
+        employee.loan_left = left
+        employee.loans_and_pays = loans_and_pays
 
 @permission_required('Management.list_employeesalary')
 def employee_salary_list(request):
@@ -1043,7 +1282,11 @@ def employee_salary_list(request):
     salaries = []
     today = date.today()
     if date(year, month, 1) <= today:
-        employees = Employee.objects.select_related('employment_terms').filter(employment_terms__isnull=False)
+        employees = Employee.objects \
+            .select_related('employment_terms__hire_type','rank') \
+            .prefetch_related('projects') \
+            .filter(employment_terms__isnull=False)
+
         for e in employees:
             # do not include employees who did not start working by the month selected
             if year < e.work_start.year or (year == e.work_start.year and month < e.work_start.month):
@@ -1058,7 +1301,17 @@ def employee_salary_list(request):
             else:
                 if es.is_deleted:
                     continue
+
+            # set employee field with already-loaded fields
+            es.employee = e
+
             salaries.append(es)
+        
+        employee_by_id = {employee.id:employee for employee in employees}
+
+        enrich_employee_salaries(salaries, employee_by_id, year, month, year, month)
+
+        set_loan_fields(employees)
 
     context = {
         'salaries':salaries, 
@@ -1082,7 +1335,16 @@ class SalaryExpensesListView(PermissionRequiredMixin, ListView):
         self.month = int(self.request.GET.get('month', current.month))
 
     def get_queryset(self):
-        return EmployeeSalary.objects.nondeleted().filter(year = self.year, month = self.month)
+        salaries = EmployeeSalary.objects.nondeleted() \
+            .select_related('employee__employment_terms__hire_type', 'employee__rank') \
+            .prefetch_related('employee__projects') \
+            .filter(year = self.year, month = self.month)
+
+        employee_by_id = {s.employee.id:s.employee for s in salaries}
+
+        enrich_employee_salaries(salaries, employee_by_id, self.year, self.month, self.year, self.month)
+
+        return salaries
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
@@ -1107,7 +1369,15 @@ class NHSalaryExpensesListView(PermissionRequiredMixin, ListView):
         self.month = int(self.request.GET.get('month', current.month))
 
     def get_queryset(self):
-        return NHEmployeeSalary.objects.nondeleted().filter(year = self.year, month = self.month)
+        salaries = NHEmployeeSalary.objects.nondeleted() \
+            .select_related('nhemployee__employment_terms__hire_type') \
+            .filter(year = self.year, month = self.month)
+
+        employee_by_id = {s.nhemployee.id:s.nhemployee for s in salaries}
+
+        enrich_nh_employee_salaries(salaries, employee_by_id, self.year, self.month, self.year, self.month)
+
+        return salaries
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
@@ -1124,18 +1394,31 @@ def nhemployee_salary_list(request):
     year = int(request.GET.get('year', current.year))
     month = int(request.GET.get('month', current.month))
     
+    salaries = []
+
+    # key is NHBranch, value is a list of NHEmployeeSalary objects
     branch_list = {}
-    
+
     for nhbe in NHBranchEmployee.objects.month(year, month):
         es, new = NHEmployeeSalary.objects.get_or_create(nhemployee = nhbe.nhemployee, nhbranch = nhbe.nhbranch,
                                                          month = month, year = year)
         if not new and es.is_deleted:
             continue
-        if (new or not es.commissions or not es.base or not es.admin_commission) and es.approved_date == None: 
+        #if (new or not es.commissions or not es.base or not es.admin_commission) and es.approved_date == None: 
+        if new:
             es.calculate()
             es.save()
+        
+        salaries.append(es)
+
         branch_sales = branch_list.setdefault(nhbe.nhbranch, [])
         branch_sales.append(es)
+
+    employee_by_id = {s.nhemployee.id:s.nhemployee for s in salaries}
+
+    enrich_nh_employee_salaries(salaries, employee_by_id, year, month, year, month)
+
+    set_loan_fields(employee_by_id.values())
 
     return render(request, 'Management/nhemployee_salaries.html', 
                               {'branch_list':branch_list, 'month': date(int(year), int(month), 1),
@@ -1148,15 +1431,42 @@ def salaries_bank(request):
         form = MonthForm(request.POST)
         if form.is_valid():
             month, year = form.cleaned_data['month'], form.cleaned_data['year']
-            salary_ids = [key.replace('salary-','') for key in request.POST if key.startswith('salary-')]
+
+            query = EmployeeSalaryBase.objects.select_related(
+                'employeesalary__employee__employment_terms',
+                'employeesalary__employee__account',
+                'nhemployeesalary__nhemployee__employment_terms',
+                'nhemployeesalary__nhemployee__account')
+
             if 'pdf' in request.POST:
-                salaries = EmployeeSalaryBase.objects.filter(pk__in = salary_ids)
-                
-                writer = SalariesBankWriter(salaries, month, year)
-                
-                return build_and_return_pdf(writer)
+                salary_ids = [key.replace('salary-','') for key in request.POST if key.startswith('salary-')]
+                salaries = query.filter(pk__in = salary_ids)
             elif 'filter' in request.POST:
-                salaries = EmployeeSalaryBase.objects.filter(month=month, year=year)
+                salaries = query.filter(month=month, year=year)
+                
+            salaries.select_related(
+                'employeesalary__employee__employment_terms',
+                'employeesalary__employee__account',
+                'nhemployeesalary__nhemployee__employment_terms',
+                'nhemployeesalary__nhemployee__account')
+
+            # replace base objects with derived
+            salaries = [s.derived for s in salaries]
+
+            # extract employees from salaries
+            employees = [salary.get_employee() for salary in salaries]
+
+            # create map
+            employee_by_id = {e.id:e for e in employees}
+
+            set_salary_base_fields(
+                salaries, 
+                employee_by_id,
+                year, month, year, month)
+
+            if 'pdf' in request.POST:
+                writer = SalariesBankWriter(salaries, month, year)
+                return build_and_return_pdf(writer)
         else:
             raise ValidationError
     else:
@@ -1193,12 +1503,27 @@ class NHEmployeeSalaryUpdate(PermissionRequiredMixin, UpdateView):
     permission_required = 'Management.change_nhemployeesalary'
 
 def employee_salary_pdf(request, year, month):
-    salaries = [es for es in EmployeeSalary.objects.nondeleted().filter(year = year, month= month)
-                if es.approved_date]
+
+    salaries = EmployeeSalary.objects \
+        .select_related('employee__employment_terms__hire_type') \
+        .nondeleted() \
+        .filter(year = year, month= month) \
+        .order_by('id')
+
+    employee_by_id = {s.employee.id:s.employee for s in salaries}
+
+    set_salary_base_fields(
+        salaries, 
+        employee_by_id, 
+        year, month, year, month)
+
+    set_salary_status_date(salaries)
+
+    approved_salaries = [salary for salary in salaries if salary.approved_date]
 
     title = u'שכר עבודה למנהלי פרויקטים לחודש %s\%s' % (year, month)
 
-    writer = EmployeeSalariesBookKeepingWriter(salaries, title)
+    writer = EmployeeSalariesBookKeepingWriter(approved_salaries, title)
 
     return build_and_return_pdf(writer)
 
@@ -1206,21 +1531,26 @@ def employee_salary_calc(request, model, id):
     es = model.objects.get(pk=id)
     es.calculate()
     es.save()
+    
     if model == EmployeeSalary:
-        return HttpResponseRedirect('/employeesalaries/?year=%s&month=%s' % (es.year, es.month))
+        url = reverse('salary-list') + '?year=%s&month=%s' % (es.year, es.month)
     elif model == NHEmployeeSalary:
-        return HttpResponseRedirect('/nhemployeesalaries/?year=%s&month=%s' % (es.year, es.month))
+        url = reverse('nh-salary-list') + '?year=%s&month=%s' % (es.year, es.month)
+
+    return HttpResponseRedirect(url)
 
 @permission_required('Management.employee_salary_delete')
 def employee_salary_delete(request, model, id):
     es = model.objects.get(pk = id)
     es.mark_deleted()
     es.save()
+    
     if model == EmployeeSalary:
-        return HttpResponseRedirect('/employeesalaries/?year=%s&month=%s' % (es.year, es.month))
+        url = reverse('salary-list') + '?year=%s&month=%s' % (es.year, es.month)
     elif model == NHEmployeeSalary:
-        return HttpResponseRedirect('/nhemployeesalaries/?year=%s&month=%s' % (es.year, es.month))
+        url = reverse('nh-salary-list') + '?year=%s&month=%s' % (es.year, es.month)
 
+    return HttpResponseRedirect(url)
 
 class EmployeeSalaryCommissionDetailView(LoginRequiredMixin, DetailView):
     model = EmployeeSalary
@@ -1567,10 +1897,17 @@ def demand_list(request):
                               )
 
 def employee_sales(request, id, year, month):
-    es = EmployeeSalary.objects.get(employee__id = id, year = year, month = month)
-    return render(request, 'Management/employee_sales.html', 
-                              { 'es':es },
-                              )
+    salary = EmployeeSalary.objects.get(employee__id = id, year = year, month = month)
+
+    employee = salary.employee
+
+    set_employee_sales(
+        [salary], 
+        {id:employee}, 
+        {id:list(employee.projects.all())},
+        year, month, year, month)
+
+    return render(request, 'Management/employee_sales.html', { 'es':salary })
 
 @permission_required('Management.add_employeesalary')
 def employee_refund(request, year, month):
@@ -3325,13 +3662,16 @@ def employee_end(request, object_id):
         form = EmployeeEndForm(request.POST, instance = employee)
         if form.is_valid():
             form.save()
-            if isinstance(employee.derived, Employee):
-                for epcommission in employee.derived.commissions.all():
+
+            employee_derived = employee.derived
+
+            if isinstance(employee_derived, Employee):
+                for epcommission in employee_derived.commissions.all():
                     if not epcommission.end_date:
                         epcommission.end_date = employee.work_end
                         epcommission.save()
-            elif isinstance(employee.derived, NHEmployee):
-                for nhbranchemployee in employee.derived.nhbranchemployee_set.all():
+            elif isinstance(employee_derived, NHEmployee):
+                for nhbranchemployee in employee_derived.nhbranchemployee_set.all():
                     if not nhbranchemployee.end_date:
                         nhbranchemployee.end_date = employee.work_end
                         nhbranchemployee.save()
@@ -4158,13 +4498,43 @@ def employeesalary_season_list(request):
         form = EmployeeSeasonForm(request.GET)
         if form.is_valid():
             employee_base = form.cleaned_data['employee']
-            from_date = date(form.cleaned_data['from_year'], form.cleaned_data['from_month'], 1)
-            to_date = date(form.cleaned_data['to_year'], form.cleaned_data['to_month'], 1)
 
-            if isinstance(employee_base.derived, Employee):
-                salaries = EmployeeSalary.objects.nondeleted().range(from_date.year, from_date.month, to_date.year, to_date.month).filter(employee__id = employee_base.id)
-            elif isinstance(employee_base.derived, NHEmployee):
-                salaries = NHEmployeeSalary.objects.nondeleted().range(from_date.year, from_date.month, to_date.year, to_date.month).filter(nhemployee__id = employee_base.id)
+            from_year, from_month = form.cleaned_data['from_year'], form.cleaned_data['from_month']
+            to_year, to_month = form.cleaned_data['to_year'], form.cleaned_data['to_month']
+
+            from_date = date(from_year, from_month, 1)
+            to_date = date(to_year, to_month, 1)
+
+            # set to Employee or NHEmployee
+            employee = employee_base.derived
+
+            set_loan_fields([employee])
+
+            if isinstance(employee, Employee):
+                salaries = EmployeeSalary.objects.nondeleted() \
+                    .range(from_year, from_month, to_year, to_month) \
+                    .filter(employee_id = employee_base.id)
+                
+                # set the same employee instance for all salaries
+                for s in salaries:
+                    s.employee = employee
+
+                enrich_employee_salaries(
+                    salaries, 
+                    {employee_base.id: employee},
+                    from_year, from_month, to_year, to_month)
+
+            elif isinstance(employee, NHEmployee):
+                salaries = NHEmployeeSalary.objects.nondeleted().range(from_year, from_month, to_year, to_month).filter(nhemployee__id = employee_base.id)
+                
+                # set the same employee instance for all salaries
+                for s in salaries:
+                    s.nhemployee = employee
+
+                enrich_nh_employee_salaries(
+                    salaries, 
+                    {employee_base.id: employee},
+                    from_year, from_month, to_year, to_month)
             
             if 'list' in request.GET:    
                 # aggregate to get total values
@@ -4198,13 +4568,30 @@ def employeesalary_season_expenses(request):
             from_date = date(form.cleaned_data['from_year'], form.cleaned_data['from_month'], 1)
             to_date = date(form.cleaned_data['to_year'], form.cleaned_data['to_month'], 1)
 
-            if isinstance(employee_base.derived, Employee):
-                salaries = EmployeeSalary.objects.nondeleted().range(from_date.year, from_date.month, to_date.year, to_date.month).filter(employee__id = employee_base.id)
-                template = 'Management/employeesalary_season_expenses.html'
-            elif isinstance(employee_base.derived, NHEmployee):
-                salaries = NHEmployeeSalary.objects.nondeleted().range(from_date.year, from_date.month, to_date.year, to_date.month).filter(nhemployee__id = employee_base.id)
-                template = 'Management/nhemployeesalary_season_expenses.html'
+            employee = employee_base.derived
+
+            if isinstance(employee, Employee):
+                salaries = EmployeeSalary.objects.nondeleted() \
+                    .range(from_date.year, from_date.month, to_date.year, to_date.month) \
+                    .select_related('employee__employment_terms__hire_type') \
+                    .filter(employee_id = employee_base.id)
                 
+                enrich_employee_salaries(
+                    salaries, 
+                    {employee_base.id: employee},
+                    from_date.year, from_date.month, to_date.year, to_date.month)
+                
+                template = 'Management/employeesalary_season_expenses.html'
+            elif isinstance(employee, NHEmployee):
+                salaries = NHEmployeeSalary.objects.nondeleted().range(from_date.year, from_date.month, to_date.year, to_date.month).filter(nhemployee__id = employee_base.id)
+
+                enrich_nh_employee_salaries(
+                    salaries, 
+                    {employee_base.id: employee},
+                    from_date.year, from_date.month, to_date.year, to_date.month)
+
+                template = 'Management/nhemployeesalary_season_expenses.html'
+
             for salary in salaries:
                 total_neto += salary.neto or 0
                 total_check_amount += salary.check_amount or 0
@@ -4230,48 +4617,83 @@ def employeesalary_season_total_expenses(request):
     if len(request.GET):
         form = DivisionTypeSeasonForm(request.GET)
         if form.is_valid():
+            # extract form values
             division_type = form.cleaned_data['division_type']
-            from_date = date(form.cleaned_data['from_year'], form.cleaned_data['from_month'], 1)
-            to_date = date(form.cleaned_data['to_year'], form.cleaned_data['to_month'], 1)
+
+            from_year, from_month = form.cleaned_data['from_year'], form.cleaned_data['from_month']
+            to_year, to_month = form.cleaned_data['to_year'], form.cleaned_data['to_month']
+
+            from_date = date(from_year, from_month, 1)
+            to_date = date(to_year, to_month, 1)
+
             if division_type.id == DivisionType.Marketing:
-                employees = list(Employee.objects.exclude(work_end__isnull = False, work_end__lt = from_date))
-                model = EmployeeSalary
+                employees = list(Employee.objects \
+                    .select_related('employment_terms') \
+                    .exclude(work_end__isnull = False, work_end__lt = from_date))
+
+                employee_by_id = {e.id:e for e in employees}
+                salaries = EmployeeSalary.objects \
+                    .select_related('employee__employment_terms') \
+                    .range(from_year, from_month, to_year, to_month) \
+                    .order_by('employee_id')
             else:
-                if division_type.id == DivisionType.NHShoham:
-                    query = NHBranchEmployee.objects.filter(nhbranch__id = NHBranch.Shoham)
-                elif division_type.id == DivisionType.NHModiin:
-                    query = NHBranchEmployee.objects.filter(nhbranch__id = NHBranch.Modiin)
-                elif division_type.id == DivisionType.NHNesZiona:
-                    query = NHBranchEmployee.objects.filter(nhbranch__id = NHBranch.NesZiona)
-                query = query.exclude(end_date__isnull=False, end_date__lt = from_date)
+                # NiceHouse division
+
+                # map DivisionType to NHBranch
+                division_to_branch = {
+                    DivisionType.NHShoham: NHBranch.Shoham,
+                    DivisionType.NHModiin: NHBranch.Modiin,
+                    DivisionType.NHNesZiona: NHBranch.NesZiona,
+                }
+
+                branch_id = division_to_branch[division_type.id]
+                
+                query = NHBranchEmployee.objects \
+                    .select_related('nhemployee__employment_terms') \
+                    .filter(nhbranch__id = branch_id) \
+                    .exclude(end_date__isnull=False, end_date__lt = from_date)
+
                 employees = [x.nhemployee for x in query]
-                model = NHEmployeeSalary
+                employee_by_id = {e.id:e for e in employees}
+                salaries = NHEmployeeSalary.objects \
+                    .range(from_year, from_month, to_year, to_month) \
+                    .order_by('nhemployee_id')
+
+            set_salary_base_fields(
+                salaries,
+                employee_by_id,
+                from_year, from_month, to_year, to_month)
 
             attrs = ['neto', 'loan_pay', 'check_amount', 'income_tax', 'national_insurance', 'health', 'pension_insurance', 
                      'vacation', 'convalescence_pay', 'bruto', 'employer_national_insurance', 'employer_benefit',
                      'compensation_allocation', 'bruto_with_employer']
-            for attr in attrs:
-                for e in employees:
-                    setattr(e, 'total_' + attr, 0)
             
-            salaries = model.objects.range(from_date.year, from_date.month, to_date.year, to_date.month)
-            
-            for salary in salaries:
-                if salary.get_employee() not in employees: 
-                    continue
-                employee_index = employees.index(salary.get_employee())
-                employee = employees[employee_index]
+            for employee_id, employee_salaries in itertools.groupby(salaries, lambda salary: salary.get_employee().id):
+                # get the employee object
+                employee = employee_by_id[employee_id]
+                
+                # evaluate and store the iterator
+                employee_salaries_list = list(employee_salaries)
+
                 for attr in attrs:
-                    add = getattr(salary, attr, 0) or 0
-                    old_value = getattr(employee, 'total_' + attr)
-                    setattr(employee, 'total_' + attr, old_value + add)
+                    # extract 'attr' from each salary
+                    attr_list = [getattr(salary, attr, 0) or 0 for salary in employee_salaries_list]
+                    # sum 'attr' over employee_salaries
+                    attr_sum = sum(attr_list)
+                    # set 'total_' attribute on employee object
+                    setattr(employee, 'total_' + attr, attr_sum)
+
     else:
         form = DivisionTypeSeasonForm()
             
-    return render(request, 'Management/employeesalary_season_total_expenses.html', 
-                              { 'employees':employees, 'start':from_date, 'end':to_date,
-                                'filterForm':form},
-                              )
+    context = { 
+        'employees':employees, 
+        'start':from_date, 
+        'end':to_date, 
+        'filterForm':form 
+    }
+
+    return render(request, 'Management/employeesalary_season_total_expenses.html', context)
 
 @permission_required('Management.sale_analysis')
 def sale_analysis(request):
@@ -4364,12 +4786,17 @@ def global_profit_lost(request):
                     for salary in salaries:
                         salaries_amount += salary.bruto or salary.check_amount or 0
 
-                    income_rows.append({'name':division,'amount':demands_amount,
-                                        'details_link':'/seasonincome/?from_year=%s;from_month=%s;to_year=%s;to_month=%s' 
-                                        % (from_date.year, from_date.month, to_date.year, to_date.month)})
-                    loss_rows.append({'name':u'הוצאות שכר', 'amount':salaries_amount,
-                                      'details_link':'/esseasontotalexpenses/?division_type=%s;from_year=%s;from_month=%s;to_year=%s;to_month=%s' 
-                                      % (division.id, from_date.year, from_date.month, to_date.year, to_date.month)})
+                    income_rows.append({
+                        'name':division,
+                        'amount':demands_amount,
+                        'details_link':'/seasonincome/?from_year=%s;from_month=%s;to_year=%s;to_month=%s' 
+                                        % (from_date.year, from_date.month, to_date.year, to_date.month)
+                    })
+                    loss_rows.append({
+                        'name':u'הוצאות שכר', 
+                        'amount':salaries_amount,
+                        'details_link': reverse('salary-season-total-expenses') + 'division_type=%s;from_year=%s;from_month=%s;to_year=%s;to_month=%s'
+                            % (division.id, from_date.year, from_date.month, to_date.year, to_date.month)})
                         
                     total_income += demands_amount
                     total_loss += salaries_amount
@@ -4393,11 +4820,15 @@ def global_profit_lost(request):
                     for salary in salaries:
                         salary_amount += salary.bruto or salary.check_amount or 0
                         
-                    income_rows.append({'name':nhbranch, 'amount':nhmonths_amount,
-                                        'details_link':'/nhseasonincome/?nhbranch=%s;from_year=%s;from_month=%s;to_year=%s;to_month=%s' 
+                    income_rows.append({
+                        'name':nhbranch, 
+                        'amount':nhmonths_amount,
+                        'details_link':'/nhseasonincome/?nhbranch=%s;from_year=%s;from_month=%s;to_year=%s;to_month=%s' 
                                         % (nhbranch.id, from_date.year, from_date.month, to_date.year, to_date.month)})
-                    loss_rows.append({'name':u'הוצאות שכר', 'amount':salary_amount,
-                                      'details_link':'/esseasontotalexpenses/?division_type=%s;from_year=%s;from_month=%s;to_year=%s;to_month=%s' 
+                    loss_rows.append({
+                        'name':u'הוצאות שכר', 
+                        'amount':salary_amount,
+                        'details_link': reverse('salary-season-total-expenses') + '?division_type=%s;from_year=%s;from_month=%s;to_year=%s;to_month=%s' 
                                     % (division.id, from_date.year, from_date.month, to_date.year, to_date.month)})
                     
                     total_income += nhmonths_amount
