@@ -32,43 +32,53 @@
 	<h3 class="text-center text-danger">כרטיס פרוייקט : {{ form.instance.initiator }} - {{ form.instance.name }}</h3>
 <form method="post" enctype="multipart/form-data">
 	{% csrf_token %}
-	<div style="float: right; width: 27%; margin-left: 10px;">
-		<fieldset class="cardFieldset">
-			<legend>פרטי משרד מכירות</legend>
-			<table cellspacing="2" cellpadding="2" class="formTable">
-				{% include "Management/form_snippet.html" %}
-				<tr>
-					<td></td>
-					<td><input type="submit" value="אישור" class="button" /></td>
-				</tr>
-			</table>
-		</fieldset><br>
+	<div class="col-md-4">
+		<div class="panel panel-primary">
+			<div class="panel-heading">פרטי משרד מכירות</div>
+			<div class="panel-body">
+				<table cellspacing="2" cellpadding="2" class="formTable">
+					{% include "Management/form_snippet.html" %}
+					<tr>
+						<td></td>
+						<td><input type="submit" value="אישור" class="button" /></td>
+					</tr>
+				</table>
+			</div>
+		</div>
 	</div>
-	<div style="float: right; width:33%; margin-left: 10px;">
-	<fieldset class="cardFieldset">
-		<legend>נתוני פרוייקט</legend>
-		<table cellspacing="2" cellpadding="2" class="formTable" >
-			{% include "Management/form_snippet.html" with form=detailsForm %}
-			<tr>
-				<td></td>
-				<td><input type="submit" value="אישור" class="button" /></td>
-			</tr>
-		</table>
-	</fieldset>
-	<fieldset class="cardFieldset">
-		<legend>מנהל מכירות</legend>
-		<table style="font-size:12; font-family:tahoma;">
-		{% for e in project.employees.all %}
-			<tr>
-				<td>{{ e }}</td>
-				<td><a href="/employees/{{e.id}}"><i class="fa fa-fw fa-info-circle text-primary"></i></a></td>
-			</tr>
-		{% endfor %}
-		</table>
-	</fieldset>
-	<fieldset class="cardFieldset">
-		<legend>אנשי קשר</legend>
-			<div>
+	
+	<div class="col-md-4">
+
+		<div class="panel panel-info">
+			<div class="panel-heading">נתוני פרוייקט</div>
+			<div class="panel-body">
+				<table cellspacing="2" cellpadding="2" class="formTable" >
+					{% include "Management/form_snippet.html" with form=detailsForm %}
+					<tr>
+						<td></td>
+						<td><input type="submit" value="אישור" class="button" /></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+
+		<div class="panel panel-info">
+			<div class="panel-heading">מנהל מכירות</div>
+			<div class="panel-body">
+				<table style="font-size:12; font-family:tahoma;">
+					{% for e in project.employees.all %}
+						<tr>
+							<td>{{ e }}</td>
+							<td><a href="/employees/{{e.id}}"><i class="fa fa-fw fa-info-circle text-primary"></i></a></td>
+						</tr>
+					{% endfor %}
+				</table>
+			</div>
+		</div>
+
+		<div class="panel panel-info">
+			<div class="panel-heading">אנשי קשר</div>
+			<div class="panel-body">
 				<b>נציג לדרישות תשלום</b> : 
 				{{project.demand_contact|default_if_none:" --- "}} 
 				<a href="demandcontact" class="fancybox">הגדר</a>
@@ -97,204 +107,235 @@
 				{% endfor %}
 				<a href="addcontact" class="fancybox">הוסף איש קשר</a>
 			</div>
-	</fieldset>
+		</div>
+
 	</div>
+
+	<div class="col-md-4">
+
+		<div class="panel panel-info">
+			<div class="panel-heading">בניינים ומחירונים</div>
+			<div class="panel-body">
+				סה"כ 
+				<b>{{project.non_deleted_buildings|length}}</b>
+				בניינים, ובהם בסה"כ - 
+				<b>{{project.houses|length}}</b>
+				דירות.<br>
+				<a href="buildings/add" class="fancybox">הוספת בניין ומחירון</a><br>
+				<a href="buildings" class="bigfancybox">פירוט בניינים ומחירונים</a>
+			</div>
+		</div>
+
+		<div class="panel panel-info">
+			<div class="panel-heading">הרשמות לדירות</div>
+			<div class="panel-body">
+				סה"כ החודש
+				<b>{{project.signups.count}}</b>
+				הרשמות.<br>
+				<a href="signups/add" >הרשמה חדשה</a><br>
+				<a href="signups" >פירוט הרשמות</a>
+			</div>
+		</div>
+
+		<div class="panel panel-info">
+			<div class="panel-heading">תזכורות</div>
+			<div class="panel-body">
+				קיימות <a id="list_reminders" href="reminders" class="fancybox"><b>{{project.get_open_reminders|length}}</b></a> תזכורות שטרם טופלו.<br>
+				<a id="add_reminder" href="addreminder" class="fancybox">תזכורת חדשה</a>
+			</div>
+		</div>
+
+		<div class="panel panel-info">
+			<div class="panel-heading">מסמכים מצורפים</div>
+			<div class="panel-body">
+				<a id="list_attachments" href="attachments" class="bigfancybox">ארכיב מסמכים</a><br>
+				<a id="add_attachment" href="attachment/add" class="bigfancybox">צרף מסמך</a>
+			</div>
+		</div>
+
+		{% if user.is_staff %}
+
+		<div class="panel panel-info">
+			<div class="panel-heading">עמלות</div>
+			<div class="panel-body">
+				{% with project.commissions.get as c %}
+				{% if c.c_var_precentage %}	
+					<div>		
+						<table class="formTable" style="text-align:center;">
+							<th>דירה</th>
+							<th>סכום</th>
+							{% for p in c.c_var_precentage.precentages.all %}
+								<tr>
+									<td>{{p.index}}</td>
+									<td>{{p.precentage}}%</td>
+								</tr>
+							{% endfor %}
+							<tr>
+								<td></td>
+								<td>
+									{% if c.c_var_precentage.is_retro %}
+										רטרואקטיבי מדירה {{c.c_var_precentage.start_retro}}
+									{% else %}
+										לא רטרואקטיבי
+									{% endif %}
+								</td>
+							</tr>
+						</table>
+						<a id="edit_cvp" href="cvp" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
+						<a href="cvp/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
+					</div>
+				{% endif %}
+				{% if c.c_var_precentage_fixed %}		
+					<div>
+						{{c.c_var_precentage_fixed.first_precentage}}%
+						עבור
+						{{c.c_var_precentage_fixed.first_count}}
+						דירות ראשונות.<br>
+						כל דירה נוספת, תוספת של
+						{{c.c_var_precentage_fixed.step}}%.<br>
+						{% if c.c_var_precentage_fixed.last_precentage %}
+							{{c.c_var_precentage_fixed.last_precentage}}%
+							עבור
+							{{c.c_var_precentage_fixed.last_count}}
+							דירות אחרונות.
+						{% endif %}
+						<a id="edit_cvpf" href="cvpf" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
+						<a href="cvpf/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
+					</div>
+				{% endif %}
+				{% if c.c_zilber %}		
+					<div>
+						עמלת בסיס 
+						{{c.c_zilber.base}}%.<br>
+						בונוס חסכון בהנחה 
+						{{c.c_zilber.b_discount}}%
+						מההפרש למחיר דוח אפס.<br>
+						בונוס קצב מכירות 
+						{{c.c_zilber.b_sale_rate}}% 
+						לכל דירה עד מקס' של 
+						{{c.c_zilber.b_sale_rate_max}}%.<br>
+						מדד בסיס 
+						{{c.c_zilber.base_madad}},
+						בתאריך 
+						{{c.c_zilber.third_start|date:"j/m/y"}}.
+						<a id="edit_cz" href="cz" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
+						<a href="cz/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
+					</div>
+				{% endif %}
+				{% if c.b_discount_save_precentage %}	
+					<div>
+						{{c.b_discount_save_precentage.precentage_bonus}}%
+						עבור כל 1%  חסכון בהנחה 
+						{% if c.b_discount_save_precentage.max_for_bonus %}
+							עד מקס' של
+							{{c.b_discount_save_precentage.max_for_bonus}}%
+						{% endif %}
+						<a id="edit_bdsp" href="bdsp" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
+						<a href="bdsp/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
+					</div>
+				{% endif %}
+				<div>
+					<button id="add_commissionsBtn" type="button" class="button">הוספה</button>
+				</div>
+				<div id="new_commissions">
+					{% if not c.c_var_precentage %}
+						עמלה משתנה (באחוזים)
+						<a id="add_cvp" href="cvp" class="fancybox"><i class="fa fa-fw fa-plus-circle text-success"></i></a> 
+					{% endif %}
+					{% if not c.c_var_precentage_fixed %}
+						<br>עמלה משתנה בקצב קבוע (באחוזים)
+						<a id="add_cvpf" href="cvpf" class="fancybox"><i class="fa fa-fw fa-plus-circle text-success"></i></a> 
+					{% endif %}
+					{% if not c.c_zilber %}
+						<br>עמלת זילברמינץ
+						<a id="add_cz" href="cz" class="fancybox"><i class="fa fa-fw fa-plus-circle text-success"></i></a> 
+					{% endif %}
+					{% if not c.b_discount_save_precentage %}
+						<br>בונוס חיסכון בהנחה (באחוזים)
+						<a id="add_bdsp" href="bdsp" class="fancybox"><i class="fa fa-fw fa-plus-circle text-success"></i></a> 
+					{% endif %}
+				</div>
+				{% if c.agreement %}
+					<a target="_blank" href="{{c.agreement.url}}">מסמך ההסכם</a>
+				{% endif %}
+				<br><br>
+				<table class="formTable">
+					<tr>
+						<th>מקס עמלה</th>
+						<td>{{c.max|default_if_none:""}}</td>
+					</tr>
+					<tr>
+						<th>סכום תוספת</th>
+						<td>{{c.add_amount|intcomma|default_if_none:""}}</td>
+					</tr>
+					<tr>
+						<th>סוג תוספת</th>
+						<td>{{c.add_type|default_if_none:""}}</td>
+					</tr>
+					<tr>
+						<th>הוצאות רישום</th>
+						<td>{{c.registration_amount|default_if_none:""}}</td>
+					</tr>
+					<tr>
+						<th>קזז הוצאות רישום לאחר משפטיות</th>
+						<td>{{c.deduct_registration|yesno}}</td>
+					</tr>
+					<tr>
+						<th>כולל מע"מ לעמלה</th>
+						<td>
+						{% if c.include_tax != None %}
+							{{c.include_tax|yesno}}
+						{% else %}
+							לא ידוע
+						{% endif %}
+						</td>
+					</tr>
+					<tr>
+						<th>כולל עו"ד לעמלה</th>
+						<td>
+						{% if c.include_lawyer != None %}
+							{{c.include_lawyer|yesno}}
+						{% else %}
+							לא ידוע
+						{% endif %}
+						</td>
+					</tr>
+					<tr>
+						<th>עמלה לפי הרשמות</th>
+						<td>{{c.commission_by_signups|yesno}}</td>
+					</tr>
+					<tr>
+						<th>נקודות חשובות להסכם</th>
+						<td>{{c.remarks}}</td>
+					</tr>
+				</table>
+				<a href="/projectcommission/{{c.id}}" class="fancybox">שנה תנאים</a>
+			{% endwith %}
+			</div>
+		</div>
+
+		{% if history|length %}
+		<div class="panel panel-info">
+			<div class="panel-heading">היסטוריית עידכון עמלות</div>
+			<div class="panel-body">
+				{% for k in history %}
+					<li>{{ k.2 }}: עידכון {{ k.0 }} ל-<b>{{ k.1 }}</b></li>
+				{% endfor %}
+			</div>
+		</div>
+		{% endif %}
+
+		{% endif %}
+
+	</div>
+
 	<div style="float: right">	
-		<fieldset class="cardFieldset">
-			<legend>בניינים ומחירונים</legend>
-			סה"כ 
-			<b>{{project.non_deleted_buildings|length}}</b>
-			בניינים, ובהם בסה"כ - 
-			<b>{{project.houses|length}}</b>
-			דירות.<br>
-			<a href="buildings/add" class="fancybox">הוספת בניין ומחירון</a><br>
-			<a href="buildings" class="bigfancybox">פירוט בניינים ומחירונים</a>
-		</fieldset>
-		<fieldset class="cardFieldset">
-			<legend>הרשמות לדירות</legend>
-			סה"כ החודש
-			<b>{{project.signups.count}}</b>
-			הרשמות.<br>
-			<a href="signups/add" >הרשמה חדשה</a><br>
-			<a href="signups" >פירוט הרשמות</a>
-		</fieldset>
-		<fieldset class="cardFieldset">
-			<legend>תזכורות</legend>
-			קיימות <a id="list_reminders" href="reminders" class="fancybox"><b>{{project.get_open_reminders|length}}</b></a> תזכורות שטרם טופלו.<br>
-			<a id="add_reminder" href="addreminder" class="fancybox">תזכורת חדשה</a>
-		</fieldset>
-		<fieldset class="cardFieldset">
-			<legend>מסמכים מצורפים</legend>
-			<a id="list_attachments" href="attachments" class="bigfancybox">ארכיב מסמכים</a><br>
-			<a id="add_attachment" href="attachment/add" class="bigfancybox">צרף מסמך</a>
-		</fieldset>
+
 	{% if user.is_staff %}
 		<fieldset class="cardFieldset">
 			<legend>עמלות</legend>
-			{% with project.commissions.get as c %}
-			{% if c.c_var_precentage %}	
-				<div>		
-					<table class="formTable" style="text-align:center;">
-						<th>דירה</th>
-						<th>סכום</th>
-						{% for p in c.c_var_precentage.precentages.all %}
-							<tr>
-								<td>{{p.index}}</td>
-								<td>{{p.precentage}}%</td>
-							</tr>
-						{% endfor %}
-						<tr>
-							<td></td>
-							<td>
-								{% if c.c_var_precentage.is_retro %}
-									רטרואקטיבי מדירה {{c.c_var_precentage.start_retro}}
-								{% else %}
-									לא רטרואקטיבי
-								{% endif %}
-							</td>
-						</tr>
-					</table>
-					<a id="edit_cvp" href="cvp" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
-					<a href="cvp/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
-				</div>
-			{% endif %}
-			{% if c.c_var_precentage_fixed %}		
-				<div>
-					{{c.c_var_precentage_fixed.first_precentage}}%
-					עבור
-					{{c.c_var_precentage_fixed.first_count}}
-					דירות ראשונות.<br>
-					כל דירה נוספת, תוספת של
-					{{c.c_var_precentage_fixed.step}}%.<br>
-					{% if c.c_var_precentage_fixed.last_precentage %}
-						{{c.c_var_precentage_fixed.last_precentage}}%
-						עבור
-						{{c.c_var_precentage_fixed.last_count}}
-						דירות אחרונות.
-					{% endif %}
-					<a id="edit_cvpf" href="cvpf" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
-					<a href="cvpf/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
-				</div>
-			{% endif %}
-			{% if c.c_zilber %}		
-				<div>
-					עמלת בסיס 
-					{{c.c_zilber.base}}%.<br>
-					בונוס חסכון בהנחה 
-					{{c.c_zilber.b_discount}}%
-					מההפרש למחיר דוח אפס.<br>
-					בונוס קצב מכירות 
-					{{c.c_zilber.b_sale_rate}}% 
-					לכל דירה עד מקס' של 
-					{{c.c_zilber.b_sale_rate_max}}%.<br>
-					מדד בסיס 
-					{{c.c_zilber.base_madad}},
-					בתאריך 
-					{{c.c_zilber.third_start|date:"j/m/y"}}.
-					<a id="edit_cz" href="cz" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
-					<a href="cz/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
-				</div>
-			{% endif %}
-			{% if c.b_discount_save_precentage %}	
-				<div>
-					{{c.b_discount_save_precentage.precentage_bonus}}%
-					עבור כל 1%  חסכון בהנחה 
-					{% if c.b_discount_save_precentage.max_for_bonus %}
-						עד מקס' של
-						{{c.b_discount_save_precentage.max_for_bonus}}%
-					{% endif %}
-					<a id="edit_bdsp" href="bdsp" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
-					<a href="bdsp/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
-				</div>
-			{% endif %}
-			<div>
-				<button id="add_commissionsBtn" type="button" class="button">הוספה</button>
-			</div>
-			<div id="new_commissions">
-				{% if not c.c_var_precentage %}
-					עמלה משתנה (באחוזים)
-					<a id="add_cvp" href="cvp" class="fancybox"><i class="fa fa-fw fa-plus-circle text-success"></i></a> 
-				{% endif %}
-				{% if not c.c_var_precentage_fixed %}
-					<br>עמלה משתנה בקצב קבוע (באחוזים)
-					<a id="add_cvpf" href="cvpf" class="fancybox"><i class="fa fa-fw fa-plus-circle text-success"></i></a> 
-				{% endif %}
-				{% if not c.c_zilber %}
-					<br>עמלת זילברמינץ
-					<a id="add_cz" href="cz" class="fancybox"><i class="fa fa-fw fa-plus-circle text-success"></i></a> 
-				{% endif %}
-				{% if not c.b_discount_save_precentage %}
-					<br>בונוס חיסכון בהנחה (באחוזים)
-					<a id="add_bdsp" href="bdsp" class="fancybox"><i class="fa fa-fw fa-plus-circle text-success"></i></a> 
-				{% endif %}
-			</div>
-			{% if c.agreement %}
-				<a target="_blank" href="{{c.agreement.url}}">מסמך ההסכם</a>
-			{% endif %}
-			<br><br>
-			<table class="formTable">
-				<tr>
-					<th>מקס עמלה</th>
-					<td>{{c.max|default_if_none:""}}</td>
-				</tr>
-				<tr>
-					<th>סכום תוספת</th>
-					<td>{{c.add_amount|intcomma|default_if_none:""}}</td>
-				</tr>
-				<tr>
-					<th>סוג תוספת</th>
-					<td>{{c.add_type|default_if_none:""}}</td>
-				</tr>
-				<tr>
-					<th>הוצאות רישום</th>
-					<td>{{c.registration_amount|default_if_none:""}}</td>
-				</tr>
-				<tr>
-					<th>קזז הוצאות רישום לאחר משפטיות</th>
-					<td>{{c.deduct_registration|yesno}}</td>
-				</tr>
-				<tr>
-					<th>כולל מע"מ לעמלה</th>
-					<td>
-					{% if c.include_tax != None %}
-						{{c.include_tax|yesno}}
-					{% else %}
-						לא ידוע
-					{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th>כולל עו"ד לעמלה</th>
-					<td>
-					{% if c.include_lawyer != None %}
-						{{c.include_lawyer|yesno}}
-					{% else %}
-						לא ידוע
-					{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th>עמלה לפי הרשמות</th>
-					<td>{{c.commission_by_signups|yesno}}</td>
-				</tr>
-				<tr>
-					<th>נקודות חשובות להסכם</th>
-					<td>{{c.remarks}}</td>
-				</tr>
-			</table>
-			<a href="/projectcommission/{{c.id}}" class="fancybox">שנה תנאים</a>
-		</fieldset>
-		{% endwith %}
-		{% if history|length %}
-			<div class="clearBoth"></div>
-			<fieldset class="cardFieldset">
-				<legend>היסטוריית עידכון עמלות</legend>
-
-					{% for k in history %}
-						<li>{{ k.2 }}: עידכון {{ k.0 }} ל-<b>{{ k.1 }}</b></li>
-					{% endfor %}
-			</fieldset>
-		{% endif %}
+			
+		
 	{% endif %}
 	</div>
 	<div class="clearBoth"> </div>
