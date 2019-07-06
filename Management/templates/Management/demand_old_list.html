@@ -210,7 +210,7 @@
 			<td style="color:#08A600;">{% if d.var_diff %} {{ d.var_diff.amount|intcomma }} ש"ח - {{ d.var_diff.reason }} {% endif %}</td>
 			<td style="color:#08A600; width:150px;">{% if d.bonus_diff %} {{ d.bonus_diff.amount|intcomma }} ש"ח - {{ d.bonus_diff.reason }} {% endif %}</td>
 			<td style="color:#D50808;">{% if d.fee_diff %} {{ d.fee_diff.amount|intcomma }} ש"ח - {{ d.fee_diff.reason }} {% endif %}</td>
-			<td><b>{% if d.get_total_amount %} {{ d.get_total_amount|intcomma }} ש"ח {% else %}----{% endif %}</b></td>
+			<td><b>{% if d.total_amount %} {{ d.total_amount|intcomma }} ש"ח {% else %}----{% endif %}</b></td>
 			<td
 			{% if d.is_fixed %}<img src="{% static "images/update_48.png" %}" width="20" height="20"  alt="תיקון" />{% endif %}
 			</td>
