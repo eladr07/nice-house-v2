@@ -1024,14 +1024,22 @@ def set_demand_open_reminders(demands):
 
 def set_demand_invoice_payment_fields(demands):
     for demand in demands:
-        demand.invoices_amount = sum([i.amount for i in demand.invoices.all()])
-        demand.invoice_offsets_amount = sum([i.offset.amount for i in demand.invoices.all() if i.offset != None])
-        demand.total_amount_offset = demand.invoices_amount + demand.invoice_offsets_amount
+        # sum invoice amounts
+        invoice_amounts = [i.amount for i in demand.invoices.all()]
+        demand.invoices_amount = sum(invoice_amounts) if len(invoice_amounts) > 0 else None
 
-        demand.payments_amount = sum([p.amount for p in demand.payments.all()])
+        # sum invoice offset amounts
+        invoice_offset_amounts = [i.offset.amount for i in demand.invoices.all() if i.offset != None]
+        demand.invoice_offsets_amount = sum(invoice_offset_amounts) if len(invoice_offset_amounts) > 0 else None
+
+        demand.total_amount_offset = (demand.invoices_amount or 0) + (demand.invoice_offsets_amount or 0)
+
+        # sum payment amounts
+        payment_amounts = [p.amount for p in demand.payments.all()]
+        demand.payments_amount = sum(payment_amounts) if len(payment_amounts) > 0 else None
 
         demand.diff_invoice = demand.total_amount_offset - demand.total_amount
-        demand.diff_invoice_payment = demand.payments_amount - demand.total_amount_offset
+        demand.diff_invoice_payment = (demand.payments_amount or 0) - demand.total_amount_offset
 
         demand.is_fully_paid = demand.force_fully_paid or (
             demand.total_amount == demand.total_amount_offset and demand.total_amount == demand.payments_amount)
@@ -4497,49 +4505,62 @@ def demand_pay_balance_list(request):
             # gather form data
             cleaned_data = form.cleaned_data
             demand_pay_balance = cleaned_data['demand_pay_balance']
-            project, from_year, from_month, to_year, to_month, all_times = cleaned_data['project'], cleaned_data['from_year'], \
-                cleaned_data['from_month'], cleaned_data['to_year'], cleaned_data['to_month'], cleaned_data['all_times']
+            project, from_year, from_month, to_year, to_month, all_times = \
+                cleaned_data['project'], \
+                cleaned_data['from_year'], \
+                cleaned_data['from_month'], \
+                cleaned_data['to_year'], \
+                cleaned_data['to_month'], \
+                cleaned_data['all_times']
             
             if project:
                 query = Demand.objects.filter(project = project)
             else:
-                query = Demand.objects.all().order_by('project', 'year', 'month')
+                query = Demand.objects.all()
             if from_year and from_month and to_year and to_month and not all_times:
                 query = query.range(from_year, from_month, to_year, to_month)
 
-            demands = list(query)
+            all_demands = query \
+                .prefetch_related('reminders__statuses', 'invoices__offset','payments') \
+                .select_related('project__demand_contact', 'project__payment_contact') \
+                .order_by('project_id', 'year', 'month')
 
-            if demand_pay_balance.id == 'un-paid':
-                demands = [demand for demand in demands if not demand.payments_amount()]
-            elif demand_pay_balance.id == 'mis-paid':
-                demands = [demand for demand in demands if demand.diff_invoice and demand.invoices_amount() != None]
-            elif demand_pay_balance.id == 'partially-paid':
-                demands = [demand for demand in demands if demand.diff_invoice_payment and demand.payments_amount() != None]
-                        
-            if demand_pay_balance.id == 'fully-paid':
-                demands = [demand for demand in demands if demand.is_fully_paid]
-            elif demand_pay_balance.id != 'all':
-                demands = [demand for demand in demands if not demand.is_fully_paid]
+            set_demand_total_fields(all_demands, from_year, from_month, to_year, to_month)
+            set_demand_diff_fields(all_demands)
+            set_demand_invoice_payment_fields(all_demands)
+            set_demand_open_reminders(all_demands)
+
+            filters = {
+                'un-paid': lambda demand: not demand.payments_amount,
+                'mis-paid': lambda demand: demand.diff_invoice and demand.invoices_amount != None,
+                'partially-paid': lambda demand: demand.diff_invoice_payment and demand.payments_amount != None,
+                'fully-paid': lambda demand: demand.is_fully_paid,
+                'all': lambda demand: True,
+            }
+
+            filter_func = filters[demand_pay_balance.id]
+
+            # apply a filter to the list of demands
+            all_demands = filter(filter_func, all_demands)
             
             # group the demands by project
             project_demands = {}
             
-            for project, demand_iter in itertools.groupby(demands, lambda demand: demand.project):
+            for project, demand_iter in itertools.groupby(all_demands, lambda demand: demand.project):
                 demands = list(demand_iter)
                 project_demands[project] = demands
                 for attr in ['total_amount', 'total_payments', 'total_invoices', 'total_diff_invoice', 'total_diff_invoice_payment']:
                     setattr(project, attr, 0)
                 for demand in demands:
-                    project.total_amount += demand.get_total_amount()
-                    project.total_payments += demand.payments_amount() or 0
-                    project.total_invoices += (demand.invoices_amount() or 0) + (demand.invoice_offsets_amount() or 0)
+                    project.total_amount += demand.total_amount
+                    project.total_payments += demand.payments_amount or 0
+                    project.total_invoices += (demand.invoices_amount or 0) + (demand.invoice_offsets_amount or 0)
                     project.total_diff_invoice += demand.diff_invoice
                     project.total_diff_invoice_payment += demand.diff_invoice_payment
                 
             if 'html' in request.GET:
                 return render(request, 'Management/demand_pay_balance_list.html', 
-                                          { 'filterForm': form, 'project_demands': project_demands},
-                                          )
+                    { 'filterForm': form, 'project_demands': project_demands})
             elif 'pdf' in request.GET:
                 # build arguments to the writer
                 kwargs = {}

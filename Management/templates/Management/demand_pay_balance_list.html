@@ -194,8 +194,8 @@
 					</a>
 				</td>
 				<td>{{ d.month }}/{{d.year}}</td>
-				<td><a href="/demandsales/?demand_id={{d.id}}" class="bigfancybox">{{ d.get_sales.count|default:"אין מכירות" }}</a></td>
-				<td><b>{% if d.get_total_amount %} {{ d.get_total_amount|intcomma }} ש"ח {% else %}----{% endif %}</b></td>
+				<td><a href="/demandsales/?demand_id={{d.id}}" class="bigfancybox">{{ d.sales_count|default:"אין מכירות" }}</a></td>
+				<td><b>{% if d.total_amount %} {{ d.total_amount|intcomma }} ש"ח {% else %}----{% endif %}</b></td>
 				<td>
 					{% for i in d.invoices.all %}
 						{{i.num}}<br>
@@ -241,7 +241,7 @@
 				{% if d.is_fixed %}<img src="{% static "images/update_48.png" %}" width="20" height="20"  alt="תיקון" />{% endif %}
 				</td>
 				<td>
-					{% for r in d.get_open_reminders %}
+					{% for r in d.open_reminders %}
 						{{ r.content|truncatewords:5 }}
 						<a class="fancybox" href="{{r.get_absolute_url}}"><img src="{% static "images/documentinfo-48.png" %}" width="15" height="15" alt="פרטים" border="0" /></a>
 						<a href="{{r.get_absolute_url}}/do"><img src="{% static "images/thumbs_up_48.png" %}" width="15" height="15" alt="בצע" border="0" /></a>
