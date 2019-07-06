@@ -4452,25 +4452,42 @@ def demand_season_list(request):
         form = ProjectSeasonForm(request.GET)
         if form.is_valid():
             project = form.cleaned_data['project']
-            from_date = date(form.cleaned_data['from_year'], form.cleaned_data['from_month'], 1)
-            to_date = date(form.cleaned_data['to_year'], form.cleaned_data['to_month'], 1)
+
+            from_year, from_month = form.cleaned_data['from_year'], form.cleaned_data['from_month']
+            to_year, to_month = form.cleaned_data['to_year'], form.cleaned_data['to_month']
+
+            from_date = date(from_year, from_month, 1)
+            to_date = date(to_year, to_month, 1)
             
-            ds = Demand.objects.range(from_date.year, from_date.month, to_date.year, to_date.month).filter(project = project)
+            ds = Demand.objects \
+                .range(from_year, from_month, to_year, to_month) \
+                .filter(project = project) \
+                .prefetch_related('reminders__statuses') \
+                .select_related('project')
+
+            set_demand_total_fields(ds, from_year, from_month, to_year, to_month)
+            set_demand_diff_fields(ds)
+            set_demand_last_status(ds)
+            set_demand_is_fixed(ds)
+            set_demand_open_reminders(ds)
 
             for d in ds:
-                total_sales_count += d.get_sales().count()
-                total_sales_amount += d.get_sales().total_price_final()
-                total_amount += d.get_total_amount()
+                total_sales_count += d.sales_count
+                total_sales_amount += d.sales_amount
+                total_amount += d.total_amount
     else:
         form = ProjectSeasonForm()
         
-    return render(request, 'Management/demand_season_list.html', 
-                              { 'demands':ds, 'start':from_date, 'end':to_date,
-                                'project':project, 'filterForm':form,
-                                'total_sales_count':total_sales_count,
-                                'total_sales_amount':total_sales_amount,
-                                'total_amount':total_amount},
-                              )
+    context = { 
+        'demands':ds, 
+        'start':from_date, 'end':to_date,
+        'project':project, 'filterForm':form,
+        'total_sales_count':total_sales_count,
+        'total_sales_amount':total_sales_amount,
+        'total_amount':total_amount
+    }
+
+    return render(request, 'Management/demand_season_list.html', context)
 
 @permission_required('Management.demand_pay_balance')
 def demand_pay_balance_list(request):
@@ -4619,6 +4636,7 @@ def demand_followup_list(request):
 
             set_demand_total_fields(ds, from_year, from_month, to_year, to_month)
             set_demand_diff_fields(ds)
+            set_demand_is_fixed(ds)
             set_demand_invoice_payment_fields(ds)
             set_demand_open_reminders(ds)
 
