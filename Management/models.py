@@ -1863,26 +1863,26 @@ class Demand(models.Model):
 
     objects = DemandManager()
     
-    @property
-    def fixed_diff(self):
-        q = self.diffs.filter(type=u'קבועה')
-        return q.count() == 1 and q[0] or None
-    @property    
-    def var_diff(self):
-        q = self.diffs.filter(type=u'משתנה')
-        return q.count() == 1 and q[0] or None
-    @property    
-    def bonus_diff(self):
-        q = self.diffs.filter(type=u'בונוס')
-        return q.count() == 1 and q[0] or None
-    @property   
-    def fee_diff(self):
-        q = self.diffs.filter(type=u'קיזוז')
-        return q.count() == 1 and q[0] or None
-    @property   
-    def adjust_diff(self):
-        q = self.diffs.filter(type=u'התאמה')
-        return q.count() == 1 and q[0] or None
+    # @property
+    # def fixed_diff(self):
+    #     q = self.diffs.filter(type=u'קבועה')
+    #     return q.count() == 1 and q[0] or None
+    # @property    
+    # def var_diff(self):
+    #     q = self.diffs.filter(type=u'משתנה')
+    #     return q.count() == 1 and q[0] or None
+    # @property    
+    # def bonus_diff(self):
+    #     q = self.diffs.filter(type=u'בונוס')
+    #     return q.count() == 1 and q[0] or None
+    # @property   
+    # def fee_diff(self):
+    #     q = self.diffs.filter(type=u'קיזוז')
+    #     return q.count() == 1 and q[0] or None
+    # @property   
+    # def adjust_diff(self):
+    #     q = self.diffs.filter(type=u'התאמה')
+    #     return q.count() == 1 and q[0] or None
     def get_madad(self):
         q = MadadBI.objects.filter(year = self.year, month=self.month)
         return q.count() > 0 and q[0].value or MadadBI.objects.latest().value
@@ -1961,21 +1961,21 @@ class Demand(models.Model):
     def finish_date(self):
         query = self.statuses.filter(type__id = DemandStatusType.Finished)
         return query.count() > 0 and query.latest().date or None
-    @property
-    def is_fixed(self):
-        return self.sales.exclude(salehousemod=None, salepricemod=None, salepre=None, salereject=None).count() > 0
+    # @property
+    # def is_fixed(self):
+    #     return self.sales.exclude(salehousemod=None, salepricemod=None, salepre=None, salereject=None).count() > 0
     @property
     def diff_invoice(self):
         return self.invoices.total_amount_offset() - int(self.get_total_amount())
     @property
     def diff_invoice_payment(self):
         return self.payments.total_amount() - self.invoices.total_amount_offset()
-    def get_open_reminders(self):
-        return [r for r in self.reminders.all() if r.statuses.latest().type.id 
-                not in (ReminderStatusType.Deleted,ReminderStatusType.Done)]
-    def _get_sales(self):
-        return Sale.objects.filter(contractor_pay_year = self.year, contractor_pay_month = self.month,
-                                house__building__project = self.project)
+    # def get_open_reminders(self):
+    #     return [r for r in self.reminders.all() if r.statuses.latest().type.id 
+    #             not in (ReminderStatusType.Deleted,ReminderStatusType.Done)]
+    # def _get_sales(self):
+    #     return Sale.objects.filter(contractor_pay_year = self.year, contractor_pay_month = self.month,
+    #                             house__building__project = self.project)
     @cache_method
     def get_pricemodsales(self):
         return self._get_sales().exclude(salepricemod=None)
@@ -1989,13 +1989,13 @@ class Demand(models.Model):
     @cache_method
     def get_canceledsales(self):
         return self._get_sales().exclude(salecancel=None)
-    @cache_method
-    def get_sales(self):
-        query = self._get_sales().filter(commission_include=True, salecancel__isnull=True)
-        commissions = self.project.commissions.get()
-        if commissions.commission_by_signups:
-            query = query.order_by('house__signups__date')
-        return query
+    # @cache_method
+    # def get_sales(self):
+    #     query = self._get_sales().filter(commission_include=True, salecancel__isnull=True)
+    #     commissions = self.project.commissions.get()
+    #     if commissions.commission_by_signups:
+    #         query = query.order_by('house__signups__date')
+    #     return query
     @cache_method
     def get_excluded_sales(self):
         q = models.Q(commission_include=False) | models.Q(salecancel__isnull=False)
@@ -2038,8 +2038,8 @@ class Demand(models.Model):
         create_revision()
 
         return self.sales_commission
-    def get_total_amount(self):
-        return self.sales_commission + self.diffs.total_amount()
+    # def get_total_amount(self):
+    #     return self.sales_commission + self.diffs.total_amount()
     def invoices_amount(self):
         amounts = [invoice.amount for invoice in self.invoices.all()]
         return len(amounts) > 0 and sum(amounts) or None

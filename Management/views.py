@@ -943,6 +943,115 @@ def projects_profit(request):
 
     return render(request, 'Management/projects_profit.html', context)
 
+def set_demand_diff_fields(demands):
+    # extract demand ids
+    demand_ids = [d.id for d in demands]
+    
+    # construct a map of demand id to DemandDiff list
+    diffs = DemandDiff.objects \
+        .filter(demand_id__in=demand_ids) \
+        .order_by('demand_id')
+
+    diff_groups = itertools.groupby(diffs, lambda diff: diff.demand_id)
+
+    demand_diff_map = {demand_id:list(demand_diffs) for (demand_id, demand_diffs) in diff_groups}
+
+    diff_type_to_field = {
+        u'קבועה': 'fixed_diff',
+        u'משתנה': 'var_diff',
+        u'בונוס': 'bonus_diff',
+        u'קיזוז': 'fee_diff',
+        u'התאמה': 'adjust_diff',
+    }
+
+    for demand in demands:
+        total_diff_amount = 0
+
+        if demand.id in demand_diff_map:
+            demand_diffs = demand_diff_map[demand.id]
+        else:
+            demand_diffs = []
+
+        for diff in demand_diffs:
+            total_diff_amount += diff.amount
+
+            if diff.type in diff_type_to_field:
+                field_name = diff_type_to_field[diff.type]
+                
+                # set '*_diff' fields
+                setattr(demand, field_name, diff)
+        
+        # set 'total_amount' field
+        demand.total_amount = demand.sales_commission + total_diff_amount
+
+def set_demand_is_fixed(demands):
+    # extract demand ids
+    demand_ids = [d.id for d in demands]
+
+    # count modified sales for demand
+    query = Sale.objects \
+        .filter(demand_id__in=demand_ids) \
+        .exclude(salehousemod=None, salepricemod=None, salepre=None, salereject=None) \
+        .values('demand_id') \
+        .annotate(cnt=Count('demand_id'))
+
+    counts_by_demand = {row['demand_id']:row['cnt'] for row in query}
+
+    for demand in demands:
+        cnt = counts_by_demand.get(demand.id, 0)
+        demand.is_fixed = cnt > 0
+
+def set_demand_last_status(demands):
+    # extract demand ids
+    demand_ids = [d.id for d in demands]
+
+    statuses = DemandStatus.objects \
+        .filter(demand_id__in=demand_ids) \
+        .order_by('demand_id','-date')
+
+    statuses_by_demand = itertools.groupby(statuses, lambda status: status.demand_id)
+
+    # construct a map of (demand_id, last_status)
+    last_status_by_demand = {demand_id:next(demand_statuses, None) for (demand_id, demand_statuses) in statuses_by_demand}
+
+    for demand in demands:
+        demand.last_status = last_status_by_demand.get(demand.id, None)
+
+def set_demand_open_reminders(demands):
+    for demand in demands:
+        demand.open_reminders = [r for r in demand.reminders.all()
+            if r.statuses.latest().type_id not in (ReminderStatusType.Deleted,ReminderStatusType.Done)]
+
+def set_demand_total_fields(demands, year, month):
+    # extract project ids
+    project_ids = [d.project_id for d in demands]
+
+    # get sales for all projects
+    sales = Sale.objects.filter(
+        house__building__project_id__in=project_ids,
+        contractor_pay_year=year,
+        contractor_pay_month=month,
+        commission_include=True, 
+        salecancel__isnull=True) \
+        .order_by('house__building__project_id') \
+        .select_related('house__building')
+
+    # group sales by project id
+    sale_groups = itertools.groupby(sales, lambda sale: sale.house.building.project_id)
+
+    sales_by_project = {project_id: list(project_sales) for (project_id, project_sales) in sale_groups}
+
+    for demand in demands:
+        project_id = demand.project_id
+
+        if project_id in sales_by_project:
+            sales_list = sales_by_project[project_id]
+        else:
+            sales_list = []
+
+        demand.sales_count = len(sales_list)
+        demand.sales_amount = sum([sale.price_final for sale in sales_list])
+
 @permission_required('Management.list_demand')
 def demand_old_list(request):
     year, month = None, None
@@ -959,27 +1068,42 @@ def demand_old_list(request):
         form = MonthForm(initial={'year':year,'month':month})
         
     if year and month:
-        ds = Demand.objects.filter(year = year, month = month).annotate(Count('statuses')).select_related('project')
+        ds = Demand.objects \
+            .filter(year = year, month = month) \
+            .annotate(Count('statuses')) \
+            .prefetch_related('reminders__statuses') \
+            .select_related('project')
+
         unhandled_projects.extend(Project.objects.active())
 
+        set_demand_total_fields(ds, year, month)
+        set_demand_diff_fields(ds)
+        set_demand_is_fixed(ds)
+        set_demand_last_status(ds)
+        set_demand_open_reminders(ds)
+
         for d in ds:
-            total_sales_count += d.get_sales().count()
-            total_sales_amount += d.get_sales().total_price_final()
-            total_amount += d.get_total_amount()
-            if d.statuses__count > 0 and d.statuses.latest().type.id in [DemandStatusType.Sent, DemandStatusType.Finished]:
+            total_sales_count += d.sales_count
+            total_sales_amount += d.sales_amount
+            total_amount += d.total_amount
+            
+            if d.last_status and d.last_status.type_id in [DemandStatusType.Sent, DemandStatusType.Finished]:
                 try:
                     unhandled_projects.remove(d.project)
                 except ValueError:
                     pass
         
-    return render(request, 'Management/demand_old_list.html', 
-                              { 'demands':ds, 'month':date(year, month, 1),
-                                'filterForm':form,
-                                'total_sales_count':total_sales_count,
-                                'total_sales_amount':total_sales_amount,
-                                'total_amount':total_amount,
-                                'unhandled_projects':unhandled_projects},
-                              )
+    context =  { 
+        'demands':ds, 
+        'month':date(year, month, 1),
+        'filterForm':form,
+        'total_sales_count':total_sales_count,
+        'total_sales_amount':total_sales_amount,
+        'total_amount':total_amount,
+        'unhandled_projects':unhandled_projects
+    }
+
+    return render(request, 'Management/demand_old_list.html', context)
 
 def nhemployee_salary_send(request, nhbranch_id, year, month):
     pass
