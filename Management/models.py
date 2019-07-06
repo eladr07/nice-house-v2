@@ -1964,12 +1964,12 @@ class Demand(models.Model):
     # @property
     # def is_fixed(self):
     #     return self.sales.exclude(salehousemod=None, salepricemod=None, salepre=None, salereject=None).count() > 0
-    @property
-    def diff_invoice(self):
-        return self.invoices.total_amount_offset() - int(self.get_total_amount())
-    @property
-    def diff_invoice_payment(self):
-        return self.payments.total_amount() - self.invoices.total_amount_offset()
+    # @property
+    # def diff_invoice(self):
+    #     return self.invoices.total_amount_offset() - self.total_amount
+    # @property
+    # def diff_invoice_payment(self):
+    #     return self.payments.total_amount() - self.invoices.total_amount_offset()
     # def get_open_reminders(self):
     #     return [r for r in self.reminders.all() if r.statuses.latest().type.id 
     #             not in (ReminderStatusType.Deleted,ReminderStatusType.Done)]
@@ -2040,21 +2040,21 @@ class Demand(models.Model):
         return self.sales_commission
     # def get_total_amount(self):
     #     return self.sales_commission + self.diffs.total_amount()
-    def invoices_amount(self):
-        amounts = [invoice.amount for invoice in self.invoices.all()]
-        return len(amounts) > 0 and sum(amounts) or None
-    def payments_amount(self):
-        amounts = [payment.amount for payment in self.payments.all()]
-        return len(amounts) > 0 and sum(amounts) or None
-    def invoice_offsets_amount(self):
-        amounts = [invoice.offset.amount for invoice in self.invoices.all() if invoice.offset != None]
-        return len(amounts) > 0 and sum(amounts) or None
-    @property
-    def is_fully_paid(self):
-        if self.force_fully_paid:
-            return True
-        total = int(self.get_total_amount())
-        return total == self.invoices.total_amount_offset() and total == self.payments.total_amount()
+    # def invoices_amount(self):
+    #     amounts = [invoice.amount for invoice in self.invoices.all()]
+    #     return len(amounts) > 0 and sum(amounts) or None
+    # def payments_amount(self):
+    #     amounts = [payment.amount for payment in self.payments.all()]
+    #     return len(amounts) > 0 and sum(amounts) or None
+    # def invoice_offsets_amount(self):
+    #     amounts = [invoice.offset.amount for invoice in self.invoices.all() if invoice.offset != None]
+    #     return len(amounts) > 0 and sum(amounts) or None
+    # @property
+    # def is_fully_paid(self):
+    #     if self.force_fully_paid:
+    #         return True
+    #     total = self.total_amount
+    #     return total == self.invoices.total_amount_offset() and total == self.payments.total_amount()
     def feed(self):
         self.statuses.create(type= DemandStatusType.objects.get(pk=DemandStatusType.Feed)).save()
     def send(self):

@@ -1022,32 +1022,47 @@ def set_demand_open_reminders(demands):
         demand.open_reminders = [r for r in demand.reminders.all()
             if r.statuses.latest().type_id not in (ReminderStatusType.Deleted,ReminderStatusType.Done)]
 
-def set_demand_total_fields(demands, year, month):
+def set_demand_invoice_payment_fields(demands):
+    for demand in demands:
+        demand.invoices_amount = sum([i.amount for i in demand.invoices.all()])
+        demand.invoice_offsets_amount = sum([i.offset.amount for i in demand.invoices.all() if i.offset != None])
+        demand.total_amount_offset = demand.invoices_amount + demand.invoice_offsets_amount
+
+        demand.payments_amount = sum([p.amount for p in demand.payments.all()])
+
+        demand.diff_invoice = demand.total_amount_offset - demand.total_amount
+        demand.diff_invoice_payment = demand.payments_amount - demand.total_amount_offset
+
+        demand.is_fully_paid = demand.force_fully_paid or (
+            demand.total_amount == demand.total_amount_offset and demand.total_amount == demand.payments_amount)
+
+def set_demand_total_fields(
+    demands, 
+    from_year, from_month, to_year, to_month):
     # extract project ids
     project_ids = [d.project_id for d in demands]
 
     # get sales for all projects
-    sales = Sale.objects.filter(
-        house__building__project_id__in=project_ids,
-        contractor_pay_year=year,
-        contractor_pay_month=month,
-        commission_include=True, 
-        salecancel__isnull=True) \
-        .order_by('house__building__project_id') \
+    all_sales = Sale.objects \
+        .contractor_pay_range(from_year, from_month, to_year, to_month) \
+        .filter(
+            house__building__project_id__in=project_ids,
+            commission_include=True, 
+            salecancel__isnull=True) \
+        .order_by('house__building__project_id', 'contractor_pay_year', 'contractor_pay_month') \
         .select_related('house__building')
 
-    # group sales by project id
-    sale_groups = itertools.groupby(sales, lambda sale: sale.house.building.project_id)
+    # group sales by (project id, year, month)
+    sale_groups = itertools.groupby(
+        all_sales, 
+        lambda sale: (sale.house.building.project_id, sale.contractor_pay_year, sale.contractor_pay_month))
 
-    sales_by_project = {project_id: list(project_sales) for (project_id, project_sales) in sale_groups}
+    sales_map = {map_key: list(sales) for (map_key, sales) in sale_groups}
 
     for demand in demands:
-        project_id = demand.project_id
+        map_key = (demand.project_id, demand.year, demand.month)
 
-        if project_id in sales_by_project:
-            sales_list = sales_by_project[project_id]
-        else:
-            sales_list = []
+        sales_list = sales_map.get(map_key, [])
 
         demand.sales_count = len(sales_list)
         demand.sales_amount = sum([sale.price_final for sale in sales_list])
@@ -1076,7 +1091,7 @@ def demand_old_list(request):
 
         unhandled_projects.extend(Project.objects.active())
 
-        set_demand_total_fields(ds, year, month)
+        set_demand_total_fields(ds, year, month, year, month)
         set_demand_diff_fields(ds)
         set_demand_is_fixed(ds)
         set_demand_last_status(ds)
@@ -1086,7 +1101,7 @@ def demand_old_list(request):
             total_sales_count += d.sales_count
             total_sales_amount += d.sales_amount
             total_amount += d.total_amount
-            
+
             if d.last_status and d.last_status.type_id in [DemandStatusType.Sent, DemandStatusType.Finished]:
                 try:
                     unhandled_projects.remove(d.project)
@@ -4589,26 +4604,44 @@ def demand_followup_list(request):
         form = ProjectSeasonForm(request.GET)
         if form.is_valid():
             project = form.cleaned_data['project']
-            from_date = date(form.cleaned_data['from_year'], form.cleaned_data['from_month'], 1)
-            to_date = date(form.cleaned_data['to_year'], form.cleaned_data['to_month'], 1)
+
+            from_year, from_month = form.cleaned_data['from_year'], form.cleaned_data['from_month']
+            to_year, to_month = form.cleaned_data['to_year'], form.cleaned_data['to_month']
+
+            from_date = date(from_year, from_month, 1)
+            to_date = date(to_year, to_month, 1)
             
-            ds = Demand.objects.range(from_date.year, from_date.month, to_date.year, to_date.month).filter(project = project)
+            ds = Demand.objects \
+                .range(from_year, from_month, to_year, to_month) \
+                .filter(project = project) \
+                .select_related('project') \
+                .prefetch_related('reminders__statuses', 'invoices__offset','payments')
+
+            set_demand_total_fields(ds, from_year, from_month, to_year, to_month)
+            set_demand_diff_fields(ds)
+            set_demand_invoice_payment_fields(ds)
+            set_demand_open_reminders(ds)
 
             for d in ds:
-                total_amount += d.get_total_amount()
-                total_invoices += d.invoices.total_amount_offset()
-                total_payments += d.payments.total_amount()
+                total_amount += d.total_amount
+                total_invoices += d.total_amount_offset
+                total_payments += d.payments_amount
                 total_diff_invoice += d.diff_invoice
                 total_diff_invoice_payment += d.diff_invoice_payment
     else:
         form = ProjectSeasonForm()
             
-    return render(request, 'Management/demand_followup_list.html', 
-                              { 'demands':ds, 'start':from_date, 'end':to_date,
-                                'project':project, 'filterForm':form,
-                                'total_amount':total_amount, 'total_invoices':total_invoices, 'total_payments':total_payments,
-                                'total_diff_invoice':total_diff_invoice, 'total_diff_invoice_payment':total_diff_invoice_payment},
-                              )
+    context = { 
+        'demands':ds, 
+        'start':from_date, 'end':to_date,
+        'project':project, 'filterForm':form,
+        'total_amount':total_amount, 
+        'total_invoices':total_invoices, 
+        'total_payments':total_payments,
+        'total_diff_invoice':total_diff_invoice, 
+        'total_diff_invoice_payment':total_diff_invoice_payment}
+
+    return render(request, 'Management/demand_followup_list.html', context)
 
 @permission_required('Management.season_employeesalary')
 def employeesalary_season_list(request):
