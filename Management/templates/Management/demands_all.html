@@ -77,10 +77,10 @@
 				<a href="/projects/{{p.id}}/addinvoice" style="text-decoration: underline; color: #D21515;">הזנת חשבונית לדרישה</a><br>
 				<a href="/projects/{{p.id}}/addpayment" style="text-decoration: underline; color: #0E9D22;">הזנת צ'ק מהיזם לדרישה</a><br>
 			</td>
-			<td><a href="/projects/{{p.id}}/demands/mispaid" class="bigfancybox">{{ p.demands_mispaid|length }}</a></td>
-			<td><a href="/projects/{{p.id}}/demands/unpaid" class="bigfancybox">{{ p.demands_unpaid|length }}</a></td>
-			<td><a href="/projects/{{p.id}}/demands/nopayment" class="bigfancybox">{{ p.demands.nopayment.count }}</a></td>
-			<td><a href="/projects/{{p.id}}/demands/noinvoice" class="bigfancybox">{{ p.demands.noinvoice.count }}</a></td>
+			<td><a href="/projects/{{p.id}}/demands/mispaid" class="bigfancybox">{{ p.demands_mispaid }}</a></td>
+			<td><a href="/projects/{{p.id}}/demands/unpaid" class="bigfancybox">{{ p.demands_unpaid }}</a></td>
+			<td><a href="/projects/{{p.id}}/demands/nopayment" class="bigfancybox">{{ p.demands_nopayment }}</a></td>
+			<td><a href="/projects/{{p.id}}/demands/noinvoice" class="bigfancybox">{{ p.demands_noinvoice }}</a></td>
 		</tr>
 	{% endfor %}
 	<tr class="rowSum">

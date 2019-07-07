@@ -1006,6 +1006,7 @@ def set_demand_last_status(demands):
     demand_ids = [d.id for d in demands]
 
     statuses = DemandStatus.objects \
+        .select_related('type') \
         .filter(demand_id__in=demand_ids) \
         .order_by('demand_id','-date')
 
@@ -1038,11 +1039,13 @@ def set_demand_invoice_payment_fields(demands):
         payment_amounts = [p.amount for p in demand.payments.all()]
         demand.payments_amount = sum(payment_amounts) if len(payment_amounts) > 0 else None
 
-        demand.diff_invoice = demand.total_amount_offset - demand.total_amount
+        total_amount = demand.total_amount
+
+        demand.diff_invoice = demand.total_amount_offset - total_amount
         demand.diff_invoice_payment = (demand.payments_amount or 0) - demand.total_amount_offset
 
         demand.is_fully_paid = demand.force_fully_paid or (
-            demand.total_amount == demand.total_amount_offset and demand.total_amount == demand.payments_amount)
+            total_amount == demand.total_amount_offset and total_amount == (demand.payments_amount or 0))
 
 def set_demand_total_fields(
     demands, 
@@ -1758,33 +1761,68 @@ def demands_all(request):
     
     total_mispaid, total_unpaid, total_nopayment, total_noinvoice, total_notyetpaid = 0,0,0,0,0
     amount_mispaid, amount_unpaid, amount_nopayment, amount_noinvoice, amount_notyetpaid = 0,0,0,0,0
-    projects = Project.objects.all()
-    for p in projects:
-        for d in p.demands_mispaid():
-            amount_mispaid += d.get_total_amount()
-            total_mispaid += 1
-        for d in p.demands_unpaid():
-            amount_unpaid += d.get_total_amount()
-            total_unpaid += 1
-        for d in p.demands.nopayment():
-            amount_nopayment += d.get_total_amount()
-            total_nopayment += 1
-        for d in p.demands.noinvoice():
-            amount_noinvoice += d.get_total_amount()
-            total_noinvoice += 1
-        for d in p.demands_not_yet_paid():
-            amount_notyetpaid += d.get_total_amount()
-            total_notyetpaid += 1
+    
+    all_demands = Demand.objects \
+        .all() \
+        .prefetch_related('invoices__offset','payments','project__contacts') \
+        .select_related('project__demand_contact','project__payment_contact') \
+        .order_by('project_id','year','month')
 
-    return render(request, 'Management/demands_all.html', 
-                              { 'projects':projects, 'total_mispaid':total_mispaid, 'total_unpaid':total_unpaid,
-                               'total_nopayment':total_nopayment, 'total_noinvoice':total_noinvoice,'total_notyetpaid':total_notyetpaid,
-                               'amount_mispaid':amount_mispaid, 'amount_unpaid':amount_unpaid, 'amount_notyetpaid':amount_notyetpaid,
-                               'amount_nopayment':amount_nopayment, 'amount_noinvoice':amount_noinvoice,
-                               'houseForm':LocateHouseForm(), 
-                               'demandForm':LocateDemandForm(),
-                               'error':error },
-                              )
+    set_demand_diff_fields(all_demands)
+    set_demand_invoice_payment_fields(all_demands)
+
+    # group demands by project
+    demand_groups = itertools.groupby(all_demands, lambda demand: demand.project)
+
+    demands_by_project = {project:list(demand_iter) for (project, demand_iter) in demand_groups}
+
+    projects = []
+    
+    for (project, demands) in demands_by_project.items():
+
+        project.demands_mispaid = 0
+        project.demands_unpaid = 0
+        project.demands_nopayment = 0
+        project.demands_noinvoice = 0
+
+        for demand in demands:
+            total_amount = demand.total_amount
+            invoices_amount = demand.invoices_amount
+            payments_amount = demand.payments_amount
+            is_fully_paid = demand.is_fully_paid
+
+            if is_fully_paid == False:
+                if invoices_amount == None and payments_amount != None:
+                    amount_noinvoice += total_amount
+                    total_noinvoice += 1
+                    project.demands_noinvoice += 1
+                if invoices_amount != None and payments_amount == None:
+                    amount_nopayment += total_amount
+                    total_nopayment += 1
+                    project.demands_nopayment += 1
+                if invoices_amount != None and payments_amount != None and demand.diff_invoice_payment > 0:
+                    amount_mispaid += total_amount
+                    total_mispaid += 1
+                    project.demands_mispaid += 1
+                if invoices_amount == None and payments_amount == None:
+                    amount_unpaid += total_amount
+                    total_unpaid += 1
+                    project.demands_unpaid += 1
+                if demand.not_yet_paid == 1:
+                    amount_notyetpaid += total_amount
+                    total_notyetpaid += 1
+                
+        projects.append(project)
+
+    context = { 
+        'projects':projects, 'total_mispaid':total_mispaid, 'total_unpaid':total_unpaid,
+        'total_nopayment':total_nopayment, 'total_noinvoice':total_noinvoice,'total_notyetpaid':total_notyetpaid,
+        'amount_mispaid':amount_mispaid, 'amount_unpaid':amount_unpaid, 'amount_notyetpaid':amount_notyetpaid,
+        'amount_nopayment':amount_nopayment, 'amount_noinvoice':amount_noinvoice,
+        'houseForm':LocateHouseForm(), 'demandForm':LocateDemandForm(),
+        'error':error }
+
+    return render(request, 'Management/demands_all.html', context)
 
 def employee_list_pdf(request):
     writer = EmployeeListWriter(
@@ -2174,13 +2212,18 @@ def demand_edit(request, object_id):
     
 @permission_required('Management.change_demand')
 def demand_close(request, id):
-    d = Demand.objects.get(pk=id)
+    demand = Demand.objects.get(pk=id)
+    
+    year, month = demand.year, demand.month
+
+    set_demand_total_fields([demand], year, month, year, month)
+
     if request.method == 'POST':
-        d.close()
-        d.save()
+        demand.close()
+        demand.save()
+
     return render(request, 'Management/demand_close.html', 
-                              { 'demand':d },
-                              )
+        { 'demand':demand })
 
 @permission_required('Management.change_demand')
 def demand_zero(request, id):
@@ -2216,21 +2259,28 @@ def demands_send(request):
     m = int(request.GET.get('month', current.month))
     form = MonthForm(initial={'year':y,'month':m})
     month = datetime(y,m,1)
-    ds = Demand.objects.filter(year = y, month = m)
+    
+    demands = Demand.objects \
+        .filter(year = y, month = m) \
+        .select_related('project__demand_contact')
+
+    set_demand_total_fields(demands, y, m, y, m)
+    set_demand_last_status(demands)
+
     forms=[]
     if request.method == 'POST':
         error = False
-        for d in ds:
-            f = DemandSendForm(request.POST, instance=d, prefix = str(d.id))
+        for demand in demands:
+            f = DemandSendForm(request.POST, instance=demand, prefix = str(demand.id))
             if f.is_valid():
                 is_finished, by_mail, by_fax, mail = f.cleaned_data['is_finished'], f.cleaned_data['by_mail'], f.cleaned_data['by_fax'], f.cleaned_data['mail']
                 if is_finished:
-                    d.finish()
-                if by_mail and d.get_sales().count() > 0:
+                    demand.finish()
+                if by_mail and demand.sales_count > 0:
                     if mail:
-                        demand_send_mail(d, mail)
+                        demand_send_mail(demand, mail)
                     else:
-                        error = u'לפרויקט %s לא הוגדר מייל לשליחת דרישות' % d.project
+                        error = u'לפרויקט %s לא הוגדר מייל לשליחת דרישות' % demand.project
                 if by_fax:
                     pass
             forms.append(f)
@@ -2239,18 +2289,17 @@ def demands_send(request):
         else:
             return HttpResponseRedirect('/demandsold')
     else:
-        for d in ds:
-            if d.project.demand_contact:
-                initial = {'mail':d.project.demand_contact.mail,
-                           'fax':d.project.demand_contact.fax}
-            else:
-                initial = {}
-            f = DemandSendForm(instance=d, prefix=str(d.id), initial = initial)
+        for demand in demands:
+            contact = demand.project.demand_contact
+            
+            initial = { 'mail':contact.mail, 'fax':contact.fax } if contact else {}
+
+            f = DemandSendForm(instance=demand, prefix=str(demand.id), initial = initial)
+            
             forms.append(f)
             
     return render(request, 'Management/demands_send.html', 
-                              { 'forms':forms,'filterForm':form, 'month':month },
-                              )
+        { 'forms':forms,'filterForm':form, 'month':month })
 
 @permission_required('Management.change_demand')
 def demand_closeall(request):

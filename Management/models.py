@@ -194,28 +194,28 @@ class Project(models.Model):
     
     def is_zilber(self):
         return self.commissions.get().c_zilber != None
-    def demands_unpaid(self):
-        query = self.demands.annotate(invoices_num = Count('invoices'), payments_num = Count('payments'))
-        query = query.filter(invoices_num = 0, payments_num = 0)
-        return [d for d in query if d.is_fully_paid == False]
-    def demands_mispaid(self):
-        query = self.demands.annotate(invoices_num = Count('invoices'), payments_num = Count('payments'))
-        query = query.filter(invoices_num__gt = 0, payments_num__gt = 0).iterator()
-        return [d for d in query if d.diff_invoice_payment != 0 and d.is_fully_paid == False]
+    # def demands_unpaid(self):
+    #     query = self.demands.annotate(invoices_num = Count('invoices'), payments_num = Count('payments'))
+    #     query = query.filter(invoices_num = 0, payments_num = 0)
+    #     return [d for d in query if d.is_fully_paid == False]
+    # def demands_mispaid(self):
+    #     query = self.demands.annotate(invoices_num = Count('invoices'), payments_num = Count('payments'))
+    #     query = query.filter(invoices_num__gt = 0, payments_num__gt = 0).iterator()
+    #     return [d for d in query if d.diff_invoice_payment != 0 and d.is_fully_paid == False]
     def current_demand(self):
         try:
             return Demand.objects.current().get(project = self)
         except Demand.DoesNotExist:
             return None
-    def demands_not_yet_paid(self):
-        demands = []
-        query   = Demand.objects.filter(project = self, not_yet_paid = 1)
+    # def demands_not_yet_paid(self):
+    #     demands = []
+    #     query   = Demand.objects.filter(project = self, not_yet_paid = 1)
 
-        for d in query :
-            if d.is_fully_paid == False :
-                demands.append(d)
+    #     for d in query :
+    #         if d.is_fully_paid == False :
+    #             demands.append(d)
 
-        return demands
+    #     return demands
     def get_open_reminders(self):
         return [r for r in self.reminders.all() if r.statuses.latest().type.id 
                 not in (ReminderStatusType.Deleted,ReminderStatusType.Done)]
