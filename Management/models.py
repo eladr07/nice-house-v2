@@ -1858,14 +1858,6 @@ class Demand(models.Model):
     # def bonus_diff(self):
     #     q = self.diffs.filter(type=u'בונוס')
     #     return q.count() == 1 and q[0] or None
-    # @property   
-    # def fee_diff(self):
-    #     q = self.diffs.filter(type=u'קיזוז')
-    #     return q.count() == 1 and q[0] or None
-    # @property   
-    # def adjust_diff(self):
-    #     q = self.diffs.filter(type=u'התאמה')
-    #     return q.count() == 1 and q[0] or None
     def get_madad(self):
         q = MadadBI.objects.filter(year = self.year, month=self.month)
         return q.count() > 0 and q[0].value or MadadBI.objects.latest().value
@@ -1944,21 +1936,9 @@ class Demand(models.Model):
     def finish_date(self):
         query = self.statuses.filter(type__id = DemandStatusType.Finished)
         return query.count() > 0 and query.latest().date or None
-    # @property
-    # def is_fixed(self):
-    #     return self.sales.exclude(salehousemod=None, salepricemod=None, salepre=None, salereject=None).count() > 0
-    # @property
-    # def diff_invoice(self):
-    #     return self.invoices.total_amount_offset() - self.total_amount
-    # @property
-    # def diff_invoice_payment(self):
-    #     return self.payments.total_amount() - self.invoices.total_amount_offset()
-    # def get_open_reminders(self):
-    #     return [r for r in self.reminders.all() if r.statuses.latest().type.id 
-    #             not in (ReminderStatusType.Deleted,ReminderStatusType.Done)]
-    # def _get_sales(self):
-    #     return Sale.objects.filter(contractor_pay_year = self.year, contractor_pay_month = self.month,
-    #                             house__building__project = self.project)
+    def _get_sales(self):
+        return Sale.objects.filter(contractor_pay_year = self.year, contractor_pay_month = self.month,
+                                house__building__project = self.project)
     @cache_method
     def get_pricemodsales(self):
         return self._get_sales().exclude(salepricemod=None)
