@@ -1047,7 +1047,7 @@ def set_demand_invoice_payment_fields(demands):
         demand.is_fully_paid = demand.force_fully_paid or (
             total_amount == demand.total_amount_offset and total_amount == (demand.payments_amount or 0))
 
-def set_demand_total_fields(
+def set_demand_sale_fields(
     demands, 
     from_year, from_month, to_year, to_month):
     # extract project ids
@@ -1077,6 +1077,7 @@ def set_demand_total_fields(
 
         demand.sales_list = sales_list
         demand.sales_count = len(sales_list)
+        demand.sales_total_price = sum([sale.price for sale in sales_list])
         demand.sales_amount = sum([sale.price_final for sale in sales_list])
 
 @permission_required('Management.list_demand')
@@ -1103,7 +1104,7 @@ def demand_old_list(request):
 
         unhandled_projects.extend(Project.objects.active())
 
-        set_demand_total_fields(ds, year, month, year, month)
+        set_demand_sale_fields(ds, year, month, year, month)
         set_demand_diff_fields(ds)
         set_demand_is_fixed(ds)
         set_demand_last_status(ds)
@@ -2069,7 +2070,7 @@ def demand_list(request):
         demand, new = Demand.objects.get_or_create(project = project, year = year, month = month)
         ds.append(demand)
 
-    set_demand_total_fields(ds, year, month, year, month)
+    set_demand_sale_fields(ds, year, month, year, month)
     set_demand_last_status(ds)
     set_demand_open_reminders(ds)
 
@@ -2216,7 +2217,7 @@ def demand_close(request, id):
     
     year, month = demand.year, demand.month
 
-    set_demand_total_fields([demand], year, month, year, month)
+    set_demand_sale_fields([demand], year, month, year, month)
 
     if request.method == 'POST':
         demand.close()
@@ -2264,7 +2265,7 @@ def demands_send(request):
         .filter(year = y, month = m) \
         .select_related('project__demand_contact')
 
-    set_demand_total_fields(demands, y, m, y, m)
+    set_demand_sale_fields(demands, y, m, y, m)
     set_demand_last_status(demands)
 
     forms=[]
@@ -4403,7 +4404,7 @@ def demand_sale_list(request):
 
         demands = [demand]
 
-        set_demand_total_fields(demands, year, month, year, month)
+        set_demand_sale_fields(demands, year, month, year, month)
 
         title = u'ריכוז מכירות לפרוייקט %s לחודש %s/%s' % (str(project), month, year)
     elif project_id:
@@ -4413,7 +4414,7 @@ def demand_sale_list(request):
             .range(from_year, from_month, to_year, to_month) \
             .filter(project = project)
 
-        set_demand_total_fields(demands, from_year, from_month, to_year, to_month)
+        set_demand_sale_fields(demands, from_year, from_month, to_year, to_month)
 
         title = u'ריכוז מכירות לפרוייקט %s מחודש %s/%s עד חודש %s/%s' % (str(project), from_month, from_year,
                                                                          to_month, to_year)
@@ -4449,7 +4450,7 @@ def project_demands(request, project_id, demand_type):
     from_year, from_month = demands[0].year, demands[0].month
     to_year, to_month = demands[-1].year, demands[-1].month
 
-    set_demand_total_fields(demands, from_year, from_month, to_year, to_month)
+    set_demand_sale_fields(demands, from_year, from_month, to_year, to_month)
     set_demand_is_fixed(demands)
     set_demand_open_reminders(demands)
 
@@ -4514,9 +4515,13 @@ def report_project_month(request, project_id = 0, year = 0, month = 0, demand = 
     if not demand:
         demand = Demand.objects.get(project__id = project_id, year = year, month = month)
     
-    if demand.get_sales().count() == 0:
+    set_demand_sale_fields([demand], demand.year, demand.month, demand.year, demand.month)
+
+    if demand.sales_count == 0:
         return render(request, 'Management/error.html', {'error':u'לדרישה שנבחרה אין מכירות'}, )
     
+    set_demand_diff_fields([demand])
+
     writer = MonthDemandWriter(demand, to_mail=False)
     
     return build_and_return_pdf(writer)
@@ -4524,7 +4529,13 @@ def report_project_month(request, project_id = 0, year = 0, month = 0, demand = 
 @permission_required('Management.report_projects_month')
 def report_projects_month(request, year, month):
 
-    demands = Demand.objects.filter(year = year, month=month).all()
+    demands = Demand.objects \
+        .prefetch_related('invoices','payments') \
+        .select_related('project') \
+        .filter(year=year, month=month)
+
+    set_demand_sale_fields(demands, year, month, year, month)
+    set_demand_diff_fields(demands)
 
     title = u'ריכוז דרישות לפרוייקטים לחודש %s\%s' % (year, month)
 
@@ -4533,13 +4544,22 @@ def report_projects_month(request, year, month):
     return build_and_return_pdf(writer)
 
 @permission_required('demand_season_pdf')
-def report_project_season(request, project_id=None, from_year=common.current_month().year, from_month=common.current_month().month, 
-                          to_year=common.current_month().year, to_month=common.current_month().month):
+def report_project_season(request, project_id=None, 
+    from_year=common.current_month().year, from_month=common.current_month().month, 
+    to_year=common.current_month().year, to_month=common.current_month().month):
+
     from_date = date(int(from_year), int(from_month), 1)
     to_date = date(int(to_year), int(to_month), 1)
     
-    demands = Demand.objects.range(from_date.year, from_date.month, to_date.year, to_date.month).filter(project__id = project_id)
-    
+    demands = Demand.objects \
+        .prefetch_related('invoices','payments') \
+        .select_related('project') \
+        .range(from_year, from_month, to_year, to_month) \
+        .filter(project__id = project_id)
+
+    set_demand_sale_fields(demands, from_year, from_month, to_year, to_month)
+    set_demand_diff_fields(demands)
+
     project = Project.objects.get(pk=project_id)
 
     title = u'ריכוז דרישות תקופתי לפרוייקט %s' % project
@@ -4549,13 +4569,21 @@ def report_project_season(request, project_id=None, from_year=common.current_mon
     return build_and_return_pdf(writer)
 
 @permission_required('demand_followup_pdf')
-def report_project_followup(request, project_id=None, from_year=common.current_month().year, from_month=common.current_month().month, 
-                            to_year=common.current_month().year, to_month=common.current_month().month):
-    from_date = date(int(from_year), int(from_month), 1)
-    to_date = date(int(to_year), int(to_month), 1)
+def report_project_followup(request, project_id=None, 
+    from_year=common.current_month().year, from_month=common.current_month().month, 
+    to_year=common.current_month().year, to_month=common.current_month().month):
     
     project = Project.objects.get(pk = project_id)
-    demands = Demand.objects.range(from_date.year, from_date.month, to_date.year, to_date.month).filter(project__id = project_id)
+    
+    demands = Demand.objects \
+        .prefetch_related('invoices','payments') \
+        .select_related('project') \
+        .range(from_year, from_month, to_year, to_month) \
+        .filter(project__id = project_id)
+
+    set_demand_sale_fields(demands, from_year, from_month, to_year, to_month)
+    set_demand_diff_fields(demands)
+    set_demand_invoice_payment_fields(demands)
 
     writer = DemandFollowupWriter(project, from_month, from_year, to_month, to_year, demands)
     
@@ -4584,7 +4612,7 @@ def demand_season_list(request):
                 .prefetch_related('reminders__statuses') \
                 .select_related('project')
 
-            set_demand_total_fields(ds, from_year, from_month, to_year, to_month)
+            set_demand_sale_fields(ds, from_year, from_month, to_year, to_month)
             set_demand_diff_fields(ds)
             set_demand_last_status(ds)
             set_demand_is_fixed(ds)
@@ -4636,7 +4664,7 @@ def demand_pay_balance_list(request):
                 .select_related('project__demand_contact', 'project__payment_contact') \
                 .order_by('project_id', 'year', 'month')
 
-            set_demand_total_fields(all_demands, from_year, from_month, to_year, to_month)
+            set_demand_sale_fields(all_demands, from_year, from_month, to_year, to_month)
             set_demand_diff_fields(all_demands)
             set_demand_invoice_payment_fields(all_demands)
             set_demand_open_reminders(all_demands)
@@ -4764,7 +4792,7 @@ def demand_followup_list(request):
                 .select_related('project') \
                 .prefetch_related('reminders__statuses', 'invoices__offset','payments')
 
-            set_demand_total_fields(ds, from_year, from_month, to_year, to_month)
+            set_demand_sale_fields(ds, from_year, from_month, to_year, to_month)
             set_demand_diff_fields(ds)
             set_demand_is_fixed(ds)
             set_demand_invoice_payment_fields(ds)
@@ -4773,7 +4801,7 @@ def demand_followup_list(request):
             for d in ds:
                 total_amount += d.total_amount
                 total_invoices += d.total_amount_offset
-                total_payments += d.payments_amount
+                total_payments += (d.payments_amount or 0)
                 total_diff_invoice += d.diff_invoice
                 total_diff_invoice_payment += d.diff_invoice_payment
     else:
