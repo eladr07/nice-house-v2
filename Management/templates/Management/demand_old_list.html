@@ -202,7 +202,7 @@
 			</td>
 			<td>{{ d.project.initiator }}</td>
 			<td><a href="/projects/{{d.project.id}}">{{ d.project.name }}</a></td>
-			<td><a href="/demandsales/?demand_id={{d.id}}" class="bigfancybox">{{ d.get_sales.count|default:"אין מכירות" }}</a></td>
+			<td><a href="/demandsales/?demand_id={{d.id}}" class="bigfancybox">{{ d.sales_count|default:"אין מכירות" }}</a></td>
 			<td>{{d.sale_count}}</td>
 			<td>{% if d.sales_amount %} {{ d.sales_amount|intcomma }} ש"ח {% else %}----{% endif %}</td>
 			<td>{% if d.sales_commission %} {{ d.sales_commission|intcomma }} ש"ח {% else %}----{% endif %}</td>
