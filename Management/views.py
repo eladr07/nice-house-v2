@@ -1800,7 +1800,7 @@ def demands_all(request):
                     amount_nopayment += total_amount
                     total_nopayment += 1
                     project.demands_nopayment += 1
-                if invoices_amount != None and payments_amount != None and demand.diff_invoice_payment > 0:
+                if invoices_amount != None and payments_amount != None and demand.diff_invoice_payment != 0:
                     amount_mispaid += total_amount
                     total_mispaid += 1
                     project.demands_mispaid += 1
@@ -4431,12 +4431,48 @@ def demand_sale_list(request):
         {'sales':sales, 'sales_amount':sales_amount,'title':title})
 
 @login_required
-def project_demands(request, project_id, func, template_name):
-    p = Project.objects.get(pk = project_id)
-    demands = getattr(p, func)
-    return render(request, template_name,
-                               {'demands':demands(), 'project':p},
-                               )
+def project_demands(request, project_id, demand_type):
+    project = Project.objects.get(pk=project_id)
+
+    all_demands = Demand.objects \
+        .prefetch_related('invoices__offset','payments') \
+        .select_related('project') \
+        .filter(project_id=project_id) \
+        .order_by('year','month')
+
+    set_demand_diff_fields(all_demands)
+    set_demand_invoice_payment_fields(all_demands)
+
+    # exclude fully-paid demands
+    demands = list(filter(lambda demand: demand.is_fully_paid == False, all_demands))
+
+    from_year, from_month = demands[0].year, demands[0].month
+    to_year, to_month = demands[-1].year, demands[-1].month
+
+    set_demand_total_fields(demands, from_year, from_month, to_year, to_month)
+    set_demand_is_fixed(demands)
+    set_demand_open_reminders(demands)
+
+    if demand_type == 'mis-paid':
+        func = lambda demand: demand.invoices_amount != None and demand.payments_amount != None and demand.diff_invoice_payment != 0
+        template_name = 'Management/project_demands_mispaid.html'
+    elif demand_type == 'un-paid':
+        func = lambda demand: demand.invoices_amount == None and demand.payments_amount == None
+        template_name = 'Management/project_demands_unpaid.html'
+    elif demand_type == 'no-invoice':
+        func = lambda demand: demand.invoices_amount == None and demand.payments_amount != None
+        template_name = 'Management/project_demands_noinvoice.html'
+    elif demand_type == 'no-payment':
+        func = lambda demand: demand.invoices_amount != None and demand.payments_amount == None
+        template_name = 'Management/project_demands_nopayment.html'
+    elif demand_type == 'not-yet-paid':
+        func = lambda demand: demand.not_yet_paid == 1
+        template_name = 'Management/project_demands_noinvoice.html'
+
+    # apply the correct filter
+    demands = filter(func, demands)
+
+    return render(request, template_name, {'demands':demands, 'project':project})
 
 @login_required
 def demand_sales(request, project_id, year, month):

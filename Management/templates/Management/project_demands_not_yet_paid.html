@@ -29,9 +29,9 @@
 					</a>
 				</td>
 				<td>{{ d.month }}/{{ d.year }}</td>
-				<td><a href="/demandsales/?demand_id={{d.id}}">{{d.get_sales.count}}</a></td>
-				<td>{{ d.get_sales_amount }}</td>
-				<td>{{ d.get_total_amount }}</td>
+				<td><a href="/demandsales/?demand_id={{d.id}}">{{d.sales_count}}</a></td>
+				<td>{{ d.sales_amount }}</td>
+				<td>{{ d.total_amount }}</td>
 				<td>
 				{% for i in d.invoices.all %}
 					<a href="/invoices/{{i.id}}" target="_blank">{{i.amount|intcomma}}</a><br>
@@ -43,7 +43,7 @@
 				{% endif %}
 				</td>
 				<td>
-				{% for r in d.get_open_reminders %}
+				{% for r in d.open_reminders %}
 					{{ r.content|truncatewords:5 }}
 					<a href="{{r.get_absolute_url}}"><img src="{% static "images/documentinfo-48.png" %}" width="15" height="15" alt="פרטים" border="0" /></a>
 					<a href="{{r.get_absolute_url}}/do"><img src="{% static "images/thumbs_up_48.png" %}" width="15" height="15" alt="בצע" border="0" /></a>

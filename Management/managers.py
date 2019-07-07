@@ -56,10 +56,6 @@ class DemandManager(SeasonManager):
             demand.diffs.create(type=u'קבועה', amount = commissions.add_amount, reason = commissions.add_type)
         return demand, created
             
-    def noinvoice(self):
-        return self.get_queryset().noinvoice()
-    def nopayment(self):
-        return self.get_queryset().nopayment()
     def current(self):
         now = common.current_month()
         return self.filter(year = now.year, month = now.month)

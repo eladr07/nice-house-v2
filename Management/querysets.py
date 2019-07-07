@@ -33,12 +33,6 @@ class DemandQuerySet(SeasonQuerySet):
         return self.aggregate(Sum('sales_commission'))['sales_commission__sum'] or 0
     def total_sale_count(self):
         return self.aggregate(Sum('sale_count'))['sale_count__sum'] or 0
-    def noinvoice(self):
-        query = self.annotate(invoices_num = Count('invoices'), payments_num = Count('payments'))
-        return query.filter(invoices_num = 0, payments_num__gt = 0, force_fully_paid = False)
-    def nopayment(self):
-        query = self.annotate(invoices_num = Count('invoices'), payments_num = Count('payments'))
-        return query.filter(invoices_num__gt = 0, payments_num = 0, force_fully_paid = False)
 
 class SaleQuerySet(models.QuerySet):
     def contractor_pay_range(self, from_year, from_month, to_year, to_month):
