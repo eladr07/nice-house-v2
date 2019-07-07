@@ -4435,7 +4435,7 @@ def project_demands(request, project_id, demand_type):
     project = Project.objects.get(pk=project_id)
 
     all_demands = Demand.objects \
-        .prefetch_related('invoices__offset','payments') \
+        .prefetch_related('reminders__statuses','invoices__offset','payments') \
         .select_related('project') \
         .filter(project_id=project_id) \
         .order_by('year','month')
