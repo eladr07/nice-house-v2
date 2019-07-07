@@ -1072,6 +1072,7 @@ def set_demand_total_fields(
 
         sales_list = sales_map.get(map_key, [])
 
+        demand.sales_list = sales_list
         demand.sales_count = len(sales_list)
         demand.sales_amount = sum([sale.price_final for sale in sales_list])
 
@@ -4333,28 +4334,40 @@ def demand_sale_list(request):
     from_month = int(request.GET.get('from_month', 0))
     to_year = int(request.GET.get('to_year', 0))
     to_month = int(request.GET.get('to_month', 0))
+
     if demand_id:
-        d = Demand.objects.get(pk=demand_id)
-        sales = d.get_sales()
-        sales_amount = d.get_sales().total_price()
-        title = u'ריכוז מכירות לפרוייקט %s לחודש %s/%s' % (str(d.project), d.month, d.year)
+        demand = Demand.objects.get(pk=demand_id)
+        project, year, month = demand.project, demand.year, demand.month
+
+        demands = [demand]
+
+        set_demand_total_fields(demands, year, month, year, month)
+
+        title = u'ריכוז מכירות לפרוייקט %s לחודש %s/%s' % (str(project), month, year)
     elif project_id:
-        sales = []
-        sales_amount = 0
         project = Project.objects.get(pk=project_id)
         
-        demands = Demand.objects.range(from_year, from_month, to_year, to_month).filter(project = project)
-        for demand in demands:
-            sales.extend(demand.get_sales())
-            sales_amount += demand.get_sales().total_price()
+        demands = Demand.objects \
+            .range(from_year, from_month, to_year, to_month) \
+            .filter(project = project)
+
+        set_demand_total_fields(demands, from_year, from_month, to_year, to_month)
 
         title = u'ריכוז מכירות לפרוייקט %s מחודש %s/%s עד חודש %s/%s' % (str(project), from_month, from_year,
                                                                          to_month, to_year)
     else:
         raise ValueError
+
+    sales = []
+    sales_amount = 0
+
+    for demand in demands:
+        sales.extend(demand.sales_list)
+        sales_amount += demand.sales_amount
+
     return render(request, 'Management/sale_list.html', 
-                              {'sales':sales, 'sales_amount':sales_amount,'title':title},
-                              )
+        {'sales':sales, 'sales_amount':sales_amount,'title':title})
+
 @login_required
 def project_demands(request, project_id, func, template_name):
     p = Project.objects.get(pk = project_id)
