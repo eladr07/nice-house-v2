@@ -2014,7 +2014,6 @@ def nhmonth_close(request):
 @permission_required('Management.add_demand')
 def demand_list(request):
     ds, unhandled_projects = [], []
-    sales_count, expected_sales_count, sales_amount = 0,0,0
     
     current = common.current_month()
     year, month = current.year, current.month
@@ -2031,18 +2030,32 @@ def demand_list(request):
     for project in Project.objects.active():
         demand, new = Demand.objects.get_or_create(project = project, year = year, month = month)
         ds.append(demand)
-        if demand.statuses.count() == 0 or demand.statuses.latest().type.id == DemandStatusType.Feed:
-            unhandled_projects.append(project)
+
+    set_demand_total_fields(ds, year, month, year, month)
+    set_demand_last_status(ds)
+    set_demand_open_reminders(ds)
+
+    # add un-handled projects
+    for demand in ds:
+        last_status = demand.last_status
+
+        if last_status and last_status.type_id == DemandStatusType.Feed:
+            unhandled_projects.append(demand.project)
+
+    sales_count, expected_sales_count, sales_amount = 0,0,0
+
     for d in ds:
-        sales_count += d.get_sales().count()
-        sales_amount += d.get_sales().total_price_final()
+        sales_count += d.sales_count
+        sales_amount += d.sales_amount
         expected_sales_count += d.sale_count
         
-    return render(request, 'Management/demand_list.html', 
-                              { 'demands':ds, 'unhandled_projects':unhandled_projects, 
-                               'month':date(year, month, 1), 'filterForm':form, 'sales_count':sales_count ,
-                               'sales_amount':sales_amount, 'expected_sales_count':expected_sales_count },
-                              )
+    context = { 
+        'demands':ds, 
+        'unhandled_projects':unhandled_projects, 
+        'month':date(year, month, 1), 'filterForm':form, 'sales_count':sales_count ,
+        'sales_amount':sales_amount, 'expected_sales_count':expected_sales_count }
+
+    return render(request, 'Management/demand_list.html', context)
 
 def employee_sales(request, id, year, month):
     salary = EmployeeSalary.objects.get(employee__id = id, year = year, month = month)
