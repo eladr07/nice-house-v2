@@ -33,6 +33,7 @@
 		<th style="width:150px;">שם הרוכשים</th>
 		<th>מס' בניין</th>
 		<th>מס' דירה</th>
+		<th>סוכן מכירות</th>
 		<th>מחיר חוזה</th>
 		{% if sales.0.discount %}<th>% הנחה ניתן</th>{% endif %}
 		{% if sales.0.allowed_discount %}<th>% הנחה מותר</th>{% endif %}
@@ -50,6 +51,15 @@
 				<td><a target="_parent" href="/buildings/{{b.id}}/pricelist/type1">{{s.house.building.num}}</a></td>
 				<td><a target="_parent" href="/buildings/{{b.id}}/house/{{s.house.id}}/type1">{{s.house.num}}</a></td>
 				{% endwith %}
+				<td>
+					{% if s.employee %}
+						<a href="/employees/{{s.employee.id}}">{{s.employee}}</a>
+					{% else %}
+						{% for e in s.house.building.project.employees.all %}
+							<a href="/employees/{{e.id}}">{{e}}</a><br>
+						{% endfor %}
+					{% endif %}
+				</td>
 				<td>
 					{{s.price|intcomma}}<br>
 					{{s.include_tax|yesno:"כולל מע\"מ, לא כולל מע\"מ"}}, 
@@ -81,7 +91,7 @@
 			</tr>
 		{% endfor %}
 		<tr class="sumRow">
-			<td colspan="5"></td>
+			<td colspan="6"></td>
 			<td><b>סה"כ מכירות</b></td>
 			<td colspan="2"><b>{{sales_amount|intcomma}}</b></td>
 		</tr>
