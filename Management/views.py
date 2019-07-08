@@ -794,7 +794,8 @@ def demand_function(request,id , function):
 def demand_return_to_calc(request, id):
     demand = Demand.objects.get(pk = id)
     demand.close()
-    return HttpResponseRedirect('/demandsold/?year=%s&month=%s' % (demand.year,demand.month))
+    url = reverse('demand-old') + '?year=%s&month=%s' % (demand.year,demand.month)
+    return HttpResponseRedirect(url)
 
 @permission_required('Management.list_demand')
 def demand_calc(request, id):
@@ -837,7 +838,8 @@ def demand_calc(request, id):
                 scd.delete()
         d.calc_sales_commission()
         
-    return HttpResponseRedirect('/demandsold/?year=%s&month=%s' % (d.year,d.month))
+    url = reverse('demand-old') + '?year=%s&month=%s' % (d.year,d.month)
+    return HttpResponseRedirect(url)
 
 @permission_required('Management.projects_profit')
 def projects_profit(request):
@@ -2288,7 +2290,7 @@ def demands_send(request):
         if error:
             return render(request, 'Management/error.html', {'error': error}, )
         else:
-            return HttpResponseRedirect('/demandsold')
+            return HttpResponseRedirect(reverse('demand-old'))
     else:
         for demand in demands:
             contact = demand.project.demand_contact
