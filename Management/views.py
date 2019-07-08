@@ -803,11 +803,12 @@ def demand_calc(request, id):
     #reversion.revision.end()
         
     d = Demand.objects.get(pk=id)
-    c = d.project.commissions.get()
-    if c.commission_by_signups or c.c_zilber:
-        if c.commission_by_signups:
+    commissions = d.project.commissions.get()
+
+    if commissions.commission_by_signups or c.c_zilber:
+        if commissions.commission_by_signups:
             demands = list(Demand.objects.filter(project = d.project))
-        elif c.c_zilber:
+        elif commissions.c_zilber:
             demand = d
             demands = []
             while demand.zilber_cycle_index() > 1:
@@ -815,17 +816,28 @@ def demand_calc(request, id):
                 demand = demand.get_previous_demand()
             demands.insert(0, demand)
         
+        # enrich demands
+        set_demand_diff_fields(demands)
+        set_demand_last_status(demands)
+
         # exclude all demands that were already sent! to include them you must manually change their status!!!!!
-        demands = [demand for demand in demands if demand.statuses.count() == 0 or (demand.statuses.count() > 0 and
-                    demand.statuses.latest().type.id not in (DemandStatusType.Sent, DemandStatusType.Finished))]
+        demands = [demand for demand in demands if demand.last_status.type_id not in (DemandStatusType.Sent, DemandStatusType.Finished)]
             
-        #delete all commissions and sale commission details before re-calculating
+        # delete all commissions and sale commission details before re-calculating
         for demand in demands:
-            for s in demand.statuses.all():
-                s.delete()
-            for s in demand.get_sales():
-                for scd in s.project_commission_details.all():
+            # enrich demand
+            year, month = demand.year, demand.month
+            set_demand_sale_fields([demand], year, month, year, month)
+
+            # delete demand statuses
+            for status in demand.statuses.all():
+                status.delete()
+
+            # delete sale commission details
+            for sale in demand.sales_list:
+                for scd in sale.project_commission_details.all():
                     scd.delete()
+
         for d2 in demands:
             d2.calc_sales_commission()
             demand = Demand.objects.get(pk=d2.id)
@@ -833,9 +845,16 @@ def demand_calc(request, id):
                 demand.finish()
                 time.sleep(1)
     else:
-        for s in d.get_sales():
-            for scd in s.project_commission_details.all():
+        # enrich demand
+        set_demand_sale_fields([d], d.year, d.month, d.year, d.month)
+        set_demand_diff_fields([d])
+
+        # delete all commission details
+        for sale in d.sales_list:
+            for scd in sale.project_commission_details.all():
                 scd.delete()
+
+        # re-calculate commission for demand
         d.calc_sales_commission()
         
     url = reverse('demand-old') + '?year=%s&month=%s' % (d.year,d.month)
