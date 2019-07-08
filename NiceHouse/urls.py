@@ -334,7 +334,7 @@ urlpatterns += [
     path('demands/<int:id>/zero', demand_zero),
     path('demands/<int:id>/forcefullypaid', demand_force_fully_paid),
     path('demands/<int:id>/notyetpaid', demand_not_yet_paid),
-    path('demands/<int:object_id>', demand_edit),
+    path('demands/<int:object_id>', demand_edit, name='demand-edit'),
     path('demands/<int:obj_id>/reminders', obj_reminders,
      {'model': Demand}),
     path('demands/<int:obj_id>/addreminder', obj_add_reminder,

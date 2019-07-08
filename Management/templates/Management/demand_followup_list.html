@@ -123,7 +123,7 @@
 	{% else %}
 		<tr class="{% cycle 'row1' 'row2' %}" objid={{d.id}}>
 	{% endif %}
-			<td><a href="/demands/{{d.id}}">{{d.id}}</a></td>
+			<td><a href="{% url 'demand-edit' object_id=d.id %}">{{d.id}}</a></td>
 			<td>
 				<a href="/reports/project_month/{{d.project.id}}/{{d.year}}/{{d.month}}">
 				<img src="{% static "images/PDF-48.png" %}" width="15" height="15"/>
