@@ -21,7 +21,7 @@
 		</tr>
 		{% for d in demands %}
 			<tr class="{% cycle 'row1' 'row2' %}" objid={{a.id}}>
-				<td><a target="_blank" href="/demands/{{d.id}}"><img src="{% static "images/documentinfo-48.png" %}" width="15" height="15" alt="פרטים" border="0" /></a></td>
+				<td><a target="_blank" href="{% url 'demand-edit' object_id=d.id %}"><img src="{% static "images/documentinfo-48.png" %}" width="15" height="15" alt="פרטים" border="0" /></a></td>
 				<td>
 					<a href="/reports/project_month/{{d.project.id}}/{{d.year}}/{{d.month}}">
 					<img src="{% static "images/PDF-48.png" %}" width="15" height="15"/>
