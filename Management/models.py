@@ -1996,23 +1996,6 @@ class Demand(models.Model):
         create_revision()
 
         return self.sales_commission
-    # def get_total_amount(self):
-    #     return self.sales_commission + self.diffs.total_amount()
-    # def invoices_amount(self):
-    #     amounts = [invoice.amount for invoice in self.invoices.all()]
-    #     return len(amounts) > 0 and sum(amounts) or None
-    # def payments_amount(self):
-    #     amounts = [payment.amount for payment in self.payments.all()]
-    #     return len(amounts) > 0 and sum(amounts) or None
-    # def invoice_offsets_amount(self):
-    #     amounts = [invoice.offset.amount for invoice in self.invoices.all() if invoice.offset != None]
-    #     return len(amounts) > 0 and sum(amounts) or None
-    # @property
-    # def is_fully_paid(self):
-    #     if self.force_fully_paid:
-    #         return True
-    #     total = self.total_amount
-    #     return total == self.invoices.total_amount_offset() and total == self.payments.total_amount()
     def feed(self):
         self.statuses.create(type= DemandStatusType.objects.get(pk=DemandStatusType.Feed)).save()
     def send(self):

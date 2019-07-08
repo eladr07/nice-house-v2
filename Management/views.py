@@ -2850,9 +2850,11 @@ def invoice_details(request, project, year, month):
     
 def demand_details(request, project, year, month):
     try:
-        d = Demand.objects.get(project = project, year = year, month = month)
-        return render(request, 'Management/demand_details.html', 
-                                  { 'demand':d}, )
+        demand = Demand.objects.get(project=project, year=year, month=month)
+
+        set_demand_diff_fields([demand])
+
+        return render(request, 'Management/demand_details.html', { 'demand':demand})
     except Demand.DoesNotExist:
         return HttpResponse('')
 
@@ -5153,23 +5155,53 @@ def global_profit_lost(request):
     if len(request.GET):
         form = GloablProfitLossForm(request.GET)
         if form.is_valid():
+            # extract form data
             divisions = form.cleaned_data['divisions']
-            from_date = date(form.cleaned_data['from_year'], form.cleaned_data['from_month'], 1)
-            to_date = date(form.cleaned_data['to_year'], form.cleaned_data['to_month'], 1)
+            from_year, from_month = form.cleaned_data['from_year'], form.cleaned_data['from_month']
+            to_year, to_month = form.cleaned_data['to_year'], form.cleaned_data['to_month']
+
+            from_date = date(from_year, from_month, 1)
+            to_date = date(to_year, to_month, 1)
+
             for division in divisions:
                 total_income, total_loss = 0,0
                 income_rows, loss_rows = [], []
                 
                 if division.id == DivisionType.Marketing:
-                    demands = Demand.objects.range(from_date.year, from_date.month, to_date.year, to_date.month)
-                    salaries = EmployeeSalary.objects.nondeleted().range(from_date.year, from_date.month, to_date.year, to_date.month)
-                    
-                    demands_amount, salaries_amount = 0,0
+                    # load and enrich demands
+                    demands = Demand.objects \
+                        .range(from_year, from_month, to_year, to_month)
+
+                    set_demand_diff_fields(demands)
+
+                    # load and enrich salaries
+                    salaries = EmployeeSalary.objects \
+                        .select_related('employee__employment_terms') \
+                        .nondeleted() \
+                        .range(from_year, from_month, to_year, to_month)
+
+                    set_salary_base_fields(
+                        salaries,
+                        {s.employee_id:s.employee for s in salaries},
+                        from_year, from_month, to_year, to_month)
+
+                    # load all Tax objects, order by 'date' descending
+                    taxes = list(Tax.objects.all())
+
+                    # sum up demands total_amount
+                    demands_amount = 0
+
                     for demand in demands:
-                        tax_val = Tax.objects.filter(date__lte=date(demand.year, demand.month,1)).latest().value / 100 + 1
-                        demands_amount += demand.get_total_amount() / tax_val
-                    for salary in salaries:
-                        salaries_amount += salary.bruto or salary.check_amount or 0
+                        # find the first tax object with date earlier then demand's date
+                        demand_date = date(demand.year, demand.month, 1)
+                        tax = next((t for t in taxes if t.date <= demand_date))  
+
+                        tax_val = tax.value / 100 + 1
+
+                        demands_amount += demand.total_amount / tax_val
+
+                    # sum up salaries amount
+                    salaries_amount = sum([salary.bruto or salary.check_amount or 0 for salary in salaries])
 
                     income_rows.append({
                         'name':division,
@@ -5195,8 +5227,20 @@ def global_profit_lost(request):
                     elif division.id == DivisionType.NHNesZiona:
                         nhbranch = NHBranch.objects.get(pk = NHBranch.NesZiona)
                     
-                    salaries = NHEmployeeSalary.objects.nondeleted().range(from_date.year, from_date.month, to_date.year, to_date.month).filter(nhbranch = nhbranch)
-                    nhmonths = NHMonth.objects.range(from_date.year, from_date.month, to_date.year, to_date.month).filter(nhbranch = nhbranch)
+                    # load and enrich salaries
+                    salaries = NHEmployeeSalary.objects \
+                        .select_related('nhemployee') \
+                        .nondeleted() \
+                        .range(from_year, from_month, to_year, to_month) \
+                        .filter(nhbranch = nhbranch)
+
+                    set_salary_base_fields(
+                        salaries,
+                        {s.nhemployee_id: s.nhemployee for s in salaries},
+                        from_year, from_month, to_year, to_month)
+
+                    nhmonths = NHMonth.objects.range(from_year, from_month, to_year, to_month) \
+                        .filter(nhbranch = nhbranch)
                     
                     nhmonths_amount, salary_amount = 0,0
                     for nhmonth in nhmonths:
@@ -5220,13 +5264,14 @@ def global_profit_lost(request):
                     total_loss += salary_amount
                     
                 #general information required by all divisions    
-                incomes = Income.objects.range(from_date.year, from_date.month, to_date.year, to_date.month).filter(division_type = division)
-                checks = PaymentCheck.objects.filter(issue_date__range = (from_date,to_date), division_type = division)
+                incomes = Income.objects \
+                    .range(from_year, from_month, to_year, to_month) \
+                    .filter(division_type = division)
+
+                checks = PaymentCheck.objects \
+                    .filter(issue_date__range=(from_date,to_date), division_type=division)
                 
-                incomes_amount = 0
-                for income in incomes:
-                    incomes_amount += income.invoice and income.invoice.amount or 0
-                    
+                incomes_amount = sum([income.invoice and income.invoice.amount or 0 for income in incomes])
                 total_income += incomes_amount
                 
                 income_rows.extend([{'name':u'הכנסות אחרות','amount':incomes_amount,
@@ -5236,10 +5281,7 @@ def global_profit_lost(request):
                 
                 global_income += total_income
                 
-                expenses_amount = 0
-                for check in checks:
-                    expenses_amount += check.amount
-                    
+                expenses_amount = sum([check.amount for check in checks])
                 total_loss += expenses_amount
                 
                 loss_rows.extend([{'name':u'הוצאות אחרות', 'amount':expenses_amount,
