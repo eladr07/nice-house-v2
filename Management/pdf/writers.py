@@ -397,7 +397,7 @@ class MonthDemandWriter(DocumentBase):
                 else:
                     row = [None, None]
                 
-                if sale in sales_commission_details:
+                if s in sales_commission_details:
                     details = sales_commission_details[sale]
                     latest_doh0price = details.get('latest_doh0price', 0)
                     memudad = details.get('memudad', 0)
