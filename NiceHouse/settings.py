@@ -169,7 +169,7 @@ LOGGING = {
             'level':'DEBUG',
             'class':'logging.FileHandler',
             'filename': os.path.join(BASE_DIR, 'logs/salary.log'), 
-            #'formatter': 'form01'
+            'formatter': 'form01'
         },
         'hand05': {
             'level':'DEBUG',
@@ -181,11 +181,13 @@ LOGGING = {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
             'filename': os.path.join(BASE_DIR, 'logs/error.log'),
+            'formatter': 'form01'
         },        
         'query': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': os.path.join(BASE_DIR, 'logs/query.log'),
+            'formatter': 'form01'
         },
     },
     'loggers': {
