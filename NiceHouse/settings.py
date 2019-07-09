@@ -169,7 +169,7 @@ LOGGING = {
             'level':'DEBUG',
             'class':'logging.FileHandler',
             'filename': os.path.join(BASE_DIR, 'logs/salary.log'), 
-            'formatter': 'form01'
+            #'formatter': 'form01'
         },
         'hand05': {
             'level':'DEBUG',
