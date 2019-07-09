@@ -590,7 +590,7 @@ class MonthDemandWriter(DocumentBase):
         rows = []
         total_lawyer_pay, total_pc_base_worth, total_pb_dsp_worth = 0, 0 ,0
         
-        commissions = self.demand.project.commissions
+        commissions = self.demand.project.commissions.get()
         
         for s in sales:
             s.restore = True
