@@ -1541,7 +1541,7 @@ def employee_salary_calc(request, model, id):
             year, month, year, month)
 
     salary.calculate()
-    salart.save()
+    salary.save()
     
     if model == EmployeeSalary:
         url = reverse('salary-list') + '?year=%s&month=%s' % (es.year, es.month)
