@@ -616,10 +616,10 @@ class MonthDemandWriter(DocumentBase):
                 
             row.extend([
                 commaise(s.price_final),
-                round(s.pc_base, -3), 
+                round(s.pc_base, 3), 
                 commaise(s.pc_base_worth)
             ])
-            
+
             total_pc_base_worth += s.pc_base_worth
             
             if final:
