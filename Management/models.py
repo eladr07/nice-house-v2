@@ -1115,8 +1115,8 @@ class EmployeeSalary(EmployeeSalaryBase):
                              {'employee':self.employee, 'year':self.year, 'month':self.month})
             raise
         else:
-            logger.info('succeeded to calculate salary for employee %s, year %s, month %s',
-                self.employee, self.year, self.month)
+            logger.info('succeeded to calculate salary for employee %d, year %d, month %d',
+                self.employee_id, self.year, self.month)
             
     def get_absolute_url(self):
         return '/salaries/%s' % self.id
