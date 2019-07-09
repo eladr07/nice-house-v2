@@ -195,7 +195,7 @@
 				<td>{{s.discount|floatformat:-3}}</td>
 				<td>{{s.allowed_discount|floatformat:-3}}</td>
 				{% endif %}
-				<td>{{s.pc_base}}</td>
+				<td>{{s.pc_base|floatformat:-3}}</td>
 				<td>{{s.pc_base_worth|floatformat:-3|intcomma}} ש"ח</td>
 				{% if demand.project.commissions.get.b_discount_save_precentage %}
 					<td>{{s.pb_dsp|floatformat:-3}}</td>

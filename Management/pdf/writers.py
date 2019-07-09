@@ -614,7 +614,12 @@ class MonthDemandWriter(DocumentBase):
             if discount:
                 row.extend([s.discount, s.allowed_discount])
                 
-            row.extend([commaise(s.price_final),s.pc_base, commaise(s.pc_base_worth)])
+            row.extend([
+                commaise(s.price_final),
+                round(s.pc_base, -3), 
+                commaise(s.pc_base_worth)
+            ])
+            
             total_pc_base_worth += s.pc_base_worth
             
             if final:
