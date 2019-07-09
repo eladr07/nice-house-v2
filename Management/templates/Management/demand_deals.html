@@ -189,9 +189,9 @@
 				<td {% if s.salepricemod.id %}style="background-color: #F69F9F;"{% endif %}>
 					{{s.price|intcomma}} ש"ח
 				</td>
-				<td>{{s.price_final|intcomma}} ש"ח</td>
+				<td>{{s.price_final|floatformat:0|intcomma}} ש"ח</td>
 				{% if demand.sales_with_discount %}
-				<td>{{s.price_taxed|intcomma}}</td>
+				<td>{{s.price_taxed|floatformat:0|intcomma}}</td>
 				<td>{{s.discount|floatformat:-3}}</td>
 				<td>{{s.allowed_discount|floatformat:-3}}</td>
 				{% endif %}
@@ -250,8 +250,8 @@
 					</td>
 					<td>{{s.house.get_signup.date|date:"j/m/Y"}}</td>
 					<td>{{s.sale_date|date:"j/m/Y"}}</td>
-					<td>{{s.price|intcomma}} ש"ח</td>
-					<td>{{s.price_final|intcomma}} ש"ח</td>
+					<td>{{s.price|floatformat:0|intcomma}} ש"ח</td>
+					<td>{{s.price_final|floatformat:0|intcomma}} ש"ח</td>
 					{% if s.discount %}
 					<td colspan="3"></td>
 					{% endif %}
@@ -283,8 +283,8 @@
 			{% endif %}
 			<tr height="40px">
 				<td colspan={% if sales.0.discount %}"7"{%else%}"6"{%endif%}></td>
-				<td><b><u>{{sales.total_price|intcomma}} ש"ח</u></b></td>
-				<td><b><u>{{sales.total_price_final|intcomma}} ש"ח</u></b></td>
+				<td><b><u>{{sales.total_price|floatformat:0|intcomma}} ש"ח</u></b></td>
+				<td><b><u>{{sales.total_price_final|floatformat:0|intcomma}} ש"ח</u></b></td>
 				<td colspan={% if sales.0.discount %}"5"{%else%}"2"{%endif%}></td>
 				<td colspan={% if demand.project.commissions.get.b_discount_save_precentage or demand.project.commissions.get.c_zilber %}"3"{%else%}"1"{%endif%}></td>
 				<td colspan="2"><b><u style="color:#1A339C;">{{demand.sales_commission|intcomma}} ש"ח</u></b></td>
