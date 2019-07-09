@@ -1531,7 +1531,7 @@ def employee_salary_calc(request, model, id):
     salary = model.objects.get(pk=id)
     
     if model == EmployeeSalary:
-        employee = salary.employee
+        employee, year, month = salary.employee, salary.year, salary.month
 
         # enrish salary object
         set_employee_sales(
