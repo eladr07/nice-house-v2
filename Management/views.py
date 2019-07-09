@@ -1530,8 +1530,10 @@ def employee_salary_pdf(request, year, month):
 def employee_salary_calc(request, model, id):
     salary = model.objects.get(pk=id)
     
+    year, month = salary.year, salary.month
+
     if model == EmployeeSalary:
-        employee, year, month = salary.employee, salary.year, salary.month
+        employee = salary.employee
 
         # enrish salary object
         set_employee_sales(
@@ -1544,9 +1546,9 @@ def employee_salary_calc(request, model, id):
     salary.save()
     
     if model == EmployeeSalary:
-        url = reverse('salary-list') + '?year=%s&month=%s' % (es.year, es.month)
+        url = reverse('salary-list') + '?year=%s&month=%s' % (year, month)
     elif model == NHEmployeeSalary:
-        url = reverse('nh-salary-list') + '?year=%s&month=%s' % (es.year, es.month)
+        url = reverse('nh-salary-list') + '?year=%s&month=%s' % (year, month)
 
     return HttpResponseRedirect(url)
 
