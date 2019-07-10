@@ -117,13 +117,13 @@
 	<tr height="30px" class="rowSum">
 		<td colspan="3" align="center">סיכום</td>
 		<td>{{total_sale_count}}</td>
-		<td>{{total_income|intcomma}} ש"ח</td>
+		<td>{{total_income|floatformat:0|intcomma}} ש"ח</td>
 		<td></td>
 		<td></td>
 		<td>{{total_expense|intcomma}} ש"ח</td>
 		<td>{{avg_relative_expense_income|floatformat:-2}}%</td>
 		<td>{{avg_relative_sales_expense|floatformat:-2}}%</td>
-		<td>{{total_profit|intcomma}} ש"ח</td>
+		<td>{{total_profit|floatformat:0|intcomma}} ש"ח</td>
 	</tr>
 </table>
 {% endblock content %}

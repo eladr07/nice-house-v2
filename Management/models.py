@@ -1049,12 +1049,12 @@ class EmployeeSalary(EmployeeSalaryBase):
         logger = logging.getLogger('salary')
         
         try:
-            logger.info('starting to calculate salary for employee %(employee)s, year %(year)s, month %(month)s',
-                        {'employee':self.employee, 'year':self.year, 'month':self.month})
+            logger.info('starting to calculate salary for employee #%(employee)d, year %(year)d, month %(month)d',
+                        {'employee':self.employee_id, 'year':self.year, 'month':self.month})
             
             sale_commission_details =  SaleCommissionDetail.objects.filter(employee_salary=self)
             
-            logger.info('deleting %s sale commisison details' % sale_commission_details.count())
+            logger.info('deleting %s sale commisison details', sale_commission_details.count())
             sale_commission_details.delete()
 
             terms = self.employee.employment_terms        
@@ -1069,36 +1069,48 @@ class EmployeeSalary(EmployeeSalaryBase):
             else:
                 self.base = terms.salary_base
     
-            logger.debug('salary base : %s' % self.base)
+            logger.debug('salary base : %s', self.base)
     
             for project, sales in self.sales.items():
-                q = self.employee.commissions.filter(project__id = project.id)
+                project_id = project.id
+
+                # load commission for project
+                q = self.employee.commissions.filter(project__id=project_id)
+
                 if q.count() == 0: 
-                    logger.warning('no employee commission is defined for project %s, continuing' % project)
+                    logger.warning('no employee commission is defined for project #%d, continuing', project_id)
                     continue
+
                 epc = q[0]
+
+                # validate commission is active
                 if not epc.is_active(date(self.year, self.month,1)) or not sales or len(sales) == 0:
                     self.project_commission[epc.project] = 0
-                    logger.warning('no employee commission for project %(project)s is not active - start: %(start)s end: %(end)s, continuing',
-                                   {'project':project, 'start':epc.start_date, 'end':epc.end_date})
+                    logger.warning('no employee commission for project #%(project)d is not active - start: %(start)s end: %(end)s, continuing',
+                        {'project':project_id, 'start':epc.start_date, 'end':epc.end_date})
                     continue
                 
+                # calculate commission for project
                 amount = epc.calc(sales, self)
-                logger.info('employee commission for project %(project)s is %(amount)s', {'project':project, 'amount':amount})
+
+                logger.info('employee commission for project #%(project)d is %(amount)d', 
+                    {'project':project_id, 'amount':amount})
                 
                 self.project_commission[epc.project] = amount
                 self.commissions += amount
+
                 if terms.salary_net == False:
                     self.pdf_remarks = u'ברוטו, כמה נטו בעדכון הוצאות'
-                for s in sales:
-                    s.employee_paid = True
-                    s.save() 
+
+                for sale in sales:
+                    sale.employee_paid = True
+                    sale.save() 
         except:
-            logger.exception('exception while trying to calculate salary for employee %(employee)s, year %(year)s, month %(month)s',
-                             {'employee':self.employee, 'year':self.year, 'month':self.month})
+            logger.exception('exception while trying to calculate salary for employee #%(employee)d, year %(year)d, month %(month)d',
+                             {'employee':self.employee_id, 'year':self.year, 'month':self.month})
         else:
-            logger.info('succeeded to calculate salary for employee %(employee)s, year %(year)s, month %(month)s',
-                        {'employee':self.employee, 'year':self.year, 'month':self.month})
+            logger.info('succeeded to calculate salary for employee #%(employee)d, year %(year)d, month %(month)d',
+                {'employee':self.employee_id, 'year':self.year, 'month':self.month})
             
     def get_absolute_url(self):
         return '/salaries/%s' % self.id

@@ -560,7 +560,7 @@ class MonthDemandWriter(DocumentBase):
             names.append(u'הרשמה\nתאריך')
             colWidths.append(None)
         names.extend([u'שם הרוכשים',u'ודירה\nבניין',u'מכירה\nתאריך', u'חוזה\nמחיר'])
-        colWidths.extend([65, None,None,45])
+        colWidths.extend([65, None,None,55])
         
         if zilber:
             names.extend([u'רישום\nהוצאות',u'מזומן\nהנחת', u'מפרט\nהוצאות',u'עו"ד\nשכ"ט', u'נוספות\nהוצאות'])
@@ -573,7 +573,7 @@ class MonthDemandWriter(DocumentBase):
                 discount = True
                 
         names.extend([u'עמלה\nלחישוב\nמחיר', u'בסיס\nעמלת\n%',u'בסיס\nעמלת\nשווי'])
-        colWidths.extend([45,None,None])
+        colWidths.extend([55,None,None])
 
         commissions = self.commissions
 
@@ -615,7 +615,12 @@ class MonthDemandWriter(DocumentBase):
             if discount:
                 row.extend([s.discount, s.allowed_discount])
                 
-            row.extend([commaise(s.price_final),s.pc_base, commaise(s.pc_base_worth)])
+            row.extend([
+                commaise(s.price_final),
+                round(s.pc_base, 3), 
+                commaise(s.pc_base_worth)
+            ])
+
             total_pc_base_worth += s.pc_base_worth
             
             if final:
