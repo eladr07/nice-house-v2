@@ -30,22 +30,6 @@ class EmployeeSalaryBaseManager(SeasonManager):
     def get_queryset(self):
         return EmployeeSalaryBaseQuerySet(self.model)
     
-class InvoiceManager(models.Manager):
-    use_for_related_fields = True
-    
-    def total_amount_offset(self):
-        return self.get_queryset().total_amount_offset()
-    def get_queryset(self):
-        return InvoiceQuerySet(self.model)
-
-class PaymentManager(models.Manager):
-    use_for_related_fields = True
-    
-    def total_amount(self):
-        return self.get_queryset().total_amount()
-    def get_queryset(self):
-        return PaymentQuerySet(self.model)
-
 class DemandManager(SeasonManager):
     use_for_related_fields = True
     
@@ -62,14 +46,6 @@ class DemandManager(SeasonManager):
     
     def get_queryset(self):
         return DemandQuerySet(self.model, using=self._db)
-
-class DemandDiffManager(models.Manager):
-    use_for_related_fields = True
-    
-    def total_amount(self):
-        return self.get_queryset().total_amount()
-    def get_queryset(self):
-        return DemandDiffQuerySet(self.model)
 
 class SaleManager(models.Manager):
     use_for_related_fields = True

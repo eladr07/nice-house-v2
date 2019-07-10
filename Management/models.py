@@ -17,6 +17,8 @@ from Management.templatetags.management_extras import commaise
 from Management.decorators import cache_method
 from Management.managers import *
 
+from Management.enrichers.demand import set_demand_sale_fields, set_demand_diff_fields
+
 Salary_Types = (
                 (None, u'לא ידוע'),
                 (False, u'ברוטו'),
@@ -1743,8 +1745,6 @@ class Invoice(models.Model):
     remarks = models.TextField(gettext('remarks'), null=True,blank=True)
     offset = models.ForeignKey('InvoiceOffset', on_delete=models.PROTECT, editable=False, null=True)
     
-    objects = InvoiceManager()
-    
     def get_absolute_url(self):
         return '/invoices/%s' % self.id
     def __str__(self):
@@ -1783,8 +1783,6 @@ class Payment(models.Model):
     amount = models.IntegerField(gettext('amount'))
     remarks = models.TextField(gettext('remarks'), null=True,blank=True)
     
-    objects = PaymentManager()
-    
     def __str__(self):
         return u'תשלום על סך %s ש"ח בתאריך %s' % (commaise(self.amount), self.payment_date.strftime('%d/%m/%Y'))
     def is_split(self):
@@ -1821,8 +1819,6 @@ class DemandDiff(models.Model):
     type = models.CharField(gettext('diff_type'), max_length=30, help_text=u'קבועה, משתנה, בונוס, קיזוז או לבחירתך')
     reason = models.CharField(gettext('diff_reason'), max_length=30, null=True, blank=True)
     amount = models.FloatField(gettext('amount'))
-    
-    objects = DemandDiffManager()
     
     def __str__(self):
         return u'תוספת מסוג %s על סך %s ש"ח - %s' % (self.type, self.amount, self.reason)

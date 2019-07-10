@@ -13,20 +13,6 @@ class SeasonQuerySet(models.QuerySet):
 class EmployeeSalaryBaseQuerySet(SeasonQuerySet):
     def nondeleted(self):
         return self.filter(is_deleted=False)
-
-class InvoiceQuerySet(models.QuerySet):
-    def total_amount_offset(self):
-        invoices_amount = self.aggregate(Sum('amount'))['amount__sum'] or 0
-        offsets_amount = self.aggregate(Sum('offset__amount'))['offset__amount__sum'] or 0
-        return invoices_amount + offsets_amount
-    
-class PaymentQuerySet(models.QuerySet):
-    def total_amount(self):
-        return self.aggregate(Sum('amount'))['amount__sum'] or 0
-    
-class DemandDiffQuerySet(models.QuerySet):
-    def total_amount(self):
-        return self.aggregate(Sum('amount'))['amount__sum'] or 0
     
 class DemandQuerySet(SeasonQuerySet):
     def total_sales_commission(self):
