@@ -931,13 +931,6 @@ class EmployeeSalaryBase(models.Model):
         self.statuses.create(type = EmployeeSalaryBaseStatusType.objects.get(pk = EmployeeSalaryBaseStatusType.SentChecks)).save()
     def send_to_bookkeeping(self):
         self.statuses.create(type = EmployeeSalaryBaseStatusType.objects.get(pk = EmployeeSalaryBaseStatusType.SentBookkeeping)).save()
-    @property
-    @cache_method
-    def loan(self):
-        amount = 0
-        for lp in self.get_employee().loans.filter(year = self.year, month = self.month):
-            amount += lp.amount
-        return amount
     def mark_deleted(self):
         self.is_deleted = True
     def get_employee(self):
