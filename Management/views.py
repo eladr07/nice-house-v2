@@ -2175,9 +2175,6 @@ def demand_sale_cancel(request, demand_id, id):
 
 @permission_required('Management.add_invoice')
 def invoice_add(request, initial=None):
-    
-    sales = initial.get('demand').get_sales().select_related('house__building')
-
     if request.method == 'POST':
         form = DemandInvoiceForm(request.POST)
         if form.is_valid():
@@ -2188,7 +2185,12 @@ def invoice_add(request, initial=None):
                 return HttpResponseRedirect('/payments/add')
     else:
         form = DemandInvoiceForm(initial=initial)
-    return render(request, 'Management/invoice_edit.html', {'form':form, 'sales':sales, 'demand': initial.get('demand')}, )
+
+    demand = initial['demand']
+
+    context = {'form':form, 'sales':demand.sales_list, 'demand': demand}
+
+    return render(request, 'Management/invoice_edit.html', context)
 
 class InvoiceUpdate(PermissionRequiredMixin, UpdateView):
     model = Invoice
@@ -2198,8 +2200,15 @@ class InvoiceUpdate(PermissionRequiredMixin, UpdateView):
 
 @permission_required('Management.add_invoice')
 def demand_invoice_add(request, id):
-    demand = Demand.objects.select_related('project').get(pk=id)
-    return invoice_add(request, {'project':demand.project.id, 'month':demand.month, 'year':demand.year, 'demand': demand})
+    demand = Demand.objects \
+        .select_related('project') \
+        .get(pk=id)
+
+    year, month = demand.year, demand.month
+
+    set_demand_sale_fields([demand], year, month, year, month)
+
+    return invoice_add(request, {'project':demand.project_id, 'month':month, 'year':year, 'demand': demand})
 
 @permission_required('Management.demand_invoices')
 def demand_invoice_list(request):
