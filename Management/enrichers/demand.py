@@ -85,6 +85,16 @@ def set_demand_open_reminders(demands):
             if r.statuses.latest().type_id not in (ReminderStatusType.Deleted,ReminderStatusType.Done)]
 
 def set_demand_invoice_payment_fields(demands):
+    """
+    Sets the following fields for each demand:
+    - invoices_amount: sum of invoice amounts
+    - invoice_offsets_amount: sum of invoice offset amounts
+    - total_amount_offset: invoices_amount + invoice_offsets_amount
+    - payments_amount: sum of payment amounts
+    - diff_invoice
+    - diff_invoice_payment: payments_amount - total_amount_offset
+    - is_fully_paid
+    """
     for demand in demands:
         # sum invoice amounts
         invoice_amounts = [i.amount for i in demand.invoices.all()]
@@ -111,6 +121,14 @@ def set_demand_invoice_payment_fields(demands):
 def set_demand_sale_fields(
     demands, 
     from_year, from_month, to_year, to_month):
+    """
+    Sets the following fields for each demand: 
+    - sales_list
+    - sales_with_discount
+    - sales_count
+    - sales_total_price: sum of sale.price
+    - sales_amount: sum of sale.price_final
+    """
     # extract project ids
     project_ids = [d.project_id for d in demands]
 
