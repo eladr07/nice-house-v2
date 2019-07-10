@@ -72,19 +72,6 @@ def calc_salaries(salaries):
     thread.setDaemon(True)
     thread.start()
 
-def calc_demands(demands):
-    def calc_demands_core(demands):
-        with reversion.create_revision():
-            for demand in demands:
-                try:
-                    demand.calc_sales_commission()
-                except:
-                    continue
-    
-    thread = threading.Thread(target = lambda: calc_demands_core(demands))
-    thread.setDaemon(True)
-    thread.start()
-
 @login_required
 def index(request):
     context = {
@@ -813,7 +800,7 @@ def demand_calc(request, id):
     d = Demand.objects.get(pk=id)
     commissions = d.project.commissions.get()
 
-    if commissions.commission_by_signups or c.c_zilber:
+    if commissions.commission_by_signups or commissions.c_zilber:
         if commissions.commission_by_signups:
             demands = list(Demand.objects.filter(project = d.project))
         elif commissions.c_zilber:
@@ -838,13 +825,11 @@ def demand_calc(request, id):
             set_demand_sale_fields([demand], year, month, year, month)
 
             # delete demand statuses
-            for status in demand.statuses.all():
-                status.delete()
+            demand.statuses.delete()
 
             # delete sale commission details
             for sale in demand.sales_list:
-                for scd in sale.project_commission_details.all():
-                    scd.delete()
+                sale.project_commission_details.delete()
 
         for d2 in demands:
             d2.calc_sales_commission()
@@ -2126,7 +2111,8 @@ def demand_sale_reject(request, demand_id, id):
     sr.to_year, sr.to_month = to_year, to_month
     sr.save()
     
-    calc_demands(demands_to_calc)
+    for demand in demands_to_calc:
+        demand.calc_sales_commission()
     
     return HttpResponseRedirect('/salereject/%s' % sr.id)
 
@@ -2152,7 +2138,8 @@ def demand_sale_pre(request, demand_id, id):
     sr.to_year, sr.to_month = to_year, to_month
     sr.save()
     
-    calc_demands(demands_to_calc)
+    for demand in demands_to_calc:
+        demand.calc_sales_commission()
     
     return HttpResponseRedirect('/salepre/%s' % sr.id)
 
@@ -2169,7 +2156,7 @@ def demand_sale_cancel(request, demand_id, id):
     sale.save()
     
     #re-calculate the entire demand
-    calc_demands([sale.demand])
+    sale.demand.calc_sales_commission()
     
     return HttpResponseRedirect('/salecancel/%s' % sc.id)
 
@@ -4062,7 +4049,7 @@ def sale_edit(request, id):
                     next = '/salehousemod/%s' % shm.id
             form.save()
 
-            calc_demands([demand])
+            demand.calc_sales_commission()
 
             year, month = sale.demand.year, sale.demand.month
             employees = demand.project.employees.exclude(work_end__isnull = False, work_end__lt = date(year, month, 1))
@@ -4106,7 +4093,7 @@ def sale_add(request, demand_id=None):
                 sp.save()
                 next = '/salepre/%s' % sp.id 
             
-            calc_demands([demand])
+            demand.calc_sales_commission()
             
             employees = demand.project.employees.exclude(work_end__isnull = False, work_end__lt = date(year, month, 1))
             

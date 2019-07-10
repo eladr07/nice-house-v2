@@ -2,7 +2,7 @@ import itertools
 
 from django.db.models import Count
 
-from Management.models import Sale, DemandStatus, DemandDiff, ReminderStatusType
+from Management.models import Sale, DemandStatus, DemandDiff, ReminderStatusType, ProjectCommission
 
 def set_demand_diff_fields(demands):
     # extract demand ids
@@ -149,10 +149,24 @@ def set_demand_sale_fields(
 
     sales_map = {map_key: list(sales) for (map_key, sales) in sale_groups}
 
+    # get project commissions
+    project_commissions = ProjectCommission.objects \
+        .filter(project_id__in=project_ids) \
+        .order_by('project_id')
+
+    # map project_id to comissions
+    project_commissions_map = {item.project_id: item for item in project_commissions}
+
     for demand in demands:
         map_key = (demand.project_id, demand.year, demand.month)
 
         sales_list = sales_map.get(map_key, [])
+
+        # get project commissions - TODO optimize
+        commissions = project_commissions_map.get(demand.project_id)
+
+        if commissions and commissions.commission_by_signups:
+            sales_list.sort(key=lambda sale: sale.house.get_signup().date)
 
         demand.sales_list = sales_list
         demand.sales_with_discount = [sale for sale in sales_list if sale.discount != None]
