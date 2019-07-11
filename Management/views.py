@@ -1,9 +1,8 @@
-﻿import reversion, itertools, time, threading, io
+﻿import itertools, time, io
 from datetime import datetime, date
 
 import django.core.paginator
-from django.db import models, transaction
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, Q
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError, FileResponse
 from django.forms.models import inlineformset_factory
@@ -57,20 +56,6 @@ def revision_list(request):
         filterForm = RevisionFilterForm(request.GET)
         
     return render(request, 'revision_list.html', {'filterForm':filterForm })
-
-def calc_salaries(salaries):
-    def calc_salaries_core(salaries):
-        with reversion.create_revision():
-            for salary in salaries:
-                try:
-                    salary.calculate()
-                    salary.save()
-                except:
-                    continue
-    
-    thread = threading.Thread(target = lambda: calc_salaries_core(salaries))
-    thread.setDaemon(True)
-    thread.start()
 
 @login_required
 def index(request):
@@ -2068,12 +2053,12 @@ def salepaymod_edit(request, model, object_id):
             
             # need to re-calc both origin and destination demand (if changed)
             if object.to_year != to_year or object.to_month != to_month:
-                q = models.Q(year = object.to_year, month = object.to_month) | models.Q(year = to_year, month = to_month)
+                q = Q(year = object.to_year, month = object.to_month) | Q(year = to_year, month = to_month)
                 demands_to_calc.extend(project.demands.filter(q))
                 
             # need to calc origin and destination salaries for all project employees
             if object.employee_pay_year != employee_pay_year or object.employee_pay_month != employee_pay_month:
-                q = models.Q(year = object.employee_pay_year, month = object.employee_pay_month) | models.Q(year = employee_pay_year, month = employee_pay_month)
+                q = Q(year = object.employee_pay_year, month = object.employee_pay_month) | Q(year = employee_pay_year, month = employee_pay_month)
                 salaries = EmployeeSalary.objects.nondeleted().filter(q, employee__in = project.employees.all())
                 salaries_to_calc.extend(salaries)
             
@@ -2105,7 +2090,7 @@ def demand_sale_reject(request, demand_id, id):
     if to_year != sr.to_year or to_month != sr.to_month:
         project = sale.demand.project
         # need to recalc both origin and destination demands
-        q = models.Q(year = y, month = m) | models.Q(year = to_year, month = to_month)
+        q = Q(year = y, month = m) | Q(year = to_year, month = to_month)
         demands_to_calc.extend(project.demands.filter(q))
         
     sr.to_year, sr.to_month = to_year, to_month
@@ -2132,7 +2117,7 @@ def demand_sale_pre(request, demand_id, id):
     if to_year != sr.to_year or to_month != sr.to_month:
         project = sale.demand.project
         # need to recalc both origin and destination demands
-        q = models.Q(year = y, month = m) | models.Q(year = to_year, month = to_month)
+        q = Q(year = y, month = m) | Q(year = to_year, month = to_month)
         demands_to_calc.extend(project.demands.filter(q))
         
     sr.to_year, sr.to_month = to_year, to_month
@@ -4016,7 +4001,6 @@ def attachment_add(request):
                               )
 
 @permission_required('Management.change_sale')
-#@transaction.autocommit
 def sale_edit(request, id):
     sale = Sale.objects.get(pk=id)
     if request.POST:
@@ -4054,8 +4038,13 @@ def sale_edit(request, id):
             year, month = sale.demand.year, sale.demand.month
             employees = demand.project.employees.exclude(work_end__isnull = False, work_end__lt = date(year, month, 1))
             
-            salaries_to_calc = list(EmployeeSalary.objects.nondeleted().filter(employee__in = employees, year = year, month = month))
-            calc_salaries(salaries_to_calc)
+            salaries_to_calc = EmployeeSalary.objects \
+                .nondeleted() \
+                .filter(employee__in = employees, year = year, month = month)
+
+            for salary in salaries_to_calc:
+                salary.calculate()
+                salary.save()
 
             if 'addanother' in request.POST:
                 return HttpResponseRedirect(next or '/demands/%s/sale/add' % sale.demand.id)
@@ -4068,7 +4057,6 @@ def sale_edit(request, id):
                               )    
 
 @permission_required('Management.add_sale')
-#@transaction.autocommit
 def sale_add(request, demand_id=None):
     if demand_id:
         demand = Demand.objects.get(pk = demand_id)
@@ -4097,9 +4085,14 @@ def sale_add(request, demand_id=None):
             
             employees = demand.project.employees.exclude(work_end__isnull = False, work_end__lt = date(year, month, 1))
             
-            salaries_to_calc = list(EmployeeSalary.objects.nondeleted().filter(employee__in = employees, year = year, month = month))
-            calc_salaries(salaries_to_calc)
-                
+            salaries_to_calc = EmployeeSalary.objects \
+                .nondeleted() \
+                .filter(employee__in = employees, year = year, month = month)
+
+            for salary in salaries_to_calc:
+                salary.calculate()
+                salary.save()
+                            
             if 'addanother' in request.POST:
                 return HttpResponseRedirect(next or reverse(sale_add, args=[demand_id]))
             elif 'todemand' in request.POST:
