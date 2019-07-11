@@ -22,14 +22,14 @@ def mail(to, cc='', bcc='', subject='', contents='', attachments = ()):
     for attachment in attachments:
         part = MIMEBase('application', 'octet-stream')
         if isinstance(attachment, str):
-            attachment_file = open(attachment)
+            attachment_file = open(attachment, 'rb')
         else:
             attachment_file = attachment
             
         payload = attachment_file.read()
         filename = attachment_file.name
 
-        part.set_payload(encodebytes(payload).decode())
+        part.set_payload(payload)
         encoders.encode_base64(part)
         part.add_header(u'Content-Disposition', 'attachment; filename="%s"' % filename)
         msg.attach(part)
