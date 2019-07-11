@@ -26,6 +26,8 @@ from Management.pdf.table_fields import *
 from Management.pdf.salary_table_fields import *
 from Management.pdf.styles import *
 
+from Management.enrichers.demand import set_demand_sale_fields
+
 #register Hebrew fonts
 
 from NiceHouse.settings import BASE_DIR
@@ -460,6 +462,10 @@ class MonthDemandWriter(DocumentBase):
         
         while demand.zilber_cycle_index() > 1:
             demand = demand.get_previous_demand()
+
+            # enrich demand
+            set_demand_sale_fields([demand], demand.year, demand.month, demand.year, demand.month)
+
             # adds sales of the current demand before the sales we already have because we are iterating in reverse
             demand_sales = demand.sales_list
             demand_sales.extend(sales)
@@ -494,10 +500,13 @@ class MonthDemandWriter(DocumentBase):
                    Paragraph(commaise(total_adds), styleSaleSumRow)]
         sum_row.reverse()
         rows.append(sum_row)
+
         data = [headers]
         data.extend(rows)
+        
         t = Table(data, colWidths, style = saleTableStyle, repeatRows = 1)
         flows.append(t)
+        
         return flows
                         
     def signupFlows(self):

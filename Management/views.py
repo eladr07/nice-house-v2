@@ -1964,6 +1964,7 @@ def demands_send(request):
         .select_related('project__demand_contact')
 
     set_demand_sale_fields(demands, y, m, y, m)
+    set_demand_diff_fields(demands)
     set_demand_last_status(demands)
 
     forms=[]
