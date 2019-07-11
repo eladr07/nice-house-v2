@@ -26,6 +26,14 @@ from Management.pdf.writers import MonthDemandWriter, MultipleDemandWriter, Empl
 from Management.pdf.writers import PricelistWriter, BuildingClientsWriter, EmployeeSalariesBookKeepingWriter, SalariesBankWriter, DemandFollowupWriter
 from Management.pdf.writers import EmployeeSalesWriter, SaleAnalysisWriter, DemandPayBalanceWriter
 
+from Management.enrichers.demand import set_demand_diff_fields, set_demand_is_fixed, set_demand_last_status
+from Management.enrichers.demand import set_demand_open_reminders, set_demand_invoice_payment_fields
+from Management.enrichers.demand import set_demand_sale_fields
+
+from Management.enrichers.salary import enrich_employee_salaries, enrich_nh_employee_salaries
+from Management.enrichers.salary import set_salary_base_fields, set_employee_sales, set_salary_status_date
+from Management.enrichers.salary import set_loan_fields
+
 from Management.mail import mail
 from pprint import pprint
 
@@ -61,19 +69,6 @@ def calc_salaries(salaries):
                     continue
     
     thread = threading.Thread(target = lambda: calc_salaries_core(salaries))
-    thread.setDaemon(True)
-    thread.start()
-
-def calc_demands(demands):
-    def calc_demands_core(demands):
-        with reversion.create_revision():
-            for demand in demands:
-                try:
-                    demand.calc_sales_commission()
-                except:
-                    continue
-    
-    thread = threading.Thread(target = lambda: calc_demands_core(demands))
     thread.setDaemon(True)
     thread.start()
 
@@ -794,7 +789,8 @@ def demand_function(request,id , function):
 def demand_return_to_calc(request, id):
     demand = Demand.objects.get(pk = id)
     demand.close()
-    return HttpResponseRedirect('/demandsold/?year=%s&month=%s' % (demand.year,demand.month))
+    url = reverse('demand-old') + '?year=%s&month=%s' % (demand.year,demand.month)
+    return HttpResponseRedirect(url)
 
 @permission_required('Management.list_demand')
 def demand_calc(request, id):
@@ -802,11 +798,12 @@ def demand_calc(request, id):
     #reversion.revision.end()
         
     d = Demand.objects.get(pk=id)
-    c = d.project.commissions.get()
-    if c.commission_by_signups or c.c_zilber:
-        if c.commission_by_signups:
+    commissions = d.project.commissions.get()
+
+    if commissions.commission_by_signups or commissions.c_zilber:
+        if commissions.commission_by_signups:
             demands = list(Demand.objects.filter(project = d.project))
-        elif c.c_zilber:
+        elif commissions.c_zilber:
             demand = d
             demands = []
             while demand.zilber_cycle_index() > 1:
@@ -814,17 +811,26 @@ def demand_calc(request, id):
                 demand = demand.get_previous_demand()
             demands.insert(0, demand)
         
+        # enrich demands
+        set_demand_diff_fields(demands)
+        set_demand_last_status(demands)
+
         # exclude all demands that were already sent! to include them you must manually change their status!!!!!
-        demands = [demand for demand in demands if demand.statuses.count() == 0 or (demand.statuses.count() > 0 and
-                    demand.statuses.latest().type.id not in (DemandStatusType.Sent, DemandStatusType.Finished))]
+        demands = [demand for demand in demands if demand.last_status.type_id not in (DemandStatusType.Sent, DemandStatusType.Finished)]
             
-        #delete all commissions and sale commission details before re-calculating
+        # delete all commissions and sale commission details before re-calculating
         for demand in demands:
-            for s in demand.statuses.all():
-                s.delete()
-            for s in demand.get_sales():
-                for scd in s.project_commission_details.all():
-                    scd.delete()
+            # enrich demand
+            year, month = demand.year, demand.month
+            set_demand_sale_fields([demand], year, month, year, month)
+
+            # delete demand statuses
+            demand.statuses.delete()
+
+            # delete sale commission details
+            for sale in demand.sales_list:
+                sale.project_commission_details.delete()
+
         for d2 in demands:
             d2.calc_sales_commission()
             demand = Demand.objects.get(pk=d2.id)
@@ -832,38 +838,60 @@ def demand_calc(request, id):
                 demand.finish()
                 time.sleep(1)
     else:
-        for s in d.get_sales():
-            for scd in s.project_commission_details.all():
+        # enrich demand
+        set_demand_sale_fields([d], d.year, d.month, d.year, d.month)
+        set_demand_diff_fields([d])
+
+        # delete all commission details
+        for sale in d.sales_list:
+            for scd in sale.project_commission_details.all():
                 scd.delete()
+
+        # re-calculate commission for demand
         d.calc_sales_commission()
         
-    return HttpResponseRedirect('/demandsold/?year=%s&month=%s' % (d.year,d.month))
+    url = reverse('demand-old') + '?year=%s&month=%s' % (d.year,d.month)
+    return HttpResponseRedirect(url)
 
 @permission_required('Management.projects_profit')
 def projects_profit(request):
+        
+    # load all Tax objects, order by 'date' descending
+    taxes = list(Tax.objects.all())
+
     def _process_demands(demands):
         projects = []
+
         for p, demand_iter in itertools.groupby(demands, lambda demand: demand.project):
             p.sale_count, p.total_income, p.total_expense, p.profit, p.total_sales_amount = 0,0,0,0,0
             p.employee_expense = {}
             
-            for d in demand_iter:
-                tax_val = Tax.objects.filter(date__lte=date(d.year, d.month,1)).latest().value / 100 + 1
+            for demand in demand_iter:
+                # find the first tax object with date earlier then demand's date
+                demand_date = date(demand.year, demand.month, 1)
+                tax = next((t for t in taxes if t.date <= demand_date))  
+
+                tax_val = tax.value / 100 + 1
     
-                total_amount = d.get_total_amount() / tax_val
-                sales = d.get_sales()
-                sale_count = len(sales)
+                total_amount = demand.total_amount / tax_val
+                sales = demand.sales_list
+                sale_count = demand.sales_count
+                
                 p.total_income += total_amount
                 p.sale_count += sale_count
-                for s in sales:
-                    p.total_sales_amount += s.include_tax and s.price or (s.price / tax_val)
+                p.total_sales_amount += sum(map(lambda sale: sale.price if sale.include_tax else sale.price / tax_val ,sales))
             
             projects.append(p)
             
         return projects
+
     def _process_salaries(salaries, projects):
         for s in salaries:
-            tax_val = Tax.objects.filter(date__lte=date(s.year, s.month,1)).latest().value / 100 + 1
+            # find the first tax object with date earlier then salary's date
+            salary_date = date(s.year, s.month, 1)
+            tax = next((t for t in taxes if t.date <= salary_date))  
+            
+            tax_val = tax.value / 100 + 1
             terms = s.employee.employment_terms
             if not terms: continue
             s.calculate()
@@ -882,7 +910,13 @@ def projects_profit(request):
             cleaned_data = form.cleaned_data
             from_year, from_month, to_year, to_month = cleaned_data['from_year'], cleaned_data['from_month'], cleaned_data['to_year'], cleaned_data['to_month']
             
-            demands = Demand.objects.range(from_year, from_month, to_year, to_month).order_by('project')
+            demands = Demand.objects \
+                .range(from_year, from_month, to_year, to_month) \
+                .order_by('project')
+
+            set_demand_sale_fields(demands, from_year, from_month, to_year, to_month)
+            set_demand_diff_fields(demands)
+                
             salaries = EmployeeSalary.objects.nondeleted().range(from_year, from_month, to_year, to_month)
             
             projects = _process_demands(demands)
@@ -959,27 +993,42 @@ def demand_old_list(request):
         form = MonthForm(initial={'year':year,'month':month})
         
     if year and month:
-        ds = Demand.objects.filter(year = year, month = month).annotate(Count('statuses')).select_related('project')
+        ds = Demand.objects \
+            .filter(year = year, month = month) \
+            .annotate(Count('statuses')) \
+            .prefetch_related('reminders__statuses') \
+            .select_related('project')
+
         unhandled_projects.extend(Project.objects.active())
 
+        set_demand_sale_fields(ds, year, month, year, month)
+        set_demand_diff_fields(ds)
+        set_demand_is_fixed(ds)
+        set_demand_last_status(ds)
+        set_demand_open_reminders(ds)
+
         for d in ds:
-            total_sales_count += d.get_sales().count()
-            total_sales_amount += d.get_sales().total_price_final()
-            total_amount += d.get_total_amount()
-            if d.statuses__count > 0 and d.statuses.latest().type.id in [DemandStatusType.Sent, DemandStatusType.Finished]:
+            total_sales_count += d.sales_count
+            total_sales_amount += d.sales_amount
+            total_amount += d.total_amount
+
+            if d.last_status and d.last_status.type_id in [DemandStatusType.Sent, DemandStatusType.Finished]:
                 try:
                     unhandled_projects.remove(d.project)
                 except ValueError:
                     pass
         
-    return render(request, 'Management/demand_old_list.html', 
-                              { 'demands':ds, 'month':date(year, month, 1),
-                                'filterForm':form,
-                                'total_sales_count':total_sales_count,
-                                'total_sales_amount':total_sales_amount,
-                                'total_amount':total_amount,
-                                'unhandled_projects':unhandled_projects},
-                              )
+    context =  { 
+        'demands':ds, 
+        'month':date(year, month, 1),
+        'filterForm':form,
+        'total_sales_count':total_sales_count,
+        'total_sales_amount':total_sales_amount,
+        'total_amount':total_amount,
+        'unhandled_projects':unhandled_projects
+    }
+
+    return render(request, 'Management/demand_old_list.html', context)
 
 def nhemployee_salary_send(request, nhbranch_id, year, month):
     pass
@@ -1067,212 +1116,6 @@ class SalaryExpensesUpdate(PermissionRequiredMixin, UpdateView):
     exclude = ('approved_date',)
     template_name = 'Management/salaryexpenses_edit.html'
     permission_required = 'Management.change_salaryexpenses'
-
-def enrich_employee_salaries(salaries, employee_by_id, from_year, from_month, to_year, to_month):
-    set_salary_base_fields(salaries, employee_by_id, from_year, from_month, to_year, to_month)
-    
-    # construct a map between employee id and project list
-    employee_projects_map = {employee_id: list(employee.projects.all()) for (employee_id, employee) in employee_by_id.items()}
-
-    set_demands(salaries, employee_projects_map, from_year, from_month, to_year, to_month)
-
-    set_employee_sales(salaries, employee_by_id, employee_projects_map, from_year, from_month, to_year, to_month)
-
-    set_salary_status_date(salaries)
-
-def enrich_nh_employee_salaries(salaries, employee_by_id, from_year, from_month, to_year, to_month):
-    set_salary_base_fields(salaries, employee_by_id, from_year, from_month, to_year, to_month)
-    
-    set_salary_status_date(salaries)
-
-def set_salary_base_fields(salaries, employee_by_id, from_year, from_month, to_year, to_month):
-    employee_ids = employee_by_id.keys()
-
-    # construct a map between (employee id, year, month) and SalaryExpense object
-    salary_expenses = SalaryExpenses.objects \
-        .range(from_year, from_month, to_year, to_month) \
-        .filter(employee_id__in = employee_ids)
-
-    expenses_map = {(e.employee_id, e.year, e.month): e for e in salary_expenses}
-    
-    # construct a map between (employee id, year, month) and Total Amount of Loan Pay objects
-    loan_pays = LoanPay.objects \
-        .range(from_year, from_month, to_year, to_month) \
-        .filter(employee_id__in = employee_ids, deduct_from_salary = True) \
-        .values('employee_id','year','month') \
-        .annotate(total_amount = Sum('amount'))
-
-    loan_pay_map = {(row['employee_id'], row['year'], row['month']): row['total_amount'] \
-        for row in loan_pays}
-
-    for salary in salaries:
-        # create the key for the maps constructed above
-        map_key = (salary.get_employee().id, salary.year, salary.month)
-        (employee_id, year, month) = map_key
-
-        employee = employee_by_id[employee_id]
-        terms = employee.employment_terms
-        
-        # load mapped objects
-        exp = expenses_map.get(map_key)
-        loan_pay = loan_pay_map.get(map_key, 0)
-
-        bruto, neto, check_amount, invoice_amount = None, None, None, None
-
-        if terms:
-            total_amount = salary.total_amount
-
-            if terms.salary_net == None:
-                check_amount = total_amount - loan_pay
-                invoice_amount = total_amount - loan_pay
-            else:
-                if terms.salary_net == False:
-                    bruto = total_amount - loan_pay
-                    if exp != None:
-                        neto = total_amount - exp.income_tax - exp.national_insurance - exp.health - exp.pension_insurance
-                elif terms.salary_net == True:
-                    neto = total_amount
-                    if exp != None:
-                        bruto = total_amount + exp.income_tax + exp.national_insurance + exp.health + exp.pension_insurance \
-                            + exp.vacation + exp.convalescence_pay
-                
-                if neto:
-                    check_amount = neto - loan_pay
-        
-        salary.expenses = exp
-
-        salary.bruto = bruto
-        salary.neto = neto
-        salary.check_amount = check_amount
-        salary.invoice_amount = invoice_amount
-
-        salary.loan_pay = loan_pay
-
-        # set 'bruto_employer_expense' field
-        if exp:
-            salary.bruto_employer_expense = sum([
-                bruto,exp.employer_benefit,exp.employer_national_insurance,exp.compensation_allocation])
-        else:
-            salary.bruto_employer_expense = None
-
-def set_demands(salaries, employee_projects_map, from_year, from_month, to_year, to_month):
-    # construct a map between (project id, year, month) and Demand object
-    demands = Demand.objects.select_related('project').range(from_year, from_month, to_year, to_month)
-
-    demand_map = {(d.project_id, d.year, d.month): d for d in demands}
-
-    for salary in salaries:
-        # create the key for the maps constructed above
-        map_key = (salary.employee_id, salary.year, salary.month)
-        (employee_id, year, month) = map_key
-        
-        # set 'demands' property
-        project_ids = [project.id for project in employee_projects_map[employee_id]]
-
-        salary.demands = [demand_map.get((project_id, year, month)) for project_id in project_ids if (project_id, year, month) in demand_map]
-
-def set_employee_sales(
-    salaries, 
-    employee_by_id, employee_projects_map, 
-    from_year, from_month, to_year, to_month):
-    """
-    Set 'sales' and 'sales_count' fields for every EmployeeSalary object in 'salaries'
-    """
-    # construct a map between Porject and Sale list
-    sales = Sale.objects.select_related('house__building') \
-        .employee_pay_range(from_year, from_month, to_year, to_month) \
-        .order_by('house__building__project_id','sale_date')
-
-    # group sales by (project_id, year, month)
-    sale_groups = itertools.groupby(sales,
-        lambda sale: (sale.house.building.project_id, sale.employee_pay_year, sale.employee_pay_month))
-
-    # create map
-    sales_map = {map_key:list(project_sales) for (map_key, project_sales) in sale_groups}
-
-    for salary in salaries:
-        year, month = salary.year, salary.month
-
-        employee = employee_by_id[salary.employee_id]
-        employee_projects = employee_projects_map[salary.employee_id]
-
-        # construct sales list for salary
-        employee_sales = {}
-
-        if employee.rank_id == RankType.RegionalSaleManager:
-            employee_sales = {
-                project: sales_map[(project.id, year, month)] \
-                    for project in employee_projects if (project.id, year, month) in sales_map}
-        else:
-            employee_sales = {
-                project: [sale for sale in sales_map[(project.id, year, month)] if sale.employee_id in (employee.id, None)] \
-                    for project in employee_projects if (project.id, year, month) in sales_map}
-
-        salary.sales = employee_sales
-        salary.sales_count = sum(len(project_sales) for (project, project_sales) in employee_sales.items())
-
-def set_salary_status_date(salaries):
-    """
-    Set 'approved_date', 'sent_to_bookkeeping_date', 'sent_to_checks_date' fields 
-    for every EmployeeSalary object in 'salaries'
-    """
-    salary_ids = [salary.id for salary in salaries]
-
-    # construct a map between Salary object and its latest status
-    all_statuses = EmployeeSalaryBaseStatus.objects \
-        .filter(employeesalarybase_id__in=salary_ids) \
-        .order_by('employeesalarybase_id','-date')
-
-    statuses_by_salary_id = {esb_id: list(statuses) for (esb_id, statuses) in itertools.groupby(all_statuses, lambda status: status.employeesalarybase_id)}
-
-    for salary in salaries:
-        # set status properties
-        salary_statuses = statuses_by_salary_id.get(salary.id)
-
-        if salary_statuses != None:
-            salary.approved_date = next((status.date for status in salary_statuses if status.type_id == EmployeeSalaryBaseStatusType.Approved), None)
-            salary.sent_to_bookkeeping_date = next((status.date for status in salary_statuses if status.type_id == EmployeeSalaryBaseStatusType.SentBookkeeping), None)
-            salary.sent_to_checks_date = next((status.date for status in salary_statuses if status.type_id == EmployeeSalaryBaseStatusType.SentChecks), None)
-        else:
-            salary.approved_date = None
-            salary.sent_to_bookkeeping_date = None
-            salary.sent_to_checks_date = None
-
-def set_loan_fields(employees):
-    """
-    Set 'loan_left' and 'loans_and_pays' fields for every Employee in 'employees'
-    """
-    loans = Loan.objects.filter(employee__in=employees).order_by('employee_id')
-    loan_pays = LoanPay.objects.filter(employee__in=employees).order_by('employee_id')
-
-    loans_by_employee_id = {employee_id:list(loans) for (employee_id, loans) in itertools.groupby(loans, lambda loan: loan.employee_id)}
-    loan_pays_by_employee_id = {employee_id:list(loan_pays) for (employee_id, loan_pays) in itertools.groupby(loan_pays, lambda loan_pay: loan_pay.employee_id)}
-
-    for employee in employees:
-        employee_id = employee.id
-        # merge loans and loan-pays to a single list
-        loans_and_pays = []
-
-        if employee_id in loans_by_employee_id:
-            loans_and_pays += list(loans_by_employee_id[employee_id])
-        if employee_id in loan_pays_by_employee_id:
-            loans_and_pays += list(loan_pays_by_employee_id[employee_id])
-
-        # sort list by (year, month)
-        loans_and_pays.sort(key=lambda x: date(x.year, x.month, 1))
-
-        left = 0
-
-        for item in loans_and_pays:
-            if isinstance(item, Loan):
-                left += item.amount
-            elif isinstance(item, LoanPay):
-                left -= item.amount
-            item.left = left
-
-        # set fields on employee
-        employee.loan_left = left
-        employee.loans_and_pays = loans_and_pays
 
 @permission_required('Management.list_employeesalary')
 def employee_salary_list(request):
@@ -1528,14 +1371,27 @@ def employee_salary_pdf(request, year, month):
     return build_and_return_pdf(writer)
 
 def employee_salary_calc(request, model, id):
-    es = model.objects.get(pk=id)
-    es.calculate()
-    es.save()
+    salary = model.objects.get(pk=id)
+    
+    year, month = salary.year, salary.month
+
+    if model == EmployeeSalary:
+        employee = salary.employee
+
+        # enrish salary object
+        set_employee_sales(
+            [salary], 
+            {employee.id:employee}, 
+            {employee.id:list(employee.projects.all())},
+            year, month, year, month)
+
+    salary.calculate()
+    salary.save()
     
     if model == EmployeeSalary:
-        url = reverse('salary-list') + '?year=%s&month=%s' % (es.year, es.month)
+        url = reverse('salary-list') + '?year=%s&month=%s' % (year, month)
     elif model == NHEmployeeSalary:
-        url = reverse('nh-salary-list') + '?year=%s&month=%s' % (es.year, es.month)
+        url = reverse('nh-salary-list') + '?year=%s&month=%s' % (year, month)
 
     return HttpResponseRedirect(url)
 
@@ -1610,33 +1466,68 @@ def demands_all(request):
     
     total_mispaid, total_unpaid, total_nopayment, total_noinvoice, total_notyetpaid = 0,0,0,0,0
     amount_mispaid, amount_unpaid, amount_nopayment, amount_noinvoice, amount_notyetpaid = 0,0,0,0,0
-    projects = Project.objects.all()
-    for p in projects:
-        for d in p.demands_mispaid():
-            amount_mispaid += d.get_total_amount()
-            total_mispaid += 1
-        for d in p.demands_unpaid():
-            amount_unpaid += d.get_total_amount()
-            total_unpaid += 1
-        for d in p.demands.nopayment():
-            amount_nopayment += d.get_total_amount()
-            total_nopayment += 1
-        for d in p.demands.noinvoice():
-            amount_noinvoice += d.get_total_amount()
-            total_noinvoice += 1
-        for d in p.demands_not_yet_paid():
-            amount_notyetpaid += d.get_total_amount()
-            total_notyetpaid += 1
+    
+    all_demands = Demand.objects \
+        .all() \
+        .prefetch_related('invoices__offset','payments','project__contacts') \
+        .select_related('project__demand_contact','project__payment_contact') \
+        .order_by('project_id','year','month')
 
-    return render(request, 'Management/demands_all.html', 
-                              { 'projects':projects, 'total_mispaid':total_mispaid, 'total_unpaid':total_unpaid,
-                               'total_nopayment':total_nopayment, 'total_noinvoice':total_noinvoice,'total_notyetpaid':total_notyetpaid,
-                               'amount_mispaid':amount_mispaid, 'amount_unpaid':amount_unpaid, 'amount_notyetpaid':amount_notyetpaid,
-                               'amount_nopayment':amount_nopayment, 'amount_noinvoice':amount_noinvoice,
-                               'houseForm':LocateHouseForm(), 
-                               'demandForm':LocateDemandForm(),
-                               'error':error },
-                              )
+    set_demand_diff_fields(all_demands)
+    set_demand_invoice_payment_fields(all_demands)
+
+    # group demands by project
+    demand_groups = itertools.groupby(all_demands, lambda demand: demand.project)
+
+    demands_by_project = {project:list(demand_iter) for (project, demand_iter) in demand_groups}
+
+    projects = []
+    
+    for (project, demands) in demands_by_project.items():
+
+        project.demands_mispaid = 0
+        project.demands_unpaid = 0
+        project.demands_nopayment = 0
+        project.demands_noinvoice = 0
+
+        for demand in demands:
+            total_amount = demand.total_amount
+            invoices_amount = demand.invoices_amount
+            payments_amount = demand.payments_amount
+            is_fully_paid = demand.is_fully_paid
+
+            if is_fully_paid == False:
+                if invoices_amount == None and payments_amount != None:
+                    amount_noinvoice += total_amount
+                    total_noinvoice += 1
+                    project.demands_noinvoice += 1
+                if invoices_amount != None and payments_amount == None:
+                    amount_nopayment += total_amount
+                    total_nopayment += 1
+                    project.demands_nopayment += 1
+                if invoices_amount != None and payments_amount != None and demand.diff_invoice_payment != 0:
+                    amount_mispaid += total_amount
+                    total_mispaid += 1
+                    project.demands_mispaid += 1
+                if invoices_amount == None and payments_amount == None:
+                    amount_unpaid += total_amount
+                    total_unpaid += 1
+                    project.demands_unpaid += 1
+                if demand.not_yet_paid == 1:
+                    amount_notyetpaid += total_amount
+                    total_notyetpaid += 1
+                
+        projects.append(project)
+
+    context = { 
+        'projects':projects, 'total_mispaid':total_mispaid, 'total_unpaid':total_unpaid,
+        'total_nopayment':total_nopayment, 'total_noinvoice':total_noinvoice,'total_notyetpaid':total_notyetpaid,
+        'amount_mispaid':amount_mispaid, 'amount_unpaid':amount_unpaid, 'amount_notyetpaid':amount_notyetpaid,
+        'amount_nopayment':amount_nopayment, 'amount_noinvoice':amount_noinvoice,
+        'houseForm':LocateHouseForm(), 'demandForm':LocateDemandForm(),
+        'error':error }
+
+    return render(request, 'Management/demands_all.html', context)
 
 def employee_list_pdf(request):
     writer = EmployeeListWriter(
@@ -1866,7 +1757,6 @@ def nhmonth_close(request):
 @permission_required('Management.add_demand')
 def demand_list(request):
     ds, unhandled_projects = [], []
-    sales_count, expected_sales_count, sales_amount = 0,0,0
     
     current = common.current_month()
     year, month = current.year, current.month
@@ -1883,18 +1773,32 @@ def demand_list(request):
     for project in Project.objects.active():
         demand, new = Demand.objects.get_or_create(project = project, year = year, month = month)
         ds.append(demand)
-        if demand.statuses.count() == 0 or demand.statuses.latest().type.id == DemandStatusType.Feed:
-            unhandled_projects.append(project)
+
+    set_demand_sale_fields(ds, year, month, year, month)
+    set_demand_last_status(ds)
+    set_demand_open_reminders(ds)
+
+    # add un-handled projects
+    for demand in ds:
+        last_status = demand.last_status
+
+        if last_status and last_status.type_id == DemandStatusType.Feed:
+            unhandled_projects.append(demand.project)
+
+    sales_count, expected_sales_count, sales_amount = 0,0,0
+
     for d in ds:
-        sales_count += d.get_sales().count()
-        sales_amount += d.get_sales().total_price_final()
+        sales_count += d.sales_count
+        sales_amount += d.sales_amount
         expected_sales_count += d.sale_count
         
-    return render(request, 'Management/demand_list.html', 
-                              { 'demands':ds, 'unhandled_projects':unhandled_projects, 
-                               'month':date(year, month, 1), 'filterForm':form, 'sales_count':sales_count ,
-                               'sales_amount':sales_amount, 'expected_sales_count':expected_sales_count },
-                              )
+    context = { 
+        'demands':ds, 
+        'unhandled_projects':unhandled_projects, 
+        'month':date(year, month, 1), 'filterForm':form, 'sales_count':sales_count ,
+        'sales_amount':sales_amount, 'expected_sales_count':expected_sales_count }
+
+    return render(request, 'Management/demand_list.html', context)
 
 def employee_sales(request, id, year, month):
     salary = EmployeeSalary.objects.get(employee__id = id, year = year, month = month)
@@ -1997,8 +1901,16 @@ def nhemployee_remarks(request, year, month):
 
 @permission_required('Management.change_demand')
 def demand_edit(request, object_id):
-    demand = Demand.objects.select_related('project').get(pk = object_id)
-    sales = demand.get_sales().select_related('house__building')
+    demand = Demand.objects \
+        .prefetch_related('diffs','invoices','payments') \
+        .select_related('project') \
+        .get(pk = object_id)
+
+    year, month = demand.year, demand.month
+
+    set_demand_sale_fields([demand], year, month, year, month)
+    set_demand_diff_fields([demand])
+
     months = None
 
     if request.method == 'POST':
@@ -2009,17 +1921,23 @@ def demand_edit(request, object_id):
         form = DemandForm(instance = demand)
         months = MonthForm()
         
-    return render(request, 'Management/demand_edit.html', { 'form':form, 'demand':demand, 'sales':sales, 'months':months }, )
+    return render(request, 'Management/demand_edit.html', 
+        { 'form':form, 'demand':demand, 'sales':demand.sales_list, 'months':months }, )
     
 @permission_required('Management.change_demand')
 def demand_close(request, id):
-    d = Demand.objects.get(pk=id)
+    demand = Demand.objects.get(pk=id)
+    
+    year, month = demand.year, demand.month
+
+    set_demand_sale_fields([demand], year, month, year, month)
+
     if request.method == 'POST':
-        d.close()
-        d.save()
+        demand.close()
+        demand.save()
+
     return render(request, 'Management/demand_close.html', 
-                              { 'demand':d },
-                              )
+        { 'demand':demand })
 
 @permission_required('Management.change_demand')
 def demand_zero(request, id):
@@ -2055,41 +1973,47 @@ def demands_send(request):
     m = int(request.GET.get('month', current.month))
     form = MonthForm(initial={'year':y,'month':m})
     month = datetime(y,m,1)
-    ds = Demand.objects.filter(year = y, month = m)
+    
+    demands = Demand.objects \
+        .filter(year = y, month = m) \
+        .select_related('project__demand_contact')
+
+    set_demand_sale_fields(demands, y, m, y, m)
+    set_demand_last_status(demands)
+
     forms=[]
     if request.method == 'POST':
         error = False
-        for d in ds:
-            f = DemandSendForm(request.POST, instance=d, prefix = str(d.id))
+        for demand in demands:
+            f = DemandSendForm(request.POST, instance=demand, prefix = str(demand.id))
             if f.is_valid():
                 is_finished, by_mail, by_fax, mail = f.cleaned_data['is_finished'], f.cleaned_data['by_mail'], f.cleaned_data['by_fax'], f.cleaned_data['mail']
                 if is_finished:
-                    d.finish()
-                if by_mail and d.get_sales().count() > 0:
+                    demand.finish()
+                if by_mail and demand.sales_count > 0:
                     if mail:
-                        demand_send_mail(d, mail)
+                        demand_send_mail(demand, mail)
                     else:
-                        error = u'לפרויקט %s לא הוגדר מייל לשליחת דרישות' % d.project
+                        error = u'לפרויקט %s לא הוגדר מייל לשליחת דרישות' % demand.project
                 if by_fax:
                     pass
             forms.append(f)
         if error:
             return render(request, 'Management/error.html', {'error': error}, )
         else:
-            return HttpResponseRedirect('/demandsold')
+            return HttpResponseRedirect(reverse('demand-old'))
     else:
-        for d in ds:
-            if d.project.demand_contact:
-                initial = {'mail':d.project.demand_contact.mail,
-                           'fax':d.project.demand_contact.fax}
-            else:
-                initial = {}
-            f = DemandSendForm(instance=d, prefix=str(d.id), initial = initial)
+        for demand in demands:
+            contact = demand.project.demand_contact
+            
+            initial = { 'mail':contact.mail, 'fax':contact.fax } if contact else {}
+
+            f = DemandSendForm(instance=demand, prefix=str(demand.id), initial = initial)
+            
             forms.append(f)
             
     return render(request, 'Management/demands_send.html', 
-                              { 'forms':forms,'filterForm':form, 'month':month },
-                              )
+        { 'forms':forms,'filterForm':form, 'month':month })
 
 @permission_required('Management.change_demand')
 def demand_closeall(request):
@@ -2187,7 +2111,8 @@ def demand_sale_reject(request, demand_id, id):
     sr.to_year, sr.to_month = to_year, to_month
     sr.save()
     
-    calc_demands(demands_to_calc)
+    for demand in demands_to_calc:
+        demand.calc_sales_commission()
     
     return HttpResponseRedirect('/salereject/%s' % sr.id)
 
@@ -2213,7 +2138,8 @@ def demand_sale_pre(request, demand_id, id):
     sr.to_year, sr.to_month = to_year, to_month
     sr.save()
     
-    calc_demands(demands_to_calc)
+    for demand in demands_to_calc:
+        demand.calc_sales_commission()
     
     return HttpResponseRedirect('/salepre/%s' % sr.id)
 
@@ -2230,15 +2156,12 @@ def demand_sale_cancel(request, demand_id, id):
     sale.save()
     
     #re-calculate the entire demand
-    calc_demands([sale.demand])
+    sale.demand.calc_sales_commission()
     
     return HttpResponseRedirect('/salecancel/%s' % sc.id)
 
 @permission_required('Management.add_invoice')
 def invoice_add(request, initial=None):
-    
-    sales = initial.get('demand').get_sales().select_related('house__building')
-
     if request.method == 'POST':
         form = DemandInvoiceForm(request.POST)
         if form.is_valid():
@@ -2249,7 +2172,12 @@ def invoice_add(request, initial=None):
                 return HttpResponseRedirect('/payments/add')
     else:
         form = DemandInvoiceForm(initial=initial)
-    return render(request, 'Management/invoice_edit.html', {'form':form, 'sales':sales, 'demand': initial.get('demand')}, )
+
+    demand = initial['demand']
+
+    context = {'form':form, 'sales':demand.sales_list, 'demand': demand}
+
+    return render(request, 'Management/invoice_edit.html', context)
 
 class InvoiceUpdate(PermissionRequiredMixin, UpdateView):
     model = Invoice
@@ -2259,8 +2187,15 @@ class InvoiceUpdate(PermissionRequiredMixin, UpdateView):
 
 @permission_required('Management.add_invoice')
 def demand_invoice_add(request, id):
-    demand = Demand.objects.select_related('project').get(pk=id)
-    return invoice_add(request, {'project':demand.project.id, 'month':demand.month, 'year':demand.year, 'demand': demand})
+    demand = Demand.objects \
+        .select_related('project') \
+        .get(pk=id)
+
+    year, month = demand.year, demand.month
+
+    set_demand_sale_fields([demand], year, month, year, month)
+
+    return invoice_add(request, {'project':demand.project_id, 'month':month, 'year':year, 'demand': demand})
 
 @permission_required('Management.demand_invoices')
 def demand_invoice_list(request):
@@ -2607,9 +2542,11 @@ def invoice_details(request, project, year, month):
     
 def demand_details(request, project, year, month):
     try:
-        d = Demand.objects.get(project = project, year = year, month = month)
-        return render(request, 'Management/demand_details.html', 
-                                  { 'demand':d}, )
+        demand = Demand.objects.get(project=project, year=year, month=month)
+
+        set_demand_diff_fields([demand])
+
+        return render(request, 'Management/demand_details.html', { 'demand':demand})
     except Demand.DoesNotExist:
         return HttpResponse('')
 
@@ -4112,7 +4049,7 @@ def sale_edit(request, id):
                     next = '/salehousemod/%s' % shm.id
             form.save()
 
-            calc_demands([demand])
+            demand.calc_sales_commission()
 
             year, month = sale.demand.year, sale.demand.month
             employees = demand.project.employees.exclude(work_end__isnull = False, work_end__lt = date(year, month, 1))
@@ -4156,7 +4093,7 @@ def sale_add(request, demand_id=None):
                 sp.save()
                 next = '/salepre/%s' % sp.id 
             
-            calc_demands([demand])
+            demand.calc_sales_commission()
             
             employees = demand.project.employees.exclude(work_end__isnull = False, work_end__lt = date(year, month, 1))
             
@@ -4186,47 +4123,96 @@ def demand_sale_list(request):
     from_month = int(request.GET.get('from_month', 0))
     to_year = int(request.GET.get('to_year', 0))
     to_month = int(request.GET.get('to_month', 0))
+
     if demand_id:
-        d = Demand.objects.get(pk=demand_id)
-        sales = d.get_sales()
-        sales_amount = d.get_sales().total_price()
-        title = u'ריכוז מכירות לפרוייקט %s לחודש %s/%s' % (str(d.project), d.month, d.year)
+        demand = Demand.objects.get(pk=demand_id)
+        project, year, month = demand.project, demand.year, demand.month
+
+        demands = [demand]
+
+        set_demand_sale_fields(demands, year, month, year, month)
+
+        title = u'ריכוז מכירות לפרוייקט %s לחודש %s/%s' % (str(project), month, year)
     elif project_id:
-        sales = []
-        sales_amount = 0
         project = Project.objects.get(pk=project_id)
         
-        demands = Demand.objects.range(from_year, from_month, to_year, to_month).filter(project = project)
-        for demand in demands:
-            sales.extend(demand.get_sales())
-            sales_amount += demand.get_sales().total_price()
+        demands = Demand.objects \
+            .range(from_year, from_month, to_year, to_month) \
+            .filter(project = project)
+
+        set_demand_sale_fields(demands, from_year, from_month, to_year, to_month)
 
         title = u'ריכוז מכירות לפרוייקט %s מחודש %s/%s עד חודש %s/%s' % (str(project), from_month, from_year,
                                                                          to_month, to_year)
     else:
         raise ValueError
+
+    sales = []
+    sales_amount = 0
+
+    for demand in demands:
+        sales.extend(demand.sales_list)
+        sales_amount += demand.sales_amount
+
     return render(request, 'Management/sale_list.html', 
-                              {'sales':sales, 'sales_amount':sales_amount,'title':title},
-                              )
+        {'sales':sales, 'sales_amount':sales_amount,'title':title})
+
 @login_required
-def project_demands(request, project_id, func, template_name):
-    p = Project.objects.get(pk = project_id)
-    demands = getattr(p, func)
-    return render(request, template_name,
-                               {'demands':demands(), 'project':p},
-                               )
+def project_demands(request, project_id, demand_type):
+    project = Project.objects.get(pk=project_id)
+
+    all_demands = Demand.objects \
+        .prefetch_related('reminders__statuses','invoices__offset','payments') \
+        .select_related('project') \
+        .filter(project_id=project_id) \
+        .order_by('year','month')
+
+    set_demand_diff_fields(all_demands)
+    set_demand_invoice_payment_fields(all_demands)
+
+    # exclude fully-paid demands
+    demands = list(filter(lambda demand: demand.is_fully_paid == False, all_demands))
+
+    from_year, from_month = demands[0].year, demands[0].month
+    to_year, to_month = demands[-1].year, demands[-1].month
+
+    set_demand_sale_fields(demands, from_year, from_month, to_year, to_month)
+    set_demand_is_fixed(demands)
+    set_demand_open_reminders(demands)
+
+    if demand_type == 'mis-paid':
+        func = lambda demand: demand.invoices_amount != None and demand.payments_amount != None and demand.diff_invoice_payment != 0
+        template_name = 'Management/project_demands_mispaid.html'
+    elif demand_type == 'un-paid':
+        func = lambda demand: demand.invoices_amount == None and demand.payments_amount == None
+        template_name = 'Management/project_demands_unpaid.html'
+    elif demand_type == 'no-invoice':
+        func = lambda demand: demand.invoices_amount == None and demand.payments_amount != None
+        template_name = 'Management/project_demands_noinvoice.html'
+    elif demand_type == 'no-payment':
+        func = lambda demand: demand.invoices_amount != None and demand.payments_amount == None
+        template_name = 'Management/project_demands_nopayment.html'
+    elif demand_type == 'not-yet-paid':
+        func = lambda demand: demand.not_yet_paid == 1
+        template_name = 'Management/project_demands_noinvoice.html'
+
+    # apply the correct filter
+    demands = filter(func, demands)
+
+    return render(request, template_name, {'demands':demands, 'project':project})
 
 @login_required
 def demand_sales(request, project_id, year, month):
     try:
         demand = Demand.objects.get(project__id = project_id, year = year, month = month)
-        sales = demand.get_sales()
+
+        set_demand_sale_fields([demand], year, month, year, month)
+
+        sales = demand.sales_list
     except Demand.DoesNotExist:
-        sales = Demand.objects.none()
+        sales = []
         
-    return render(request, 'Management/sale_table.html',
-							  {'sales':sales},
-							  )
+    return render(request, 'Management/sale_table.html', {'sales':sales})
 
 @permission_required('Management.report_employee_sales')
 def report_employee_sales(request):
@@ -4256,9 +4242,13 @@ def report_project_month(request, project_id = 0, year = 0, month = 0, demand = 
     if not demand:
         demand = Demand.objects.get(project__id = project_id, year = year, month = month)
     
-    if demand.get_sales().count() == 0:
+    set_demand_sale_fields([demand], demand.year, demand.month, demand.year, demand.month)
+
+    if demand.sales_count == 0:
         return render(request, 'Management/error.html', {'error':u'לדרישה שנבחרה אין מכירות'}, )
     
+    set_demand_diff_fields([demand])
+
     writer = MonthDemandWriter(demand, to_mail=False)
     
     return build_and_return_pdf(writer)
@@ -4266,7 +4256,13 @@ def report_project_month(request, project_id = 0, year = 0, month = 0, demand = 
 @permission_required('Management.report_projects_month')
 def report_projects_month(request, year, month):
 
-    demands = Demand.objects.filter(year = year, month=month).all()
+    demands = Demand.objects \
+        .prefetch_related('invoices','payments') \
+        .select_related('project') \
+        .filter(year=year, month=month)
+
+    set_demand_sale_fields(demands, year, month, year, month)
+    set_demand_diff_fields(demands)
 
     title = u'ריכוז דרישות לפרוייקטים לחודש %s\%s' % (year, month)
 
@@ -4275,13 +4271,22 @@ def report_projects_month(request, year, month):
     return build_and_return_pdf(writer)
 
 @permission_required('demand_season_pdf')
-def report_project_season(request, project_id=None, from_year=common.current_month().year, from_month=common.current_month().month, 
-                          to_year=common.current_month().year, to_month=common.current_month().month):
+def report_project_season(request, project_id=None, 
+    from_year=common.current_month().year, from_month=common.current_month().month, 
+    to_year=common.current_month().year, to_month=common.current_month().month):
+
     from_date = date(int(from_year), int(from_month), 1)
     to_date = date(int(to_year), int(to_month), 1)
     
-    demands = Demand.objects.range(from_date.year, from_date.month, to_date.year, to_date.month).filter(project__id = project_id)
-    
+    demands = Demand.objects \
+        .prefetch_related('invoices','payments') \
+        .select_related('project') \
+        .range(from_year, from_month, to_year, to_month) \
+        .filter(project__id = project_id)
+
+    set_demand_sale_fields(demands, from_year, from_month, to_year, to_month)
+    set_demand_diff_fields(demands)
+
     project = Project.objects.get(pk=project_id)
 
     title = u'ריכוז דרישות תקופתי לפרוייקט %s' % project
@@ -4291,13 +4296,21 @@ def report_project_season(request, project_id=None, from_year=common.current_mon
     return build_and_return_pdf(writer)
 
 @permission_required('demand_followup_pdf')
-def report_project_followup(request, project_id=None, from_year=common.current_month().year, from_month=common.current_month().month, 
-                            to_year=common.current_month().year, to_month=common.current_month().month):
-    from_date = date(int(from_year), int(from_month), 1)
-    to_date = date(int(to_year), int(to_month), 1)
+def report_project_followup(request, project_id=None, 
+    from_year=common.current_month().year, from_month=common.current_month().month, 
+    to_year=common.current_month().year, to_month=common.current_month().month):
     
     project = Project.objects.get(pk = project_id)
-    demands = Demand.objects.range(from_date.year, from_date.month, to_date.year, to_date.month).filter(project__id = project_id)
+    
+    demands = Demand.objects \
+        .prefetch_related('invoices','payments') \
+        .select_related('project') \
+        .range(from_year, from_month, to_year, to_month) \
+        .filter(project__id = project_id)
+
+    set_demand_sale_fields(demands, from_year, from_month, to_year, to_month)
+    set_demand_diff_fields(demands)
+    set_demand_invoice_payment_fields(demands)
 
     writer = DemandFollowupWriter(project, from_month, from_year, to_month, to_year, demands)
     
@@ -4313,25 +4326,42 @@ def demand_season_list(request):
         form = ProjectSeasonForm(request.GET)
         if form.is_valid():
             project = form.cleaned_data['project']
-            from_date = date(form.cleaned_data['from_year'], form.cleaned_data['from_month'], 1)
-            to_date = date(form.cleaned_data['to_year'], form.cleaned_data['to_month'], 1)
+
+            from_year, from_month = form.cleaned_data['from_year'], form.cleaned_data['from_month']
+            to_year, to_month = form.cleaned_data['to_year'], form.cleaned_data['to_month']
+
+            from_date = date(from_year, from_month, 1)
+            to_date = date(to_year, to_month, 1)
             
-            ds = Demand.objects.range(from_date.year, from_date.month, to_date.year, to_date.month).filter(project = project)
+            ds = Demand.objects \
+                .range(from_year, from_month, to_year, to_month) \
+                .filter(project = project) \
+                .prefetch_related('reminders__statuses') \
+                .select_related('project')
+
+            set_demand_sale_fields(ds, from_year, from_month, to_year, to_month)
+            set_demand_diff_fields(ds)
+            set_demand_last_status(ds)
+            set_demand_is_fixed(ds)
+            set_demand_open_reminders(ds)
 
             for d in ds:
-                total_sales_count += d.get_sales().count()
-                total_sales_amount += d.get_sales().total_price_final()
-                total_amount += d.get_total_amount()
+                total_sales_count += d.sales_count
+                total_sales_amount += d.sales_amount
+                total_amount += d.total_amount
     else:
         form = ProjectSeasonForm()
         
-    return render(request, 'Management/demand_season_list.html', 
-                              { 'demands':ds, 'start':from_date, 'end':to_date,
-                                'project':project, 'filterForm':form,
-                                'total_sales_count':total_sales_count,
-                                'total_sales_amount':total_sales_amount,
-                                'total_amount':total_amount},
-                              )
+    context = { 
+        'demands':ds, 
+        'start':from_date, 'end':to_date,
+        'project':project, 'filterForm':form,
+        'total_sales_count':total_sales_count,
+        'total_sales_amount':total_sales_amount,
+        'total_amount':total_amount
+    }
+
+    return render(request, 'Management/demand_season_list.html', context)
 
 @permission_required('Management.demand_pay_balance')
 def demand_pay_balance_list(request):
@@ -4341,49 +4371,60 @@ def demand_pay_balance_list(request):
             # gather form data
             cleaned_data = form.cleaned_data
             demand_pay_balance = cleaned_data['demand_pay_balance']
-            project, from_year, from_month, to_year, to_month, all_times = cleaned_data['project'], cleaned_data['from_year'], \
-                cleaned_data['from_month'], cleaned_data['to_year'], cleaned_data['to_month'], cleaned_data['all_times']
+            project, from_year, from_month, to_year, to_month, all_times = \
+                cleaned_data['project'], \
+                cleaned_data['from_year'], \
+                cleaned_data['from_month'], \
+                cleaned_data['to_year'], \
+                cleaned_data['to_month'], \
+                cleaned_data['all_times']
             
             if project:
                 query = Demand.objects.filter(project = project)
             else:
-                query = Demand.objects.all().order_by('project', 'year', 'month')
+                query = Demand.objects.all()
             if from_year and from_month and to_year and to_month and not all_times:
                 query = query.range(from_year, from_month, to_year, to_month)
 
-            demands = list(query)
+            all_demands = query \
+                .prefetch_related('reminders__statuses', 'invoices__offset','payments') \
+                .select_related('project__demand_contact', 'project__payment_contact') \
+                .order_by('project_id', 'year', 'month')
 
-            if demand_pay_balance.id == 'un-paid':
-                demands = [demand for demand in demands if not demand.payments_amount()]
-            elif demand_pay_balance.id == 'mis-paid':
-                demands = [demand for demand in demands if demand.diff_invoice and demand.invoices_amount() != None]
-            elif demand_pay_balance.id == 'partially-paid':
-                demands = [demand for demand in demands if demand.diff_invoice_payment and demand.payments_amount() != None]
-                        
-            if demand_pay_balance.id == 'fully-paid':
-                demands = [demand for demand in demands if demand.is_fully_paid]
-            elif demand_pay_balance.id != 'all':
-                demands = [demand for demand in demands if not demand.is_fully_paid]
+            set_demand_sale_fields(all_demands, from_year, from_month, to_year, to_month)
+            set_demand_diff_fields(all_demands)
+            set_demand_invoice_payment_fields(all_demands)
+            set_demand_open_reminders(all_demands)
+
+            filters = {
+                'un-paid': lambda demand: not demand.payments_amount,
+                'mis-paid': lambda demand: demand.diff_invoice and demand.invoices_amount != None,
+                'partially-paid': lambda demand: demand.diff_invoice_payment and demand.payments_amount != None,
+                'fully-paid': lambda demand: demand.is_fully_paid,
+                'all': lambda demand: True,
+            }
+
+            filter_func = filters[demand_pay_balance.id]
+
+            # apply a filter to the list of demands
+            all_demands = filter(filter_func, all_demands)
             
             # group the demands by project
             project_demands = {}
             
-            for project, demand_iter in itertools.groupby(demands, lambda demand: demand.project):
+            for project, demand_iter in itertools.groupby(all_demands, lambda demand: demand.project):
                 demands = list(demand_iter)
                 project_demands[project] = demands
-                for attr in ['total_amount', 'total_payments', 'total_invoices', 'total_diff_invoice', 'total_diff_invoice_payment']:
-                    setattr(project, attr, 0)
-                for demand in demands:
-                    project.total_amount += demand.get_total_amount()
-                    project.total_payments += demand.payments_amount() or 0
-                    project.total_invoices += (demand.invoices_amount() or 0) + (demand.invoice_offsets_amount() or 0)
-                    project.total_diff_invoice += demand.diff_invoice
-                    project.total_diff_invoice_payment += demand.diff_invoice_payment
+
+                project.total_amount = sum(map(lambda d: d.total_amount, demands))
+                project.total_payments = sum(map(lambda d: d.payments_amount or 0, demands))
+                project.total_invoices = sum(map(lambda d: (d.invoices_amount or 0) + (d.invoice_offsets_amount or 0), demands))
+                project.total_diff_invoice = sum(map(lambda d: d.diff_invoice, demands))
+                project.total_diff_invoice_payment = sum(map(lambda d: d.diff_invoice_payment, demands))
                 
             if 'html' in request.GET:
                 return render(request, 'Management/demand_pay_balance_list.html', 
-                                          { 'filterForm': form, 'project_demands': project_demands},
-                                          )
+                    { 'filterForm': form, 'project_demands': project_demands})
             elif 'pdf' in request.GET:
                 # build arguments to the writer
                 kwargs = {}
@@ -4408,35 +4449,51 @@ def season_income(request):
     if len(request.GET):
         form = SeasonForm(request.GET)
         if form.is_valid():
-            from_date = date(form.cleaned_data['from_year'], form.cleaned_data['from_month'], 1)
-            to_date = date(form.cleaned_data['to_year'], form.cleaned_data['to_month'], 1)
-                        
-            ds = Demand.objects.range(from_date.year, from_date.month, to_date.year, to_date.month)
+            # extract form data
+            from_year, from_month = form.cleaned_data['from_year'], form.cleaned_data['from_month']
+            to_year, to_month = form.cleaned_data['to_year'], form.cleaned_data['to_month']
+
+            from_date = date(from_year, from_month, 1)
+            to_date = date(to_year, to_month, 1)
+            
+            # load Demand objects
+            demands = Demand.objects \
+                .select_related('project') \
+                .range(from_year, from_month, to_year, to_month)
+
+            set_demand_sale_fields(demands, from_year, from_month, to_year, to_month)
+            set_demand_diff_fields(demands)
                 
-            for d in ds:
-                if d.project in projects:
-                    project = projects[projects.index(d.project)]
+            # load all Tax objects, order by 'date' descending
+            taxes = list(Tax.objects.all())
+
+            for demand in demands:
+                if demand.project in projects:
+                    project = projects[projects.index(demand.project)]
                 else:
-                    project = d.project
+                    project = demand.project
                     projects.append(project)
                     for attr in ['total_amount', 'total_amount_notax', 'total_sale_count']:
                         setattr(project, attr, 0)
-                        
-                tax = Tax.objects.filter(date__lte=date(d.year, d.month,1)).latest().value / 100 + 1
+
+                # find the first tax object with date earlier then demand's date
+                demand_date = date(demand.year, demand.month, 1)
+                tax = next((t for t in taxes if t.date <= demand_date))       
+                tax_val = tax.value / 100 + 1
                 
                 # sum amount
-                amount = d.get_total_amount()
+                amount = demand.total_amount
                 project.total_amount += amount
-                project.total_amount_notax += amount / tax
+                project.total_amount_notax += amount / tax_val
 
                 # sum sale count
-                sales_count = d.get_sales().count()
+                sales_count = demand.sales_count
                 project.total_sale_count += sales_count
                 total_sale_count += sales_count
 
                 # sum totals
                 total_amount += amount
-                total_amount_notax += amount / tax
+                total_amount_notax += amount / tax_val
 
             # set avg_sale_count
             for p in projects:
@@ -4448,12 +4505,15 @@ def season_income(request):
     else:
         form = SeasonForm()
 
-    return render(request, 'Management/season_income.html', 
-                              { 'start':from_date, 'end':to_date,
-                                'projects':projects, 'filterForm':form,'total_amount':total_amount,'total_sale_count':total_sale_count,
-                                'total_amount_notax':total_amount_notax,'avg_amount':total_amount/month_count,
-                                'avg_amount_notax':total_amount_notax/month_count,'avg_sale_count':total_sale_count/month_count},
-                              )
+    context = { 
+        'start':from_date, 'end':to_date,
+        'projects':projects, 'filterForm':form,
+        'total_amount':total_amount,'total_sale_count':total_sale_count,
+        'total_amount_notax':total_amount_notax,'avg_amount':total_amount/month_count,
+        'avg_amount_notax':total_amount_notax/month_count,'avg_sale_count':total_sale_count/month_count
+    }
+
+    return render(request, 'Management/season_income.html', context)
 
 @permission_required('Management.demand_followup')
 def demand_followup_list(request):
@@ -4465,26 +4525,45 @@ def demand_followup_list(request):
         form = ProjectSeasonForm(request.GET)
         if form.is_valid():
             project = form.cleaned_data['project']
-            from_date = date(form.cleaned_data['from_year'], form.cleaned_data['from_month'], 1)
-            to_date = date(form.cleaned_data['to_year'], form.cleaned_data['to_month'], 1)
+
+            from_year, from_month = form.cleaned_data['from_year'], form.cleaned_data['from_month']
+            to_year, to_month = form.cleaned_data['to_year'], form.cleaned_data['to_month']
+
+            from_date = date(from_year, from_month, 1)
+            to_date = date(to_year, to_month, 1)
             
-            ds = Demand.objects.range(from_date.year, from_date.month, to_date.year, to_date.month).filter(project = project)
+            ds = Demand.objects \
+                .range(from_year, from_month, to_year, to_month) \
+                .filter(project = project) \
+                .select_related('project') \
+                .prefetch_related('reminders__statuses', 'invoices__offset','payments')
+
+            set_demand_sale_fields(ds, from_year, from_month, to_year, to_month)
+            set_demand_diff_fields(ds)
+            set_demand_is_fixed(ds)
+            set_demand_invoice_payment_fields(ds)
+            set_demand_open_reminders(ds)
 
             for d in ds:
-                total_amount += d.get_total_amount()
-                total_invoices += d.invoices.total_amount_offset()
-                total_payments += d.payments.total_amount()
+                total_amount += d.total_amount
+                total_invoices += d.total_amount_offset
+                total_payments += (d.payments_amount or 0)
                 total_diff_invoice += d.diff_invoice
                 total_diff_invoice_payment += d.diff_invoice_payment
     else:
         form = ProjectSeasonForm()
             
-    return render(request, 'Management/demand_followup_list.html', 
-                              { 'demands':ds, 'start':from_date, 'end':to_date,
-                                'project':project, 'filterForm':form,
-                                'total_amount':total_amount, 'total_invoices':total_invoices, 'total_payments':total_payments,
-                                'total_diff_invoice':total_diff_invoice, 'total_diff_invoice_payment':total_diff_invoice_payment},
-                              )
+    context = { 
+        'demands':ds, 
+        'start':from_date, 'end':to_date,
+        'project':project, 'filterForm':form,
+        'total_amount':total_amount, 
+        'total_invoices':total_invoices, 
+        'total_payments':total_payments,
+        'total_diff_invoice':total_diff_invoice, 
+        'total_diff_invoice_payment':total_diff_invoice_payment}
+
+    return render(request, 'Management/demand_followup_list.html', context)
 
 @permission_required('Management.season_employeesalary')
 def employeesalary_season_list(request):
@@ -4768,23 +4847,53 @@ def global_profit_lost(request):
     if len(request.GET):
         form = GloablProfitLossForm(request.GET)
         if form.is_valid():
+            # extract form data
             divisions = form.cleaned_data['divisions']
-            from_date = date(form.cleaned_data['from_year'], form.cleaned_data['from_month'], 1)
-            to_date = date(form.cleaned_data['to_year'], form.cleaned_data['to_month'], 1)
+            from_year, from_month = form.cleaned_data['from_year'], form.cleaned_data['from_month']
+            to_year, to_month = form.cleaned_data['to_year'], form.cleaned_data['to_month']
+
+            from_date = date(from_year, from_month, 1)
+            to_date = date(to_year, to_month, 1)
+
             for division in divisions:
                 total_income, total_loss = 0,0
                 income_rows, loss_rows = [], []
                 
                 if division.id == DivisionType.Marketing:
-                    demands = Demand.objects.range(from_date.year, from_date.month, to_date.year, to_date.month)
-                    salaries = EmployeeSalary.objects.nondeleted().range(from_date.year, from_date.month, to_date.year, to_date.month)
-                    
-                    demands_amount, salaries_amount = 0,0
+                    # load and enrich demands
+                    demands = Demand.objects \
+                        .range(from_year, from_month, to_year, to_month)
+
+                    set_demand_diff_fields(demands)
+
+                    # load and enrich salaries
+                    salaries = EmployeeSalary.objects \
+                        .select_related('employee__employment_terms') \
+                        .nondeleted() \
+                        .range(from_year, from_month, to_year, to_month)
+
+                    set_salary_base_fields(
+                        salaries,
+                        {s.employee_id:s.employee for s in salaries},
+                        from_year, from_month, to_year, to_month)
+
+                    # load all Tax objects, order by 'date' descending
+                    taxes = list(Tax.objects.all())
+
+                    # sum up demands total_amount
+                    demands_amount = 0
+
                     for demand in demands:
-                        tax_val = Tax.objects.filter(date__lte=date(demand.year, demand.month,1)).latest().value / 100 + 1
-                        demands_amount += demand.get_total_amount() / tax_val
-                    for salary in salaries:
-                        salaries_amount += salary.bruto or salary.check_amount or 0
+                        # find the first tax object with date earlier then demand's date
+                        demand_date = date(demand.year, demand.month, 1)
+                        tax = next((t for t in taxes if t.date <= demand_date))  
+
+                        tax_val = tax.value / 100 + 1
+
+                        demands_amount += demand.total_amount / tax_val
+
+                    # sum up salaries amount
+                    salaries_amount = sum([salary.bruto or salary.check_amount or 0 for salary in salaries])
 
                     income_rows.append({
                         'name':division,
@@ -4810,8 +4919,20 @@ def global_profit_lost(request):
                     elif division.id == DivisionType.NHNesZiona:
                         nhbranch = NHBranch.objects.get(pk = NHBranch.NesZiona)
                     
-                    salaries = NHEmployeeSalary.objects.nondeleted().range(from_date.year, from_date.month, to_date.year, to_date.month).filter(nhbranch = nhbranch)
-                    nhmonths = NHMonth.objects.range(from_date.year, from_date.month, to_date.year, to_date.month).filter(nhbranch = nhbranch)
+                    # load and enrich salaries
+                    salaries = NHEmployeeSalary.objects \
+                        .select_related('nhemployee') \
+                        .nondeleted() \
+                        .range(from_year, from_month, to_year, to_month) \
+                        .filter(nhbranch = nhbranch)
+
+                    set_salary_base_fields(
+                        salaries,
+                        {s.nhemployee_id: s.nhemployee for s in salaries},
+                        from_year, from_month, to_year, to_month)
+
+                    nhmonths = NHMonth.objects.range(from_year, from_month, to_year, to_month) \
+                        .filter(nhbranch = nhbranch)
                     
                     nhmonths_amount, salary_amount = 0,0
                     for nhmonth in nhmonths:
@@ -4835,13 +4956,14 @@ def global_profit_lost(request):
                     total_loss += salary_amount
                     
                 #general information required by all divisions    
-                incomes = Income.objects.range(from_date.year, from_date.month, to_date.year, to_date.month).filter(division_type = division)
-                checks = PaymentCheck.objects.filter(issue_date__range = (from_date,to_date), division_type = division)
+                incomes = Income.objects \
+                    .range(from_year, from_month, to_year, to_month) \
+                    .filter(division_type = division)
+
+                checks = PaymentCheck.objects \
+                    .filter(issue_date__range=(from_date,to_date), division_type=division)
                 
-                incomes_amount = 0
-                for income in incomes:
-                    incomes_amount += income.invoice and income.invoice.amount or 0
-                    
+                incomes_amount = sum([income.invoice and income.invoice.amount or 0 for income in incomes])
                 total_income += incomes_amount
                 
                 income_rows.extend([{'name':u'הכנסות אחרות','amount':incomes_amount,
@@ -4851,10 +4973,7 @@ def global_profit_lost(request):
                 
                 global_income += total_income
                 
-                expenses_amount = 0
-                for check in checks:
-                    expenses_amount += check.amount
-                    
+                expenses_amount = sum([check.amount for check in checks])
                 total_loss += expenses_amount
                 
                 loss_rows.extend([{'name':u'הוצאות אחרות', 'amount':expenses_amount,

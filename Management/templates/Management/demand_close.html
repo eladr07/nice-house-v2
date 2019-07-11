@@ -32,9 +32,9 @@
 			</tr>
 			<tr>
 				<th>מס' מכירות בפועל</th>
-				<td>{{demand.get_sales|length}}</td>
+				<td>{{demand.sales_count}}</td>
 			</tr>
-			{% if demand.sale_count != demand.get_sales|length %}
+			{% if demand.sale_count != demand.sales_count %}
 			<tr>
 				<td colspan="2">לתשומת לבך, מס' המכירות הצפוי אינו תואם את מס' המכירות שהוזנו בפועל !</td>
 			</tr>

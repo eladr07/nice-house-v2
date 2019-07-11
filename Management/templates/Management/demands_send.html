@@ -41,19 +41,19 @@
 		<th>סטטוס</th>
 		{% for f in forms %}
 		{% with f.instance as d %}
-			{% if not d.statuses.count %}
+			{% if not d.last_status %}
 				<tr class="row3" objid={{d.id}}>
 			{% else %}
-				{% if d.statuses.latest.type.id == 1 %}
+				{% if d.last_status.type_id == 1 %}
 					<tr class="{% cycle 'row1' 'row2' %}" objid={{d.id}}>
 				{% endif %}
-				{% if d.statuses.latest.type.id == 2 %}
+				{% if d.last_status.type_id == 2 %}
 					<tr class="row4" objid={{d.id}}>
 				{% endif %}
-				{% if d.statuses.latest.type.id == 3 %}
+				{% if d.last_status.type_id == 3 %}
 					<tr class="row5" objid={{d.id}}>
 				{% endif %}
-				{% if d.statuses.latest.type.id == 4 %}
+				{% if d.last_status.type_id == 4 %}
 					<tr class="row5" objid={{d.id}}>
 				{% endif %}
 			{% endif %}
@@ -68,7 +68,7 @@
 				</td>
 				<td><a href="{{f.instance.project.get_absolute_url}}" target="_blank">{{ f.instance.project }}</a></td>
 				<td>{{ f.instance.month }}/{{f.instance.year}}</a></td>
-				<td><a href="/demandsales/?demand_id={{f.instance.id}}" class="bigfancybox">{{ f.instance.get_sales.count|default:"אין מכירות" }}</a></td>
+				<td><a href="/demandsales/?demand_id={{f.instance.id}}" class="bigfancybox">{{ f.instance.sales_count|default:"אין מכירות" }}</a></td>
 				<td>{{f.is_finished}}</td>
 				<td>{{f.by_mail}}</td>
 				<td>
@@ -84,7 +84,7 @@
 						<img src="{% static "images/error-48.png" %}" width="15 height="15" /> 
 					{% endif %}
 				</td>
-				<td>{{f.instance.statuses.latest}}</td>
+				<td>{{f.instance.last_status|default_if_none:""}}</td>
 			</tr>
 		{% endfor %}
 	</table>

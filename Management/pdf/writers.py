@@ -304,8 +304,8 @@ class MonthDemandWriter(DocumentBase):
     def __init__(self, demand, to_mail=False):
         super(MonthDemandWriter, self).__init__()
         self.demand = demand
-        commissions = self.demand.project.commissions.get()
-        self.signup_adds = commissions.commission_by_signups
+        self.commissions = self.demand.project.commissions.get()
+        self.signup_adds = self.commissions.commission_by_signups
         self.to_mail = to_mail
     def toPara(self):
         contact = self.demand.project.demand_contact
@@ -325,7 +325,7 @@ class MonthDemandWriter(DocumentBase):
         frame1 = Frame(300, 580, 250, 200)
         frame1.addFromList([self.toPara()], canv)
     def introPara(self):
-        project_commissions = self.demand.project.commissions.get()
+        project_commissions = self.commissions
         if project_commissions.include_lawyer == None:
             lawyer_str = u''
         elif project_commissions.include_lawyer == False:
@@ -334,11 +334,11 @@ class MonthDemandWriter(DocumentBase):
             lawyer_str = u', כולל שכ"ט עו"ד'
         tax_str = project_commissions.include_tax and u'כולל מע"מ' or u'לא כולל מע"מ'
         s = log2vis(u'א. רצ"ב פירוט דרישתנו לתשלום בגין %i עסקאות שנחתמו החודש.' %
-                    self.demand.get_sales().count()) + '<br/>'
+                    self.demand.sales_count) + '<br/>'
         s += log2vis(u'ב. סה"כ מכירות (%s%s) - %s ש"ח.' %
-                     (tax_str, lawyer_str, commaise(self.demand.get_sales().total_price_final()))) + '<br/>'
+                     (tax_str, lawyer_str, commaise(self.demand.sales_amount))) + '<br/>'
         s += log2vis(u'ג. עמלתנו (כולל מע"מ) - %s ש"ח (ראה פירוט רצ"ב).' % 
-                    commaise(self.demand.get_total_amount())) + '<br/>'
+                    commaise(self.demand.total_amount)) + '<br/>'
         s += log2vis(u'ד. נא בדיקתכם ואישורכם לתשלום לתאריך %s אודה.' % datetime.now().strftime('31/%m/%Y')) + '<br/>'
         s += log2vis(u'ה. במידה ויש שינוי במחירי הדירות ו\או שינוי אחר') + '<br/>'
         s += log2vis(u'אנא עדכנו אותנו בפקס ו\או בטלפון הרצ"ב על גבי דרישה זו.   ') + '<br/>'
@@ -349,7 +349,7 @@ class MonthDemandWriter(DocumentBase):
         logger = logging.getLogger('pdf')
         logger.info('starting zilberBonusFlows')
         
-        commissions = self.demand.project.commissions.get()
+        commissions = self.commissions
 
         flows = [tableCaption(caption=log2vis(u'נספח ב - דו"ח חסכון בהנחה')), Spacer(0,20),
                  tableCaption(caption=log2vis(u'מדד בסיס - %s' % commissions.c_zilber.base_madad)),
@@ -365,7 +365,7 @@ class MonthDemandWriter(DocumentBase):
         i = 0
         total_prices, total_adds, total_doh0price, total_memudad, total_diff = 0, 0, 0, 0, 0
         demand = self.demand
-        commissions = demand.project.commissions.get()
+        commissions = self.commissions
         base_madad = commissions.c_zilber.base_madad
                 
         logger.debug(str({'base_madad':base_madad}))
@@ -373,12 +373,13 @@ class MonthDemandWriter(DocumentBase):
         while demand != None:
             logger.info('starting to write bonuses for %(demand)s', {'demand':demand})
 
-            sales = demand.get_sales().select_related('house__building')
+            sales = demand.sales_list
             
             # for performance reasons we take all commission details in a single query and store them for later use
-            commission_details = models.SaleCommissionDetail.objects.filter(employee_salary__isnull = True, sale__in = sales,
-                                                                            commission__in = ('latest_doh0price', 'memudad', 'current_madad')) \
-                                                                    .order_by('sale__id')
+            commission_details = models.SaleCommissionDetail.objects.filter(
+                employee_salary__isnull = True, sale__in = sales,
+                commission__in = ('latest_doh0price', 'memudad', 'current_madad')) \
+                .order_by('sale__id')
             
             # creating an easy-to-use dictionary {sale, {cd.commission, cd.value}} where cd is the commission detail
             sales_commission_details = {}
@@ -454,13 +455,13 @@ class MonthDemandWriter(DocumentBase):
         headers.reverse()
         rows = []
         demand = self.demand
-        sales = list(demand.get_sales().select_related('house__building'))
+        sales = demand.sales_list
         total_prices, total_prices_finals, total_adds = 0, 0, 0
         
         while demand.zilber_cycle_index() > 1:
             demand = demand.get_previous_demand()
             # adds sales of the current demand before the sales we already have because we are iterating in reverse
-            demand_sales = list(demand.get_sales().select_related('house__building'))
+            demand_sales = demand.sales_list
             demand_sales.extend(sales)
             sales = demand_sales
                 
@@ -545,7 +546,7 @@ class MonthDemandWriter(DocumentBase):
         s += log2vis(u' + %s מחודשים קודמים' % count)
         return Paragraph(s, ParagraphStyle('signup_months', fontName='David', fontSize=10, alignment=TA_CENTER))
     def saleFlows(self):
-        sales = self.demand.get_sales()
+        sales = self.demand.sales_list
         names = [u'מס"ד']
         colWidths = [35]
         contract_num, discount, final = False, False, False
@@ -559,7 +560,7 @@ class MonthDemandWriter(DocumentBase):
             names.append(u'הרשמה\nתאריך')
             colWidths.append(None)
         names.extend([u'שם הרוכשים',u'ודירה\nבניין',u'מכירה\nתאריך', u'חוזה\nמחיר'])
-        colWidths.extend([65, None,None,45])
+        colWidths.extend([65, None,None,55])
         
         if zilber:
             names.extend([u'רישום\nהוצאות',u'מזומן\nהנחת', u'מפרט\nהוצאות',u'עו"ד\nשכ"ט', u'נוספות\nהוצאות'])
@@ -572,9 +573,9 @@ class MonthDemandWriter(DocumentBase):
                 discount = True
                 
         names.extend([u'עמלה\nלחישוב\nמחיר', u'בסיס\nעמלת\n%',u'בסיס\nעמלת\nשווי'])
-        colWidths.extend([45,None,None])
+        colWidths.extend([55,None,None])
 
-        commissions = self.demand.project.commissions.get()
+        commissions = self.commissions
 
         if commissions.b_discount_save_precentage:
             names.extend([u'חסכון\nבונוס\n%',u'חסכון\nבונוס\nשווי', u'סופי\nעמלה\n%',u'סופי\nעמלה\nשווי'])
@@ -590,7 +591,7 @@ class MonthDemandWriter(DocumentBase):
         rows = []
         total_lawyer_pay, total_pc_base_worth, total_pb_dsp_worth = 0, 0 ,0
         
-        commissions = self.demand.project.commissions
+        commissions = self.commissions
         
         for s in sales:
             s.restore = True
@@ -614,7 +615,12 @@ class MonthDemandWriter(DocumentBase):
             if discount:
                 row.extend([s.discount, s.allowed_discount])
                 
-            row.extend([commaise(s.price_final),s.pc_base, commaise(s.pc_base_worth)])
+            row.extend([
+                commaise(s.price_final),
+                round(s.pc_base, 3), 
+                commaise(s.pc_base_worth)
+            ])
+
             total_pc_base_worth += s.pc_base_worth
             
             if final:
@@ -630,8 +636,8 @@ class MonthDemandWriter(DocumentBase):
             row.append(None)
         if self.signup_adds:
             row.append(None)
-        row.extend([None,Paragraph(log2vis('%s' % self.demand.get_sales().count()), styleSaleSumRow),None])
-        row.append(Paragraph(commaise(self.demand.get_sales().total_price()), styleSaleSumRow))
+        row.extend([None,Paragraph(log2vis('%s' % self.demand.sales_count), styleSaleSumRow),None])
+        row.append(Paragraph(commaise(self.demand.sales_total_price), styleSaleSumRow))
         if zilber:
             row.extend([None,None,None,Paragraph(commaise(total_lawyer_pay), styleSaleSumRow),None])
         if discount:
@@ -641,7 +647,7 @@ class MonthDemandWriter(DocumentBase):
                         None,Paragraph(commaise(total_pb_dsp_worth), styleSaleSumRow),
                         None,Paragraph(commaise(self.demand.sales_commission), styleSaleSumRow)])
         else:
-            row.extend([Paragraph(commaise(self.demand.get_sales().total_price_final()), styleSaleSumRow),
+            row.extend([Paragraph(commaise(self.demand.sales_amount), styleSaleSumRow),
                         None,Paragraph(commaise(self.demand.sales_commission), styleSaleSumRow)])
         row.reverse()
         rows.append(row)
@@ -662,7 +668,7 @@ class MonthDemandWriter(DocumentBase):
                                            leading=16, alignment=TA_RIGHT))
     def addsPara(self):
         s = '<br/>'.join([log2vis(u'%s - %s ש"ח' % (d.reason, commaise(d.amount))) for d in self.demand.diffs.all()]) + '<br/>'
-        s += '<b>%s</b>' % log2vis(u'סה"כ : %s ש"ח' % commaise(self.demand.get_total_amount())) + '<br/>'
+        s += '<b>%s</b>' % log2vis(u'סה"כ : %s ש"ח' % commaise(self.demand.total_amount)) + '<br/>'
         return Paragraph(s, ParagraphStyle(name='addsPara', fontName='David', fontSize=14, 
                                            leading=16, alignment=TA_LEFT))
     def get_story(self):
@@ -1281,7 +1287,7 @@ class EmployeeSalesWriter(DocumentBase):
         flows = []
         
         for demand in self.demands:
-            sales = demand.get_sales()
+            sales = demand.sales_list
             houses = [sale.house for sale in sales]
             
             if len(sales) == 0:
@@ -1455,9 +1461,9 @@ class DemandFollowupWriter(DocumentBase):
             offsets = [invoice.offset for invoice in invoices if invoice.offset]
             offset_amount_str = '<br/>'.join([offset.amount for offset in offsets])
             
-            sales_count = len(demand.get_sales())
+            sales_count = demand.sales_count
             
-            row = [demand.id, u'%s/%s' % (demand.month, demand.year), sales_count, commaise(demand.get_total_amount()),
+            row = [demand.id, u'%s/%s' % (demand.month, demand.year), sales_count, commaise(demand.total_amount),
                    Paragraph(invoice_num_str, styleRow9), Paragraph(invoice_amount_str, styleRow9), Paragraph(invoice_date_str, styleRow9), 
                    Paragraph(payment_amount_str, styleRow9), Paragraph(payment_date_str, styleRow9), commaise(demand.diff_invoice),
                    commaise(demand.diff_invoice_payment), Paragraph(offset_amount_str, styleRow9)]
@@ -1466,9 +1472,9 @@ class DemandFollowupWriter(DocumentBase):
             rows.append(row)
 
             total_sales_count += sales_count
-            total_amount += demand.get_total_amount()
-            total_invoices += demand.invoices.total_amount_offset()
-            total_payments += demand.payments.total_amount()
+            total_amount += demand.total_amount
+            total_invoices += demand.total_amount_offset
+            total_payments += (demand.payments_amount or 0)
             total_diff_invoice += demand.diff_invoice
             total_diff_invoice_payment += demand.diff_invoice_payment
         

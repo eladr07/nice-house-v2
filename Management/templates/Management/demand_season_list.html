@@ -89,46 +89,46 @@
 		<th>הערות</th>
 	</tr>
     {% for d in demands %}
-	{% if not d.statuses.count %}
+	{% if not d.last_status %}
     	<tr class="row3" objid={{d.id}}>
 	{% else %}
-		{% if d.statuses.latest.type.id == 1 %}
+		{% if d.last_status.type_id == 1 %}
 			<tr class="{% cycle 'row1' 'row2' %}" objid={{d.id}}>
 		{% endif %}
-		{% if d.statuses.latest.type.id == 2 %}
+		{% if d.last_status.type_id == 2 %}
 			<tr class="row4" objid={{d.id}}>
 		{% endif %}
-		{% if d.statuses.latest.type.id == 3 %}
+		{% if d.last_status.type_id == 3 %}
 			<tr class="row5" objid={{d.id}}>
 		{% endif %}
-		{% if d.statuses.latest.type.id == 4 %}
+		{% if d.last_status.type_id == 4 %}
 			<tr class="row5" objid={{d.id}}>
 		{% endif %}
 	{% endif %}
-			<td><a href="/demands/{{d.id}}">{{d.id}}</a></td>
+			<td><a href="{% url 'demand-edit' object_id=d.id %}">{{d.id}}</a></td>
 			<td>
 				<a href="/reports/project_month/{{d.project.id}}/{{d.year}}/{{d.month}}">
 				<img src="{% static "images/PDF-48.png" %}" width="15" height="15"/>
 				</a>
 			</td>
 			<td>{{ d.month }}/{{d.year}}</td>
-			<td><a href="/demandsales/?demand_id={{d.id}}" class="bigfancybox">{{ d.get_sales.count|default:"אין מכירות" }}</a></td>
+			<td><a href="/demandsales/?demand_id={{d.id}}" class="bigfancybox">{{ d.sales_count|default:"אין מכירות" }}</a></td>
 			<td>{{d.sale_count}}</td>
-			<td>{% if d.get_sales.total_price_final %} {{ d.get_sales.total_price_final|intcomma }} ש"ח {% else %}----{% endif %}</td>
+			<td>{% if d.sales_amount %} {{ d.sales_amount|intcomma }} ש"ח {% else %}----{% endif %}</td>
 			<td>{% if d.sales_commission %} {{ d.sales_commission|intcomma }} ש"ח {% else %}----{% endif %}</td>
 			<td style="color:#08A600;">{% if d.fixed_diff %} {{ d.fixed_diff.amount }} ש"ח {% endif %}</td>
 			<td style="color:#08A600;">{% if d.var_diff %} {{ d.var_diff.amount }} ש"ח - {{ d.var_diff.reason }} {% endif %}</td>
 			<td style="color:#08A600; width:150px;">{% if d.bonus_diff %} {{ d.bonus_diff.amount }} ש"ח - {{ d.bonus_diff.reason }} {% endif %}</td>
 			<td style="color:#D50808;">{% if d.fee_diff %} {{ d.fee_diff.amount }} ש"ח - {{ d.fee_diff.reason }} {% endif %}</td>
-			<td><b>{% if d.get_total_amount %} {{ d.get_total_amount|intcomma }} ש"ח {% else %}----{% endif %}</b></td>
+			<td><b>{% if d.total_amount %} {{ d.total_amount|intcomma }} ש"ח {% else %}----{% endif %}</b></td>
 			<td>
 			{% if d.is_fixed %}
 			 <i class="fa fa-fw fa-exclamation-triangle text-warning"></i>
 			{% endif %}
 			</td>
 			<td>
-			{% if d.get_open_reminders|length %}
-				<a href="/demands/{{d.id}}/reminders" class="fancybox">{{d.get_open_reminders|length}} תזכורות</a>
+			{% if d.open_reminders|length %}
+				<a href="/demands/{{d.id}}/reminders" class="fancybox">{{d.open_reminders|length}} תזכורות</a>
 			{% endif %}
 				<a href="/demands/{{d.id}}/addreminder" class="fancybox">
 					<i class="fa fa-fw fa-plus-circle text-success"></i>

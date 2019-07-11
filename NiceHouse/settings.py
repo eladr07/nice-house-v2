@@ -184,11 +184,13 @@ LOGGING = {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
             'filename': os.path.join(BASE_DIR, 'logs/error.log'),
+            'formatter': 'form01'
         },        
         'query': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': os.path.join(BASE_DIR, 'logs/query.log'),
+            'formatter': 'form01'
         },
     },
     'loggers': {

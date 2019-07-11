@@ -13,32 +13,12 @@ class SeasonQuerySet(models.QuerySet):
 class EmployeeSalaryBaseQuerySet(SeasonQuerySet):
     def nondeleted(self):
         return self.filter(is_deleted=False)
-
-class InvoiceQuerySet(models.QuerySet):
-    def total_amount_offset(self):
-        invoices_amount = self.aggregate(Sum('amount'))['amount__sum'] or 0
-        offsets_amount = self.aggregate(Sum('offset__amount'))['offset__amount__sum'] or 0
-        return invoices_amount + offsets_amount
-    
-class PaymentQuerySet(models.QuerySet):
-    def total_amount(self):
-        return self.aggregate(Sum('amount'))['amount__sum'] or 0
-    
-class DemandDiffQuerySet(models.QuerySet):
-    def total_amount(self):
-        return self.aggregate(Sum('amount'))['amount__sum'] or 0
     
 class DemandQuerySet(SeasonQuerySet):
     def total_sales_commission(self):
         return self.aggregate(Sum('sales_commission'))['sales_commission__sum'] or 0
     def total_sale_count(self):
         return self.aggregate(Sum('sale_count'))['sale_count__sum'] or 0
-    def noinvoice(self):
-        query = self.annotate(invoices_num = Count('invoices'), payments_num = Count('payments'))
-        return query.filter(invoices_num = 0, payments_num__gt = 0, force_fully_paid = False)
-    def nopayment(self):
-        query = self.annotate(invoices_num = Count('invoices'), payments_num = Count('payments'))
-        return query.filter(invoices_num__gt = 0, payments_num = 0, force_fully_paid = False)
 
 class SaleQuerySet(models.QuerySet):
     def contractor_pay_range(self, from_year, from_month, to_year, to_month):

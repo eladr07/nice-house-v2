@@ -79,7 +79,7 @@
 			<td>{{ p.name }}</td>
 			<td><a class="bigfancybox" href="/demandsales/?project_id={{p.id}}&from_year={{from_year}}&from_month={{from_month}}&to_year={{to_year}}&to_month={{to_month}}">
 				{{ p.sale_count }}</a></td>
-			<td>{{p.total_income|intcomma}}</td>
+			<td>{{p.total_income|floatformat:0|intcomma}}</td>
 			<td>{{p.relative_income|floatformat:-2}}%</td>
 			<td>
 			{% for employee, commission in p.employee_expense.items %}
@@ -106,19 +106,19 @@
 					{{ p.relative_sales_expense_str }}
 				{% endif %}
 			</td>
-			<td>{{ p.profit|intcomma }}</td>
+			<td>{{ p.profit|floatformat:0|intcomma }}</td>
 		</tr>
 	{% endfor %}
 	<tr height="30px" class="rowSum">
 		<td colspan="2" align="center">סיכום</td>
 		<td>{{total_sale_count}}</td>
-		<td>{{total_income|intcomma}} ש"ח</td>
+		<td>{{total_income|floatformat:0|intcomma}} ש"ח</td>
 		<td></td>
 		<td></td>
 		<td>{{total_expense|intcomma}} ש"ח</td>
 		<td>{{avg_relative_expense_income|floatformat:-2}}%</td>
 		<td>{{avg_relative_sales_expense|floatformat:-2}}%</td>
-		<td>{{total_profit|intcomma}} ש"ח</td>
+		<td>{{total_profit|floatformat:0|intcomma}} ש"ח</td>
 	</tr>
 </table>
 {% endblock content %}

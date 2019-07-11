@@ -62,7 +62,7 @@ class DemandSalesCountField(TableField):
     def __init__(self):
         return super(DemandSalesCountField, self).__init__(gettext('demand_sales_count'),50, is_summarized=True)
     def format(self, item):
-        return len(item.get_sales())
+        return item.sales_count
     
     class Meta:
         models = (models.Demand,)
@@ -72,7 +72,7 @@ class DemandSalesTotalPriceField(TableField):
         return super(DemandSalesTotalPriceField, self).__init__(gettext('demand_total_sales_price'),50, 
                                                                 is_commaised=True, is_summarized=True)
     def format(self, item):
-        return item.get_sales().total_price()
+        return item.sales_total_price
     
     class Meta:
         models = (models.Demand,)
@@ -82,7 +82,7 @@ class DemandTotalAmountField(TableField):
         return super(DemandTotalAmountField, self).__init__(gettext('demand_total_amount'),50, is_commaised=True, 
                                                             is_summarized=True)
     def format(self, item):
-        return item.get_total_amount()
+        return item.total_amount
     
     class Meta:
         models = (models.Demand,)

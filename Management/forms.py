@@ -210,17 +210,26 @@ class HouseForm(forms.ModelForm):
     
     def save(self, price_type_id, *args, **kw):
         h = forms.ModelForm.save(self, *args, **kw)
+        
         for f in ['parking1','parking2','parking3']:
             if self.cleaned_data[f]:
                 h.parkings.add(self.cleaned_data[f])
         for f in ['storage1','storage2']:
             if self.cleaned_data[f]:
                 h.storages.add(self.cleaned_data[f])
+
         price, price_date = self.cleaned_data['price'], self.cleaned_data['price_date']
-        q = self.instance.versions.filter(type__id = price_type_id)
-        if price and (q.count() == 0 or q.latest().price != price):
-            house_version = HouseVersion(type = PricelistType.objects.get(pk=price_type_id), price = price, date = price_date)
+        
+        versions = self.instance.versions.filter(type__id = price_type_id)
+        
+        if price and (versions.count() == 0 or versions.latest().price != price):
+            pricelist_type = PricelistType.objects.get(pk=price_type_id)
+            house_version = HouseVersion(type = pricelist_type, price = price, date = price_date)
+            # save the object first
+            house_version.save()
+            # and add it to the House versions
             self.instance.versions.add(house_version)
+
         return h
     
     def clean(self):

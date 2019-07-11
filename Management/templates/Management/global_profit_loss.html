@@ -45,7 +45,7 @@
 							{%endif%}
 						</td>
 						<td>{{ incomeRow.name }}</td>
-						<td>{{ incomeRow.amount|intcomma }}</td>
+						<td>{{ incomeRow.amount|floatformat:0|intcomma }}</td>
 						<td>{{ incomeRow.relative|floatformat:-2 }}</td>
 					</tr>
 				{% endfor %}
@@ -66,28 +66,28 @@
 							{%endif%}
 						</td>
 						<td>{{ lossRow.name }}</td>
-						<td>{{ lossRow.amount|intcomma }}</td>
+						<td>{{ lossRow.amount|floatformat:0|intcomma }}</td>
 						<td>{{ lossRow.relative|floatformat:-2 }}</td>
 					</tr>
 				{% endfor %}
 			</table>
 		</div>
 		<div class="clearBoth"></div>
-		<h4 style="text-align:center; background-color:#96F2A4;">רווח - {{row.profit|intcomma}} ש"ח</h4>
+		<h4 style="text-align:center; background-color:#96F2A4;">רווח - {{row.profit|floatformat:0|intcomma}} ש"ח</h4>
 		<br>
 	{% endfor %}
 	<table class="formTable" border="1">
 		<tr>
 			<th>סה"כ הכנסות</th>
-			<td>{{global_income|intcomma}}</td>
+			<td>{{global_income|floatformat:0|intcomma}}</td>
 		</tr>
 		<tr>
 			<th>סה"כ הוצאות</th>
-			<td>{{global_loss|intcomma}}</td>
+			<td>{{global_loss|floatformat:0|intcomma}}</td>
 		</tr>
 		<tr>
 			<th>סה"כ רווח</th>
-			<td>{{global_profit|intcomma}}</td>
+			<td>{{global_profit|floatformat:0|intcomma}}</td>
 		</tr>
 	</table>
 {% endblock content %}

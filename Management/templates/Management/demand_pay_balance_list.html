@@ -182,15 +182,15 @@
 					<tr class="{% cycle 'row1' 'row2' %}" objid={{d.id}}>
 				{% endif %}
 			{% endif %}
-				<td><a href="/demands/{{d.id}}">{{d.id}}</a></td>
+				<td><a href="{% url 'demand-edit' object_id=d.id %}">{{d.id}}</a></td>
 				<td>
 					<a href="/reports/project_month/{{d.project.id}}/{{d.year}}/{{d.month}}">
 					<img src="{% static "images/PDF-48.png" %}" width="15" height="15"/>
 					</a>
 				</td>
 				<td>{{ d.month }}/{{d.year}}</td>
-				<td><a href="/demandsales/?demand_id={{d.id}}" class="bigfancybox">{{ d.get_sales.count|default:"אין מכירות" }}</a></td>
-				<td><b>{% if d.get_total_amount %} {{ d.get_total_amount|intcomma }} ש"ח {% else %}----{% endif %}</b></td>
+				<td><a href="/demandsales/?demand_id={{d.id}}" class="bigfancybox">{{ d.sales_count|default:"אין מכירות" }}</a></td>
+				<td><b>{% if d.total_amount %} {{ d.total_amount|intcomma }} ש"ח {% else %}----{% endif %}</b></td>
 				<td>
 					{% for i in d.invoices.all %}
 						{{i.num}}<br>
@@ -236,7 +236,7 @@
 				{% if d.is_fixed %} <i class="fa fa-fw fa-exclamation-triangle text-warning"></i>{% endif %}
 				</td>
 				<td>
-					{% for r in d.get_open_reminders %}
+					{% for r in d.open_reminders %}
 						{{ r.content|truncatewords:5 }}
 						<a class="fancybox" href="{{r.get_absolute_url}}"><i class="fa fa-fw fa-info-circle text-primary"></i></a>
 						<a href="{{r.get_absolute_url}}/do"><img src="{% static "images/thumbs_up_48.png" %}" width="15" height="15" alt="בצע" border="0" /></a>

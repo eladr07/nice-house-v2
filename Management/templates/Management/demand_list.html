@@ -162,10 +162,10 @@
 		<th>סטטוס דרישה</th>
 	</tr>
     {% for d in demands %}
-	{% if not d.statuses.count %}
+	{% if not d.last_status %}
     	<tr class="row3" objid={{d.id}}>
 	{% else %}
-		{% if d.statuses.latest.type.id != 1 %}
+		{% if d.last_status.type_id != 1 %}
 			<tr class="row4" objid={{d.id}}>
 		{% else %}
 			<tr class="{% cycle 'row1' 'row2' %}" objid={{d.id}}>
@@ -180,13 +180,13 @@
 			<td>{{ d.project.initiator }}</td>
 			<td><a href="/projects/{{d.project.id}}">{{ d.project.name }}</a></td>
 			<td>{{ d.project.city }}</td>
-			<td><a href="/demandsales/?demand_id={{d.id}}" class="bigfancybox">{{ d.get_sales.count }}</a></td>
+			<td><a href="/demandsales/?demand_id={{d.id}}" class="bigfancybox">{{ d.sales_count }}</a></td>
 			<td><a href="{{d.get_absolute_url}}/salecount" class="fancybox">{{d.sale_count}}</a></td>
-			<td>{% if d.get_sales.total_price_final %}{{ d.get_sales.total_price_final|intcomma }} ש"ח {% endif %}</td>
+			<td>{% if d.sales_amount %}{{ d.sales_amount|intcomma }} ש"ח {% endif %}</td>
 			<td>{{ d.remarks|default_if_none:"" }}</td>
 			<td>
-			{% if d.get_open_reminders|length %}
-				<a href="{{d.get_absolute_url}}/reminders" class="fancybox">{{d.get_open_reminders|length}} תזכורות</a>
+			{% if d.open_reminders|length %}
+				<a href="{{d.get_absolute_url}}/reminders" class="fancybox">{{d.open_reminders|length}} תזכורות</a>
 			{% endif %}
 				<a href="{{d.get_absolute_url}}/addreminder" class="fancybox">
 					<i class="fa fa-fw fa-plus-circle text-success"></i>
@@ -200,9 +200,9 @@
 			{% endfor %}
 			</td>
 			<td>
-				{% if d.statuses.count %}
-					{{ d.statuses.latest.type }}<br>
-					{% if d.statuses.latest.type.id == 1 %}
+				{% if d.last_status %}
+					{{ d.last_status.type }}<br>
+					{% if d.last_status.type_id == 1 %}
 						<a href="{{d.get_absolute_url}}/close" class="fancybox">אשר</a>
 					{% endif %}
 				{% else %}
