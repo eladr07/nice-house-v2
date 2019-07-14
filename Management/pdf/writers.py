@@ -389,11 +389,11 @@ class MonthDemandWriter(DocumentBase):
             for sale, group in itertools.groupby(commission_details, lambda commission_detail: commission_detail.sale):
                 sales_commission_details[sale] = { cd.commission:cd.value for cd in list(group) }
                         
-            for s in sales:
-                logger.info('starting to write bonus for sale #%(id)s', {'id':s.id})
+            for sale in sales:
+                logger.info('starting to write bonus for sale #%d', sale.id)
                 
                 i += 1
-                actual_demand = s.actual_demand
+                actual_demand = sale.actual_demand
 
                 if actual_demand:
                     row = ['%s-%s' % (actual_demand.id, i),'%s/%s' % (actual_demand.month, actual_demand.year)]
@@ -407,18 +407,18 @@ class MonthDemandWriter(DocumentBase):
                     current_madad = details.get('current_madad', 0)
                     price_memduad_diff = sale.price_final - memudad
                 else:
-                    logger.warning('sale #%(sale_id)s has no commission details', {'sale_id': s.id})
+                    logger.warning('sale #%d has no commission details', sale.id)
                     latest_doh0price, memudad, current_madad, price_memduad_diff = 0,0,0,0
                 
-                row.extend([log2vis(s.clients), '%s/%s' % (str(s.house.building), str(s.house)), 
-                            s.sale_date.strftime('%d/%m/%y'), commaise(s.price_final), commaise(latest_doh0price), 
-                            current_madad, commaise(memudad), commaise(price_memduad_diff), commaise(s.zdb)])
+                row.extend([log2vis(sale.clients), '%s/%s' % (str(sale.house.building), str(sale.house)), 
+                            sale.sale_date.strftime('%d/%m/%y'), commaise(sale.price_final), commaise(latest_doh0price), 
+                            current_madad, commaise(memudad), commaise(price_memduad_diff), commaise(sale.zdb)])
 
                 row.reverse()
                 rows.append(row)
                 
-                total_prices += s.price
-                total_adds += s.zdb
+                total_prices += sale.price
+                total_adds += sale.zdb
                 total_doh0price += latest_doh0price
                 total_memudad += memudad
                 total_diff += price_memduad_diff
