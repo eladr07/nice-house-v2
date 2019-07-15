@@ -373,7 +373,7 @@ class MonthDemandWriter(DocumentBase):
         logger.debug(str({'base_madad':base_madad}))
         
         while demand != None:
-            logger.info('starting to write bonuses for %(demand)s', {'demand':demand})
+            logger.info('starting to write bonuses for demand #%d', demand.id)
 
             sales = demand.sales_list
             
@@ -427,6 +427,9 @@ class MonthDemandWriter(DocumentBase):
                 break
             
             demand = demand.get_previous_demand()
+
+            # enrich demand
+            set_demand_sale_fields([demand], demand.year, demand.month, demand.year, demand.month)
             
         sum_row = [Paragraph(log2vis(u'סה"כ'), styleSaleSumRow), None, None, None, None, 
                    Paragraph(commaise(total_prices), styleSaleSumRow), 
