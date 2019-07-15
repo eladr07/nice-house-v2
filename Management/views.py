@@ -2063,7 +2063,12 @@ def salepaymod_edit(request, model, object_id):
                 salaries = EmployeeSalary.objects.nondeleted().filter(q, employee__in = project.employees.all())
                 salaries_to_calc.extend(salaries)
             
+            # enrich demands
+            set_demand_diff_fields(demands_to_calc)
+
             for demand in demands_to_calc:
+                year, month = demand.year, demand.month
+                set_demand_sale_fields([demand], year, month, year, month)
                 demand.calc_sales_commission()
             
             for salary in salaries_to_calc:
@@ -2097,7 +2102,12 @@ def demand_sale_reject(request, demand_id, id):
     sr.to_year, sr.to_month = to_year, to_month
     sr.save()
     
+    # enrich demands
+    set_demand_diff_fields(demands_to_calc)
+
     for demand in demands_to_calc:
+        year, month = demand.year, demand.month
+        set_demand_sale_fields([demand], year, month, year, month)
         demand.calc_sales_commission()
     
     return HttpResponseRedirect('/salereject/%s' % sr.id)
@@ -2124,7 +2134,12 @@ def demand_sale_pre(request, demand_id, id):
     sr.to_year, sr.to_month = to_year, to_month
     sr.save()
     
+    # enrich demands
+    set_demand_diff_fields(demands_to_calc)
+
     for demand in demands_to_calc:
+        year, month = demand.year, demand.month
+        set_demand_sale_fields([demand], year, month, year, month)
         demand.calc_sales_commission()
     
     return HttpResponseRedirect('/salepre/%s' % sr.id)
@@ -2140,6 +2155,13 @@ def demand_sale_cancel(request, demand_id, id):
     
     sale.commission_include = False
     sale.save()
+    
+    demand = sale.demand
+    year, month = demand.year, demand.month
+
+    # enrich demand
+    set_demand_sale_fields([demand], year, month, year, month)
+    set_demand_diff_fields([demand])
     
     #re-calculate the entire demand
     sale.demand.calc_sales_commission()
@@ -4004,6 +4026,8 @@ def attachment_add(request):
 @permission_required('Management.change_sale')
 def sale_edit(request, id):
     sale = Sale.objects.get(pk=id)
+    demand = sale.demand
+
     if request.POST:
         form = SaleForm(request.POST, instance = sale)
         #handles the case when the building changes, and the house is not in the queryset of the house field
@@ -4012,8 +4036,8 @@ def sale_edit(request, id):
         if form.is_valid():
             project = form.cleaned_data['project']
             next = None
+
             #temp fix. should remove
-            demand = sale.demand
             if demand.statuses.count() == 0:
                 demand.feed()
             if demand.was_sent:
@@ -4032,12 +4056,20 @@ def sale_edit(request, id):
                         shm = SaleHouseMod(sale = sale, old_house = sale.house)
                     shm.save()
                     next = '/salehousemod/%s' % shm.id
+            
             form.save()
+
+            year, month = demand.year, demand.month
+
+            # enrich demand
+            set_demand_sale_fields([demand], year, month, year, month)
+            set_demand_diff_fields([demand])
 
             demand.calc_sales_commission()
 
-            year, month = sale.demand.year, sale.demand.month
-            employees = demand.project.employees.exclude(work_end__isnull = False, work_end__lt = date(year, month, 1))
+            employees = demand.project.employees.exclude(
+                work_end__isnull=False, 
+                work_end__lt=date(year, month, 1))
             
             salaries_to_calc = EmployeeSalary.objects \
                 .nondeleted() \
@@ -4082,6 +4114,10 @@ def sale_add(request, demand_id=None):
                 sp.save()
                 next = '/salepre/%s' % sp.id 
             
+            # enrich demand
+            set_demand_sale_fields([demand], year, month, year, month)
+            set_demand_diff_fields([demand])
+
             demand.calc_sales_commission()
             
             employees = demand.project.employees.exclude(work_end__isnull = False, work_end__lt = date(year, month, 1))
