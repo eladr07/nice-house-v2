@@ -22,7 +22,7 @@ def mail(to, cc='', bcc='', subject='', contents='', attachments = ()):
     for attachment in attachments:
         part = MIMEBase('application', 'octet-stream')
         if isinstance(attachment, str):
-            attachment_file = open(attachment)
+            attachment_file = open(attachment, 'rb')
         else:
             attachment_file = attachment
             

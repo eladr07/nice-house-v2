@@ -22,6 +22,16 @@
 				<td>{{existForm.contact.errors|join:" "}}</td>
 			</tr>
 			<tr>
+				<td></td>
+				<td><input type="submit" value="אישור" class="button"/></td>
+			</tr>
+		</table>
+	</form>
+
+	<form method="POST">
+		{% csrf_token %}
+		<table class="formTable">
+			<tr>
 				<th>איש קשר חדש</th>
 				<td></td>
 			</tr>
@@ -38,5 +48,6 @@
 			</tr>
 		</table>
 	</form>
+	
 </div>
 {% endblock page %}
