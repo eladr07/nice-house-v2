@@ -4253,8 +4253,13 @@ def report_employee_sales(request):
             project, from_month, from_year, to_month, to_year = cleaned_data['project'], cleaned_data['from_month'], \
                 cleaned_data['from_year'], cleaned_data['to_month'], cleaned_data['to_year']
                 
-            demands = Demand.objects.range(from_year, from_month, to_year, to_month).filter(project = project)
+            demands = Demand.objects \
+                .range(from_year, from_month, to_year, to_month) \
+                .filter(project = project)
             
+            # enrich demands
+            set_demand_sale_fields(demands, from_year, from_month, to_year, to_month)
+
             writer = EmployeeSalesWriter(project, from_month, from_year, to_month, to_year, demands)
             
             return build_and_return_pdf(writer)
