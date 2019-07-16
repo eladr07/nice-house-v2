@@ -3,8 +3,6 @@ BODY {
 	padding: 0;
 	direction: rtl;
 	text-align: center;
-	font-size: 12px;
-	font-family: Arial;
 }
 
 .clearBoth {
@@ -46,67 +44,6 @@ BODY {
 	direction: rtl;
 	text-align: right;
 }
-
-#header {
-	border-bottom: 1px solid #D4D4D4; /* I added a bottom border to the element. */
-	text-align: left;
-}
-
-
-#header #Nice {
-	font-family: Tahoma;
-	color: #0065BD;
-	cursor: pointer; /* Defines the Cursor type when the mouse is over the object of that class.. in out design it's the NiceHouse title.. */
-	margin-bottom: 0px; /* I defined that the space between the bottom border and the element is zero pixels. */
-	font-size: 34px;
-}
-
-
-#header #House {
-	font-family: Tahoma;
-	color: #AFAFAF;
-	cursor: pointer; /* Defines the Cursor type when the mouse is over the object of that class.. in out design it's the NiceHouse title.. */
-	margin-bottom: 0px; /* I defined that the space between the bottom border and the element is zero pixels. */
-	font-size: 34px;
-}
-
-
-#menu {
-	background-color: #EFEFEF;
-	height: 21px;
-	border-bottom: 1px solid #D4D4D4;
-}
-
-
-#menu span {
-	color: #4F4F4F;
-}
-
-#menu #user {
-	float: left;
-	padding: 2px 0px 0px 8px;
-	font-size: 12px;
-	font-family: Tahoma;
-}
-
-#menu #nav {
-	padding: 2px 8px 0px 0px;
-	font-size: 12px;
-	font-family: Tahoma;
-	float: right;
-}
-
-#menu a, .dataTable a {
-	text-decoration: none;
-	font-size: 12px;
-	color: #0065BD;
-}
-
-
-#menu a:hover, .dataTable a:hover {
-	color: #AF0007;
-}
-
 
 #content {
 	border: 1px solid #D4D4D4;
@@ -217,6 +154,9 @@ BODY {
 	font-size: 12px;
 	padding: 4px 4px 4px 4px;
 	font-family: Arial;
+}
+.formTable th {
+	padding: 4px 4px 4px 4px;
 }
 .formTable caption {
 	padding: 4px 4px 4px 4px;
