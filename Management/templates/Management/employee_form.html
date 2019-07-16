@@ -98,6 +98,9 @@
 							</tr>
 						{% endwith %}
 						</table>
+
+						<hr/>
+
 						<a href="/employees/{{form.instance.id}}/employmentterms" class="fancybox" style="text-decoration:none;">
 							שינוי תנאי העסקה 
 							<i class="fa fa-edit" title='שינוי'></i>
@@ -144,6 +147,9 @@
 						{% endwith %}
 						</table>
 						{% if perms.Management.change_account %}
+						
+						<hr/>
+						
 						<a href="account" class="fancybox" style="text-decoration:none;">
 							שינוי פרטי חשבון
 							<i class="fa fa-edit" title='שינוי'></i>
