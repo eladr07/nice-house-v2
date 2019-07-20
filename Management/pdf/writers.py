@@ -307,7 +307,7 @@ class MonthDemandWriter(DocumentBase):
         super(MonthDemandWriter, self).__init__()
         self.demand = demand
         self.commissions = self.demand.project.commissions.get()
-        self.is_zilber = commissions.c_zilber != None
+        self.is_zilber = self.commissions.c_zilber != None
         self.signup_adds = self.commissions.commission_by_signups
         self.to_mail = to_mail
     def toPara(self):
