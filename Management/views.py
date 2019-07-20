@@ -2662,7 +2662,12 @@ class ProjectListView(LoginRequiredMixin, ListView):
     model = Project
 
     def get_queryset(self):
-        return Project.objects.filter(end_date = None).select_related('demand_contact','payment_contact')
+        projects = Project.objects \
+            .select_related('details','demand_contact','payment_contact') \
+            .prefetch_related('employees','contacts') \
+            .filter(end_date = None)
+
+        return projects
 
 @permission_required('Management.project_list_pdf')
 def project_list_pdf(request):
@@ -2674,7 +2679,12 @@ class ProjectArchiveListView(LoginRequiredMixin, ListView):
     template_name = 'Management/project_archive.html'
 
     def get_queryset(self):
-        return Project.objects.archive()
+        projects = Project.objects \
+            .select_related('details','demand_contact','payment_contact') \
+            .prefetch_related('employees','contacts') \
+            .filter(end_date = None)
+
+        return projects
 
 class NHSaleDetailView(LoginRequiredMixin, DetailView):
     model = NHSale
