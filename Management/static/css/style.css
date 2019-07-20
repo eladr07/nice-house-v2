@@ -46,9 +46,7 @@ BODY {
 }
 
 #content {
-	border: 1px solid #D4D4D4;
-	background-color: #F5F5F5;
-	font-family: Tahoma;
+	font-family: Arial;
 	font-size: 12px;
 	padding: 4px 4px 4px 4px;
 	direction: rtl;

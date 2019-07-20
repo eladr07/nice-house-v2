@@ -5,17 +5,16 @@
 {{ block.super }}
 <script>
 	$(document).ready(function() {		
-		$("input[type!='submit']").attr("class", "inputText");
-	    $("a[id*='contact_delete']").click(function (event) { 
-				var answer = confirm("האם אתה בטוח שברצונך למחוק את איש הקשר שנבחר ?");
-				if (!answer)
-					event.preventDefault();
-			});
-	    $("a[id*='building_delete']").click(function (event) { 
-				var answer = confirm("האם אתה בטוח שברצונך למחוק את " + $(this).parent().text() + " ? כל הבתים בתוכו יימחקו גם הם.");
-				if (!answer)
-					event.preventdefault();
-			});
+		$("a[id*='contact_delete']").click(function (event) { 
+			var answer = confirm("האם אתה בטוח שברצונך למחוק את איש הקשר שנבחר ?");
+			if (!answer)
+				event.preventDefault();
+		});
+		$("a[id*='building_delete']").click(function (event) { 
+			var answer = confirm("האם אתה בטוח שברצונך למחוק את " + $(this).parent().text() + " ? כל הבתים בתוכו יימחקו גם הם.");
+			if (!answer)
+				event.preventdefault();
+		});
 		$("#url_go").click(function(event) {
 				$(this).attr("href", $("#id_url").val());
 			});
@@ -30,7 +29,7 @@
 
 {% block content %}
 	<h3 class="text-center text-danger">כרטיס פרוייקט : {{ form.instance.initiator }} - {{ form.instance.name }}</h3>
-<form method="post" enctype="multipart/form-data">
+<form method="post" enctype="multipart/form-data" class="form-horizontal">
 	{% csrf_token %}
 	<div class="col-md-4">
 		<div class="panel panel-primary">

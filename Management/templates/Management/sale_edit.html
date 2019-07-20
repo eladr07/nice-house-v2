@@ -2,6 +2,7 @@
 
 {% load static %}
 {% load humanize %}
+{% load widget_tweaks %}
 
 {% block header %}
 {{ block.super }}
@@ -14,9 +15,6 @@
 	var priceIncludeLawyerChk;
 	var priceNoLawyerInput;
 	$(document).ready(function() {
-		$("input[type!='submit']").attr("class", "inputText");
-		$("select").attr("class", "inputText");
-		
 		projectSelect = $("#id_project");
 		buildingSelect = $("#id_building");
 		houseSelect = $("#id_house");
@@ -124,284 +122,183 @@
 </script>
 {% endblock header %}
 {% block content %}
-	<div class="title">
-		<div class="pageTitle">
-			{% if form.instance.id %}
-				עדכון מכירה מס' 
-				{{form.instance.id}} 
-				לחודש 
-				{{form.instance.demand.month}}/{{form.instance.demand.year}}
-			{% else %}
-				מכירה חדשה
-			{% endif %}
-		</div>
-		{% if form.instance.demand.was_sent %}
-		<i>לתשומת לבך, הדרישה כבר נשלחה ליזם! עדכון הבניין\הדירה\מחיר המכירה יוזן כתיקון דרישה</i>
+
+<div class="title">
+	<div class="pageTitle">
+		{% if form.instance.id %}
+			עדכון מכירה מס' 
+			{{form.instance.id}} 
+			לחודש 
+			{{form.instance.demand.month}}/{{form.instance.demand.year}}
+		{% else %}
+			מכירה חדשה
 		{% endif %}
 	</div>
-	<br>
-	<div id="rightSide">
-		<form method="POST">
-		{% csrf_token %}
-		<table cellspacing="2" cellpadding="2" class="formTable">
-			<tr>
-				<th></th>
-				<td>{{form.id}}</td>
-			</tr>
-			<tr>
-				<th>{{ form.project.label_tag }}</th>
-				<td>
-					{{ form.project }}
-					{% if form.project.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.project.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-			<tr>
-				<th>{{ form.building.label_tag }}</th>
-				<td>
-					{{ form.building }}
-					{% if form.building.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.building.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<th>{{ form.house.label_tag }}</th>
-				<td>
-					{{ form.house }}
-					{% if form.house.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.house.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<th>{{ form.employee.label_tag }}</th>
-				<td>
-					{{ form.employee }}
-					{% if form.employee.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.employee.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<th>{{ form.joined_sale.label_tag }}</th>
-				<td>
-					{{ form.joined_sale }}
-					{% if form.joined_sale.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.joined_sale.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<td></td>
-				<td><u><b>נתוני מכירה</b></u></td>
-			</tr>
-			<tr>
-				<th>{{ form.clients.label_tag }}</th>
-				<td>
-					{{ form.clients }}
-					{% if form.clients.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.clients.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<th>{{ form.clients_phone.label_tag }}</th>
-				<td>
-					{{ form.clients_phone }}
-					{% if form.clients_phone.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.clients_phone.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<th>{{ form.sale_date.label_tag }}</th>
-				<td>
-					{{ form.sale_date }}
-					{% if form.sale_date.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.sale_date.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<th>{{ form.price.label_tag }}</th>
-				<td>
-					{{ form.price }}
-					{% if form.price.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.price.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<th>{{ form.min_price.label_tag }}</th>
-				<td>
-					{{ form.min_price }}
-					{% if form.min_price.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.min_price.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<th>{{ form.price_include_lawyer.label_tag }}</th>
-				<td>
-					{{ form.price_include_lawyer }}
-					{% if form.price_include_lawyer.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.price_include_lawyer.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<th>{{ form.price_no_lawyer.label_tag }}</th>
-				<td>
-					{{ form.price_no_lawyer }}
-					{% if form.price_no_lawyer.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.price_no_lawyer.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<th>{{ form.include_tax.label_tag }}</th>
-				<td>
-					{{ form.include_tax }}
-					{% if form.include_tax.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.include_tax.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<td></td>
-				<td><u><b>נתוני שיכון עובדים</b></u></td>
-			</tr>
-			<tr>
-				<th>{{ form.contract_num.label_tag }}</th>
-				<td>
-					{{ form.contract_num }}
-					{% if form.contract_num.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.contract_num.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<th>{{ form.discount.label_tag }}</th>
-				<td>
-					{{ form.discount }}
-					{% if form.discount.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.discount.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<th>{{ form.allowed_discount.label_tag }}</th>
-				<td>
-					{{ form.allowed_discount }}
-					{% if form.allowed_discount.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.allowed_discount.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<td></td>
-				<td><u><b>נתוני זילברמינץ</b></u></td>
-			</tr>
-			<tr>
-				<th>{{ form.company_price.label_tag }}</th>
-				<td>
-					{{ form.company_price }}
-					{% if form.company_price.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.company_price.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<th>{{ form.commission_madad_bi.label_tag }}</th>
-				<td>
-					{{ form.commission_madad_bi }}
-					{% if form.commission_madad_bi.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.commission_madad_bi.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<th>{{ form.include_registration.label_tag }}</th>
-				<td>
-					{{ form.include_registration }}
-					{% if form.include_registration.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.include_registration.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<th>{{ form.specification_expense.label_tag }}</th>
-				<td>
-					{{ form.specification_expense }}
-					{% if form.specification_expense.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.specification_expense.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<th>{{ form.other_expense.label_tag }}</th>
-				<td>
-					{{ form.other_expense }}
-					{% if form.other_expense.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.other_expense.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<td></td>
-				<td><u><b>נתוני מרום השרון</b></u></td>
-			</tr>
-			<tr>
-				<th>{{ form.signup_date.label_tag }}</th>
-				<td>
-					{{ form.signup_date }}
-					{% if form.signup_date.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.signup_date.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<td></td>
-				<td><u><b>נתונים נוספים</b></u></td>
-			</tr>
-			<tr>
-				<th>{{ form.remarks.label_tag }}</th>
-				<td>
-					{{ form.remarks }}
-					{% if form.remarks.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.remarks.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-			<tr>
-				<th>{{ form.commission_include.label_tag }}</th>
-				<td>
-					{{ form.commission_include }}
-					{% if form.commission_include.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.commission_include.errors|join:""}}'></i>{% endif %}
-				</td>
-			</tr>
-		</table>
-		<input name="addanother" type="submit" value="שמור והמשך בהזנה" class="button" />
-		<input name="todemand" type="submit" value="שמור וחזור לכרטיס הדרישה" class="button" />
-		</form>
+</div>
+
+<hr/>
+
+{% if form.instance.demand.was_sent %}
+<div class="col-md-6 col-md-offset-3">
+	<div class="alert alert-warning">
+		לתשומת לבך, הדרישה כבר נשלחה ליזם! עדכון הבניין\הדירה\מחיר המכירה יוזן כתיקון דרישה
 	</div>
-	<div id="leftSide">
+</div>
+{% endif %}
+
+<div class="col-md-8">
+	<form method="POST" class="form-horizontal">
+
+		<div class="col-md-6">
+			{% csrf_token %}
+			
+			{{form.id}}
+
+			{% include 'Management/form_field_snippet.html' with field=form.project %}
+			{% include 'Management/form_field_snippet.html' with field=form.building %}
+			{% include 'Management/form_field_snippet.html' with field=form.house %}
+			{% include 'Management/form_field_snippet.html' with field=form.employee %}
+
+			{% with form.joined_sale as field %}
+			<div class="form-group">
+				<label for="{{field.id_for_label}}" class="col-xs-4 control-label">{{field.label}}</label>
+				<div class="col-xs-6">
+					{{field}}
+					{% if field.errors %}
+						<i class="fa fa-exclamation-circle text-danger" title='{{field.errors|join:""}}'></i>
+					{% endif %}
+				</div>
+			</div>
+			{% endwith %}
+
+			<h4 class="text-primary text-center"><u>נתוני מכירה</u></h4>
+
+			{% include 'Management/form_field_snippet.html' with field=form.clients %}
+			{% include 'Management/form_field_snippet.html' with field=form.clients_phone %}
+			{% include 'Management/form_field_snippet.html' with field=form.sale_date %}
+			{% include 'Management/form_field_snippet.html' with field=form.price %}
+			{% include 'Management/form_field_snippet.html' with field=form.min_price %}
+			{% include 'Management/form_field_snippet.html' with field=form.price_include_lawyer %}
+			{% include 'Management/form_field_snippet.html' with field=form.price_no_lawyer %}
+			{% include 'Management/form_field_snippet.html' with field=form.include_tax %}
+
+		</div>
+	
+		<div class="col-md-6">
+
+			<h4 class="text-primary text-center"><u>נתוני שיכון עובדים</u></h4>
+
+			{% include 'Management/form_field_snippet.html' with field=form.contract_num %}
+			{% include 'Management/form_field_snippet.html' with field=form.discount %}
+			{% include 'Management/form_field_snippet.html' with field=form.allowed_discount %}
+
+			<h4 class="text-primary text-center"><u>נתוני זילברמינץ</u></h4>
+
+			{% include 'Management/form_field_snippet.html' with field=form.company_price %}
+			{% include 'Management/form_field_snippet.html' with field=form.commission_madad_bi %}
+			{% include 'Management/form_field_snippet.html' with field=form.include_registration %}
+			{% include 'Management/form_field_snippet.html' with field=form.specification_expense %}
+			{% include 'Management/form_field_snippet.html' with field=form.other_expense %}
+
+			<h4 class="text-primary text-center"><u>נתוני מרום השרון</u></h4>
+
+			{% include 'Management/form_field_snippet.html' with field=form.signup_date %}
+
+			<h4 class="text-primary text-center"><u>נתונים נוספים</u></h4>
+
+			{% include 'Management/form_field_snippet.html' with field=form.remarks %}
+			
+			{% with form.commission_include as field %}
+			<div class="form-group">
+				<label for="{{field.id_for_label}}" class="col-xs-4 control-label">{{field.label}}</label>
+				<div class="col-xs-6">
+					{{field}}
+					{% if field.errors %}
+						<i class="fa fa-exclamation-circle text-danger" title='{{field.errors|join:""}}'></i>
+					{% endif %}
+				</div>
+			</div>
+			{% endwith %}
+
+		</div>
+	
+		<div class="form-group">
+			<div class="col-sm-offset-2 col-sm-10">
+				<input name="addanother" type="submit" value="שמור והמשך בהזנה" class="btn btn-primary" />
+				<input name="todemand" type="submit" value="שמור וחזור לכרטיס הדרישה" class="btn btn-default" />
+			</div>
+		</div>
+
+	</form>
+</div>
+
+	<div class="col-md-4">
 	{% if form.instance.id %}
 		{% with form.instance as s %}
-		<fieldset class="cardFieldset">
-		<legend>תיקונים למכירה</legend>
-			<ul>
-				{% if s.salepricemod %}
-					<li>המחיר שונה מ- 
-					{{s.salepricemod.old_price|intcomma}} 
-					ל - 
-					<b>{{s.price|intcomma}}</b>. 
-					<a href="{{ s.salepricemod.get_absolute_url }}">פרטים</a>
-					</li>
-				{% endif %}
-				{% if s.salehousemod %}
-					<li>הדירה  שונתה מבניין
-					<a href="/buildings/{{s.salehousemod.old_house.building.id}}/pricelist/type1">{{s.salehousemod.old_house.building.num}}</a>
-					 דירה 
-					<a href="/buildings/{{s.salehousemod.old_house.building.id}}/house/{{s.salehousemod.old_house.id}}/type1">{{s.salehousemod.old_house.num}}</a>			
-					 לבניין 
-					<a href="/buildings/{{s.house.building.id}}/pricelist/type1"><b>{{s.house.building.num}}</b></a>
-					 דירה 
-					<a href="/buildings/{{s.house.building.id}}/house/{{s.house.id}}/type1"><b>{{s.house.num}}</b></a>. 
-					<a href="{{ s.salehousemod.get_absolute_url }}">פרטים</a>
-					</li>
-				{% endif %}
-				{% if s.salepre %}
-					<li>המכירה הוקדמה לחודש זה. העובד יקבל תשלום בחודש
-					<b>{{s.salepre.employee_pay_month}}/{{s.salepre.employee_pay_year}}</b>. 
-					<a href="{{ s.salepre.get_absolute_url }}">פרטים</a>
-					</li>
-				{% endif %}
-				{% if s.salereject %}
-					<li>המכירה נדחתה לחודש
-					<b>{{s.salereject.to_month_month}}/{{s.salereject.to_month_year}}</b>
-					העובד יקבל תשלום בחודש
-					<b>{{s.salereject.employee_pay_month}}/{{s.salereject.employee_pay_year}}</b>. 
-					<a href="{{ s.salereject.get_absolute_url }}">פרטים</a>
-					</li>			
-				{% endif %}
-				{% if s.salecancel %}
-					<li>המכירה בוטלה. הקיזוז מהדרישה - 
-					<b>{{s.cancel.fee|intcomma}}</b>
-					<a href="{{ s.salecancel.get_absolute_url }}">פרטים</a>
-					</li>			
-				{% endif %}
-			</ul>
-		</fieldset>
-		<br>
+		<div class="panel panel-info">
+			<div class="panel-heading">תיקונים למכירה</div>
+			<div class="panel-body">
+				<ul>
+					{% if s.salepricemod %}
+						<li>המחיר שונה מ- 
+						{{s.salepricemod.old_price|intcomma}} 
+						ל - 
+						<b>{{s.price|intcomma}}</b>. 
+						<a href="{{ s.salepricemod.get_absolute_url }}">פרטים</a>
+						</li>
+					{% endif %}
+					{% if s.salehousemod %}
+						<li>הדירה  שונתה מבניין
+						<a href="/buildings/{{s.salehousemod.old_house.building.id}}/pricelist/type1">{{s.salehousemod.old_house.building.num}}</a>
+						 דירה 
+						<a href="/buildings/{{s.salehousemod.old_house.building.id}}/house/{{s.salehousemod.old_house.id}}/type1">{{s.salehousemod.old_house.num}}</a>			
+						 לבניין 
+						<a href="/buildings/{{s.house.building.id}}/pricelist/type1"><b>{{s.house.building.num}}</b></a>
+						 דירה 
+						<a href="/buildings/{{s.house.building.id}}/house/{{s.house.id}}/type1"><b>{{s.house.num}}</b></a>. 
+						<a href="{{ s.salehousemod.get_absolute_url }}">פרטים</a>
+						</li>
+					{% endif %}
+					{% if s.salepre %}
+						<li>המכירה הוקדמה לחודש זה. העובד יקבל תשלום בחודש
+						<b>{{s.salepre.employee_pay_month}}/{{s.salepre.employee_pay_year}}</b>. 
+						<a href="{{ s.salepre.get_absolute_url }}">פרטים</a>
+						</li>
+					{% endif %}
+					{% if s.salereject %}
+						<li>המכירה נדחתה לחודש
+						<b>{{s.salereject.to_month_month}}/{{s.salereject.to_month_year}}</b>
+						העובד יקבל תשלום בחודש
+						<b>{{s.salereject.employee_pay_month}}/{{s.salereject.employee_pay_year}}</b>. 
+						<a href="{{ s.salereject.get_absolute_url }}">פרטים</a>
+						</li>			
+					{% endif %}
+					{% if s.salecancel %}
+						<li>המכירה בוטלה. הקיזוז מהדרישה - 
+						<b>{{s.cancel.fee|intcomma}}</b>
+						<a href="{{ s.salecancel.get_absolute_url }}">פרטים</a>
+						</li>			
+					{% endif %}
+				</ul>
+			</div>
+		</div>
 		{% endwith %}
 	{% endif %}
-		<fieldset class="cardFieldset">
-		<legend>פרטי דירה</legend>
+
+	<div class="panel panel-info">
+		<div class="panel-heading">פרטי דירה</div>
+		<div class="panel-body">
 			<div id="houseDetails"></div>
-		</fieldset>
-		<br>
-		<fieldset class="cardFieldset">
-		<legend>עסקאות לדרישה לתשלום לחודש {{month}}/{{year}}</legend>
-			<div id="sales"></div>
-		</fieldset>
+		</div>
 	</div>
-	<div class="clearBoth"></div> 
+	
+	<div class="panel panel-default">
+		<div class="panel-heading">עסקאות לדרישה לתשלום לחודש {{month}}/{{year}}</div>
+		<div class="panel-body">
+			<div id="sales"></div>
+		</div>
+	</div>
+</div>
+
+<div class="clearBoth"></div> 
 {% endblock content %}

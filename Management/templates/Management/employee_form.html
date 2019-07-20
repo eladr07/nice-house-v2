@@ -5,7 +5,6 @@
 {{ block.super }}
 <script>
 	$(document).ready(function() {
-		$("input[type!='submit']").attr("class", "inputText");
 		$("select").attr("class", "inputText");
 		$("a[id*='commission_delete']").click(function (event) { 
 			var answer = confirm("האם אתה בטוח שברצונך למחוק את העמלה שנבחרה ?");
@@ -27,7 +26,7 @@
 		{% endif %}
 	</h3>
 	<div class=col-md-4>
-		<form method="POST">
+		<form method="POST" class="form-horizontal">
 		{% csrf_token %}
 		<div class="panel panel-primary">
 			<div class="panel-heading">פרטים כלליים</div>

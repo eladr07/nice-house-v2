@@ -41,21 +41,19 @@
 	<h3 class="text-center text-danger">ברוך הבא לאתר FollowUp</h3> 
 	<br><br>
 	<div class="col-md-4"> 
-		<div class="subTitle">הגדרות מערכת</div> 
-		<ul>
-			<li><a href="madadbi">מדד תשומות הבנייה למגורים</a></li>
-			<li><a href="madadcp">מדד המחירים לצרכן</a></li>
-			<li><a href="tax">מע"מ</a></li>
-		</ul>
-		<br>
-		<div class="subTitle">ביקורת נתונים</div> 
-		<ul> 
-			<li><a href="projects">תנאים מסחריים בפרוייקטים</a></li>
-			<li><a href="employees">תנאי שכר לעובדים</a></li>
-			<li><a href="#">בדיקת דו"חות לאישור דרישה</a></li>
-		</ul>
-		<br>
-		<div class="subTitle">נווה העיר</div> 
+
+		<div class="panel panel-default">
+			<div class="panel-heading">הגדרות מערכת</div>
+			<div class="panel-body">
+				<ul>
+					<li><a href="madadbi">מדד תשומות הבנייה למגורים</a></li>
+					<li><a href="madadcp">מדד המחירים לצרכן</a></li>
+					<li><a href="tax">מע"מ</a></li>
+				</ul>
+			</div>
+		</div>
+
+		<!-- <div class="subTitle">נווה העיר</div> 
 		<div class="listTitle">כרטיסי נתונים</div>
 		<ul>
 			<li><a href="projects">כרטיסי פרוייקטים</a>
@@ -65,135 +63,159 @@
 			<a href="employees/add" ><i class="fa fa-fw fa-plus-circle text-success"></i></a></li>
 			<li><a href="employees/archive">ארכיון עובדים</a></li>
 			<li><a href="activity/add">הזנת דו"ח פעילות לאתר</a></li>
-		</ul>
-		<div class="listTitle">דרישות לתשלום</div>
-		<ul>
-			<li><a href="sale">מכירה חדשה</a></li>
-			<li><a href="demands">הזנה ועדכון דרישות לתשלום</a>
-			<a href="demands/add" ><i class="fa fa-fw fa-plus-circle text-success"></i></a></li>
-			<li><a href="{% url 'demand-old' %}">ריכוז דרישות לסך הפרוייקטים לפי חודש</a></li>
-			<li><a href="{% url 'demand-season' %}">ריכוז דרישות תקופתי לפרוייקט</a></li>
-			<li><a href="{% url 'demand-followup' %}">מעקב דרישות תקופתי לפרוייקט</a></li>
-			<li><a href="demandsall">מעקב דרישות יזמים</a></li>
-			<li><a href="{% url 'demand-pay-balance' %}">מצב תשלום דרישות יזמים</a></li>
-		</ul>
-		<div>דו"חות</div>
-		<div class="listTitle">עובדים</div>
-		<ul>
-			<li><a href="{% url 'salary-season-expenses' %}">ריכוז שכר לעובד כולל הוצאות מעביד תקופתי</a></li>
-			<li><a href="{% url 'salary-season-total-expenses' %}">ריכוז שכר לעובדים כולל הוצאות מעביד תקופתי</a></li>
-			<li><a href="{% url 'salary-list' %}">דו"ח הנפקת משכורות עובדים</a></li>
-			<li><a href="{% url 'salary-bank' %}">דו"ח שכר עובדים להעברה בנקאית</a></li>
-			<li><a href="{% url 'salary-season' %}">ריכוז משכורות לפי תקופה</a></li>
-			<li><a href="{% url 'salary-expenses' %}">ריכוז הזנת הוצאות מעביד לשכר</a></li>
-			<li><a href="loans">הלוואות עובדים</a></li>
-		</ul>
-		<div class="listTitle">יזמים</div>
-		<ul>
-			<li><a href="reports">ריכוזי מכירות</a></li>
-			<li><a href="#">איתור דרישה לתשלום ליזם</a></li>
-			<li><a href="buildings/add" class="fancybox">הוספת בניין ומחירון</a></li>
-			<li><a href="demandsall" >מעקב תשלומים מיזמים</a></li>
-		</ul>
-		<div class="listTitle">מעקב תשלומים מיזם</div>
-		<ul>
-			<li><a href="demands/unpaid">דו"ח סך הדרישות שטרם שולמו</a></li>
-			<li><a href="demands/paidsome">דו"ח סך הדרישות ששולמו בחסר</a></li>
-		</ul>
+		</ul> -->
+
+		<div class="panel panel-default">
+			<div class="panel-heading">דרישות לתשלום</div>
+			<div class="panel-body">
+				<ul>
+						<li><a href="sale">מכירה חדשה</a></li>
+						<li><a href="demands">הזנה ועדכון דרישות לתשלום</a>
+						<a href="demands/add" ><i class="fa fa-fw fa-plus-circle text-success"></i></a></li>
+						<li><a href="{% url 'demand-old' %}">ריכוז דרישות לסך הפרוייקטים לפי חודש</a></li>
+						<li><a href="{% url 'demand-season' %}">ריכוז דרישות תקופתי לפרוייקט</a></li>
+						<li><a href="{% url 'demand-followup' %}">מעקב דרישות תקופתי לפרוייקט</a></li>
+						<li><a href="demandsall">מעקב דרישות יזמים</a></li>
+						<li><a href="{% url 'demand-pay-balance' %}">מצב תשלום דרישות יזמים</a></li>
+					</ul>
+			</div>
+		</div>
+
+		<div class="panel panel-default">
+			<div class="panel-heading">עובדים</div>
+			<div class="panel-body">
+				<ul>
+						<li><a href="{% url 'salary-season-expenses' %}">ריכוז שכר לעובד כולל הוצאות מעביד תקופתי</a></li>
+						<li><a href="{% url 'salary-season-total-expenses' %}">ריכוז שכר לעובדים כולל הוצאות מעביד תקופתי</a></li>
+						<li><a href="{% url 'salary-list' %}">דו"ח הנפקת משכורות עובדים</a></li>
+						<li><a href="{% url 'salary-bank' %}">דו"ח שכר עובדים להעברה בנקאית</a></li>
+						<li><a href="{% url 'salary-season' %}">ריכוז משכורות לפי תקופה</a></li>
+						<li><a href="{% url 'salary-expenses' %}">ריכוז הזנת הוצאות מעביד לשכר</a></li>
+						<li><a href="loans">הלוואות עובדים</a></li>
+					</ul>
+			</div>
+		</div>
+
+		<div class="panel panel-default">
+			<div class="panel-heading">יזמים</div>
+			<div class="panel-body">
+				<ul>
+					<li><a href="buildings/add" class="fancybox">הוספת בניין ומחירון</a></li>
+					<li><a href="demandsall" >מעקב תשלומים מיזמים</a></li>
+				</ul>
+			</div>
+		</div>
+		
+		<div class="panel panel-default">
+			<div class="panel-heading">מעקב תשלומים מיזם</div>
+			<div class="panel-body">
+				<ul>
+					<li><a href="demands/unpaid">דו"ח סך הדרישות שטרם שולמו</a></li>
+					<li><a href="demands/paidsome">דו"ח סך הדרישות ששולמו בחסר</a></li>
+				</ul>
+			</div>
+		</div>
+
 		<div class="listTitle">תזכורת לתשלום ליזמים</div>
 		<ul>
 			<li><a href="#">שלח תזכורת</a></li>
 		</ul>
-		<div class="listTitle">דו"חות עסקיים</div>
-		<ul>
-			<li><a href="projectsprofit">דו"ח רווח והפסד לפרוייקט לא כולל מע"מ</a></li>
-			<li><a href="nhseasonprofit">דו"ח רווח והפסד - נייס האוס</a></li>
-			<li><a href="profitloss">דו"ח רווח והפסד - גלובלי</a></li>
-			<li><a href="seasonincome">דו"ח ריכוז הכנסות תקופתי</a></li>
-			<li><a href="saleanalysis">דו"ח ניתוח וריכוז מכירות לפי תקופה</a></li>
-			<li><a href="#">ניהול מעקב תקציבי</a></li>
-			<li><a href="#">דו"ח אפס</a></li>
-			<li><a href="#">סטטיסטיקות</a></li>
-		</ul>
-	</div> 
+
+		<div class="panel panel-default">
+			<div class="panel-heading">דו"חות עסקיים</div>
+			<div class="panel-body">
+				<ul>
+					<li><a href="projectsprofit">דו"ח רווח והפסד לפרוייקט לא כולל מע"מ</a></li>
+					<li><a href="nhseasonprofit">דו"ח רווח והפסד - נייס האוס</a></li>
+					<li><a href="profitloss">דו"ח רווח והפסד - גלובלי</a></li>
+					<li><a href="seasonincome">דו"ח ריכוז הכנסות תקופתי</a></li>
+					<li><a href="saleanalysis">דו"ח ניתוח וריכוז מכירות לפי תקופה</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
 	<div class="col-md-4">
-	<div class="listTitle">הוצאת צ'קים</div>
-		<ul>
-			<li><a href="#">פתיחת פנקס צ'קים</a></li>
-			<li><a href="employeechecks">צ'קים לעובדים</a>
-			<a class="fancybox" href="employeechecks/add" ><i class="fa fa-fw fa-plus-circle text-success"></i></a></li>
-			<li><a href="advancepayments">מקדמות לעובדים</a></li>
-			<li><a href="checks">צ'קים אחרים</a>
-			<a class="fancybox" href="checks/add" ><i class="fa fa-fw fa-plus-circle text-success"></i></a></li>
-			<li><a href="#">צ'קים חסרים</a></li>
-		</ul>
-		<div class="listTitle">תקבולים מיזמים</div>
-		<ul>
-			<li><a href="payments/add">הקלדת תשלום שהתקבל</a></li>
-			<li><a href="splitpayment/add">הקלדת תשלום מפוצל</a></li>
-			<li><a href="demandpayments" >ריכוז תשלומים</a></li>
-			<li><a href="invoices/add">הקלדת חשבונית שהוצאה</a></li>
-			<li><a href="invoices/offset" class="fancybox">הקלדת זיכוי לחשבונית</a></li>
-			<li><a href="demandinvoices" >ריכוז חשבוניות</a></li>
-			<li><a href="#">חשבוניות חסרות</a></li>
-		</ul>
+
+		<div class="panel panel-default">
+			<div class="panel-heading">הוצאת צ'קים</div>
+			<div class="panel-body">
+				<ul>
+					<li><a href="#">פתיחת פנקס צ'קים</a></li>
+					<li><a href="employeechecks">צ'קים לעובדים</a>
+					<a class="fancybox" href="employeechecks/add" ><i class="fa fa-fw fa-plus-circle text-success"></i></a></li>
+					<li><a href="advancepayments">מקדמות לעובדים</a></li>
+					<li><a href="checks">צ'קים אחרים</a>
+					<a class="fancybox" href="checks/add" ><i class="fa fa-fw fa-plus-circle text-success"></i></a></li>
+				</ul>
+			</div>
+		</div>
+		
+		<div class="panel panel-default">
+			<div class="panel-heading">תקבולים מיזמים</div>
+			<div class="panel-body">
+				<ul>
+					<li><a href="payments/add">הקלדת תשלום שהתקבל</a></li>
+					<li><a href="splitpayment/add">הקלדת תשלום מפוצל</a></li>
+					<li><a href="demandpayments" >ריכוז תשלומים</a></li>
+					<li><a href="invoices/add">הקלדת חשבונית שהוצאה</a></li>
+					<li><a href="invoices/offset" class="fancybox">הקלדת זיכוי לחשבונית</a></li>
+					<li><a href="demandinvoices" >ריכוז חשבוניות</a></li>
+				</ul>
+			</div>
+		</div>
+
 		<div class="listTitle">הכנסות אחרות</div>
 		<ul>
 			<li><a href="incomes/add">הזנת הכנסה אחרת</a></li>
 			<li><a href="incomes">ריכוז הכנסות אחרות</a></li>
 		</ul>
-		<div class="listTitle">ניהול מלאי</div>
-		<ul>
-			<li><a href="#">מלאי קבוע</a></li>
-			<li><a href="#">טלפונים</a></li>
-			<li><a href="cars">מכוניות</a></li>
-			<li><a href="#">מלאי לקוחות</a></li>
-		</ul>
-		<div class="listTitle">חשבון בנק</div>
-		<ul>
-			<li><a href="#">חשבון בנק XXXXX מספר XXXXX</a></li>
-		</ul>
-		<div class="listTitle">יוזמה ואסטרטגיה</div>
-		<ul>
-			<li><a href="#">חשבון בנק</a></li>
-			<li><a href="#">הכנסות (חשבוניות)</a></li>
-			<li><a href="checks">הוצאות (צ'קים)</a></li>
-			<li><a href="#">רכוש קבוע (הסכמים)</a></li>
-		</ul>
 		<div class="listTitle">אנשי קשר ומסמכים</div>
 		<ul>
 			<li><a href="attachments">ארכיב מסמכים</a></li>
 			<li><a href="contacts">אנשי קשר</a></li>
-			<li><a href="#">טפסי חברה - סטנדרט</a></li>
 		</ul>
 		<div class="listTitle">ניהול זמן</div>
-		<ul>
-			<li><a href="tasks">משימות</a></li>
-			<li><a href="#">תזכורות</a></li>
-			<li><a href="#">טפסי חברה - סטנדרט</a></li>
-		</ul>
-		<div class="subTitle">נייס האוס</div>
-		<ul>
-			<li><a href="nhemployees/add">עובד חדש</a></li>
-			<li><a href="lawyers">עורכי דין</a></li>
-			<li><a href="nhbranch/add">פתיחת סניף חדש</a></li>
-		</ul>
-		<div class="listTitle">נייס האוס - הנהלה</div>
-		<ul>
-			<li><a href="#">ריכוז מכירות לחודש לכל הסניפים</a></li>
-			<li><a href="{% url 'nh-salary-list' %}">ריכוז שכר עובדי נייס האוס</a></li>
-			<li><a href="{% url 'nh-salary-expenses' %}">ריכוז הוצאות שכר עובדי נייס האוס</a></li>
-		</ul>
+
+		<div class="panel-group">
+			<div class="panel panel-default">
+				<div class="panel-heading">נייס האוס</div>
+				<div class="panel-body">
+					<ul>
+						<li><a href="nhemployees/add">עובד חדש</a></li>
+						<li><a href="lawyers">עורכי דין</a></li>
+						<li><a href="nhbranch/add">פתיחת סניף חדש</a></li>
+					</ul>
+				</div>
+			</div>
+	
+			<div class="panel panel-default">
+				<div class="panel-heading">נייס האוס - הנהלה</div>
+				<div class="panel-body">
+					<ul>
+						<li><a href="#">ריכוז מכירות לחודש לכל הסניפים</a></li>
+						<li><a href="{% url 'nh-salary-list' %}">ריכוז שכר עובדי נייס האוס</a></li>
+						<li><a href="{% url 'nh-salary-expenses' %}">ריכוז הוצאות שכר עובדי נייס האוס</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		
+		<div class="panel-group">
 		{% for b in nhbranches %}
-		<div class="listTitle">{{b.name}}</div>
-		<ul>
-			<li><a href="nhbranch/{{b.id}}">פרטי הסניף</a></li>
-			<li><a href="nhbranch/{{b.id}}/nhsale/add">עסקה חדשה</a></li>
-			<li><a href="nhbranch/{{b.id}}/sales">ריכוז מכירות לחודש</a></li>
-			<li><a href="nhseasonincome/?nhbranch={{b.id}}">ריכוז הכנסה תקופתי</a></li>
-		</ul>
+			<div class="panel panel-default">
+				<div class="panel-heading">{{b.name}}</div>
+				<div class="panel-body">
+					<ul>
+						<li><a href="nhbranch/{{b.id}}">פרטי הסניף</a></li>
+						<li><a href="nhbranch/{{b.id}}/nhsale/add">עסקה חדשה</a></li>
+						<li><a href="nhbranch/{{b.id}}/sales">ריכוז מכירות לחודש</a></li>
+						<li><a href="nhseasonincome/?nhbranch={{b.id}}">ריכוז הכנסה תקופתי</a></li>
+					</ul>
+				</div>
+			</div>
 		{% endfor %}
-		<li><a href="links">שימושון נדל"ן</a></li>
+		</div>
 	</div>
 	<div class="col-md-4">
 		<div class="panel panel-info">

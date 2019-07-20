@@ -5,7 +5,6 @@
 	var selectedID = 0;
 	var prevClass;
 	$(document).ready(function() {
-		$("input[type!='submit']").attr("class", "inputText");
 		$("#saleTable tr").click(function() {
 			var tr = $(this);
 			if (selectedID > 0)
@@ -63,9 +62,12 @@
 </script>
 
 <div class="clearBoth"></div>
-	<fieldset class="cardFieldset">
-		<legend>פירוט מכירות - {{demand.project}} לחודש {{demand.month}}/{{demand.year}}</legend>
 
+<div class="panel panel-primary">
+	<div class="panel-heading">
+		פירוט מכירות - {{demand.project}} לחודש {{demand.month}}/{{demand.year}}
+	</div>
+	<div class="panel-body">
 		<a href="/demands/{{demand.id}}/sale/add" class="btn btn-default" role="button">
 			<i class="fa fa-fw fa-plus-circle text-success"></i> הזנת מכירה
 		</a>
@@ -286,5 +288,5 @@
 				<td colspan="2"><b><u style="color:#1A339C;">{{demand.sales_commission|intcomma}} ש"ח</u></b></td>
 			</tr>
 		</table>
-	</fieldset>
-<div class="clearBoth"></div>
+	</div>
+</div>

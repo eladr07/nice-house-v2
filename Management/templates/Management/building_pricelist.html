@@ -7,7 +7,6 @@
 	var selectedID = 0;
 	var prevClass;
 	$(document).ready(function() {		
-		$("input[type!='submit']").attr("class", "inputText");	
 		$("#houseTable tr").click(function() {
 			var tr = $(this);
 			if (selectedID > 0)
@@ -62,24 +61,34 @@
 		מחירון לבניין - {{type}}
 	{% endif %}
 </h3>
-<form method="POST">
+
+<hr/>
+
 {% csrf_token %}
 <table class="pageSubTitle" cellspacing="5" align="center" style="text-align:right;cellpadding:5px;" >
 	<tr>
 		<th>יזם</th>
 		<td>{{b.project.initiator}}</td>
+	</tr>
+	<tr>
 		<th>פרוייקט</th>
 		<td colspan="0.5">
 			<a href="/projects/{{b.project.id}}">{{b.project.name}}</a>
 		</td>
+	</tr>
+	<tr>
 		<th>עיר</th>
 		<td>{{b.project.city}}</td>
 	</tr>
 	<tr>
 		<th>{% if b.is_cottage %}מס' מגרש{% else %}מס' בניין{% endif %}</th>
 		<td><a href="/buildings/{{b.id}}" class="fancybox">{{b.num}}</a></td>
+	</tr>
+	<tr>
 		<th>מס' קומות</th>
 		<td>{{b.floors}}</td>
+	</tr>
+	<tr>
 		<th>מס' יחידות</th>
 		<td>{{b.house_count}}</td>
 	</tr>
@@ -89,6 +98,8 @@
 	</tr>
 	<tr>
 		<th colspan="6"><a href="/projects/{{b.project.id}}/buildings" class="bigfancybox">בניינים ומחירונים בפרוייקט</a></th>
+	</tr>
+	<tr>
 		<td>שנה סוג מחירון : </td>
 		<td>
 			<select id="changeType">
@@ -100,27 +111,30 @@
 	</tr>
 </table>
 {% endwith %}
-<fieldset class="cardFieldset">
-	<legend>פירוט יחידות</legend>
 
-	<a href="../addhouse/type{{type.id}}" class="btn btn-default" role="button">
-		<i class="fa fa-fw fa-plus-circle text-success"></i> הוספת דירה חדשה למחירון
-	</a>
-	<a id="houseEdit" class="btn btn-default" role="button">
-		<i class="fa fa-fw fa-edit"></i> שינוי
-	</a>
-	<a id="houseDelete" class="btn btn-default" role="button">
-		<i class="fa fa-fw fa-times-circle text-danger"></i> מחיקה
-	</a>
-	<a href="../clients" class="btn btn-default" role="button">
-		<i class="fa fa-fw fa-users"></i> מצבת רוכשים
-	</a>
-	<a href="type{{type.id}}/pdf?type=avaliable" class="btn btn-default" role="button">
-		<i class="fa fa-fw fa-print"></i> גרסת הדפסה
-	</a>
-	<a href="type{{type.id}}/pdf?type=full" class="btn btn-default" role="button">
-		<i class="fa fa-fw fa-print"></i> גרסת הדפסה מלאה
-	</a>
+<div class="panel panel-default">
+	<div class="panel-heading">פירוט יחידות</div>
+	<div class="panel-body">
+
+		<a href="../addhouse/type{{type.id}}" class="btn btn-default" role="button">
+			<i class="fa fa-fw fa-plus-circle text-success"></i> הוספת דירה חדשה למחירון
+		</a>
+		<a id="houseEdit" class="btn btn-default" role="button">
+			<i class="fa fa-fw fa-edit"></i> שינוי
+		</a>
+		<a id="houseDelete" class="btn btn-default" role="button">
+			<i class="fa fa-fw fa-times-circle text-danger"></i> מחיקה
+		</a>
+		<a href="../clients" class="btn btn-default" role="button">
+			<i class="fa fa-fw fa-users"></i> מצבת רוכשים
+		</a>
+		<a href="type{{type.id}}/pdf?type=avaliable" class="btn btn-default" role="button">
+			<i class="fa fa-fw fa-print"></i> גרסת הדפסה
+		</a>
+		<a href="type{{type.id}}/pdf?type=full" class="btn btn-default" role="button">
+			<i class="fa fa-fw fa-print"></i> גרסת הדפסה מלאה
+		</a>
+	
 		<table class="formTable" style="float:left;">
 			<tr>
 				<th>מס' יחידות פנויות</th>
@@ -137,260 +151,204 @@
 				<td style="width:20px; background-color:#FAA99E;"></td>
 			</tr>
 		</table>
-	<br>
-	<div class="clearBoth"></div> 
-	<table class="dataTable" border="1" id="houseTable" style="text-align:center;">
-		<th><input type="checkbox" id="all-checkboxes"/></th>
-		<th></th>
-		<th>מס'</th>
-		<th>קומה</th>
-		<th>סוג הנכס</th>
-		<th>חדרים</th>
-		<th>שטח נטו</th>
-		<th>גודל מרפסת/גינה</th>
-		<th>מחיר</th>
-		<th>מס' חנייה</th>
-		<th>סוג חנייה</th>
-		<th>מס' מחסן</th>
-		<th>הערות</th>
-		{% for h in houses %}
-			{% ifchanged h.get_cottage_num %}
-				{% if not forloop.first and form.instance.building.is_cottage %}
-					<tr height="10"><td style="background-color:#5F7172;" colspan="12"></td></tr>
-				{% endif %}
-			{% endifchanged %}
-		{% if h.get_sale or h.is_sold %}
-			<tr class="deletedRow" objid={{h.id}}>
-		{% endif %}
-		{% if h.get_signup and not h.get_sale and not h.is_sold %}
-			<tr class="row3" objid={{h.id}}>
-		{% endif %}
-		{% if not h.get_signup and not h.get_sale and not h.is_sold %}
-			<tr class="{% cycle 'row1' 'row2' %}" objid={{h.id}}>
-		{% endif %}
-			<td><input type="checkbox" name="house-{{h.id}}"/></td>
-			<td><a href="../house/{{h.id}}/type{{type.id}}"><i class="fa fa-fw fa-info-circle text-primary"></i></a></td>
-			<td>{{h.num}}</td>
-			<td>{{h.floor}}</td>
-			<td>{{h.type}}</td>
-			<td>{{h.rooms}}</td>
-			<td>{{h.net_size}} מ"ר</td>
-			<td>{% if h.garden_size %}{{h.garden_size}} מ"ר{% endif %}</td>
-			<td>
-				{% if h.price %}
-					<a href="../house/{{h.id}}/type{{type.id}}/versionlog" class="fancybox">{{h.price|intcomma}} ש"ח</a>
-				{% endif %}
-			</td>
-			<td>
-				{% for p in h.parkings.all %}
-					{{p.num}}<br>
-				{% endfor %}
-			</td>
-			<td>
-				{% for p in h.parkings.all %}
-					{{p.type}}<br>
-				{% endfor %}
-			</td>
-			<td>
-				{% for s in h.storages.all %}
-					{{s.num}}<br>
-				{% endfor %}
-			</td>
-			<td>{{h.remarks}}</td>
-		</tr>
-		{% endfor %}
-	</table>
-	<fieldset class="cardFieldset">
-		<legend>עדכון מחירון</legend>
-			<table class="formTable">
-				<tr>
-					{% for field in updateForm %}
-					<th>{{field.label_tag}}</th>
-					<td>
-						{{field}}
-						{% if field.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{field.errors|join:""}}'></i>{% endif %}
-					</td>
-					{% endfor %}
-					<td><input type="submit" value="אישור" class="button"/></td>
-				</tr>					
-			</table>
-	</fieldset>
-</fieldset>
-	<div style="width:27%; float:right;">
-		<fieldset class="cardFieldset">
-			<legend>הבהרות למחירון</legend>
-			<table class="formTable" >
-				<tr>
-					<th>{{form.include_tax.label_tag}}</th>
-					<td>
-						{{form.include_tax}}
-						{% if form.include_tax.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.include_tax.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th>{{form.include_lawyer.label_tag}}</th>
-					<td>
-						{{form.include_lawyer}}
-						{% if form.include_lawyer.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.include_lawyer.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th>{{form.include_parking.label_tag}}</th>
-					<td>
-						{{form.include_parking}}
-						{% if form.include_parking.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.include_parking.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th>{{form.include_storage.label_tag}}</th>
-					<td>
-						{{form.include_storage}}
-						{% if form.include_storage.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.include_storage.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th>{{form.include_registration.label_tag}}</th>
-					<td>
-						{{form.include_registration}}
-						{% if form.include_registration.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.include_registration.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th>{{form.include_guarantee.label_tag}}</th>
-					<td>
-						{{form.include_guarantee}}
-						{% if form.include_guarantee.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.include_guarantee.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th>{{form.settle_date.label_tag}}</th>
-					<td>
-						{{form.settle_date}}
-						{% if form.settle_date.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.settle_date.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th>{{form.allowed_discount.label_tag}}</th>
-					<td>
-						{{form.allowed_discount}}
-						{% if form.allowed_discount.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.allowed_discount.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th>{{form.is_permit.label_tag}}</th>
-					<td>
-						{{form.is_permit}}
-						{% if form.is_permit.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.is_permit.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th>{{form.permit_date.label_tag}}</th>
-					<td>
-						{{form.permit_date}}
-						{% if form.permit_date.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.permit_date.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th>{{form.remarks.label_tag}}</th>
-					<td>
-						{{form.remarks}}
-						{% if form.remarks.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.remarks.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-			</table>
-		</fieldset>
-	</div>
-	<div style="width:27%; float:right;">
-		<fieldset class="cardFieldset">
-			<legend>הוצאות</legend>
-			<table class="formTable" >
-				<tr>
-					<th>מס רכישה</th>
-					<td>כחוק</td>
-				</tr>
-				<tr>
-					<th>{{form.lawyer_fee.label_tag}}</th>
-					<td>
-						{{form.lawyer_fee}}
-						{% if form.lawyer_fee.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.lawyer_fee.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th>{{form.register_amount.label_tag}}</th>
-					<td>
-						{{form.register_amount}}
-						{% if form.register_amount.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.register_amount.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th>{{form.guarantee_amount.label_tag}}</th>
-					<td>
-						{{form.guarantee_amount}}
-						{% if form.guarantee_amount.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.guarantee_amount.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<th>{{form.storage_cost.label_tag}}</th>
-					<td>
-						{{form.storage_cost}}
-						{% if form.storage_cost.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{form.storage_cost.errors|join:""}}'></i>{% endif %}
-					</td>
-				</tr>	
-			</table>
-			<button type="button" class="button" id="show_parking_costs">עלות חנייה נוספת</button><br>
-			<table class="formTable" id="parking_costs_table">
-				<tr>
-					<td></td>
-					<td><u><b>עלות חנייה נוספת</b></u></td>
-				</tr>
-				{{formset}}
-			</table>
-		</fieldset>
+
 		<br>
-		<input type="submit" value="שמור הבהרות והוצאות" class="button"/>
+
+		<div class="clearBoth"></div> 
+		<table class="dataTable" border="1" id="houseTable" style="text-align:center;">
+			<th><input type="checkbox" id="all-checkboxes"/></th>
+			<th></th>
+			<th>מס'</th>
+			<th>קומה</th>
+			<th>סוג הנכס</th>
+			<th>חדרים</th>
+			<th>שטח נטו</th>
+			<th>גודל מרפסת/גינה</th>
+			<th>מחיר</th>
+			<th>מס' חנייה</th>
+			<th>סוג חנייה</th>
+			<th>מס' מחסן</th>
+			<th>הערות</th>
+			{% for h in houses %}
+				{% ifchanged h.get_cottage_num %}
+					{% if not forloop.first and form.instance.building.is_cottage %}
+						<tr height="10"><td style="background-color:#5F7172;" colspan="12"></td></tr>
+					{% endif %}
+				{% endifchanged %}
+			{% if h.get_sale or h.is_sold %}
+				<tr class="deletedRow" objid={{h.id}}>
+			{% endif %}
+			{% if h.get_signup and not h.get_sale and not h.is_sold %}
+				<tr class="row3" objid={{h.id}}>
+			{% endif %}
+			{% if not h.get_signup and not h.get_sale and not h.is_sold %}
+				<tr class="{% cycle 'row1' 'row2' %}" objid={{h.id}}>
+			{% endif %}
+				<td><input type="checkbox" name="house-{{h.id}}"/></td>
+				<td><a href="../house/{{h.id}}/type{{type.id}}"><i class="fa fa-fw fa-info-circle text-primary"></i></a></td>
+				<td>{{h.num}}</td>
+				<td>{{h.floor}}</td>
+				<td>{{h.type}}</td>
+				<td>{{h.rooms}}</td>
+				<td>{{h.net_size}} מ"ר</td>
+				<td>{% if h.garden_size %}{{h.garden_size}} מ"ר{% endif %}</td>
+				<td>
+					{% if h.price %}
+						<a href="../house/{{h.id}}/type{{type.id}}/versionlog" class="fancybox">{{h.price|intcomma}} ש"ח</a>
+					{% endif %}
+				</td>
+				<td>
+					{% for p in h.parkings.all %}
+						{{p.num}}<br>
+					{% endfor %}
+				</td>
+				<td>
+					{% for p in h.parkings.all %}
+						{{p.type}}<br>
+					{% endfor %}
+				</td>
+				<td>
+					{% for s in h.storages.all %}
+						{{s.num}}<br>
+					{% endfor %}
+				</td>
+				<td>{{h.remarks}}</td>
+			</tr>
+			{% endfor %}
+		</table>
 	</div>
-	<fieldset class="cardFieldset" style="width:15%; float:left;">
-		<legend>מחסנים</legend>
-		{% if form.instance.building.storages.count %}
-		<button id="show_storages" type="button" class="button">הצג\הסתר מחסנים</button><br>
-		<table id="storages_table" class="formTable">
-			<th>מס'</th>
-			<th>גודל</th>
-			<th>מס' דירה</th>
-			<th></th>
-			{% for s in form.instance.building.storages.all %}
-			<tr>
-				<td>{{s.num}}</td>
-				<td>{{s.size|default_if_none:""}}</td>
-				<td style="text-align:center;">{{s.house.num}}</td>
-				<td><a href="/storages/{{s.id}}" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a></td>
-			</tr>
-			{% endfor %}
-		</table>
-		{% endif %}
-		<a href="../addstorage" class="fancybox">מחסן חדש</a>
-	</fieldset>
-	<fieldset class="cardFieldset" style="width:18%; float:left;">
-		<legend>חניות</legend>
-		{% if form.instance.building.parkings.count %}
-		<button id="show_parkings" type="button" class="button">הצג\הסתר חניות</button><br>
-		<table id="parkings_table" class="formTable">
-			<th>מס'</th>
-			<th>סוג</th>
-			<th>מס' דירה</th>
-			<th></th>
-			{% for p in form.instance.building.parkings.all %}
-			<tr>
-				<td>{{p.num}}</td>
-				<td>{{p.type}}</td>
-				<td style="text-align:center;">{{p.house.num}}</td>
-				<td><a href="/parkings/{{p.id}}" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a></td>
-			</tr>
-			{% endfor %}
-		</table>
-		{% endif %}
-		<a href="../addparking" class="fancybox">חנייה חדשה</a>
-	</fieldset>
+</div>
+
+<div class="col-md-12">
+	<div class="panel panel-primary">
+		<div class="panel-heading">עדכון מחירון</div>
+		<div class="panel-body">
+			<form method="POST">
+				<table class="formTable">
+					<tr>
+						{% for field in updateForm %}
+						<th>{{field.label_tag}}</th>
+						<td>
+							{{field}}
+							{% if field.errors %}<i class="fa fa-exclamation-circle text-danger" title='{{field.errors|join:""}}'></i>{% endif %}
+						</td>
+						{% endfor %}
+						<td><input type="submit" value="אישור" class="btn btn-sm btn-default"/></td>
+					</tr>					
+				</table>
+			</form>
+		</div>
+	</div>
+</div>
+
+<form method="POST" class="form-horizontal">
+
+	<div class="col-md-4">
+		<div class="panel panel-default">
+			<div class="panel-heading">הבהרות למחירון</div>
+			<div class="panel-body">
+		
+				{% include 'Management/form_field_snippet.html' with field=form.include_tax %}
+				{% include 'Management/form_field_snippet.html' with field=form.include_lawyer %}
+				{% include 'Management/form_field_snippet.html' with field=form.include_parking %}
+				{% include 'Management/form_field_snippet.html' with field=form.include_storage %}
+				{% include 'Management/form_field_snippet.html' with field=form.include_registration %}
+				{% include 'Management/form_field_snippet.html' with field=form.include_guarantee %}
+				{% include 'Management/form_field_snippet.html' with field=form.settle_date %}
+				{% include 'Management/form_field_snippet.html' with field=form.allowed_discount %}
+				{% include 'Management/form_field_snippet.html' with field=form.is_permit %}
+				{% include 'Management/form_field_snippet.html' with field=form.permit_date %}
+				{% include 'Management/form_field_snippet.html' with field=form.remarks %}
+			
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-4">
+		<div class="panel panel-default">
+			<div class="panel-heading">הוצאות</div>
+			<div class="panel-body">
+				
+				<div class="form-group">
+					<label class="col-xs-4 control-label">מס רכישה</label>
+					<div class="col-xs-6">כחוק</div>
+				</div>
+
+				{% include 'Management/form_field_snippet.html' with field=form.lawyer_fee %}
+				{% include 'Management/form_field_snippet.html' with field=form.register_amount %}
+				{% include 'Management/form_field_snippet.html' with field=form.guarantee_amount %}
+				{% include 'Management/form_field_snippet.html' with field=form.storage_cost %}
+
+				<h4 class="text-primary text-center"><u>עלות חנייה נוספת</u></h4>
+
+				{{ formset }}
+
+			</div>
+		</div>
+		
+		<input type="submit" value="שמור הבהרות והוצאות" class="btn btn-primary"/>
+
+	</div>
+
 </form>
+
+<div class="col-md-4">
+	
+	<div class="panel panel-info">
+		<div class="panel-heading">מחסנים</div>
+		<div class="panel-body">
+				{% if form.instance.building.storages.count %}
+				<button id="show_storages" type="button" class="button">הצג\הסתר מחסנים</button><br>
+				<table id="storages_table" class="formTable">
+					<th>מס'</th>
+					<th>גודל</th>
+					<th>מס' דירה</th>
+					<th></th>
+					{% for s in form.instance.building.storages.all %}
+					<tr>
+						<td>{{s.num}}</td>
+						<td>{{s.size|default_if_none:""}}</td>
+						<td style="text-align:center;">{{s.house.num}}</td>
+						<td><a href="/storages/{{s.id}}" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a></td>
+					</tr>
+					{% endfor %}
+				</table>
+				{% endif %}
+				
+				<hr/>
+				
+				<a href="../addstorage" class="fancybox">מחסן חדש</a>
+		</div>
+	</div>
+
+	<div class="panel panel-info">
+		<div class="panel-heading">חניות</div>
+		<div class="panel-body">
+			{% if form.instance.building.parkings.count %}
+			<button id="show_parkings" type="button" class="button">הצג\הסתר חניות</button><br>
+			<table id="parkings_table" class="formTable">
+				<th>מס'</th>
+				<th>סוג</th>
+				<th>מס' דירה</th>
+				<th></th>
+				{% for p in form.instance.building.parkings.all %}
+				<tr>
+					<td>{{p.num}}</td>
+					<td>{{p.type}}</td>
+					<td style="text-align:center;">{{p.house.num}}</td>
+					<td><a href="/parkings/{{p.id}}" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a></td>
+				</tr>
+				{% endfor %}
+			</table>
+			{% endif %}
+			
+			<hr/>
+			
+			<a href="../addparking" class="fancybox">חנייה חדשה</a>
+		</div>
+	</div>
+
+</div>
+	
 <div class="clearBoth"></div>
 {% endblock content%}

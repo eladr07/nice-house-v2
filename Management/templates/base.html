@@ -27,34 +27,33 @@
 </script>
 {% endblock header %}
 {% block page %}
-<div id="header">
-	<span id="Nice">נווה העיר  </span><span id="House">2007</span><br>
-	<span style="color: #0065BD;">{% now "d F Y l H:i" %}</span> 
-</div>
 
-<div id="menu">
-	<div id="nav">
-		<a href="/">דף הבית</a> /
-		<a href="/employees">מצבת עובדים</a> /
-		<a href="/projects">מצבת פרוייקטים</a> / 
-		שימושון נדל"ן : 
-		<select width="100px" id="linkSelect">
-			<option value="0">----</option>
-		</select>
+<nav class="navbar navbar-default">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="/"><span class="text-primary">נווה העיר</span> 2007</a>
 	</div>
-	<div id="user">
-		<span>שלום, 
-		{% if user.is_authenticated %}
-			{{ user.get_full_name }} !
-			<a href="/accounts/logout">התנתק</a> / <a href="/accounts/password_change">שנה סיסמא</a>
-		{% else %}
-			אורח !
-			<a href="/accounts/login">התחבר</a>
-		{% endif %}
-		</span>
-	</div>
-	<div class="clearBoth"> </div>
-</div>
+
+	{% if user.is_authenticated %}
+	<ul class="nav navbar-nav">
+		<li><a href="/employees">מצבת עובדים</a></li>
+		<li><a href="/projects">מצבת פרוייקטים</a></li>
+	</ul>
+	{% endif %}
+
+	<ul class="nav navbar-nav navbar-left">
+		<p class="navbar-text navbar-left">
+			<span>שלום, </span>
+			{% if user.is_authenticated %}
+				<span>{{ user.get_full_name }} !</span>
+				<a href="/accounts/logout">התנתק</a> / <a href="/accounts/password_change">שנה סיסמא</a>
+			{% else %}
+				<span>אורח !</span>
+				<a href="/accounts/login">התחבר</a>
+			{% endif %}
+		</p>
+	</ul>
+</nav>
+
 <div id="content">
 {% block content %}{% endblock content %}
 </div>

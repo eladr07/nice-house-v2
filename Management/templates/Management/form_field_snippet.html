@@ -1,17 +1,11 @@
 {% load widget_tweaks %}
 
-{% for field in form %}
-
 <div class="form-group">
   <label for="{{field.id_for_label}}" class="col-xs-4 control-label">{{field.label}}</label>
   <div class="col-xs-6">
     {{field|add_class:"form-control input-sm"}}
-  </div>
-  <div class="col-xs-2 helpText">
-    {% if field.help_text %}
-      {{field.help_text}}
+    {% if field.errors %}
+      <i class="fa fa-exclamation-circle text-danger" title='{{field.errors|join:""}}'></i>
     {% endif %}
   </div>
 </div>
-
-{% endfor %}

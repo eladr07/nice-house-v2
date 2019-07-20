@@ -49,147 +49,213 @@
 {% else %}
 	<h3 class="text-center text-danger">פתיחת דרישה חדשה</h3>
 {% endif %}
-<div id="rightSide">
-	<form method="POST" class="formTable">
+
+<hr/>
+
+<div class="col-md-4">
+	<form method="POST" class="form-horizontal">
 		{% csrf_token %}
-		<table class="formTable" >
-			{% include "Management/form_snippet.html" %}
-		</table>
-		<input type="submit" value="אישור" class="button"/>
+		
+		{% include "Management/form_snippet.html" %}
+
+		<div class="form-group">
+			<div class="col-sm-offset-2 col-sm-10">
+				<input type="submit" value="אישור" class="btn btn-sm btn-primary"/>
+			</div>
+		</div>
+
 	</form>
 </div>
-<div id="leftSide">
-	<table class="formTable">
-		<tr>
-			<th>עמלה בגין מכירות</th>
-			<td>{{demand.sales_commission|intcomma}} ש"ח</td>
-		</tr>
-		<tr>
-			<th>סה"כ תשלום לחברה</th>
-			<td>{{demand.total_amount|intcomma}} ש"ח</td>
-		</tr>
-	</table>
-	<fieldset class="cardFieldset" >
-		<legend>תוספות וקיזוזים</legend>
-		{% for d in demand.diffs.all %}
-			{{ d }}				
-			<a href="{{d.get_absolute_url}}" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
-			<a href="{{d.get_absolute_url}}/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
-			<br>
-		{% endfor %}
-		<br><a class="fancybox" href="{{demand.id}}/adddiff">תוספת\קיזוז חדש</a><br>
-	</fieldset>
-	<fieldset class="cardFieldset">
-		<legend>תיקונים לדרישה</legend>
-		<ul>
-			{% for s in demand.get_pricemodsales %}
-				<li>המחיר עבור מכירה מס'
-				<a href="/sale/{{s.id}}">{{s.id}}</a>
-				שונה מ- 
-				{{s.salepricemod.old_price|intcomma}} 
-				ל - 
-				<b>{{s.price|intcomma}}</b>. 
-				<a href="{{ s.salepricemod.get_absolute_url }}">פרטים</a>
-				</li>
-			{% endfor %}
-			{% for s in demand.get_housemodsales %}
-				<li>הדירה עבור מכירה מס'
-				<a href="/sale/{{s.id}}">{{s.id}}</a>
-				 שונתה מבניין
-				<a href="/buildings/{{s.salehousemod.old_house.building.id}}/pricelist/type1">{{s.salehousemod.old_house.building.num}}</a>
-				 דירה 
-				<a href="/buildings/{{s.salehousemod.old_house.building.id}}/house/{{s.salehousemod.old_house.id}}/type1">{{s.salehousemod.old_house.num}}</a>			
-				 לבניין 
-				<a href="/buildings/{{s.house.building.id}}/pricelist/type1"><b>{{s.house.building.num}}</b></a>
-				 דירה 
-				<a href="/buildings/{{s.house.building.id}}/house/{{s.house.id}}/type1"><b>{{s.house.num}}</b></a>. 
-				<a href="{{ s.salehousemod.get_absolute_url }}">פרטים</a>
-				</li>
-			{% endfor %}
-			{% for s in demand.get_presales %}
-				<li>מכירה מס' 
-				<a href="/sale/{{s.id}}">{{s.id}}</a> - ({{s}})
-				הוקדמה לחודש זה. העובד יקבל תשלום בחודש
-				<b>{{s.salepre.employee_pay_month}}/{{s.salepre.employee_pay_year}}</b>. 
-				<a href="{{ s.salepre.get_absolute_url }}">פרטים</a>
-				</li>
-			{% endfor %}
-			{% for s in demand.get_rejectedsales %}
-				<li>מכירה מס' 
-				<a href="/sale/{{s.id}}">{{s.id}}</a> - ({{s}})
-				נדחתה לחודש
-				<b>{{s.salereject.to_month}}/{{s.salereject.to_year}}</b>
-				העובד יקבל תשלום בחודש
-				<b>{{s.salereject.employee_pay_month}}/{{s.salereject.employee_pay_year}}</b>. 
-				<a href="{{ s.salereject.get_absolute_url }}">פרטים</a>
-				</li>			
-			{% endfor %}
-			{% for s in demand.get_canceledsales %}
-				<li>מכירה מס' 
-				<a href="/sale/{{s.id}}">{{s.id}}</a> - ({{s}})
-				בוטלה.
-				<a href="{{ s.salecancel.get_absolute_url }}">פרטים</a>
-				</li>			
-			{% endfor %}
-		</ul>
-	</fieldset>
-	<fieldset class="cardFieldset" >
-		<legend>חשבוניות</legend>
-		{% for i in demand.invoices.all %}
-			{{ i.num }}
-			- בתאריך
-			<b>{{i.date|date:"j/m/y"}}</b>
-			על סך
-			<b>{{i.amount|intcomma}} ש"ח</b>  				
-			<a href="/demandinvoice/{{i.id}}" ><i class="fa fa-edit" title='עריכה'></i></a>
-			<a href="/invoices/{{i.id}}/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
-			{% if i.offset %}
-				בתאריך 
-				{{i.offset.date|date:"j/m/y"}}
-				זיכוי על סך של 
-				{{i.offset.amount|intcomma}} ש"ח
-				בגלל 
-				{{i.offset.reason}} 
-				<a href="{{i.offset.get_absolute_url}}" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
-				<a href="{{i.offset.get_absolute_url}}/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
-			{% else %}
-				<a href="/invoices/{{i.id}}/offset" class="fancybox">הזנת זיכוי לחשבונית</a>
-			{% endif %}
-			<br>
-		{% endfor %}
-		<br><a href="{{demand.id}}/invoice/add">חשבונית חדשה</a><br>
-	</fieldset>
-	<fieldset class="cardFieldset" >
-		<legend>תשלומים מהיזם</legend>
-		{% for p in demand.payments.all %}
-			{{ p.num }}
-			- לתאריך
-			<b>{{p.payment_date|date:"j/m/y"}}</b>
-			על סך
-			<b>{{p.amount|intcomma}} ש"ח</b>  				
-			<a href="/demandpayment/{{p.id}}" ><i class="fa fa-edit" title='עריכה'></i></a>
-			<a href="/payments/{{p.id}}/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
-			<br>
-		{% endfor %}
-		<br><a href="{{demand.id}}/payment/add">הוסף תשלום</a><br>
-	</fieldset>		
-	<fieldset class="cardFieldset">
-		<legend>מסמכים מצורפים</legend>
-		<a id="list_attachments" href="{{demand.id}}/attachments" class="bigfancybox">ארכיב מסמכים</a><br>
-		<a id="add_attachment" href="{{demand.id}}/attachment/add" class="bigfancybox">צרף מסמך</a>
-	</fieldset>
+
+<div class="col-md-8">
+	
+	<div class="col-md-6">
+		<div class="panel panel-default">
+			<div class="panel-heading">סיכום</div>
+			<div class="panel-body">
+				<table class="formTable">
+					<tr>
+						<th>עמלה בגין מכירות</th>
+						<td>{{demand.sales_commission|intcomma}} ש"ח</td>
+					</tr>
+					<tr>
+						<th>סה"כ תשלום לחברה</th>
+						<td>{{demand.total_amount|intcomma}} ש"ח</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-6">
+		<div class="panel panel-default">
+			<div class="panel-heading">תוספות וקיזוזים</div>
+			<div class="panel-body">
+				{% for d in demand.diffs.all %}
+					{{ d }}				
+					<a href="{{d.get_absolute_url}}" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
+					<a href="{{d.get_absolute_url}}/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
+					<br>
+				{% endfor %}
+				
+				<hr/>
+
+				<a class="fancybox" href="{{demand.id}}/adddiff">תוספת\קיזוז חדש</a>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-6">
+		<div class="panel panel-default">
+			<div class="panel-heading">תיקונים לדרישה</div>
+			<div class="panel-body">
+				<ul>
+					{% for s in demand.get_pricemodsales %}
+						<li>המחיר עבור מכירה מס'
+						<a href="/sale/{{s.id}}">{{s.id}}</a>
+						שונה מ- 
+						{{s.salepricemod.old_price|intcomma}} 
+						ל - 
+						<b>{{s.price|intcomma}}</b>. 
+						<a href="{{ s.salepricemod.get_absolute_url }}">פרטים</a>
+						</li>
+					{% endfor %}
+					{% for s in demand.get_housemodsales %}
+						<li>הדירה עבור מכירה מס'
+						<a href="/sale/{{s.id}}">{{s.id}}</a>
+							שונתה מבניין
+						<a href="/buildings/{{s.salehousemod.old_house.building.id}}/pricelist/type1">{{s.salehousemod.old_house.building.num}}</a>
+							דירה 
+						<a href="/buildings/{{s.salehousemod.old_house.building.id}}/house/{{s.salehousemod.old_house.id}}/type1">{{s.salehousemod.old_house.num}}</a>			
+							לבניין 
+						<a href="/buildings/{{s.house.building.id}}/pricelist/type1"><b>{{s.house.building.num}}</b></a>
+							דירה 
+						<a href="/buildings/{{s.house.building.id}}/house/{{s.house.id}}/type1"><b>{{s.house.num}}</b></a>. 
+						<a href="{{ s.salehousemod.get_absolute_url }}">פרטים</a>
+						</li>
+					{% endfor %}
+					{% for s in demand.get_presales %}
+						<li>מכירה מס' 
+						<a href="/sale/{{s.id}}">{{s.id}}</a> - ({{s}})
+						הוקדמה לחודש זה. העובד יקבל תשלום בחודש
+						<b>{{s.salepre.employee_pay_month}}/{{s.salepre.employee_pay_year}}</b>. 
+						<a href="{{ s.salepre.get_absolute_url }}">פרטים</a>
+						</li>
+					{% endfor %}
+					{% for s in demand.get_rejectedsales %}
+						<li>מכירה מס' 
+						<a href="/sale/{{s.id}}">{{s.id}}</a> - ({{s}})
+						נדחתה לחודש
+						<b>{{s.salereject.to_month}}/{{s.salereject.to_year}}</b>
+						העובד יקבל תשלום בחודש
+						<b>{{s.salereject.employee_pay_month}}/{{s.salereject.employee_pay_year}}</b>. 
+						<a href="{{ s.salereject.get_absolute_url }}">פרטים</a>
+						</li>			
+					{% endfor %}
+					{% for s in demand.get_canceledsales %}
+						<li>מכירה מס' 
+						<a href="/sale/{{s.id}}">{{s.id}}</a> - ({{s}})
+						בוטלה.
+						<a href="{{ s.salecancel.get_absolute_url }}">פרטים</a>
+						</li>			
+					{% endfor %}
+				</ul>
+			</div>
+		</div>
+
+	</div>
+
+	<div class="col-md-6">
+		<div class="panel panel-default">
+			<div class="panel-heading">חשבוניות</div>
+			<div class="panel-body">
+				{% for i in demand.invoices.all %}
+					{{ i.num }}
+					- בתאריך
+					<b>{{i.date|date:"j/m/y"}}</b>
+					על סך
+					<b>{{i.amount|intcomma}} ש"ח</b>  				
+					<a href="/demandinvoice/{{i.id}}" ><i class="fa fa-edit" title='עריכה'></i></a>
+					<a href="/invoices/{{i.id}}/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
+					{% if i.offset %}
+						בתאריך 
+						{{i.offset.date|date:"j/m/y"}}
+						זיכוי על סך של 
+						{{i.offset.amount|intcomma}} ש"ח
+						בגלל 
+						{{i.offset.reason}} 
+						<a href="{{i.offset.get_absolute_url}}" class="fancybox"><i class="fa fa-edit" title='עריכה'></i></a>
+						<a href="{{i.offset.get_absolute_url}}/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
+					{% else %}
+						<a href="/invoices/{{i.id}}/offset" class="fancybox">הזנת זיכוי לחשבונית</a>
+					{% endif %}
+					<br>
+				{% endfor %}
+				
+				<hr/>
+				
+				<a href="{{demand.id}}/invoice/add">חשבונית חדשה</a>
+
+			</div>
+		</div>
+	</div>
+		
+	<div class="col-md-6">
+		<div class="panel panel-default">
+			<div class="panel-heading">תשלומים מהיזם</div>
+			<div class="panel-body">
+				{% for p in demand.payments.all %}
+					{{ p.num }}
+					- לתאריך
+					<b>{{p.payment_date|date:"j/m/y"}}</b>
+					על סך
+					<b>{{p.amount|intcomma}} ש"ח</b>  				
+					<a href="/demandpayment/{{p.id}}" ><i class="fa fa-edit" title='עריכה'></i></a>
+					<a href="/payments/{{p.id}}/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
+					<br>
+				{% endfor %}
+
+				<hr/>
+
+				<a href="{{demand.id}}/payment/add">הוסף תשלום</a>
+			</div>
+		</div>
+	</div>	
+	
+	<div class="col-md-6">
+		<div class="panel panel-default">
+			<div class="panel-heading">מסמכים מצורפים</div>
+			<div class="panel-body">
+				<a id="list_attachments" href="{{demand.id}}/attachments" class="bigfancybox">ארכיב מסמכים</a><br>
+				<a id="add_attachment" href="{{demand.id}}/attachment/add" class="bigfancybox">צרף מסמך</a>
+			</div>
+		</div>
+	</div>
+
 </div>
-	<div class="clearBoth"/>
-	<p style="color: #CC0000; font-weight: bold;">
-		{% if not demand.invoices.count %}
-			לתשומת לבך ! לא הוצאה חשבונית בגין הדרישה<br>
-		{% endif %}
-		{% if not demand.payments.count %}
-			לתשומת לבך ! לא התקבל תשלום בגין הדרישה<br>
-		{% endif %}	{% if demand.diff_invoice_payment %}
-			לתשומת לבך ! קיים פער בין הסכום בחשבונית שהוצאה, לסכום בתשלום שהתקבל מהיזם<br>
-		{% endif %}
-	</p>
+
+<div class="clearBoth"></div>
+	
+<div class="col-md-4">
+	{% if not demand.invoices.count %}
+		<div class="alert alert-danger">
+			לתשומת לבך ! לא הוצאה חשבונית בגין הדרישה
+		</div>	
+	{% endif %}
+
+	{% if not demand.payments.count %}
+		<div class="alert alert-danger">
+			לתשומת לבך ! לא התקבל תשלום בגין הדרישה
+		</div>
+	{% endif %}	
+	
+	{% if demand.diff_invoice_payment %}
+		<div class="alert alert-danger">
+			לתשומת לבך ! קיים פער בין הסכום בחשבונית שהוצאה, לסכום בתשלום שהתקבל מהיזם
+		</div>
+	{% endif %}
+</div>
+
 	{% if demand.statuses.latest.type.id == 1 %}
 		<a href="close">סגור דרישה</a><br><br>
 	{% endif %}
