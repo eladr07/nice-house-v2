@@ -307,6 +307,7 @@ class MonthDemandWriter(DocumentBase):
         super(MonthDemandWriter, self).__init__()
         self.demand = demand
         self.commissions = self.demand.project.commissions.get()
+        self.is_zilber = commissions.c_zilber != None
         self.signup_adds = self.commissions.commission_by_signups
         self.to_mail = to_mail
     def toPara(self):
@@ -562,7 +563,6 @@ class MonthDemandWriter(DocumentBase):
         names = [u'מס"ד']
         colWidths = [35]
         contract_num, discount, final = False, False, False
-        zilber = self.demand.project.is_zilber()
         
         if sales[0].contract_num != None:
             names.append(u"חוזה\nמס'")
@@ -574,7 +574,7 @@ class MonthDemandWriter(DocumentBase):
         names.extend([u'שם הרוכשים',u'ודירה\nבניין',u'מכירה\nתאריך', u'חוזה\nמחיר'])
         colWidths.extend([65, None,None,55])
         
-        if zilber:
+        if self.is_zilber:
             names.extend([u'רישום\nהוצאות',u'מזומן\nהנחת', u'מפרט\nהוצאות',u'עו"ד\nשכ"ט', u'נוספות\nהוצאות'])
             colWidths.extend([30,30,30,None,30])
 
@@ -615,7 +615,7 @@ class MonthDemandWriter(DocumentBase):
                 row.append(signup and signup.date.strftime('%d/%m/%y') or '')
             row.extend([clientsPara(s.clients), '%s/%s' % (str(s.house.building), str(s.house)), 
                         s.sale_date.strftime('%d/%m/%y'), commaise(s.price)])
-            if zilber:
+            if self.is_zilber:
                 if commissions.deduct_registration and s.include_registration:
                     row.append(commaise(commissions.registration_amount))
                 else:
@@ -650,7 +650,7 @@ class MonthDemandWriter(DocumentBase):
             row.append(None)
         row.extend([None,Paragraph(log2vis('%s' % self.demand.sales_count), styleSaleSumRow),None])
         row.append(Paragraph(commaise(self.demand.sales_total_price), styleSaleSumRow))
-        if zilber:
+        if self.is_zilber:
             row.extend([None,None,None,Paragraph(commaise(total_lawyer_pay), styleSaleSumRow),None])
         if discount:
             row.extend([None,None])
@@ -691,7 +691,7 @@ class MonthDemandWriter(DocumentBase):
         story.append(titlePara(title))
         story.append(Spacer(0, 10))
         subTitle = u"דרישה מס' %s" % self.demand.id
-        if self.demand.project.is_zilber():
+        if self.is_zilber:
             subTitle += u' (%s מתוך %s)' % (self.demand.zilber_cycle_index(), models.CZilber.Cycle)
 
         story.append(Paragraph('<u>%s</u>' % log2vis(subTitle), styleSubTitleBold))
@@ -699,7 +699,7 @@ class MonthDemandWriter(DocumentBase):
         story.extend(self.saleFlows())
         if self.demand.diffs.count() > 0:
             story.extend([Spacer(0, 20), self.addsPara()])
-        if self.demand.project.is_zilber() and (self.demand.include_zilber_bonus() or not self.to_mail):
+        if self.is_zilber and (self.demand.include_zilber_bonus() or not self.to_mail):
             story.extend([PageBreak(), Spacer(0,30)])
             story.extend(self.zilberAddsFlows())
             story.extend([PageBreak(), Spacer(0,30)])

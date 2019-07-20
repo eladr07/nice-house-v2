@@ -144,8 +144,6 @@ class Project(models.Model):
 
     objects = ProjectManager()
     
-    def is_zilber(self):
-        return self.commissions.get().c_zilber != None
     def current_demand(self):
         try:
             return Demand.objects.current().get(project = self)
