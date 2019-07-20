@@ -76,8 +76,6 @@ AdvancePaymentForm = modelform_factory(AdvancePayment, exclude=('date_paid','is_
 LoanPayForm = modelform_factory(LoanPay, fields=('employee','month','year','amount','deduct_from_salary','remarks'))
         
 SalaryExpensesForm = modelform_factory(SalaryExpenses, exclude=('approved_date',))
-        
-TaskForm = modelform_factory(Task, fields=('user','content'))
 
 AccountForm = modelform_factory(Account, fields=('num','bank','branch','branch_num','payee'))
 

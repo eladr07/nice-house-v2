@@ -392,60 +392,6 @@ class TaxDelete(PermissionRequiredMixin, DeleteView):
     template_name = 'Management/object_confirm_delete.html'
     permission_required = 'Management.delete_tax'
 
-### Link Views ###
-
-class LinkListView(LoginRequiredMixin, ListView):
-    model = Link
-
-    def get_queryset(self):
-        return Link.objects.all()
-
-class LinkCreate(PermissionRequiredMixin, CreateView):
-    model = Link
-    fields = ('name','url')
-    template_name = 'Management/object_edit.html'
-    permission_required = 'Management.add_link'
-
-class LinkUpdate(PermissionRequiredMixin, UpdateView):
-    model = Link
-    fields = ('name','url')
-    template_name = 'Management/object_edit.html'
-    permission_required = 'Management.change_link'
-
-class LinkDelete(PermissionRequiredMixin, DeleteView):
-    model = Link
-    success_url = '/links'
-    template_name = 'Management/object_confirm_delete.html'
-    permission_required = 'Management.delete_link'
-
-### Car Views ###
-
-class CarListView(LoginRequiredMixin, ListView):
-    model = Car
-
-    def get_queryset(self):
-        return Car.objects.all()
-
-class CarCreate(PermissionRequiredMixin, CreateView):
-    model = Car
-    fields = ('number','owner','insurance_expire_date','insurance_man','insurance_phone',
-        'tow_company','tow_phone','compulsory_insurance_cost','comprehensive_insurance_cost')
-    template_name = 'Management/object_edit.html'
-    permission_required = 'Management.add_car'
-
-class CarUpdate(PermissionRequiredMixin, UpdateView):
-    model = Car
-    fields = ('number','owner','insurance_expire_date','insurance_man','insurance_phone',
-        'tow_company','tow_phone','compulsory_insurance_cost','comprehensive_insurance_cost')
-    template_name = 'Management/object_edit.html'
-    permission_required = 'Management.change_car'
-
-class CarDelete(PermissionRequiredMixin, DeleteView):
-    model = Car
-    success_url = '/cars'
-    template_name = 'Management/object_confirm_delete.html'
-    permission_required = 'Management.delete_car'
-
 ### NHCommission Views ###
 
 class NHCommissionCreate(PermissionRequiredMixin, CreateView):
@@ -3904,69 +3850,7 @@ def json_house(request, house_id):
     fields['price'] = house.prices.latest().price
     a = '[' + str({'pk':house.id, 'model':'Management.house', 'fields':fields}) + ']'
     return HttpResponse(a)
-  
-@login_required
-def json_links(request):
-    data = serializers.serialize('json', Link.objects.all())
-    return HttpResponse(data)
-
-@login_required
-def task_list(request):
-    sender = request.GET.get('sender', 'others')
-    status = request.GET.get('status', 'undone')
-    filterForm = TaskFilterForm(initial={'sender':sender, 'status':status})
-    tasks = request.user.tasks.filter(is_deleted = False)
-    if sender == 'me':
-        tasks = tasks.filter(sender = request.user)
-    if sender == 'others':
-        tasks = tasks.filter(user = request.user)
-    if status == 'done':
-        tasks = tasks.filter(is_done = True)
-    if status == 'undone':
-        tasks = tasks.filter(is_done = False)
-    
-    return render(request, 'Management/task_list.html',
-                              {'tasks': tasks, 'filterForm' : filterForm}, )
-
-@permission_required('Management.add_task')
-def task_add(request):
-    if request.method=='POST':
-        form = TaskForm(data = request.POST)
-        if form.is_valid():
-            t = form.instance
-            t.sender = request.user
-            form.save()
-    else:
-        form = TaskForm()
-    
-    return render(request, 'Management/object_edit.html',
-                              {'form' : form}, )
-    
-
-class TaskDelete(PermissionRequiredMixin, DeleteView):
-    model = Task
-    success_url = '/tasks'
-    template_name = 'Management/object_confirm_delete.html'
-    permission_required = 'Management.delete_task'
-
-@permission_required('Management.change_task')
-def task_do(request, id):
-    t = Task.objects.get(pk = id)
-    if t.is_done:
-        return HttpResponse('task is already done')
-    else:
-        t.do()
-        return HttpResponseRedirect('/tasks')    
-
-@permission_required('Management.delete_task')
-def task_del(request, id):
-    t = Task.objects.get(pk = id)
-    if t.is_deleted:
-        return HttpResponse('task is already deleted')
-    else:
-        t.delete()
-        return HttpResponseRedirect('/tasks')
-
+      
 class AttachmentUpdate(PermissionRequiredMixin, UpdateView):
     model = Attachment
     form_class = AttachmentForm

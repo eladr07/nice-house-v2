@@ -160,21 +160,6 @@ urlpatterns += [
     path('attachment/add', attachment_add),
     path('attachment/<int:pk>', AttachmentUpdate.as_view()),
     path('attachment/<int:pk>/del', AttachmentDelete.as_view()),
-
-    path('tasks/', task_list),
-    path('task/add', task_add),
-    path('task/<int:pk>/del', TaskDelete.as_view()),
-    path('task/<int:id>/do', task_do),
-
-    path('links/', LinkListView.as_view()),
-    path('link/add', LinkCreate.as_view()),
-    path('link/<int:pk>', LinkUpdate.as_view()),
-    path('link/<int:pk>/del', LinkDelete.as_view()),
-     
-    path('cars/', CarListView.as_view()),
-    path('car/add', CarCreate.as_view()),
-    path('car/<int:object_id>', CarUpdate.as_view()),
-    path('car/<int:object_id>/del', CarDelete.as_view()),
     
     path('nhbranch/add', NHBranchCreate.as_view()),
     path('nhbranch/<int:pk>/', NHBranchUpdate.as_view()),
@@ -382,7 +367,6 @@ urlpatterns += [
     path('xml/employees/<int:project_id>', json_employees),
     path('xml/houses/<int:building_id>', json_houses),
     path('xml/house/<int:house_id>', json_house),
-    path('json/links', json_links),
     path('demand_details/<int:project>/<int:year>/<int:month>', demand_details),
     path('demand_sales/<int:project_id>/<int:year>/<int:month>', demand_sales),
     path('invoice_details/<int:project>/<int:year>/<int:month>', invoice_details),

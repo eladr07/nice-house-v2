@@ -80,43 +80,6 @@ class Attachment(models.Model):
     class Meta:
         db_table = 'Attachment'
         permissions = (('list_attachment', 'Can list attachments'),)
-
-class Car(models.Model):
-    number = models.IntegerField(gettext('car_num'), unique = True)
-    owner = models.CharField(gettext('car_owner'), max_length = 20)
-    insurance_expire_date = models.DateField(gettext('insurance_expire_date'))
-    insurance_man = models.CharField(gettext('insurance_man'), max_length = 20)
-    insurance_phone = models.CharField(gettext('insurance_phone'), max_length = 10)
-    tow_company = models.CharField(gettext('tow_company'), max_length = 20)
-    tow_phone = models.CharField(gettext('tow_phone'), max_length = 10)
-    compulsory_insurance_cost = models.IntegerField(gettext('compulsory_insurance_cost'))
-    comprehensive_insurance_cost = models.IntegerField(gettext('comprehensive_insurance_cost'))
-
-    def get_absolute_url(self):
-        return '/car/%s' % self.id
-
-    class Meta:
-        db_table = 'Car'
-
-class Task(models.Model):
-    sender = models.ForeignKey(User, on_delete=models.PROTECT, related_name='task_requests', editable=False)
-    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name='tasks', verbose_name=gettext('user'))
-    content = models.TextField(gettext('content'))
-    time = models.DateTimeField(auto_now_add=True, editable=False)
-    is_done = models.BooleanField(default=False, editable=False)
-    time_done = models.DateTimeField(null = True, editable=False)
-    is_deleted = models.BooleanField(default=False, editable=False)
-    
-    def do(self):
-        self.is_done = True
-        self.time_done = datetime.now()
-        self.save()
-    def delete(self):
-        self.is_deleted = True
-        self.save()
-    class Meta:
-        ordering = ['is_done', '-time']
-        db_table = 'Task'
         
 class ReminderStatusType(models.Model):
     Added, Done, Deleted = 1,2,3
@@ -147,17 +110,6 @@ class Reminder(models.Model):
         return '/reminder/%s' % self.id
     class Meta:
         db_table = 'Reminder'
-    
-class Link(models.Model):
-    name = models.CharField(gettext('name'), max_length=30)
-    url = models.URLField(gettext('url'))
-    
-    def get_absolute_url(self):
-        return '/link/%s' % self.id
-
-    class Meta:
-        db_table = 'Link'
-        ordering = ['name']
 
 class ProjectDetails(models.Model):
     architect = models.CharField(gettext('architect'), max_length=30)
