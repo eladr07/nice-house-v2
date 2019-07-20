@@ -7,24 +7,7 @@
 <script type="text/javascript" src="{% static "fancybox/jquery.metadata.js" %}"></script> 
 <script type="text/javascript" src="{% static "fancybox/jquery.pngFix.js" %}"></script> 
 <script type="text/javascript" src="{% static "fancybox/jquery.fancybox.js" %}"></script> 
-<script>
-	$(document).ready(function() {
-		var linkSelect = $("#linkSelect");
-		$.getJSON("/json/links", function(data) {
-			for (i in data)
-			{
-				obj = data[i];
-				linkSelect.append(
-					"<option value='" + obj.fields['url'] + "'>" + obj.fields['name'] + "</option>");
-			}
-		});
-		linkSelect.change(function () {
-			var link = linkSelect.val();
-			if (link != "0")
-				window.open(link);
-		});
-	});
-</script>
+
 {% endblock header %}
 {% block page %}
 
