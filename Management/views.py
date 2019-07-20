@@ -1526,7 +1526,12 @@ class EmployeeListView(LoginRequiredMixin, ListView):
     context_object_name = 'employee_list'
 
     def get_queryset(self):
-        return Employee.objects.active().select_related('employment_terms__hire_type')
+        employees = Employee.objects \
+            .active() \
+            .select_related('employment_terms__hire_type','rank') \
+            .prefetch_related('projects')
+
+        return employees
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
@@ -1540,7 +1545,11 @@ class EmployeeArchiveListView(LoginRequiredMixin, ListView):
     context_object_name = 'employee'
 
     def get_queryset(self):
-        return Employee.objects.archive()
+        employees = Employee.objects \
+            .archive() \
+            .select_related('employment_terms__hire_type','rank')           
+
+        return employees
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
