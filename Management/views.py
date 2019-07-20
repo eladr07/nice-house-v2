@@ -2665,7 +2665,9 @@ class ProjectListView(LoginRequiredMixin, ListView):
         projects = Project.objects \
             .select_related('details','demand_contact','payment_contact') \
             .prefetch_related('employees','contacts') \
-            .filter(end_date = None)
+            .filter(end_date__isnull = True)
+
+        set_project_buildings(projects)
 
         return projects
 
@@ -2673,6 +2675,22 @@ class ProjectListView(LoginRequiredMixin, ListView):
 def project_list_pdf(request):
     writer = ProjectListWriter(projects = Project.objects.active())
     return build_and_return_pdf(writer)
+
+def set_project_buildings(projects):
+    # load non-deleted buildings for all projects
+    project_ids = [project.id for project in projects]
+
+    buildings = Building.objects \
+        .filter(is_deleted=False, project_id__in=project_ids) \
+        .order_by('project_id')
+
+    # construct a map of project_id -> buildings
+    building_groups = itertools.groupby(buildings, lambda building: building.project_id)
+
+    buildings_map = {project_id: list(buildings_iter) for (project_id, buildings_iter) in building_groups}
+
+    for project in projects:
+        project.non_deleted_buildings = buildings_map.get(project.id, [])
 
 class ProjectArchiveListView(LoginRequiredMixin, ListView):
     model = Project
@@ -2682,7 +2700,9 @@ class ProjectArchiveListView(LoginRequiredMixin, ListView):
         projects = Project.objects \
             .select_related('details','demand_contact','payment_contact') \
             .prefetch_related('employees','contacts') \
-            .filter(end_date = None)
+            .filter(end_date__isnull = False)
+
+        set_project_buildings(projects)
 
         return projects
 
