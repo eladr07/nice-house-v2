@@ -1,5 +1,5 @@
 gunicorn
-Django==2.2.1
+Django==2.2.3
 django-reversion==3.0.4
 mysqlclient==1.4.2.post1
 pyfribidi==0.12.0
