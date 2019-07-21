@@ -1673,11 +1673,11 @@ class ProjectCommission(models.Model):
                     
             # enforce the maximum commission for all commissions sum
             if self.max:
-                for s in dic:
-                    if dic[s] > self.max:
-                        dic[s] = self.max
+                for sale in dic:
+                    if dic[sale] > self.max:
+                        dic[sale] = self.max
                         logger.info('sale #%(id)d - final commission (%(commission_value).3f) exceeded max commission %(max).3f',
-                                    {'id':s.id, 'commission_value':dic[s], 'max':self.max})
+                                    {'id':sale.id, 'commission_value':dic[sale], 'max':self.max})
                         
             for sale in details:
                 for c, v in details[sale].items():
