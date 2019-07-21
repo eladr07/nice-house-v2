@@ -11,6 +11,6 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=mysql://elad:200639219@nicehosue.chy7p6mqhc1r.eu-central-1.rds.amazonaws.com/Management
+      - DATABASE_URL=mysql://elad:200639219@nicehosue.chy7p6mqhc1r.eu-central-1.rds.amazonaws.com/Management_0719
     # depends_on:
     #   - db
