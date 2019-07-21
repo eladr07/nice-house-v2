@@ -758,10 +758,6 @@ def demand_calc(request, id):
             # delete demand statuses
             demand.statuses.delete()
 
-            # delete sale commission details
-            for sale in demand.sales_list:
-                sale.project_commission_details.delete()
-
         for d2 in demands:
             d2.calc_sales_commission()
             demand = Demand.objects.get(pk=d2.id)
@@ -772,11 +768,6 @@ def demand_calc(request, id):
         # enrich demand
         set_demand_sale_fields([d], d.year, d.month, d.year, d.month)
         set_demand_diff_fields([d])
-
-        # delete all commission details
-        for sale in d.sales_list:
-            for scd in sale.project_commission_details.all():
-                scd.delete()
 
         # re-calculate commission for demand
         d.calc_sales_commission()

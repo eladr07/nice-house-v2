@@ -995,18 +995,16 @@ class EmployeeSalary(EmployeeSalaryBase):
             logger.info('starting to calculate salary for employee #%(employee)d, year %(year)d, month %(month)d',
                         {'employee':self.employee_id, 'year':self.year, 'month':self.month})
             
-            sale_commission_details =  SaleCommissionDetail.objects.filter(employee_salary=self)
-            
-            logger.info('deleting %s sale commisison details', sale_commission_details.count())
-            sale_commission_details.delete()
+            terms = self.employee.employment_terms
 
-            terms = self.employee.employment_terms        
             if not terms:
                 self.remarks = u'לעובד לא הוגדרו תנאי העסקה!'
                 logger.warn('could not load employment terms.')
                 return
+
             self.commissions = 0
             self.safety_net = self.sales_count == 0 and terms.safety or None
+
             if self.year == self.employee.work_start.year and self.month == self.employee.work_start.month:
                 self.base = float(30 - self.employee.work_start.day) / 30 * terms.salary_base 
             else:
@@ -1089,48 +1087,79 @@ class EPCommission(models.Model):
             restore_date = date(salary.year, salary.month , 1)
             logger.debug('restore_date: %s' % restore_date)
             
-            dic = {}# key: sale value: commission amount for sale
-            for s in sales:
-                for scd in s.commission_details.filter(employee_salary=salary):
-                    scd.delete()
+            # commission amount for each sale
+            dic = {}
+            
             for c in ['c_var', 'c_by_price', 'b_house_type', 'b_discount_save']:
                 commission = getattr(self,c)
+
                 if not commission: 
+                    # delete and previous commission detail
+                    for sale in sales:
+                        sale.commission_details \
+                            .filter(employee_salary=salary, commission=c) \
+                            .delete()
                     continue
+
                 commission = common.restore_object(commission, restore_date)
                 
                 logger.info('calculating commission : %s' % c)
                 
                 amounts = commission.calc(sales)
-                for s in amounts:
-                    if amounts[s] == 0: 
-                        logger.warning('sale #%s has 0 commission!' % s.id)
-                        continue
-                    s.commission_details.create(employee_salary = salary, value = amounts[s], commission = c)
-                    dic[s] = s in dic and dic[s] + amounts[s] or amounts[s]
+
+                for sale in amounts:
+                    amount = amounts[sale]
+
+                    if amount == 0: 
+                        logger.warning('sale #%s has 0 commission!' % sale.id)
+
+                    # update commission detail
+                    scd = sale.commission_details.get_or_create(employee_salary=salary, commission=c)
+                    scd.value = amount
+                    scd.save()
+
+                    # update dic
+                    dic[sale] = dic[sale] + amount if sale in dic else amount
+
             for c in ['c_var_precentage', 'b_discount_save_precentage']:
                 commission = getattr(self,c)
+
                 if not commission: 
+                    # delete and previous commission detail
+                    for sale in sales:
+                        sale.commission_details \
+                            .filter(employee_salary=salary, commission=c) \
+                            .delete()
                     continue
+
                 commission = common.restore_object(commission, restore_date)
                 
                 logger.info('calculating commission : %s' % c)
                 
                 precentages = commission.calc(sales)
-                for s in precentages:
-                    if precentages[s] == 0: 
-                        logger.warning('sale #%s has 0 commission!' % s.id)
-                        continue
-                    if self.max and precentages[s] > self.max:
-                        logger.warning('sale #%(id)s commission %(commission)s is higher than max commission %(max_commission)s',
-                                       {'id':s.id, 'commission':precentages[s], 'max_commission':self.max})
-                        precentages[s] = self.max
-                    amount = precentages[s] * s.employee_price(self.employee) / 100
-                    s.commission_details.create(employee_salary = salary, value = amount, commission = c)
-                    dic[s] = s in dic and dic[s] + amount or amount
-            total_amount = 0
-            for s in dic:
-                total_amount = total_amount + dic[s]
+
+                for sale in precentages:
+                    if precentages[sale] == 0: 
+                        logger.warning('sale #%d has 0 commission!' % sale.id)
+
+                    if self.max and precentages[sale] > self.max:
+                        logger.warning('sale #%(id)d commission %(commission)s is higher than max commission %(max_commission).2f',
+                                       {'id':sale.id, 'commission':precentages[sale], 'max_commission':self.max})
+                        precentages[sale] = self.max
+
+                    amount = precentages[sale] * sale.employee_price(self.employee) / 100
+                    
+                    # update commission detail
+                    scd = sale.commission_details.get_or_create(employee_salary=salary, commission=c)
+                    scd.value = amount
+                    scd.save()
+
+                    # update dic
+                    dic[sale] = dic[sale] + amount if sale in dic else amount
+
+            # sum up amounts from all sales
+            total_amount = sum(dic[sale] for sale in dic)
+
             for c in ['b_sale_rate']:
                 commission = getattr(self,c)
                 if not commission: 
@@ -1364,10 +1393,25 @@ class CZilber(models.Model):
             memudad = latest_doh0price * memudad_multiplier
             
             zdb = (s.price_final - memudad) * self.b_discount
-            s.commission_details.create(commission='c_zilber_discount', value = zdb)
-            s.commission_details.create(commission='latest_doh0price', value = latest_doh0price)
-            s.commission_details.create(commission='memudad', value = memudad)
-            s.commission_details.create(commission='current_madad', value = current_madad)
+
+            commissions = {
+                'c_zilber_discount': zdb,
+                'latest_doh0price': latest_doh0price,
+                'memudad': memudad,
+                'current_madad': current_madad,
+            }
+
+            # overwrite project commission details (not attached to a salary)
+            for scd in s.commission_details.filter(employee_salary=None):
+                commission = scd.commission
+                
+                if commission in commissions:
+                    # update commission
+                    scd.value = commissions[commission]
+                    scd.save()
+                else:
+                    # delete any extra commission
+                    scd.delete()
             
             total_zdb += zdb
               
@@ -1432,7 +1476,6 @@ class CZilber(models.Model):
             for sale in sales:
                 sale.price_final = sale.project_price()
                 sale.save()
-                sale.project_commission_details.delete()
                 
                 logger.debug('sale #%(id)s price_final = %(value)s', {'id':sale.id, 'value':sale.price_final})
             
@@ -1440,9 +1483,13 @@ class CZilber(models.Model):
             excluded_sales = [sale for sale in sales if sale.commission_include == False]
             sales = set([sale for sale in sales if sale.commission_include == True])
             
+            # reset commissions for excluded sales
             for sale in excluded_sales:
-                sale.commission_details.create(commission = 'c_zilber_base', value = 0)
-                sale.commission_details.create(commission = 'final', value = 0)
+                for scd in sale.commission_details:
+                    if scd.commission in ['c_zilber_base', 'final']:
+                        scd.value = 0
+                        scd.save()
+                        
                 logger.warning('skipping sale #%d because commission_include=False', sale.id)
                                 
             self.calc_bonus(month, sales, d)
@@ -1657,10 +1704,17 @@ class ProjectCommission(models.Model):
             details={}
             for c in ['c_var_precentage','c_var_precentage_fixed','b_discount_save_precentage']:
                 if getattr(self,c) == None:
+                    # delete any previous commission details
+                    for sale in sales:
+                        sale.commission_details \
+                            .filter(employee_salary=None) \
+                            .delete()
                     continue
+                
                 commission = getattr(self,c)
                 commission = common.restore_object(commission, restore_date)
                 precentages = commission.calc(sales)
+
                 for s in precentages:
                     if c in ['c_var_precentage', 'c_var_precentage_fixed'] and self.max and precentages[s] > self.max:
                         precentages[s] = self.max
