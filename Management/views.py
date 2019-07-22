@@ -214,45 +214,6 @@ def employeecheck_list(request):
 
     return render(request, 'Management/employeecheck_list.html', context)
 
-### Advance Payment Views ###
-
-class AdvancePaymentListView(LoginRequiredMixin, ListView):
-    model = AdvancePayment
-
-    def get_queryset(self):
-        return AdvancePayment.objects.filter(is_paid=None)
-
-class AdvancePaymentCreate(PermissionRequiredMixin, CreateView):
-    model = AdvancePayment
-    form_class = AdvancePaymentForm
-    template_name = 'Management/object_edit.html'
-    permission_required = 'Management.add_advancepayments'
-
-class AdvancePaymentUpdate(PermissionRequiredMixin, UpdateView):
-    model = AdvancePayment
-    form_class = AdvancePaymentForm
-    template_name = 'Management/object_edit.html'
-    permission_required = 'Management.change_advancepayments'
-
-class AdvancePaymentDelete(PermissionRequiredMixin, DeleteView):
-    model = AdvancePayment
-    success_url = '/advancepayments'
-    template_name = 'Management/object_confirm_delete.html'
-    permission_required = 'Management.delete_advancepayments'
-
-@permission_required('Management.delete_advancepayment')
-def advance_payment_toloan(request, id):
-    ap = AdvancePayment.objects.get(pk=id)
-    if request.method == 'POST':
-        form = LoanForm(request.POST)
-        if form.is_valid():
-            form.save()
-            ap.to_loan()
-    else:
-        form = LoanForm(initial={'employee':ap.employee.id, 'amount':ap.amount, 'year':ap.date.year, 'month':ap.date.month})
-   
-    return render(request, 'Management/object_edit.html', {'form':form})
-
 ### Loan Views ###
 
 class LoanListView(PermissionRequiredMixin, ListView):

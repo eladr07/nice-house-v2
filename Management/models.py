@@ -719,28 +719,6 @@ class NHSaleCommissionDetail(models.Model):
     class Meta:
         db_table = 'NHSaleCommissionDetail'
         
-class AdvancePayment(models.Model):
-    employee = models.ForeignKey('EmployeeBase', on_delete=models.PROTECT, related_name = 'advance_payments', verbose_name=gettext('employee'))
-    month = models.PositiveSmallIntegerField(gettext('month'), choices=common.get_month_choices())
-    year = models.PositiveSmallIntegerField(gettext('year'), choices=common.get_year_choices())
-    amount = models.IntegerField(gettext('amount'))
-    date_paid = models.DateField(editable=False, null=True)
-    is_paid = models.NullBooleanField(editable=False)
-
-    def pay(self):
-        self.is_paid = True
-        self.date_paid = datetime.now()
-        self.save()
-    def to_loan(self):
-        self.is_paid=False
-        self.save()
-    def get_absolute_url(self):
-        return '/advancepayments/%s' % self.id
-
-    class Meta:
-        db_table='AdvancePayment'
-        ordering = ['year', 'month']
-        
 class Loan(models.Model):
     employee = models.ForeignKey('EmployeeBase', on_delete=models.PROTECT, related_name = 'loans', verbose_name=gettext('employee'))
     amount = models.IntegerField(gettext('amount'))

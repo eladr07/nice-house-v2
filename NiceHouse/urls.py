@@ -246,12 +246,6 @@ urlpatterns += [
     path('checks/add', check_add),
     path('checks/<int:id>', check_edit),
     path('checks/<int:pk>/del', PaymentCheckDelete.as_view()),
-        
-    path('advancepayments', AdvancePaymentListView.as_view()),
-    path('advancepayments/add', AdvancePaymentCreate.as_view()),
-    path('advancepayments/<int:pk>', AdvancePaymentUpdate.as_view()),
-    path('advancepayments/<int:id>/toloan', advance_payment_toloan),
-    path('advancepayments/<int:pk>/del', AdvancePaymentDelete.as_view()),
     
     path('loans/', LoanListView.as_view()),
     path('loans/add', LoanCreate.as_view()),

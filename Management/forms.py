@@ -71,8 +71,6 @@ BHouseTypeForm = modelform_factory(BHouseType, RevisionExtForm, fields=('date',)
 
 BSaleRateForm = modelform_factory(BSaleRate, RevisionExtForm, fields=('date',))
 
-AdvancePaymentForm = modelform_factory(AdvancePayment, exclude=('date_paid','is_paid'))
-
 LoanPayForm = modelform_factory(LoanPay, fields=('employee','month','year','amount','deduct_from_salary','remarks'))
         
 SalaryExpensesForm = modelform_factory(SalaryExpenses, exclude=('approved_date',))
