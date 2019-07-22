@@ -1350,8 +1350,16 @@ class DemandPayBalanceWriter(DocumentBase):
                 # skip if the project does not have some contact person
                 if not contact:
                     continue
-                contact_str = str(contact) + ", " + gettext('phone') + ": " + contact.phone + ", " + gettext('fax') + ": " + \
-                    contact.fax + ", " + gettext('mail') + ": " + contact.mail
+
+                contact_details = [
+                    str(contact),
+                    gettext('phone') + ": " + (contact.phone or ''),
+                    gettext('fax') + ": " + (contact.fax or ''),
+                    gettext('mail') + ": " + (contact.mail or '')
+                ]
+
+                contact_str = ", ".join(contact_details)
+                
                 style = ParagraphStyle('contact_para', fontName='David',fontSize=12, alignment=TA_CENTER)
                 paragraph = Paragraph(log2vis(contact_str), style)
                 projectFlow.append(paragraph)
