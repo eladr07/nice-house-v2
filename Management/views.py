@@ -2289,95 +2289,6 @@ def invoice_offset_del(request, id):
     InvoiceOffset.objects.get(pk=id).delete()
     return HttpResponseRedirect('/demands/%s' % demand_id)
 
-def process_deal_form(form):
-    pass
-
-def process_income_form(form):
-    new_division_type, new_income_type, new_income_producer_type, new_client_type = (form.cleaned_data['new_client_status_type'],
-                                                                                     form.cleaned_data['new_income_type'],
-                                                                                     form.cleaned_data['new_income_producer_type'],
-                                                                                     form.cleaned_data['new_client_type'])
-    if new_division_type:
-        division_type, new = DivisionType.objects.get_or_create(name=new_division_type)
-        form.cleaned_data['division_type'] = division_type
-    if new_income_type:
-        income_type, new = DivisionType.objects.get_or_create(name=new_income_type)
-        form.cleaned_data['income_type'] = income_type
-    if new_income_producer_type:
-        income_producer_type, new = DivisionType.objects.get_or_create(name=new_income_producer_type)
-        form.cleaned_data['income_producer_type'] = income_producer_type
-    if new_client_type:
-        client_type, new = DivisionType.objects.get_or_create(name=new_client_type)
-        form.cleaned_data['client_type'] = client_type
-
-@permission_required('Management.add_income')
-def income_add(request):
-    return income_core(request, Income(deal = Deal(), invoice = Invoice(), payment = Payment()))
-
-@permission_required('Management.edit_income')
-def income_edit(request, id):
-    income = Income.objects.get(pk=id)
-    return income_core(request, income)
-
-def income_core(request, instance):
-    if request.method=='POST':
-        incomeForm, dealForm, invoiceForm, paymentForm = (IncomeForm(request.POST, instance = instance), 
-                                                          DealForm(request.POST, instance = instance.deal), 
-                                                          InvoiceForm(request.POST, instance = instance.invoice), 
-                                                          PaymentForm(request.POST, instance = instance.payment))
-        if (incomeForm.is_valid() and dealForm.is_valid() 
-            and (invoiceForm.has_changed() == False or invoiceForm.is_valid())
-            and (paymentForm.has_changed() == False or paymentForm.is_valid())):
-            process_deal_form(dealForm)
-            process_income_form(incomeForm)
-            instance.deal, instance.invoice, instance.payment = dealForm.save(), invoiceForm.save(), paymentForm.save()
-            incomeForm.save()
-    else:
-        incomeForm = IncomeForm(instance = instance)
-        dealForm = DealForm(instance = instance.deal)
-        invoiceForm = InvoiceForm(instance = instance.invoice)
-        paymentForm = PaymentForm(instance = instance.payment)
-    
-    context = {
-        'incomeForm':incomeForm, 
-        'dealForm':dealForm, 
-        'invoiceForm':invoiceForm,
-        'paymentForm':paymentForm 
-        }
-
-    return render(request, 'Management/income_edit.html', context) 
-
-@permission_required('Management.list_income')
-def income_list(request):
-    incomes, from_date, to_date = [], date.today(), date.today()
-    if len(request.GET):
-        form = IncomeFilterForm(request.GET)
-        incomes = Income.objects.all()
-        if form.is_valid():
-            if form.cleaned_data['division_type']:
-                incomes = incomes.filter(division_type = form.cleaned_data['division_type'])
-            if form.cleaned_data['income_type']:
-                incomes = incomes.filter(income_type = form.cleaned_data['income_type'])
-            if form.cleaned_data['income_producer_type']:
-                incomes = incomes.filter(income_producer_type = form.cleaned_data['income_producer_type'])
-            if form.cleaned_data['client_type']:
-                incomes = incomes.filter(client_type = form.cleaned_data['client_type'])
-            from_date = date(form.cleaned_data['from_year'], form.cleaned_data['from_month'], 1)
-            to_date = date(form.cleaned_data['to_year'], form.cleaned_data['to_month'], 1)
-            incomes = incomes.range(from_date.year, from_date.month, to_date.year, to_date.month)
-    else:
-        form = IncomeFilterForm()
-    
-    context = { 'filterForm':form, 'incomes':incomes, 'from_date':from_date, 'to_date':to_date }
-
-    return render(request, 'Management/income_list.html', context) 
-
-class IncomeDelete(PermissionRequiredMixin, DeleteView):
-    model = Income
-    success_url = '/incomes'
-    template_name = 'Management/object_confirm_delete.html'
-    permission_required = 'Management.delete_income'
-
 @permission_required('Management.add_payment')
 def split_payment_add(request):
     DemandFormset = formset_factory(SplitPaymentDemandForm, extra=5)
@@ -4897,14 +4808,10 @@ def global_profit_lost(request):
                     total_loss += salary_amount
                     
                 #general information required by all divisions    
-                incomes = Income.objects \
-                    .range(from_year, from_month, to_year, to_month) \
-                    .filter(division_type = division)
-
                 checks = PaymentCheck.objects \
                     .filter(issue_date__range=(from_date,to_date), division_type=division)
                 
-                incomes_amount = sum([income.invoice and income.invoice.amount or 0 for income in incomes])
+                incomes_amount = 0 # Income model was removed
                 total_income += incomes_amount
                 
                 income_rows.extend([{'name':u'הכנסות אחרות','amount':incomes_amount,

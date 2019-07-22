@@ -763,16 +763,6 @@ class NHBranchEmployeeForm(forms.ModelForm):
         model = NHBranchEmployee
         fields=('nhbranch','nhemployee','is_manager','start_date','end_date')
 
-class IncomeFilterForm(SeasonForm):
-    division_type = forms.ModelChoiceField(queryset = DivisionType.objects.all(), label=gettext('division_type'), 
-                                           required=False)
-    income_type = forms.ModelChoiceField(queryset = IncomeType.objects.all(), label=gettext('income_type'), 
-                                         required=False)
-    client_type = forms.ModelChoiceField(queryset = ClientType.objects.all(), label=gettext('client_name'), 
-                                         required=False)
-    income_producer_type = forms.ModelChoiceField(queryset = IncomeProducerType.objects.all(), label=gettext('income_producer_type'), 
-                                                  required=False)
-    
 class CheckFilterForm(SeasonForm):
     division_type = forms.ModelChoiceField(queryset = DivisionType.objects.all(), label=gettext('division_type'), 
                                            required=False)
@@ -843,44 +833,6 @@ class EmployeeCheckForm(forms.ModelForm):
         model = EmployeeCheck
         fields = ['division_type','new_division_type','employee','year','month','expense_type','new_expense_type','purpose_type',
                   'invoice_num','type','amount','num','issue_date','pay_date','remarks']
-
-class IncomeForm(forms.ModelForm):
-    new_division_type = forms.CharField(label = gettext('new_division_type'), max_length = 20, required=False)
-    new_income_type = forms.CharField(label = gettext('new_income_type'), max_length = 20, required=False)
-    new_income_producer_type = forms.CharField(label = gettext('new_income_producer_type'), max_length = 20, required=False)
-    new_client_type = forms.CharField(label=gettext('new_client_type'), max_length = 30, required = False)
-
-    def clean(self):
-        if not self.cleaned_data['division_type'] and not self.cleaned_data['new_division_type']:
-            raise forms.ValidationError(gettext('missing_division_type'))
-        if not self.cleaned_data['income_type'] and not self.cleaned_data['new_income_type']:
-            raise forms.ValidationError(gettext('missing_income_type'))
-        if not self.cleaned_data['income_producer_type'] and not self.cleaned_data['new_income_producer_type']:
-            raise forms.ValidationError(gettext('missing_income_producer_type'))
-        if not self.cleaned_data['client_type'] and not self.cleaned_data['new_client_type']:
-            raise forms.ValidationError(gettext('missing_client_type'))
-        return self.cleaned_data
-    
-    class Meta:
-        model = Income
-        fields = ['year','month','division_type','new_division_type','income_type','new_income_type',
-                  'income_producer_type','new_income_producer_type','client_type','new_client_type']
-
-class DealForm(forms.ModelForm):
-    new_client_status_type = forms.CharField(label=gettext('new_client_status_type'), max_length = 30, required = False)
-    
-    def __init__(self, *args, **kw):
-        forms.ModelForm.__init__(self,*args,**kw)
-        self.fields['remarks'].widget = forms.Textarea(attrs={'cols':'20', 'rows':'3'})
-        
-    def clean(self):
-        if not self.cleaned_data['client_status_type'] and not self.cleaned_data['new_client_status_type']:
-            raise forms.ValidationError(gettext('missing_client_status_type'))
-        return self.cleaned_data
-    
-    class Meta:
-        model = Deal
-        fields = ['client_status_type','new_client_status_type','address','rooms','floor','price','commission_precentage','commission','remarks']
 
 class NHMonthForm(MonthForm):
     nhbranch = forms.ModelChoiceField(queryset = NHBranch.objects.all(), label=gettext('nhbranch'))  
