@@ -264,12 +264,7 @@ urlpatterns += [
     path('lawyers/add', LawyerCreate.as_view()),
     path('lawyers/<int:pk>', LawyerUpdate.as_view()),
     path('lawyers/<int:pk>/del', LawyerDelete.as_view()),
-    
-    path('incomes/', income_list),
-    path('incomes/add', income_add),
-    path('incomes/<int:id>', income_edit),
-    path('incomes/<int:pk>/del', IncomeDelete.as_view()),
-     
+         
     path('employeechecks/', employeecheck_list),
     path('employeechecks/add', employeecheck_add),
     path('employeechecks/<int:id>', employeecheck_edit),
