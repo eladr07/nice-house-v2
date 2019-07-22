@@ -49,14 +49,6 @@ def build_and_return_pdf(writer):
     # present the option to save the file.
     return FileResponse(buffer, as_attachment=True, filename='hello.pdf')  
     
-def revision_list(request):
-    if len(request.GET):
-        filterForm = RevisionFilterForm(request.GET)
-    else:
-        filterForm = RevisionFilterForm(request.GET)
-        
-    return render(request, 'revision_list.html', {'filterForm':filterForm })
-
 @login_required
 def index(request):
     context = {
