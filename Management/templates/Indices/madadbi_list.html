@@ -1,0 +1,62 @@
+﻿{% extends "../base.html" %}
+
+{% load static %}
+{% load humanize %}
+
+{% block header %}
+{{ block.super }}
+<script>
+	var selectedID = 0;
+	var prev_class;
+	$(document).ready(function() {
+		$("tr").click(function() { 
+			var tr = $(this);
+			if (selectedID > 0)
+				$("tr[objid='"+selectedID+"']").attr("class", prev_class);
+			selectedID = tr.attr("objid");
+			if (!selectedID)
+				return;
+			prev_class = tr.attr("class");
+			tr.attr("class","selectedRow");
+			//sync links
+			if (selectedID > 0)
+			{
+				$("#madadEdit").attr("href", selectedID);
+				$("#madadDelete").attr("href", selectedID + "/del");
+			}
+		});
+		//add fancybox
+		$(".fancybox").fancybox();
+	});
+</script>
+{% endblock header %}
+{% block content %}
+	<h3 class="text-center text-danger">מדד תשומות הבנייה למגורים</h3>
+
+	<a href="add" class="btn btn-default fancybox" role="button">
+		<i class="fa fa-fw fa-plus-circle text-success"></i> חדש
+	</a>
+	<a id="madadEdit" class="btn btn-default fancybox" role="button">
+		<i class="fa fa-fw fa-edit"></i> שינוי
+	</a>
+	<a id="madadDelete" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-times-circle text-danger"></i> מחיקה
+	</a>
+
+	<div class="clearBoth"> </div>
+	<br /> 		
+	<table class="dataTable" border="1">
+		<th>חודש</th>
+		<th>ת. פרסום</th>
+		<th>מדד</th>
+		<th>שינוי ב-%</th>
+		{% for m in object_list %}
+			<tr class="{% cycle 'row1' 'row2' %}" objid={{m.id}}>
+				<td>{{ m.month }}/{{m.year}}</td>
+				<td>{{ m.publish_date }}</td>
+				<td><a class="fancybox" href="{{m.id}}">{{ m.value }}</a></td>
+				<td>{{ m.diff|floatformat:1 }}%</td>
+			</tr>
+		{% endfor %}
+	</table>
+{% endblock content %}

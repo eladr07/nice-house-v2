@@ -1,0 +1,58 @@
+﻿{% extends "../base.html" %}
+
+{% load static %}
+{% load humanize %}
+
+{% block header %}
+{{ block.super }}
+<script>
+	var selectedID = 0;
+	var prev_class;
+	$(document).ready(function() {
+		$("tr").click(function() { 
+			var tr = $(this);
+			if (selectedID > 0)
+				$("tr[objid='"+selectedID+"']").attr("class", prev_class);
+			selectedID = tr.attr("objid");
+			if (!selectedID)
+				return;
+			prev_class = tr.attr("class");
+			tr.attr("class","selectedRow");
+			//sync links
+			if (selectedID > 0)
+			{
+				$("#taxEdit").attr("href", selectedID);
+				$("#taxDelete").attr("href", selectedID + "/del");
+			}
+		});
+		//add fancybox
+		$(".fancybox").fancybox();
+	});
+</script>
+{% endblock header %}
+{% block content %}
+	<h3 class="text-center text-danger">מע"מ</h3>
+
+	<a href="add" class="btn btn-default fancybox" role="button">
+		<i class="fa fa-fw fa-plus-circle text-success"></i> חדש
+	</a>
+	<a id="madadEdit" class="btn btn-default fancybox" role="button">
+		<i class="fa fa-fw fa-edit"></i> שינוי
+	</a>
+	<a id="taxDelete" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-times-circle text-danger"></i> מחיקה
+	</a>
+
+	<div class="clearBoth"> </div>
+	<br /> 		
+	<table class="dataTable" border="1">
+		<th>תאריך</th>
+		<th>מדד</th>
+		{% for t in object_list %}
+			<tr class="{% cycle 'row1' 'row2' %}" objid={{t.id}}>
+				<td>{{ t.date|date:"j/m/y" }}</td>
+				<td><a class="fancybox" href="{{t.id}}">{{ t.value }}</a></td>
+			</tr>
+		{% endfor %}
+	</table>
+{% endblock content %}
