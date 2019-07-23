@@ -215,7 +215,7 @@ urlpatterns += [
      {'model':NHEmployeeSalary}),
     path('nh-salaries/<int:id>/delete', employee_salary_delete,
      {'model':NHEmployeeSalary}),
-    path('nh-salaries/<int:object_id>/details', NHEmployeeSalaryCommissionDetailView.as_view()),
+    path('nh-salaries/<int:pk>/details', NHEmployeeSalaryCommissionDetailView.as_view()),
     path('nh-salaries/<int:pk>/checkdetails', NHEmployeeSalaryCheckDetailView.as_view()),
     path('nh-salaries/<int:pk>/totaldetails', NHEmployeeSalaryTotalDetailView.as_view()),
     path('nh-salaries/<int:id>/approve', employee_salary_approve),
