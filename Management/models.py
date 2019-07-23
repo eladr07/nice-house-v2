@@ -2137,10 +2137,12 @@ class NHSaleSide(models.Model):
         return amount
     @property
     def lawyer1_pays(self):
-        return self.lawyer1.nhpays.filter(nhsaleside = self)
+        nhpays = self.lawyer1.nhpays if self.lawyer1 else NHPay.objects.none()
+        return nhpays.filter(nhsaleside = self)
     @property
     def lawyer2_pays(self):
-        return self.lawyer2.nhpays.filter(nhsaleside = self)
+        nhpays = self.lawyer2.nhpays if self.lawyer2 else NHPay.objects.none()
+        return nhpays.filter(nhsaleside = self)
     @property
     def lawyers_pay(self):
         amount = 0
