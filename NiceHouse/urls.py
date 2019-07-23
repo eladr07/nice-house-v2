@@ -20,6 +20,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path('analytics/', include('Analytics.urls')),
+    path('indices/', include('Indices.urls')),
 ]
 
 from Management.models import *
@@ -263,21 +264,6 @@ urlpatterns += [
     path('reports/project_season/<int:project_id>/<int:from_year>/<int:from_month>/<int:to_year>/<int:to_month>', report_project_season),
     path('reports/project_followup/<int:project_id>/<int:from_year>/<int:from_month>/<int:to_year>/<int:to_month>', report_project_followup),
     path('reports/employeesales', report_employee_sales),
-    
-    path('madadbi/', MadadBIListView.as_view()),
-    path('madadbi/add', MadadBICreate.as_view()),
-    path('madadbi/<int:pk>', MadadBIUpdate.as_view()),
-    path('madadbi/<int:pk>/del', MadadBIDelete.as_view()),
-    
-    path('madadcp/', MadadCPListView.as_view()),
-    path('madadcp/add', MadadCPCreate.as_view()),
-    path('madadcp/<int:pk>', MadadCPUpdate.as_view()),
-    path('madadcp/<int:pk>/del', MadadCPDelete.as_view()),
-    
-    path('tax/', TaxListView.as_view()),
-    path('tax/add', TaxCreate.as_view()),
-    path('tax/<int:pk>', TaxUpdate.as_view()),
-    path('tax/<int:pk>/del', TaxDelete.as_view()),
     
     path('salepricemod/<int:pk>', SalePriceModUpdate.as_view()),
     path('salehousemod/<int:pk>', SaleHouseModUpdate.as_view()),

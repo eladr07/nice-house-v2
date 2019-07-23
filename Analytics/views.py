@@ -5,7 +5,9 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import permission_required
 from django.urls import reverse
 
-from Management.models import HireType, Tax, Sale, DivisionType, Demand, EmployeeSalary, PaymentCheck
+from Indices.models import Tax
+
+from Management.models import HireType, Sale, DivisionType, Demand, EmployeeSalary, PaymentCheck
 from Management.models import NHMonth, NHBranch, NHEmployeeSalary
 from Management.views import build_and_return_pdf
 from Management.forms import SeasonForm, NHBranchSeasonForm

@@ -1184,6 +1184,7 @@ class PricelistWriter:
         flows.append(t)
         return flows
     def build(self, filename):
+        from Indices.models import MadadBI
         self.current_page = 1
         doc = SimpleDocTemplate(filename)
         story = [Spacer(0,80)]

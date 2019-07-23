@@ -38,6 +38,7 @@ ALLOWED_HOSTS = [
 INSTALLED_APPS = [
     'reversion',
     
+    'Indices.apps.IndicesConfig',
     'Management.apps.ManagementConfig',
     'Analytics.apps.AnalyticsConfig',
     

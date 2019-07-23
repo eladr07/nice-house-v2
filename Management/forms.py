@@ -702,14 +702,6 @@ class ReminderForm(forms.ModelForm):
         model = Reminder
         fields=('content',)
 
-class TaxForm(forms.ModelForm):
-    def __init__(self, *args, **kw):
-        super(TaxForm, self).__init__(*args, **kw)
-        self.fields['date'].widget.attrs = {'class':'vDateField'}
-    class Meta:
-        model = Tax
-        fields=('date','value')
-
 class AttachmentForm(forms.ModelForm):
     tag_new = forms.CharField(max_length=20, required=False, label=gettext('tag_new'))
     
@@ -856,22 +848,6 @@ class EmployeeSeasonForm(SeasonForm):
     employee = forms.ModelChoiceField(EmployeeBase.objects.all(), label=gettext('employee'))
 
     field_order = ['employee', 'from_year', 'from_month', 'to_year', 'to_month']
-    
-class MadadBIForm(forms.ModelForm):
-    def __init__(self, *args, **kw):
-        forms.ModelForm.__init__(self, *args, **kw)
-        self.fields['publish_date'].widget.attrs = {'class':'vDateField'}
-    class Meta:
-        model = MadadBI
-        fields=('year','month','publish_date','value')
-
-class MadadCPForm(forms.ModelForm):
-    def __init__(self, *args, **kw):
-        forms.ModelForm.__init__(self, *args, **kw)
-        self.fields['publish_date'].widget.attrs = {'class':'vDateField'}
-    class Meta:
-        model = MadadCP
-        fields=('year','month','publish_date','value')
 
 class CityCallersForm(forms.ModelForm):
     new_city = forms.CharField(label = gettext('new_city'), max_length = 20, required=False)
