@@ -19,6 +19,7 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
+    path('analytics/', include('Analytics.urls')),
 ]
 
 from Management.models import *
@@ -88,8 +89,6 @@ urlpatterns += [
     path('projects/<int:project_id>/demands/nopayment', project_demands, {'demand_type':'no-payment'}),
     path('projects/<int:project_id>/demands/mispaid', project_demands, {'demand_type':'mis-paid'}),
     path('demandsall', demands_all),
-    
-    path('projectsprofit', projects_profit, name='projects-profit'),
     
     path('buildings/add', building_add),
      
@@ -167,9 +166,6 @@ urlpatterns += [
     path('nhbranch/<int:nhbranch_id>/sales/', nhmonth_sales),
     path('nhmonth/close', nhmonth_close),
     path('nhseasonincome/', nh_season_income),
-    path('nhseasonprofit/', nh_season_profit, name='nh-season-profit'),
-    
-    path('seasonincome/', season_income, name='season-income'),
     
     path('projects/<int:project_id>/signups/', signup_list),
     path('projects/<int:project_id>/signups/add', signup_edit),
@@ -179,8 +175,6 @@ urlpatterns += [
     path('sale', sale_add),
     path('sale/<int:id>', sale_edit),
     path('sale/<int:sale_id>/commission', salecommissiondetail_edit),
-    
-    path('saleanalysis/', sale_analysis, name='sale-analysis'),
 
     path('splitpayment/add', split_payment_add),
 
@@ -363,7 +357,6 @@ urlpatterns += [
     path('house_details/<int:pk>', HouseDetailView.as_view()),
     # NOT USED
     path('signup_details/<int:pk>', SignupDetailView.as_view()),
-    path('profitloss', global_profit_lost, name='profit-loss'),
 ]
 
 urlpatterns += [

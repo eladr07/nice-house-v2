@@ -37,7 +37,9 @@ ALLOWED_HOSTS = [
 
 INSTALLED_APPS = [
     'reversion',
+    
     'Management.apps.ManagementConfig',
+    'Analytics.apps.AnalyticsConfig',
     
     'django.contrib.humanize',
     'django.contrib.admin',

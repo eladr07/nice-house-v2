@@ -383,16 +383,7 @@ class DemandDiffForm(forms.ModelForm):
     class Meta:
         model = DemandDiff
         exclude=('demand',)
-        
-class SaleAnalysisForm(SeasonForm):
-    project = forms.ModelChoiceField(queryset = Project.objects.all(), label=gettext('project'))
-    building_num = forms.CharField(max_length=4, min_length=1, required = False, label = gettext('building_num'),
-                                   widget = forms.TextInput(attrs = {'size':'3'}))
-    include_clients = forms.ChoiceField(label = gettext('include_clients'), required = False, choices = ((0,u'לא'),
-                                                                                                          (1,u'כן')))
-    house_type = forms.ModelChoiceField(queryset=HouseType.objects.all(), required = False, label = gettext('house_type'))
-    rooms_num = forms.ChoiceField(label = gettext('rooms'), required = False, choices = RoomsChoices)
-                
+                 
 class SaleForm(forms.ModelForm):
     project = forms.ModelChoiceField(queryset = Project.objects.all(), label=gettext('project'))
     building = forms.ModelChoiceField(queryset = Building.objects.all(), label=gettext('building'))
@@ -694,20 +685,6 @@ class DemandSendForm(forms.ModelForm):
 
 class DivisionTypeSeasonForm(SeasonForm):
     division_type = forms.ModelChoiceField(queryset = DivisionType.objects.all(), label=gettext('division_type'))
-
-class GloablProfitLossForm(SeasonForm):
-    division_choices = []
-    division_choices.extend([(-1, gettext('all_divisions')),
-                             (-2, gettext('all_nh'))])
-    divisions = forms.ChoiceField(label = gettext('division_type'), choices = division_choices)
-        
-    def clean_divisions(self):
-        division = self.cleaned_data['divisions']
-        if division == '-1':
-            return DivisionType.objects.all()
-        elif division == '-2':
-            return DivisionType.objects.nh_divisions()
-        return [DivisionType.objects.get(pk = int(division))]
 
 class ReminderForm(forms.ModelForm):
     status = forms.ModelChoiceField(queryset=ReminderStatusType.objects.all(), label=gettext('status'))
