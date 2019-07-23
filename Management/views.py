@@ -3,7 +3,7 @@ from datetime import datetime, date
 
 import django.core.paginator
 from django.db.models import Count, Sum, Q
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError, FileResponse
 from django.forms.models import inlineformset_factory
 from django.forms.formsets import formset_factory
@@ -2851,18 +2851,21 @@ class ProjectEndUpdate(PermissionRequiredMixin, UpdateView):
 
 @login_required  
 def project_commission_del(request, project_id, commission):
-    project = Project.objects.get(pk = project_id)
-    c = project.commissions.get()
-    for field in c._meta.fields:
+    project_commission = ProjectCommission.objects.get(project_id=project_id)
+
+    for field in project_commission._meta.fields:
         if abbrevate(field.name) == commission:
-            obj = getattr(c, field.name)
+            obj = getattr(project_commission, field.name)
             break
+
     #unlink commission from project
-    setattr(c, commission, None)
+    setattr(project_commission, commission, None)
     project.commissions.save()
+
     #delete commission
     obj.delete()
-    return HttpResponseRedirect('/projects/%s' % project.id)
+
+    return redirect('project-edit', project_id)
 
 @login_required
 def project_commission_add(request, project_id, commission):

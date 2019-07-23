@@ -55,7 +55,7 @@ urlpatterns += [
     path('projects/<int:project_id>/demandcontact', project_contact, {'demand':True}),
     path('projects/<int:project_id>/paymentcontact', project_contact, {'payment':True}),
     path('projects/<int:project_id>/contacts/<int:id>/del', contact_delete),
-    path('projects/<int:id>/', project_edit),
+    path('projects/<int:id>/', project_edit, name='project-edit'),
     path('projectcommission/<int:pk>', ProjectCommissionUpdate.as_view()),
     path('projects/add/', project_add),
     path('projects/end/<int:pk>', ProjectEndUpdate.as_view()),
