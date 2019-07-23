@@ -143,11 +143,6 @@ class Project(models.Model):
 
     objects = ProjectManager()
     
-    def current_demand(self):
-        try:
-            return Demand.objects.current().get(project = self)
-        except Demand.DoesNotExist:
-            return None
     def get_open_reminders(self):
         return [r for r in self.reminders.all() if r.statuses.latest().type.id 
                 not in (ReminderStatusType.Deleted,ReminderStatusType.Done)]

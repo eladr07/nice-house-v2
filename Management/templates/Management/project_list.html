@@ -148,12 +148,7 @@
 				{% endif %}
 			</td>
 			<td>
-				{% if i.current_demand %}
-					{{i.sales.count}}
-				{% else %}
-					0
-				{% endif %}
-				 חוזים<br>
+				{{i.sales.count}} חוזים<br>
 				{{i.signups|length}} הרשמות
 			</td>
 			<td style="text-align:center;">
