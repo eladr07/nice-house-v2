@@ -1577,7 +1577,7 @@ def demand_close(request, id):
 def demand_zero(request, id):
     d = Demand.objects.get(pk=id)
     d.close()
-    return HttpResponseRedirect('/demands')
+    return redirect('demand-list')
 
 @permission_required('Management.send_mail')
 def send_mail(request):
@@ -2168,11 +2168,10 @@ def demanddiff_del(request, pk):
 @permission_required('Management.add_payment')
 def demand_payment_add(request, id):
     demand = Demand.objects.get(pk=id)
-    return payment_add(request, {'project':demand.project.id, 'month':demand.month, 'year':demand.year})
+    return payment_add(request, {'project':demand.project_id, 'month':demand.month, 'year':demand.year})
     
 @permission_required('Management.add_payment')
 def project_payment_add(request, id):    
-    demand = Demand.objects.get(pk=id)
     return payment_add(request, {'project':id})
 
 @permission_required('Management.add_payment')
