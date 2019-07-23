@@ -12,7 +12,7 @@ from Management.forms import SeasonForm, NHBranchSeasonForm
 from Management.pdf.writers import SaleAnalysisWriter
 from Management.enrichers.demand import set_demand_diff_fields, set_demand_sale_fields
 from Management.enrichers.salary import set_salary_base_fields
-from Management import common
+from Management.common import current_month
 
 from .forms import SaleAnalysisForm, GloablProfitLossForm
 
@@ -354,7 +354,7 @@ def projects_profit(request):
                 avg_relative_expense_income = avg_relative_expense_income / project_count
                 avg_relative_sales_expense = avg_relative_sales_expense / project_count
     else:
-        month = common.current_month()
+        month = current_month()
         form = SeasonForm(initial = {'from_year': month.year, 'from_month': month.month, 'to_year': month.year, 'to_month': month.month})
         from_year, from_month, to_year, to_month = month.year, month.month, month.year, month.month
         total_income, total_expense, total_profit, avg_relative_expense_income, total_sale_count, avg_relative_sales_expense = 0,0,0,0,0,0
@@ -419,7 +419,7 @@ def nh_season_profit(request):
                     totals[key] += month[key]
     else:
         form = NHBranchSeasonForm()
-        month = common.current_month()
+        month = current_month()
         from_year, from_month, to_year, to_month = month.year, month.month, month.year, month.month
         
     context = { 

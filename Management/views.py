@@ -19,21 +19,21 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.contrib.contenttypes.models import ContentType
 
 import Management.common as common
-from Management.forms import *
-from Management.models import *
-from Management.pdf.writers import MonthDemandWriter, MultipleDemandWriter, EmployeeListWriter, EmployeeSalariesWriter, ProjectListWriter, EmployeesLoans
-from Management.pdf.writers import PricelistWriter, BuildingClientsWriter, EmployeeSalariesBookKeepingWriter, SalariesBankWriter, DemandFollowupWriter
-from Management.pdf.writers import EmployeeSalesWriter, DemandPayBalanceWriter
+from .forms import *
+from .models import *
+from .pdf.writers import MonthDemandWriter, MultipleDemandWriter, EmployeeListWriter, EmployeeSalariesWriter, ProjectListWriter, EmployeesLoans
+from .pdf.writers import PricelistWriter, BuildingClientsWriter, EmployeeSalariesBookKeepingWriter, SalariesBankWriter, DemandFollowupWriter
+from .pdf.writers import EmployeeSalesWriter, DemandPayBalanceWriter
 
-from Management.enrichers.demand import set_demand_diff_fields, set_demand_is_fixed, set_demand_last_status
-from Management.enrichers.demand import set_demand_open_reminders, set_demand_invoice_payment_fields
-from Management.enrichers.demand import set_demand_sale_fields
+from .enrichers.demand import set_demand_diff_fields, set_demand_is_fixed, set_demand_last_status
+from .enrichers.demand import set_demand_open_reminders, set_demand_invoice_payment_fields
+from .enrichers.demand import set_demand_sale_fields
 
-from Management.enrichers.salary import enrich_employee_salaries, enrich_nh_employee_salaries
-from Management.enrichers.salary import set_salary_base_fields, set_employee_sales, set_salary_status_date
-from Management.enrichers.salary import set_loan_fields
+from .enrichers.salary import enrich_employee_salaries, enrich_nh_employee_salaries
+from .enrichers.salary import set_salary_base_fields, set_employee_sales, set_salary_status_date
+from .enrichers.salary import set_loan_fields
 
-from Management.mail import mail
+from .mail import mail
 from pprint import pprint
 
 
