@@ -2815,27 +2815,27 @@ class ContactUpdate(PermissionRequiredMixin, UpdateView):
 
 @permission_required('Management.change_contact')
 def project_removecontact(request, id, project_id):
-    p = Project.objects.get(pk=project_id)
+    project = Project.objects.get(pk=project_id)
     contact = Contact.objects.get(pk=id)
     
     for attr in ['projects','projects_demand','projects_payment']:
         attr_value = getattr(contact, attr)
         try:
-            attr_value.remove(p)
+            attr_value.remove(project)
         except:
             pass
 
-    return HttpResponseRedirect('/projects/%s' % p.id)
+    return redirect('project-edit', project_id)
 
 @permission_required('Management.delete_contact')
 def project_deletecontact(request, id, project_id):
-    p = Project.objects.get(pk=project_id)
     contact = Contact.objects.get(pk=id)
     contact.projects.clear()
     contact.projects_demand.clear()
     contact.projects_payment.clear()
     contact.delete()
-    return HttpResponseRedirect('/projects/%s' % p.id)
+    
+    return redirect('project-edit', project_id)
     
 @permission_required('Management.delete_contact')
 def contact_delete(request, project_id, id):
