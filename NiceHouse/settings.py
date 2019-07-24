@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'Indices.apps.IndicesConfig',
     'Management.apps.ManagementConfig',
     'Analytics.apps.AnalyticsConfig',
+    'Activity.apps.ActivityConfig',
     
     'django.contrib.humanize',
     'django.contrib.admin',

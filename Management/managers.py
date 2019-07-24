@@ -79,20 +79,6 @@ class HouseVersionManager(models.Manager):
     def get_queryset(self):
         return HouseVersionQuerySet(self.model)
 
-class CityCallersManager(models.Manager):
-    use_for_related_fields = True
-    
-    def total_callers_num(self):
-        return self.get_queryset().total_callers_num()
-
-class MediaReferralsManager(models.Manager):
-    use_for_related_fields = True
-    
-    def total_referrals_num(self):
-        return self.get_queryset().total_referrals_num()
-    def get_queryset(self):
-        return MediaReferralsQuerySet(self.model)
-
 class DivisionTypeManager(models.Manager):
     def nh_divisions(self):
         return self.filter(pk__in = (2,3,4))

@@ -61,14 +61,14 @@
 					<th>{{citycallers.city}}</th>
 					<td>{{citycallers.callers_num}}</td>
 					<td>
-						<a href="{{citycallers.get_absolute_url}}" class="fancybox">
+						<a href="{% url 'city-callers-edit' object_id=citycallers.id %}" class="fancybox">
 							<i class="fa fa-edit" title='שינוי'></i>
 						</a>
 					</td>
 				</tr>
 			{% endfor %}
 			</table>
-			<a href="/activitybase/{{object.id}}/citycallers/add" class="fancybox"> 
+			<a href="{% url 'city-callers-add' activitybase_id=object.id %}" class="fancybox"> 
 				<i class="fa fa-fw fa-plus-circle text-success"></i>
 			</a>
 		</fieldset>
@@ -80,14 +80,14 @@
 					<th>{{mediareferrals.media}}</th>
 					<td>{{mediareferrals.referrals_num}}</td>
 					<td>
-						<a href="{{mediareferrals.get_absolute_url}}" class="fancybox">
+						<a href="{% url 'media-referrals-edit' object_id=mediareferrals.id %}" class="fancybox">
 							<i class="fa fa-edit" title='שינוי'></i>
 						</a>
 					</td>
 				</tr>
 			{% endfor %}
 			</table>
-			<a href="/activitybase/{{object.id}}/mediareferrals/add" class="fancybox"> 
+			<a href="{% url 'media-referrals-add' activitybase_id=object.id %}" class="fancybox"> 
 				<i class="fa fa-fw fa-plus-circle text-success"></i>
 			</a>
 		</fieldset>
@@ -193,7 +193,7 @@
 			{% for saleprocess in object.saleprocess_set.all %}
 				<tr>
 					<th>
-						<a href="{{saleprocess.get_absolute_url}}" class="fancybox">
+						<a href="{% url 'sale-process-edit' object_id=saleprocess.id %}" class="fancybox">
 							<i class="fa fa-edit" title='פרטים'></i>
 						</a>
 					</th>
@@ -205,7 +205,7 @@
 				</tr>
 			{% endfor %}
 			</table>
-			<a href="/activitybase/{{object.id}}/saleprocess/add" class="fancybox"> 
+			<a href="{% url 'sale-process-add' activitybase_id=object.id %}" class="fancybox"> 
 				<i class="fa fa-fw fa-plus-circle text-success"></i>
 			</a>
 		</fieldset>
@@ -225,7 +225,7 @@
 			{% for event in object.event_set.all %}
 				<tr>
 					<th>
-						<a href="{{event.get_absolute_url}}" class="fancybox">
+						<a href="{% url 'event-edit' object_id=event.id %}" class="fancybox">
 							<i class="fa fa-edit" title='פרטים'></i>
 						</a>
 					</th>
@@ -239,7 +239,7 @@
 				</tr>
 			{% endfor %}
 			</table>
-			<a href="/activitybase/{{object.id}}/event/add" class="fancybox"> 
+			<a href="{% url 'event-add' activitybase_id=object.id %}" class="fancybox"> 
 				<i class="fa fa-fw fa-plus-circle text-success"></i>
 			</a>
 		</fieldset>

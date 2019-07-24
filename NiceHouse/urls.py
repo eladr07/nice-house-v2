@@ -21,6 +21,7 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('analytics/', include('Analytics.urls')),
     path('indices/', include('Indices.urls')),
+    path('activities/', include('Activity.urls')),
 ]
 
 from Management.models import *
@@ -343,21 +344,4 @@ urlpatterns += [
     path('house_details/<int:pk>', HouseDetailView.as_view()),
     # NOT USED
     path('signup_details/<int:pk>', SignupDetailView.as_view()),
-]
-
-urlpatterns += [
-    path('activitybase/<int:activitybase_id>/citycallers/add', activitybase_citycallers_add),
-    path('citycallers/<int:object_id>', citycallers_edit),
-    path('activitybase/<int:activitybase_id>/mediareferrals/add', activitybase_mediareferrals_add),
-    path('mediareferrals/<int:object_id>', mediareferrals_edit),
-    path('activitybase/<int:activitybase_id>/event/add', activitybase_event_add),
-    path('event/<int:object_id>', event_edit),
-    path('activitybase/<int:activitybase_id>/priceoffer/add', activitybase_priceoffer_add),
-    path('priceoffer/<int:object_id>', priceoffer_edit),
-    path('activitybase/<int:activitybase_id>/saleprocess/add', activitybase_saleprocess_add),
-    path('saleprocess/<int:object_id>', saleprocess_edit),
-    
-    path('activity/add', activity_add),
-    path('activity/<int:pk>/', ActivityDetailView.as_view()),
-    path('activity/<int:pk>/edit', ActivityUpdate.as_view()),    
 ]

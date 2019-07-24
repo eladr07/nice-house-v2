@@ -57,11 +57,3 @@ class HouseVersionQuerySet(models.QuerySet):
         return self.filter(type__id = 1)
     def doh0(self):
         return self.filter(type__id = 2)
-
-class CityCallersQuerySet(models.QuerySet):
-    def total_callers_num(self):
-        return self.aggregate(Sum('callers_num'))['callers_num__sum'] or 0        
-
-class MediaReferralsQuerySet(models.QuerySet):
-    def total_referrals_num(self):
-        return self.aggregate(Sum('referrals_num'))['referrals_num__sum'] or 0
