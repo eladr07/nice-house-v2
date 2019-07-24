@@ -137,7 +137,7 @@ gulp.task('font-awesome-fonts', function () {
 });
 
 // Combine and minify css files and output fonts
-gulp.task('styles', gulp.series('bootstrap-css', 'bootstrap-rtl-css', 'bootstrap-datepicker-css', 'font-awesome-css', 'font-awesome-fonts'));
+gulp.task('styles', gulp.series('bootstrap-less', 'bootstrap-rtl-css', 'bootstrap-datepicker-css', 'font-awesome-css', 'font-awesome-fonts'));
 
 //Set a default tasks
 gulp.task('default', gulp.series('vendor-scripts', 'styles'));
