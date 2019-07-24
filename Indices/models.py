@@ -12,7 +12,6 @@ class Tax(models.Model):
         return '/tax/%s' % self.id
     
     class Meta:
-        db_table = 'Tax'
         get_latest_by = 'date'
         ordering = ['-date']
         verbose_name = gettext('tax')
@@ -36,7 +35,6 @@ class MadadBI(models.Model):
         return '/madadbi/%s' % self.id
 
     class Meta:
-        db_table = 'MadadBI'
         get_latest_by = 'publish_date'
         ordering = ['-publish_date']
         unique_together = ('year', 'month')
@@ -60,7 +58,6 @@ class MadadCP(models.Model):
         return '/madadcp/%s' % self.id
     
     class Meta:
-        db_table = 'MadadCP'
         get_latest_by = 'publish_date'
         ordering = ['-publish_date']
         unique_together = ('year', 'month')
