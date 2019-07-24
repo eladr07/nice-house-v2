@@ -34,6 +34,7 @@ var config = {
         root + '/bootstrap-datepicker/dist/locales/bootstrap-datepicker.he.min.js'
     ],
 
+    bootstrap_css: root + "/bootswatch/flatly/bootstrap.css",
     bootstrap_less: root + "/bootstrap/less/bootstrap.less",
 
     //Bootstrap CSS and Fonts
@@ -94,6 +95,15 @@ gulp.task('clean-styles', function (cb) {
     ], cb);
 });
 
+gulp.task('bootstrap-css', function () {
+    return gulp.src(config.bootstrap_css)
+        .pipe(concat('bootstrap.css'))
+        .pipe(gulp.dest(config.cssout))
+        .pipe(minifyCSS())
+        .pipe(concat('bootstrap.min.css'))
+        .pipe(gulp.dest(config.cssout));
+});
+
 gulp.task('bootstrap-less', function () {
     return gulp.src(config.bootstrap_less)
         .pipe(less())
@@ -127,7 +137,7 @@ gulp.task('font-awesome-fonts', function () {
 });
 
 // Combine and minify css files and output fonts
-gulp.task('styles', gulp.series('bootstrap-less', 'bootstrap-rtl-css', 'bootstrap-datepicker-css', 'font-awesome-css', 'font-awesome-fonts'));
+gulp.task('styles', gulp.series('bootstrap-css', 'bootstrap-rtl-css', 'bootstrap-datepicker-css', 'font-awesome-css', 'font-awesome-fonts'));
 
 //Set a default tasks
 gulp.task('default', gulp.series('vendor-scripts', 'styles'));

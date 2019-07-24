@@ -13,6 +13,7 @@
     "bootstrap": "~3.3.4",
     "bootstrap-datepicker": "~1.6.4",
     "bootstrap-rtl": "~3.3.4",
+    "bootswatch": "~3.3.4",
     "font-awesome": "~4.7.0",
     "jquery": "~2.2.3",
     "jquery-ui-dist": "1.12.1",
