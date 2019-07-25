@@ -2,16 +2,22 @@
 {% load humanize %}
 {% block header %}
 {% load static %}
-<link rel="stylesheet" href="{% static "fancybox/fancy.css" %}" type="text/css" >
 
-<script type="text/javascript" src="{% static "fancybox/jquery.metadata.js" %}"></script> 
-<script type="text/javascript" src="{% static "fancybox/jquery.pngFix.js" %}"></script> 
-<script type="text/javascript" src="{% static "fancybox/jquery.fancybox.js" %}"></script> 
+<link rel="stylesheet" href="{% static "css/jquery.fancybox.css" %}" type="text/css" >
+<script type="text/javascript" src="{% static "js/jquery.fancybox.pack.js" %}"></script> 
+
+<link rel="stylesheet" href="{% static "css/dataTables.bootstrap.min.css" %}" type="text/css" >
+<script type="text/javascript" src="{% static "js/datatables-bundle.js" %}"></script> 
 
 {% endblock header %}
 {% block page %}
 
 <nav class="navbar navbar-default">
+
+	<!-- <a class="navbar-brand" href="#">
+    <img src="{% static "images/logo_neve_hair_2018.png"%}" width="50" height="50" class="d-inline-block" alt="" >
+  </a> -->
+
 	<div class="navbar-header">
 		<a class="navbar-brand" href="/"><span class="text-primary">נווה העיר</span> 2007</a>
 	</div>

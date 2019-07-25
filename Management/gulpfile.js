@@ -20,9 +20,17 @@ var config = {
     // jQuery UI
     jqueryuisrc: root + '/jquery-ui-dist/jquery-ui.min.js',
 
+    // Fancybox
+    fancyboxSrc: root + '/fancybox/dist/js/jquery.fancybox.pack.js',
+    fancyboxCss: root + '/fancybox/dist/css/jquery.fancybox.css',
+    fancyboxImages: root + '/fancybox/dist/img/*',
+
     // DataTable
-    dataTableSrc: root + '/datatables.net/js/jquery.dataTables.min.js',
-    dataTableBsSrc: root + '/datatables.net-bs/js/dataTables.bootstrap.min.js',
+    dataTableSrc: [
+        root + '/datatables.net/js/jquery.dataTables.min.js',
+        root + '/datatables.net-buttons/js/dataTables.buttons.min.js',
+        root + '/datatables.net-bs/js/dataTables.bootstrap.min.js',
+    ],
 
     dataTableCss: root + '/datatables.net-bs/css/dataTables.bootstrap.min.css',
 
@@ -74,8 +82,13 @@ gulp.task('jquery-ui', function () {
         .pipe(gulp.dest(config.scriptsOut));
 });
 
+gulp.task('fancybox', function () {
+    return gulp.src(config.fancyboxSrc)
+        .pipe(gulp.dest(config.scriptsOut));
+});
+
 gulp.task('datatables-bundle', function () {
-    return gulp.src([config.dataTableSrc, config.dataTableBsSrc])
+    return gulp.src(config.dataTableSrc)
         .pipe(concat('datatables-bundle.js'))
         .pipe(gulp.dest(config.scriptsOut));
 });
@@ -96,7 +109,7 @@ gulp.task('bootstrap-datepicker', function () {
 });
 
 // Combine and the vendor files from bower into bundles (output to the Scripts folder)
-gulp.task('vendor-scripts', gulp.series('jquery-bundle', 'jquery-ui', 'datatables-bundle', 'bootstrap-bundle', 'bootstrap-datepicker'));
+gulp.task('vendor-scripts', gulp.series('jquery-bundle', 'jquery-ui', 'fancybox', 'datatables-bundle', 'bootstrap-bundle', 'bootstrap-datepicker'));
 
 // Synchronously delete the output style files (css / fonts)
 gulp.task('clean-styles', function (cb) {
@@ -105,6 +118,16 @@ gulp.task('clean-styles', function (cb) {
         config.cssout,
         config.imgout
     ], cb);
+});
+
+gulp.task('fancybox-css', function () {
+    return gulp.src(config.fancyboxCss)
+        .pipe(gulp.dest(config.cssout));
+});
+
+gulp.task('fancybox-images', function () {
+    return gulp.src(config.fancyboxImages)
+        .pipe(gulp.dest(config.imgout));
 });
 
 gulp.task('datatables-css', function () {
@@ -154,7 +177,7 @@ gulp.task('font-awesome-fonts', function () {
 });
 
 // Combine and minify css files and output fonts
-gulp.task('styles', gulp.series('datatables-css', 'bootstrap-less', 'bootstrap-rtl-css', 'bootstrap-datepicker-css', 'font-awesome-css', 'font-awesome-fonts'));
+gulp.task('styles', gulp.series('fancybox-css', 'fancybox-images', 'datatables-css', 'bootstrap-less', 'bootstrap-rtl-css', 'bootstrap-datepicker-css', 'font-awesome-css', 'font-awesome-fonts'));
 
 //Set a default tasks
 gulp.task('default', gulp.series('vendor-scripts', 'styles'));
