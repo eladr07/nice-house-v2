@@ -74,14 +74,10 @@ gulp.task('jquery-ui', function () {
         .pipe(gulp.dest(config.scriptsOut));
 });
 
-gulp.task('datatables', function () {
-    return gulp.src(config.dataTableSrc)
-     .pipe(gulp.dest(config.scriptsOut));
-});
-
-gulp.task('datatables-bs', function () {
-    return gulp.src(config.dataTableBsSrc)
-     .pipe(gulp.dest(config.scriptsOut));
+gulp.task('datatables-bundle', function () {
+    return gulp.src([config.dataTableSrc, config.dataTableBsSrc])
+        .pipe(concat('datatables-bundle.js'))
+        .pipe(gulp.dest(config.scriptsOut));
 });
 
 //Create a bootstrap bundled file
@@ -100,7 +96,7 @@ gulp.task('bootstrap-datepicker', function () {
 });
 
 // Combine and the vendor files from bower into bundles (output to the Scripts folder)
-gulp.task('vendor-scripts', gulp.series('jquery-bundle', 'jquery-ui', 'datatables', 'datatables-bs', 'bootstrap-bundle', 'bootstrap-datepicker'));
+gulp.task('vendor-scripts', gulp.series('jquery-bundle', 'jquery-ui', 'datatables-bundle', 'bootstrap-bundle', 'bootstrap-datepicker'));
 
 // Synchronously delete the output style files (css / fonts)
 gulp.task('clean-styles', function (cb) {
