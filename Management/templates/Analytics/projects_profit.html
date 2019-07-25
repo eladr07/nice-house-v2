@@ -3,7 +3,7 @@
 {% load static %}
 {% load humanize %}
 
-{% block header %}
+{% block scripts %}
 {{ block.super }}
 <script>
 	var selectedID = 0;
@@ -22,16 +22,16 @@
 			if (selectedID > 0)
 				$("#demandEdit").attr("href", "/demands/" + selectedID);
 				$("#demandCalc").attr("href", "/demands/" + selectedID + "/calc");
-			});
-		$(".fancybox").fancybox();
-		$(".bigfancybox").fancybox({'frameWidth':800});	
+		});
+			
 		$("#demandCalc").click(function(event) {
 			if (!confirm("האם אתה בטוח שברצונך לחשב את העמלות מחדש ?"))
 				event.preventDefault();
 		});
 	});
 </script>
-{% endblock header %}
+{% endblock scripts %}
+
 {% block content %}
 <h3 class="text-center text-danger">דו"ח רווח והפסד</h3>
 

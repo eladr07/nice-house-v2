@@ -3,7 +3,7 @@
 {% load static %}
 {% load humanize %}
 
-{% block header %}	
+{% block scripts %}	
 {{ block.super }}
 <script>
 	var projectSelect;
@@ -39,7 +39,8 @@
 			employeeSelect.attr("value", data[0].pk);
 	}
 </script>
-{% endblock header %}
+{% endblock scripts %}
+
 {% block content %}	
 <h3 class="text-center text-danger">דו"ח פעילות לאתר</h3>
 <form method="POST">

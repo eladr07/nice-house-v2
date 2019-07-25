@@ -2,11 +2,10 @@
 
 {% load static %}
 
-{% block header %}
+{% block scripts %}
 {{block.super}}
 <script>
-	$(document).ready(function() {		
-		$("input[type!='submit']").attr("class", "inputText");
+	$(document).ready(function() {
 		$("input[type='submit']").click(function (event) {
 			parent.$("#fancy_close").click(function(event) {
 					parent.location.reload();
@@ -31,7 +30,8 @@
 		});
 	}
 </script>
-{% endblock header %}
+{% endblock scripts %}
+
 {% block content %}
 	<h3 class="text-center text-danger">הוספת תשלום (צ'ק)</h3>
 	<div class="clearBoth"> </div>

@@ -3,7 +3,7 @@
 {% load static %}
 {% load humanize %}
 
-{% block header %}
+{% block scripts %}
 {{ block.super }}
 <script>
 	var selectedID = 0;
@@ -19,15 +19,16 @@
 			prev_class = tr.attr("class");
 			tr.attr("class","selectedRow");
 			//sync links
-			if (selectedID > 0)
+			if (selectedID > 0) {
 				$("#loanPay").attr("href", "/nhemployees/" + selectedID + "/loanpay");
 				$("#loanAdd").attr("href", "/nhemployees/" + selectedID + "/addloan");
 				$("#calcSalary").attr("href", "" + tr.attr("objid") + "/calc");
 				$("#approve").attr("href", "" + tr.attr("objid") + "/approve");
 				$("#edit").attr("href", tr.attr("objid"));
 				$("#expenses").attr("href", "/salary/" + tr.attr("objid") + "/expenses");
-			});
-		$(".fancybox").fancybox();
+			}
+		});
+			
 		$("#loanPay, #loanAdd, #edit").click(function (event) {
 			if (!$(this).attr("href"))
 				alert("לא נבחר עובד");
@@ -38,7 +39,8 @@
 		});
 	});
 </script>
-{% endblock header %}
+{% endblock scripts %}
+
 {% block content %}
 <h3 class="text-center text-danger">ריכוז שכר עובדי נייס האוס לחודש {{month|date:"M Y"}}</h3>
 

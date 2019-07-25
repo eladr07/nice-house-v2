@@ -1,7 +1,9 @@
 ﻿{% extends "../base.html" %}
+
 {% load humanize %}
-{% block header %}
 {% load static %}
+
+{% block scripts %}
 {{ block.super }}
 <script>
 	$(document).ready(function() {		
@@ -21,11 +23,9 @@
 		$("#add_commissionsBtn").click(function (event) {
 			$("#new_commissions").toggle();//show/hide new commission
 		});
-		$(".fancybox").fancybox();
-		$(".bigfancybox").fancybox({'frameWidth':800});
 	});
 </script>
-{% endblock header %}
+{% endblock scripts %}
 
 {% block content %}
 	

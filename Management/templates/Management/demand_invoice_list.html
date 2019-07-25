@@ -3,7 +3,7 @@
 {% load static %}
 {% load humanize %}
 
-{% block header %}
+{% block scripts %}
 {{ block.super }}
 <script>
 	var selectedID = 0;
@@ -18,19 +18,18 @@
 				return;
 			prev_class = tr.attr("class");
 			tr.attr("class","selectedRow");
+			
 			//sync links
-			if (selectedID > 0)
-			{
+			if (selectedID > 0) {
 				$("#objEdit").attr("href", "/demandinvoice/" + selectedID);
 				$("#objOffset").attr("href", "/invoices/" + selectedID + "/offset");
 				$("#objDelete").attr("href", "/invoices/" + selectedID + "/del");
 			}
 		});
-		//add fancybox
-		$(".fancybox").fancybox();
 	});
 </script>
-{% endblock header %}
+{% endblock scripts %}
+
 {% block content %}
 	<h3 class="text-center text-danger">ריכוז חשבוניות לדרישה</h3>
 	

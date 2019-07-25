@@ -2,16 +2,6 @@
 
 {% load static %}
 
-{% block header %}
-{{ block.super }}
-<script>
-	$(document).ready(function() {		
-		$("input[type!='submit']").attr("class", "inputText");
-		//add fancybox
-		$(".fancybox").fancybox();
-	});
-</script>
-{% endblock header %}
 {% block content %}
 <h3 class="text-center text-danger">
 	{% if form.instance.id %}

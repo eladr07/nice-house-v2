@@ -1,7 +1,9 @@
 ﻿{% extends "../base.html" %}
+
 {% load static %}
 {% load humanize %}
-{% block header %}
+
+{% block scripts %}
 {{ block.super }}
 <script>
 	var selectedID = 0;
@@ -26,8 +28,7 @@
 			if (!confirm("האם אתה בטוח שברצונך למחוק את הדירה ?"))
 				event.preventDefault();
 		});
-		$(".fancybox").fancybox();
-		$(".bigfancybox").fancybox({'frameWidth':800});
+		
 		$("#changeType").change(function() {
 			location.replace("type" + $(this).val());
 		});
@@ -50,7 +51,8 @@
 		});
 	});
 </script>
-{% endblock header %}
+{% endblock scripts %}
+
 {% block content %}
 
 {% with form.instance.building as b %}

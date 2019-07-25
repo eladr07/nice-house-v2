@@ -1,5 +1,6 @@
 ﻿{% extends "../base.html" %}
-{% block header %}
+
+{% block scripts %}
 {{block.super}}
 <script>
 var p = 0;
@@ -112,7 +113,8 @@ function updateValues() {
 			ac2=0;
 }
 </script>
-{% endblock header %}
+{% endblock scripts %}
+
 {% block content %}
 	<h3 class="text-center text-danger">
 			{% if form.instance.id %}

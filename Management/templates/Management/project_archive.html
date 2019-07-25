@@ -1,6 +1,7 @@
 ﻿{% extends "../base.html" %}
 {% load static %}
-{% block header %}
+
+{% block scripts %}
 {{ block.super }}
 <script>
 	var selectedID = 0;
@@ -13,13 +14,11 @@
 			selectedID = tr.attr("objid");
 			prev_class = tr.attr("class");
 			tr.attr("class","selectedRow");
-		});
-		
-		$(".fancybox").fancybox();
-		$(".bigfancybox").fancybox({'frameWidth':800});			
+		});	
 	});
 </script>
-{% endblock header %}
+{% endblock scripts %}
+
 {% block content %}
 <h3 class="text-center text-danger">ארכיון פרוייקטים</h3>
 

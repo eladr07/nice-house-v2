@@ -3,7 +3,7 @@
 {% load static %}
 {% load humanize %}
 
-{% block header %}
+{% block scripts %}
 {{ block.super }}
 <script>
 	var selectedID = 0;
@@ -19,16 +19,15 @@
 				return;
 			prev_class = tr.attr("class");
 			tr.attr("class","selectedRow");
+			
 			//sync links
-			if (selectedID > 0)
+			if (selectedID > 0) {
 				$("#demandEdit").attr("href", "/demands/" + selectedID);
 				$("#demandCalc").attr("href", "/demands/" + selectedID + "/calc");
 				$("#demandReturnToCalc").attr("href", "/demands/" + selectedID + "/returntocalc");
 				$("#demandRemarks").attr("href", "/demands/" + selectedID + "/remarks");
-			});
-		
-		$(".fancybox").fancybox();
-		$(".bigfancybox").fancybox({'frameWidth':800});	
+			}
+		});
 
 		$("#demandSend").click(function(event) {
 			event.preventDefault();
@@ -52,7 +51,8 @@
 		});
 	});
 </script>
-{% endblock header %}
+{% endblock scripts %}
+
 {% block content %}
 <h3 class="text-center text-danger">ריכוז דרישות לתשלום לחודש {{month|date:"F Y"}}</h3>
 <div class="clearBoth"></div>

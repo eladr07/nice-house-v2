@@ -2,7 +2,7 @@
 
 {% load static %}
 
-{% block header %}
+{% block scripts %}
 <script>
 	$(document).ready(function() {		
 		$("input[type!='submit']").attr("class", "inputText");
@@ -13,7 +13,8 @@
 			});
 	});
 </script>
-{% endblock header %}
+{% endblock scripts %}
+
 {% block page %}
 <div id="content">
 	<h3 class="text-center text-danger">עדכון שכר לעובד</h3>

@@ -3,16 +3,6 @@
 {% load static %}
 {% load humanize %}
 
-{% block header %}
-{{ block.super }}
-<script>
-	var selectedID = 0;
-	var prev_class;
-	$(document).ready(function() {
-		$(".fancybox").fancybox();
-	});
-</script>
-{% endblock header %}
 {% block content %}
 <h3 class="text-center text-danger"> 
 	ריכוז שכר לעובדים כולל הוצאות מעביד תקופתי<br>{{start|date:"m/y"}} - {{end|date:"m/y"}}

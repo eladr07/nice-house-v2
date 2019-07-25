@@ -2,7 +2,7 @@
 
 {% load static %}
 
-{% block header %}
+{% block scripts %}
 {{block.super}}
 <script>
 	$(document).ready(function() {		
@@ -31,7 +31,8 @@
 		});
 	}
 </script>
-{% endblock header %}
+{% endblock scripts %}
+
 {% block content %}
 	<h3 class="text-center text-danger">חשבונית חדשה</h3>
 	<div class="clearBoth"> </div>

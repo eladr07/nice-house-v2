@@ -3,7 +3,7 @@
 {% load static %}
 {% load humanize %}
 
-{% block header %}
+{% block scripts %}
 {{ block.super }}
 <script>
 	$(document).ready(function() {
@@ -13,7 +13,8 @@
 		});		
 	});
 </script>
-{% endblock header %}
+{% endblock scripts %}
+
 {% block content %}
 <h3 class="text-center text-danger">
 	דו"ח ריכוז הכנסות תקופתי<br>{{nhbranch}}

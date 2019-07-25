@@ -1,7 +1,9 @@
 ﻿{% extends "../base.html" %}
+
 {% load static %}
 {% load humanize %}
-{% block header %}
+
+{% block scripts %}
 {{ block.super }}
 <script>
 	var selectedID = 0;
@@ -17,25 +19,25 @@
 				return;
 			prev_class = tr.attr("class");
 			tr.attr("class","selectedRow");
+			
 			//sync links
-			if (selectedID > 0)
+			if (selectedID > 0) {
 				$("#saleAdd").attr("href", "/demands/" + selectedID + "/sale/add");
 				$("#saleZero").attr("href", "/demands/" + selectedID + "/zero");
 				$("#demandClose").attr("href", selectedID + "/close");
 				$("#demandRemarks").attr("href", selectedID + "/remarks");
 				$("#demandSaleCount").attr("href", selectedID + "/salecount");
-			});
+			}
+		});
 			
-		$(".fancybox").fancybox();
-		$(".bigfancybox").fancybox({'frameWidth':800});	
-		
 		$("#demandCloseAll").click(function (event) {
 			if (!confirm("האם אתה בטוח שברצונך לאשר את כל הדרישות?"))
 				event.preventDefault();
 		});
 	});
 </script>
-{% endblock header %}
+{% endblock scripts %}
+
 {% block content %}
 <h3 class="text-center text-danger">ריכוז הזנת דרישות לתשלום לחודש {{month|date:"M Y"}}</h3>
 <div class="clearBoth"></div>

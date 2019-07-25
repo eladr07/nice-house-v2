@@ -1,6 +1,7 @@
 ﻿{% extends "../template.html" %}
 {% load static %}
-{% block header %}
+
+{% block scripts %}
 <script>
 	$(document).ready(function() {
 		$("input[type='submit']").click(function (event) {
@@ -10,7 +11,8 @@
 			});
 	});
 </script>
-{% endblock header %}
+{% endblock scripts %}
+
 {% block page %}
 <div id="content">	
 	{% if title %}

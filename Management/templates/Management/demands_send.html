@@ -3,15 +3,6 @@
 {% load static %}
 {% load humanize %}
 
-{% block header %}
-{{ block.super }}
-<script>
-	$(document).ready(function() {
-		$(".fancybox").fancybox();
-		$(".bigfancybox").fancybox({'frameWidth':800});
-	});
-</script>
-{% endblock header %}
 {% block content %}
 	<h3 class="text-center text-danger">אישור ושליחת דרישות במייל ובפקס לחודש {{month|date:"M Y"}}</h3>
 <form method="GET">

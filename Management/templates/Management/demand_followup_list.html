@@ -3,7 +3,7 @@
 {% load static %}
 {% load humanize %}
 
-{% block header %}
+{% block scripts %}
 {{ block.super }}
 <script>
 	var selectedID = 0;
@@ -18,15 +18,16 @@
 				return;
 			prev_class = tr.attr("class");
 			tr.attr("class","selectedRow");
+			
 			//sync links
-			if (selectedID > 0)
+			if (selectedID > 0) {
 				$("#demandEdit").attr("href", "/demands/" + selectedID);
 				$("#demandAdjust").attr("href", "/demands/" + selectedID + "/adddiffadjust");
 				$("#demandAdjust").attr("href", "/demands/" + selectedID + "/adddiffadjust");
 				$("#demandForceFullyPaid").attr("href", "/demands/" + selectedID + "/forcefullypaid");
-			});
-		$(".fancybox").fancybox();
-		$(".bigfancybox").fancybox({'frameWidth':800});	
+			}
+		});
+			
 		$("#demandCalc").click(function(event) {
 			if (!confirm("האם אתה בטוח שברצונך לחשב את העמלות מחדש ?"))
 				event.preventDefault();
@@ -40,7 +41,8 @@
 			});
 	});
 </script>
-{% endblock header %}
+{% endblock scripts %}
+
 {% block content %}
 <h3 class="text-center text-danger">מעקב דרישות לפי תקופה</h3>
 

@@ -2,7 +2,7 @@
 
 {% load static %}
 
-{% block header %}
+{% block scripts %}
 {{ block.super }}
 <script>
 	var selectedID = 0;
@@ -22,12 +22,11 @@
 				$("#projectEdit").attr("href", selectedID);
 				$("#projectEnd").attr("href", "end/" + selectedID);
 			}
-			});
-			$(".fancybox").fancybox();
-			$(".bigfancybox").fancybox({'frameWidth':800});			
+			});	
 		});
 </script>
-{% endblock header %}
+{% endblock scripts %}
+
 {% block content %}
 	<h3 class="text-center text-danger">מצבת פרוייקטים</h3>
 

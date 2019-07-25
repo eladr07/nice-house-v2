@@ -1,8 +1,10 @@
 ﻿{% extends "../base.html" %}
+
 {% load static %}
 {% load i18n %}
 {% load humanize %}
-{% block header %}
+
+{% block scripts %}
 {{ block.super }}
 <script>
 	var prev_class;
@@ -62,8 +64,6 @@
 			}
 		});
 
-		$(".fancybox").fancybox();
-		$(".bigfancybox").fancybox({'frameWidth':800});	
 		$("#demandCalc").click(function(event) {
 			if (!confirm("האם אתה בטוח שברצונך לחשב את העמלות מחדש ?"))
 				event.preventDefault();
@@ -77,7 +77,8 @@
 			});
 	});
 </script>
-{% endblock header %}
+{% endblock scripts %}
+
 {% block content %}
 <h3 class="text-center text-danger">מצב תשלום דרישות יזמים</h3>
 <div class="clearBoth"></div>

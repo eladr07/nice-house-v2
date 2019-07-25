@@ -4,7 +4,7 @@
 {% load humanize %}
 {% load widget_tweaks %}
 
-{% block header %}
+{% block scripts %}
 {{ block.super }}
 <script>
 	var projectSelect;
@@ -14,6 +14,7 @@
 	var priceInput;
 	var priceIncludeLawyerChk;
 	var priceNoLawyerInput;
+	
 	$(document).ready(function() {
 		projectSelect = $("#id_project");
 		buildingSelect = $("#id_building");
@@ -120,7 +121,8 @@
 			priceNoLawyerInput.attr("value", p);
 	}
 </script>
-{% endblock header %}
+{% endblock scripts %}
+
 {% block content %}
 
 <div class="title">

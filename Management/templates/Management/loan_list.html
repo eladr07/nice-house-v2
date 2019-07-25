@@ -3,7 +3,7 @@
 {% load static %}
 {% load humanize %}
 
-{% block header %}
+{% block scripts %}
 {{ block.super }}
 <script>
 	var selectedID = 0;
@@ -25,11 +25,10 @@
 				$("#objDelete").attr("href", selectedID + "/del");
 			}
 		});
-		//add fancybox
-		$(".fancybox").fancybox();
 	});
 </script>
-{% endblock header %}
+{% endblock scripts %}
+
 {% block content %}
 	<h3 class="text-center text-danger">ריכוז הלוואות לעובדים</h3>
 

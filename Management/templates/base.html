@@ -1,15 +1,13 @@
 ﻿{% extends "template.html" %}
-{% load humanize %}
-{% block header %}
+
 {% load static %}
+{% load humanize %}
 
+{% block header %}
 <link rel="stylesheet" href="{% static "css/jquery.fancybox.css" %}" type="text/css" >
-<script type="text/javascript" src="{% static "js/jquery.fancybox.pack.js" %}"></script> 
-
-<link rel="stylesheet" href="{% static "css/dataTables.bootstrap.min.css" %}" type="text/css" >
-<script type="text/javascript" src="{% static "js/datatables-bundle.js" %}"></script> 
-
+<!-- <link rel="stylesheet" href="{% static "css/dataTables.bootstrap.min.css" %}" type="text/css" > -->
 {% endblock header %}
+
 {% block page %}
 
 <nav class="navbar navbar-default">
@@ -44,7 +42,9 @@
 </nav>
 
 <div id="content">
+
 {% block content %}{% endblock content %}
+
 </div>
 <div id="footer" style="text-align:center;">
 <hr width=60%>
@@ -54,3 +54,21 @@
 	<div id="error" style="display:none;">{{error|default_if_none:""}}</div>
 {% endif %}
 {% endblock page %}
+
+{% block scripts %}
+<script type="text/javascript" src="{% static "js/jquery.fancybox.pack.js" %}"></script> 
+<!-- <script type="text/javascript" src="{% static "js/datatables-bundle.js" %}"></script>  -->
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$(".fancybox").fancybox({
+			type: 'iframe'
+		});
+		$(".bigfancybox").fancybox({
+			type: 'iframe',
+			frameWidth: 800
+		});
+	});
+</script>
+
+{% endblock scripts %}

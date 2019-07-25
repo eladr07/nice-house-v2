@@ -1,15 +1,6 @@
 ﻿{% extends "../base.html" %}
 {% load humanize %}
-{% block header %}
-{{ block.super }}
-<script>
-	$(document).ready(function() {		
-		$("input[type!='submit']").attr("class", "inputText");
-		$(".fancybox").fancybox();
-		$(".bigfancybox").fancybox({'frameWidth':800});
-	});
-</script>
-{% endblock header %}
+
 {% block content %}
 	<h3 class="text-center text-danger">פרטי עסקת נייס האוס {{nhs.nhmonth.nhbranch.prefix}}-{{nhs.id}}</h3>
 	<div style="float: right; width: 27%; margin-left: 10px;">

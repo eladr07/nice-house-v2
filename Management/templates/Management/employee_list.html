@@ -2,7 +2,7 @@
 
 {% load static %}
 
-{% block header %}
+{% block scripts %}
 {{ block.super }}
 <script>
 	var selectedID = 0;
@@ -23,11 +23,9 @@
 				$("#employeeEnd").attr("href", "/employees/end/" + selectedID);
 			}
 		});
-		
-		$(".fancybox").fancybox();
 	});
 </script>
-{% endblock header %}
+{% endblock scripts %}
 
 {% block content %}
 	<h3 class="text-center text-danger">מצבת עובדים</h3>

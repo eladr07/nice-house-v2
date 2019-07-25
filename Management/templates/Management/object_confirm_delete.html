@@ -1,6 +1,8 @@
 ﻿{% extends "../template.html" %}
+
 {% load static %}
-{% block header %}
+
+{% block scripts %}
 <script>
 	$(document).ready(function() {		
 		$("input[type!='submit']").attr("class", "inputText");
@@ -11,7 +13,8 @@
 			});
 	});
 </script>
-{% endblock header %}
+{% endblock scripts %}
+
 {% block page %}
 <form method="post">{% csrf_token %}
     <p>Are you sure you want to delete "{{ object }}"?</p>

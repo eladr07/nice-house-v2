@@ -1,15 +1,6 @@
 ﻿{% extends "../base.html" %}
 {% load humanize %}
 
-{% block header %}
-{{ block.super }}
-<script>
-	$(document).ready(function() {
-		$(".fancybox").fancybox();
-	});
-</script>
-{% endblock header %}
-
 {% block content %}
 <h3 class="text-center text-danger"> 
 	ריכוז שכ"ע לפי תקופה<br><a href="{{employee.derived.get_absolute_url}}" target="_blank">{{employee}}</a>

@@ -1,6 +1,7 @@
 ﻿{% extends "../base.html" %}
 {% load humanize %}
-{% block header %}
+
+{% block scripts %}
 {{ block.super }}
 <script>
 	var selectedID = 0;
@@ -22,11 +23,10 @@
 				$("#objDelete").attr("href", selectedID + "/del");
 			}
 		});
-		//add fancybox
-		$(".fancybox").fancybox();
 	});
 </script>
-{% endblock header %}
+{% endblock scripts %}
+
 {% block content %}
 <h3 class="text-center text-danger">פירוט צ'קים לעובדים מחודש {{from_date|date:"M Y"}} עד חודש {{to_date|date:"M Y"}}</h3>
 

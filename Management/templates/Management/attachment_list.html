@@ -2,7 +2,7 @@
 
 {% load static %}
 
-{% block header %}
+{% block scripts %}
 <script>
 var selectedID = 0;
 var prevClass;
@@ -23,7 +23,8 @@ $(document).ready(function () {
 	});
 });
 </script>
-{% endblock header %}
+{% endblock scripts %}
+
 {% block content %}
 	<h3 class="text-center text-danger">ארכיב מסמכים</h3>
 	

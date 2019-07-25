@@ -3,16 +3,6 @@
 {% load static %}
 {% load humanize %}
 
-{% block header %}	
-{{ block.super }}
-<script>
-	$(document).ready(function() {
-		$("input[type!='submit']").attr("class", "inputText");
-		$(".fancybox").fancybox();
-		$(".bigfancybox").fancybox({'frameWidth':800});
-	});
-</script>
-{% endblock header %}
 {% block content %}	
 	<h3 class="text-center text-danger">דו"ח פעילות לאתר</h3>
 	<div id="rightSide">
