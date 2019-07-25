@@ -127,7 +127,7 @@ gulp.task('fancybox-css', function () {
 
 gulp.task('fancybox-images', function () {
     return gulp.src(config.fancyboxImages)
-        .pipe(gulp.dest(config.imgout));
+        .pipe(gulp.dest('static/img'));
 });
 
 gulp.task('datatables-css', function () {
