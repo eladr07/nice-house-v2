@@ -15,7 +15,7 @@
     "bootstrap-rtl": "~3.3.4",
     "bootswatch": "~3.3.4",
     "font-awesome": "~4.7.0",
-    "jquery": "~2.2.3",
+    "jquery": "~3.4.1",
     "jquery-ui-dist": "1.12.1",
     "fancybox": "3.0.1",
     "npm": "^6.4.1",
