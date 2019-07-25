@@ -8,7 +8,7 @@
 	</h3>
 	<div class="clearBoth"> </div>
 	<br /> 		
-	<table id="attachmentTable" class="dataTable" border="1">
+	<table class="table table-bordered table-striped table-condensed">
 		<tr>
 			<th>מס"ד</th>
 			<th>PDF</th>
@@ -24,7 +24,7 @@
 			<th>תזכורות להמשך טיפול</th>
 		</tr>
 		{% for d in demands %}
-			<tr class="{% cycle 'row1' 'row2' %}" objid={{a.id}}>
+			<tr>
 				<td><a target="_blank" href="{% url 'demand-edit' object_id=d.id %}">{{d.id}}</a></td>
 				<td>
 					<a href="/reports/project_month/{{d.project.id}}/{{d.year}}/{{d.month}}">
