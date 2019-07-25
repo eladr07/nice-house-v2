@@ -20,6 +20,12 @@ var config = {
     // jQuery UI
     jqueryuisrc: root + '/jquery-ui-dist/jquery-ui.min.js',
 
+    // DataTable
+    dataTableSrc: root + '/datatables.net/js/jquery.dataTables.min.js',
+    dataTableBsSrc: root + '/datatables.net-bs/js/dataTables.bootstrap.min.js',
+
+    dataTableCss: root + '/datatables.net-bs/css/dataTables.bootstrap.min.css',
+
     //JavaScript files that will be combined into a Bootstrap bundle
     bootstrapsrc: root + '/bootstrap/dist/js/bootstrap.min.js',
     bootstrapbundle: 'Scripts/dist/bootstrap-bundle.min.js',
@@ -68,6 +74,16 @@ gulp.task('jquery-ui', function () {
         .pipe(gulp.dest(config.scriptsOut));
 });
 
+gulp.task('datatables', function () {
+    return gulp.src(config.dataTableSrc)
+     .pipe(gulp.dest(config.scriptsOut));
+});
+
+gulp.task('datatables-bs', function () {
+    return gulp.src(config.dataTableBsSrc)
+     .pipe(gulp.dest(config.scriptsOut));
+});
+
 //Create a bootstrap bundled file
 gulp.task('bootstrap-bundle', function () {
     return gulp.src(config.bootstrapsrc)
@@ -84,7 +100,7 @@ gulp.task('bootstrap-datepicker', function () {
 });
 
 // Combine and the vendor files from bower into bundles (output to the Scripts folder)
-gulp.task('vendor-scripts', gulp.series('jquery-bundle', 'jquery-ui', 'bootstrap-bundle', 'bootstrap-datepicker'));
+gulp.task('vendor-scripts', gulp.series('jquery-bundle', 'jquery-ui', 'datatables', 'datatables-bs', 'bootstrap-bundle', 'bootstrap-datepicker'));
 
 // Synchronously delete the output style files (css / fonts)
 gulp.task('clean-styles', function (cb) {
@@ -93,6 +109,11 @@ gulp.task('clean-styles', function (cb) {
         config.cssout,
         config.imgout
     ], cb);
+});
+
+gulp.task('datatables-css', function () {
+    return gulp.src(config.dataTableCss)
+        .pipe(gulp.dest(config.cssout));
 });
 
 gulp.task('bootstrap-css', function () {
@@ -137,7 +158,7 @@ gulp.task('font-awesome-fonts', function () {
 });
 
 // Combine and minify css files and output fonts
-gulp.task('styles', gulp.series('bootstrap-less', 'bootstrap-rtl-css', 'bootstrap-datepicker-css', 'font-awesome-css', 'font-awesome-fonts'));
+gulp.task('styles', gulp.series('datatables-css', 'bootstrap-less', 'bootstrap-rtl-css', 'bootstrap-datepicker-css', 'font-awesome-css', 'font-awesome-fonts'));
 
 //Set a default tasks
 gulp.task('default', gulp.series('vendor-scripts', 'styles'));
