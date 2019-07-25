@@ -23,32 +23,7 @@
 				$("#employeeEnd").attr("href", "/employees/end/" + selectedID);
 			}
 		});
-		//add filters
-		var filterSelect = $("#filterSelect");
-		$("#employee_table th").each(function (index, elem) {
-			filterSelect.append("<option value='" + index + "'>" + $(elem).text() + "</option>");
-		});
-		$("#filterSelect").change(function () {
-			filterIndex = $(this).val();
-		});
-		$("#filterBtn").click(function (event) {
-			$("#employee_table tr").each(function (index, elem) {
-				if ($("td", elem).length == 0)
-					return;
-				var cell = $("td", elem).get(filterIndex);
-				var content = $(cell).text();
-				var filterText = $("#filterText").val();
-				if (content.match(filterText))
-					$(elem).show();
-				else
-					$(elem).hide();
-			});
-		});
-		$("#filterClearBtn").click(function (event) {
-			$("#employee_table tr").each(function (index, elem) {
-				$(elem).show();
-			});
-		});
+		
 		$(".fancybox").fancybox();
 	});
 </script>
@@ -56,25 +31,7 @@
 
 {% block content %}
 	<h3 class="text-center text-danger">מצבת עובדים</h3>
-	<div style="width: 60%;">
-		<table id="filter" class="dataTable">
-			<tr class="row1">
-				<td colspan="4" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש</td>
-			</tr>
-			<tr class="row2">
-				<td>
-					חיפוש לפי : 
-					<select id="filterSelect" style="width:100px;"></select>
-				</td>
-				<td>
-					ערך : 
-					<input id="filterText" type="text"/>
-				</td>
-				<td><button id="filterBtn" class="button">חפש</button></td>
-				<td><button id="filterClearBtn" class="button">הצג הכל</button></td>
-			</tr>
-		</table>
-	</div>
+	
 	<div class="clearBoth"> </div>
 
 	<div class="btn-group" role="group">

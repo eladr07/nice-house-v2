@@ -14,56 +14,22 @@
 			prev_class = tr.attr("class");
 			tr.attr("class","selectedRow");
 		});
+		
 		$(".fancybox").fancybox();
 		$(".bigfancybox").fancybox({'frameWidth':800});			
-		//add filters
-		var filterSelect = $("#filterSelect");
-		$("#projectTable th").each(function (index, elem) {
-			filterSelect.append("<option value='" + index + "'>" + $(elem).text() + "</option>");
-		});
-		$("#filterSelect").change(function () {
-			filterIndex = $(this).val();
-		});
-		$("#filterBtn").click(function (event) {
-			$("#projectTable tr").each(function (index, elem) {
-				if ($("td", elem).length == 0)
-					return;
-				var cell = $("td", elem).get(filterIndex);
-				var content = $(cell).text();
-				var filterText = $("#filterText").val();
-				if (content.match(filterText))
-					$(elem).show();
-				else
-					$(elem).hide();
-			});
-		});
-		$("#filterClearBtn").click(function (event) {
-			$("#projectTable tr").each(function (index, elem) {
-				$(elem).show();
-			});
-		});
 	});
 </script>
 {% endblock header %}
 {% block content %}
 <h3 class="text-center text-danger">ארכיון פרוייקטים</h3>
-<div id="filter" style="width:70%;">
-	<fieldset class="cardFieldset">
-		<legend>חיפוש</legend>
-		חיפוש לפי : 
-		<select id="filterSelect" style="width:100px;"></select>
-		ערך : 
-		<input id="filterText" type="text"/>
-		<button id="filterBtn" class="button">חפש</button>
-		<button id="filterClearBtn" class="button">הצג הכל</button>
-	</fieldset>
-</div>
+
 <div class="clearBoth"></div>
 <br /> 
+
 <table id="projectTable" class="dataTable" border="1">
 <caption>מציג סה"כ {{object_list|length}} פרוייקטים</caption>
 <tr>
-	<th/>
+	<th></th>
 	<th>יזם</th>
 	<th>שם פרוייקט</th>
 	<th>עיר</th>
