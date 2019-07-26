@@ -1,18 +1,20 @@
 ﻿{% extends "./template.html" %}
+
 {% load humanize %}
+
 {% block page %}
 <div id="content">	
 	{% if title %}
 	<h3 class="text-center text-danger">{{title}}</h3>
 	<div class="clearBoth"></div>
 	{% endif %}
-	<table class="myDataTable">
+	<table class="table table-bordered table-striped table-condensed">
 		<th>תאריך</th>
 		<th>מחיר</th>
 		<th>סכום שינוי</th>
 		<th>אחוז שינוי</th>
 		{% for version in versions %}
-			<tr class="{% cycle 'row1' 'row2' %}">
+			<tr>
 				<td>{{version.date|date:"j/m/y"}}</td>
 				<td>{{version.price|intcomma}}</td>
 				<td>{{version.diff_amount|intcomma}}</td>

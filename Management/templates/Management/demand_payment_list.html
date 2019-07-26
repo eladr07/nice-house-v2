@@ -7,17 +7,21 @@
 {{ block.super }}
 <script>
 	var selectedID = 0;
-	var prev_class;
+	
 	$(document).ready(function() {
 		$("tr").click(function() { 
 			var tr = $(this);
+			
 			if (selectedID > 0)
-				$("tr[objid='"+selectedID+"']").attr("class", prev_class);
-			selectedID = tr.attr("objid");
+				$("tr[data-id='"+selectedID+"']").removeClass('active');
+
+			selectedID = tr.data('id');
+
 			if (!selectedID)
 				return;
-			prev_class = tr.attr("class");
-			tr.attr("class","selectedRow");
+				
+			tr.addClass('active');
+			
 			//sync links
 			if (selectedID > 0)
 			{
@@ -62,7 +66,7 @@
 
 	<div class="clearBoth"> </div>
 	<br /> 		
-	<table class="myDataTable" border="1">
+	<table class="table table-bordered table-striped table-condensed">
 		<caption>
 		{% if page.has_previous %}
 		<a href="?page={{ page.previous_page_number }}" style="text-decoration:none;">
@@ -93,7 +97,7 @@
 		<th>סכום</th>
 		<th>הערות</th>
 		{% for i in page.object_list %}
-			<tr class="{% cycle 'row1' 'row2' %}" objid={{i.id}}>
+			<tr data-id={{i.id}}>
 				<td><a href="{{i.demands.all.0.get_absolute_url}}"><i class="fa fa-fw fa-info-circle text-primary"></i></a></td>
 				<td>{{ i.demands.all.0.project.initiator }}</td>
 				<td><a href="{{i.demands.0.project.get_absolute_url}}">{{ i.demands.all.0.project }}</td>

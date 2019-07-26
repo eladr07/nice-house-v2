@@ -10,13 +10,17 @@
 	$(document).ready(function() {
 		$("tr").click(function() { 
 			var tr = $(this);
+			
 			if (selectedID > 0)
 				$("tr[data-id='"+selectedID+"']").removeClass('active');
+
 			selectedID = tr.data('id');
+
 			if (!selectedID)
 				return;
 				
 			tr.addClass('active');
+
 			//sync links
 			if (selectedID > 0)
 			{
@@ -60,7 +64,7 @@
 
 <div class="clearBoth"></div>	
 	
-<table id="signupTable" class="myDataTable" border="1">
+<table id="signupTable" class="table table-bordered table-striped table-condensed">
 <caption>מציג סה"כ {{signups|length}} הרשמות</caption>
 	<tr>
 		<th></th>

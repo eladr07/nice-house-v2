@@ -35,7 +35,7 @@
 	
 	<div class="clearBoth"></div>
 	
-	<div class="col-md-8">
+	<div class="col-md-10">
 		<div class="panel panel-primary">
 				<div class="panel-heading">חיפוש תקופה</div>
 				<div class="panel-body">
@@ -64,7 +64,7 @@
 
 	<div class="clearBoth"> </div>
 	<br /> 		
-	<table class="myDataTable" border="1">
+	<table class="table table-bordered table-striped table-condensed">
 		<caption>
 		{% if page.has_previous %}
 		<a href="?page={{ page.previous_page_number }}" style="text-decoration:none;">
@@ -83,6 +83,7 @@
 		</a>
 		{% endif %}
 		</caption>
+
 		<th></th>
 		<th>שם היזם</th>
 		<th>פרויקט</th>
@@ -93,7 +94,7 @@
 		<th>סכום</th>
 		<th>הערות</th>
 		{% for i in page.object_list %}
-			<tr class="{% cycle 'row1' 'row2' %}" objid={{i.id}}>
+			<tr data-id={{i.id}}>
 				<td><a href="{{i.demands.all.0.get_absolute_url}}"><i class="fa fa-fw fa-info-circle text-primary"></i></a></td>
 				<td>{{ i.demands.all.0.project.initiator }}</td>
 				<td><a href="{{i.demands.0.project.get_absolute_url}}">{{ i.demands.all.0.project }}</td>

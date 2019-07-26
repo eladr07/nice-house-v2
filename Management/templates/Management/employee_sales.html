@@ -6,8 +6,10 @@
 {% block page %}
 <div id="content">
 	<h3 class="text-center text-danger">ריכוז מכירות {{es.month}}/{{es.year}} - {{es.employee}}</h3>
+	
 	<div class="clearBoth"></div>
-	<table id="sales_table" class="myDataTable">
+
+	<table id="sales_table" class="table table-bordered table-striped table-condensed small">
 		<caption>מציג סה"כ {{es.sales_count}} עסקאות</caption>
 		<th>מס"ד</th>
 		<th>ת. חוזה</th>
@@ -18,20 +20,20 @@
 		<th>מחיר חוזה</th>
 		<th>עו"ד</th>
 		{% for sales in es.sales.values %}
-		{% for sale in sales %}
-			<tr {% if sale.salereject %}class="row3"{% endif %} {% if sale.salepre %}class="row4"{% endif %}>				
-				<td><a target="_parent" href="{{ sale.get_absolute_url }}">{{sale.id}}</a></td>
-				<td>{{sale.sale_date|date:"j/m/Y"}}</td>
-				<td>{{sale.clients}}</td>
-				{% with sale.house.building as b %}
-				<td><a href="{{b.project.get_absolute_url}}" target="_parent">{{b.project}}</a></td>
-				<td><a target="_parent" href="{{b.get_absolute_url}}/pricelist/type1">{{sale.house.building.num}}</a></td>
-				<td><a target="_parent" href="{{sale.house.get_absolute_url}}/type1">{{sale.house.num}}</a></td>
-				{% endwith %}
-				<td>{{sale.price|intcomma}}</td>
-				<td>{{sale.price_include_lawyer|yesno:"כולל, לא כולל"}}</td>
-			</tr>
-		{% endfor %}
+			{% for sale in sales %}
+				<tr {% if sale.salereject %}class="row3"{% endif %} {% if sale.salepre %}class="row4"{% endif %}>				
+					<td><a target="_parent" href="{{ sale.get_absolute_url }}">{{sale.id}}</a></td>
+					<td>{{sale.sale_date|date:"j/m/Y"}}</td>
+					<td>{{sale.clients}}</td>
+					{% with sale.house.building as b %}
+					<td><a href="{{b.project.get_absolute_url}}" target="_parent">{{b.project}}</a></td>
+					<td><a target="_parent" href="{{b.get_absolute_url}}/pricelist/type1">{{sale.house.building.num}}</a></td>
+					<td><a target="_parent" href="{{sale.house.get_absolute_url}}/type1">{{sale.house.num}}</a></td>
+					{% endwith %}
+					<td>{{sale.price|intcomma}}</td>
+					<td>{{sale.price_include_lawyer|yesno:"כולל, לא כולל"}}</td>
+				</tr>
+			{% endfor %}
 		{% endfor %}
 	</table>
 </div>
