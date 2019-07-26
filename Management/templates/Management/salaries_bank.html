@@ -22,7 +22,7 @@
 <div class="clearBoth"></div>
 <form method="POST">
 	{% csrf_token %}
-	<table class="dataTable" style="width: 30%;" border="1">
+	<table class="myDataTable" style="width: 30%;" border="1">
 		<tr class="row1">
 			<td colspan="4" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש</td>
 		</tr>
@@ -34,7 +34,7 @@
 	</table>
 	<br>
 	<div class="clearBoth"></div>
-	<table id="salaryTable" class="dataTable" border="1">
+	<table id="salaryTable" class="myDataTable" border="1">
 	<caption>מציג סה"כ {{salaries|length}} עובדים</caption>
 		<tr>
 			<th><input type="checkbox" id="all-checkboxes"/></th>

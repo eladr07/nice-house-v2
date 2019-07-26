@@ -162,7 +162,7 @@ BODY {
 	font-weight: bold;
 }
 
-.dataTable {
+.myDataTable {
 	font-size: 12px;
 	padding: 4px 4px 4px 4px;
 	font-family: Arial;
@@ -172,7 +172,7 @@ BODY {
 	width: 98%;
 }
 
-.dataTable caption {
+.myDataTable caption {
 	color: #FFFFFF;
 	padding: 4px 4px 4px 4px;
 	background-color: #6696D5;
@@ -181,7 +181,7 @@ BODY {
 	font-weight: bold;
 }
 
-.dataTable th {
+.myDataTable th {
 	height: 21px;
 	background: url(../images/gradiant.gif) repeat-x;
 	color: #FFFFFF;
@@ -191,7 +191,7 @@ BODY {
 }
 
 
-.dataTable .rowSum td {
+.myDataTable .rowSum td {
 	color: #CF2222;
 	font-size: 12px;
 	font-weight: bold;
@@ -199,28 +199,28 @@ BODY {
 	padding: 4px 4px 4px 4px;
 }
 
-.dataTable .rowSumGreen td {
+.myDataTable .rowSumGreen td {
 	color: #039E33;
 	font-size: 12px;
 	font-weight: bold;
 	font-family: Arial;
 	padding: 4px 4px 4px 4px;
 }
-.dataTable .rowSumBlue td {
+.myDataTable .rowSumBlue td {
 	color: #3C79FF;
 	font-size: 12px;
 	font-weight: bold;
 	font-family: Arial;
 	padding: 4px 4px 4px 4px;
 }
-.dataTable .rowSumRed td {
+.myDataTable .rowSumRed td {
 	color: #FF3C3C;
 	font-size: 12px;
 	font-weight: bold;
 	font-family: Arial;
 	padding: 4px 4px 4px 4px;
 }
-.dataTable .rowTeal td {
+.myDataTable .rowTeal td {
 	color: #1C9AAD;
 	font-size: 12px;
 	font-weight: bold;
@@ -228,7 +228,7 @@ BODY {
 	padding: 4px 4px 4px 4px;
 }
 
-.dataTable .row1 td {
+.myDataTable .row1 td {
 	background-color: #EFEFEF;
 	color: #000;
 	font-size: 12px;
@@ -236,7 +236,7 @@ BODY {
 	padding: 4px 4px 4px 4px;
 }
 
-.dataTable .row2 td {
+.myDataTable .row2 td {
 	background-color: #FFFFFF;
 	color: #000;
 	font-size: 12px;
@@ -244,7 +244,7 @@ BODY {
 	padding: 4px 4px 4px 4px;
 }
 
-.dataTable .row3 td {
+.myDataTable .row3 td {
 	background-color: #F7E1AF;
 	color: #000;
 	font-size: 12px;
@@ -252,42 +252,42 @@ BODY {
 	padding: 4px 4px 4px 4px;
 }
 
-.dataTable .row4 td {
+.myDataTable .row4 td {
 	background-color: #B1CDFF;
 	color: #000;
 	font-size: 12px;
 	font-family: Arial;
 	padding: 4px 4px 4px 4px;
 }
-.dataTable .row5 td {
+.myDataTable .row5 td {
 	background-color: #9EE9C3;
 	color: #000;
 	font-size: 12px;
 	font-family: Arial;
 	padding: 4px 4px 4px 4px;
 }
-.dataTable .rowLightGreen td {
+.myDataTable .rowLightGreen td {
 	background-color: #98FFCE;
 	color: #000;
 	font-size: 12px;
 	font-family: Arial;
 	padding: 4px 4px 4px 4px;
 }
-.dataTable .rowLightBlue td {
+.myDataTable .rowLightBlue td {
 	background-color: #BED1F3;
 	color: #000;
 	font-size: 12px;
 	font-family: Arial;
 	padding: 4px 4px 4px 4px;
 }
-.dataTable .rowMediumBlue td {
+.myDataTable .rowMediumBlue td {
 	background-color: #A5BEEC;
 	color: #000;
 	font-size: 12px;
 	font-family: Arial;
 	padding: 4px 4px 4px 4px;
 }
-.dataTable .rowBlue td {
+.myDataTable .rowBlue td {
 	background-color: #739DE6;
 	color: #000;
 	font-size: 12px;
@@ -295,7 +295,7 @@ BODY {
 	padding: 4px 4px 4px 4px;
 }
 
-.dataTable .selectedRow td {
+.myDataTable .selectedRow td {
 	background-color: #BCD9FF;
 	color: #000;
 	font-size: 12px;
@@ -303,7 +303,7 @@ BODY {
 	padding: 4px 4px 4px 4px;
 }
 
-.dataTable .deletedRow td {
+.myDataTable .deletedRow td {
 	background-color: #FAA99E;
 	color: #000;
 	font-size: 12px;

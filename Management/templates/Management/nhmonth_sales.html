@@ -36,7 +36,7 @@ $(document).ready(function() {
 <div class="clearBoth"></div>
 <div style="float:right;width:30%;">
 	<form method="GET">
-		<table class="dataTable">
+		<table class="myDataTable">
 			<tr class="row1">
 				<td colspan="3" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש חודש</td>
 			</tr>
@@ -61,7 +61,7 @@ $(document).ready(function() {
 	<a id="monthClose" href="/nhmonth/close?nhbranch={{nhmonth.nhbranch.id}}&year={{nhmonth.year}}&month={{nhmonth.month}}">סגור חודש</a>
 </div>
 <div class="clearBoth"></div>	
-<table id="salesTable" class="dataTable" style="text-align:center;" border="1">
+<table id="salesTable" class="myDataTable" style="text-align:center;" border="1">
 <caption>מציג סה"כ {{nhmonth.nhsales.count}} עסקאות</caption>
 	<tr>
 		<th></th>
