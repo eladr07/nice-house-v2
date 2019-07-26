@@ -1,20 +1,35 @@
 {% load static %}
 {% load humanize %}
 
+<script src="{% static "js/jquery-bundle.min.js" %}" type="text/javascript"></script>
+
 <script>
 	var selectedID = 0;
-	var prevClass;
+	
 	$(document).ready(function() {
+		// var table = $('#saleTable').DataTable({
+		// 	buttons: [
+    //     'csv','excel']
+		// });
+
+		// table.buttons().container()
+    // 	.appendTo($('#myButtons'));
+
 		$("#saleTable tr").click(function() {
 			var tr = $(this);
+			
 			if (selectedID > 0)
-				$("#saleTable tr[objid='"+selectedID+"']").attr("class", prevClass);
-			selectedID = tr.attr("objid");
-			if (!selectedID) return;
-			prevClass = tr.attr("class");
-			tr.attr("class","selectedRow");
-			if (selectedID > 0)
-			{//sync links
+				$("#saleTable tr[data-id='"+selectedID+"']").removeClass('active');
+			
+				selectedID = tr.data('id');
+			
+			if (!selectedID) 
+				return;
+			
+				tr.addClass('active');
+			
+			//sync links
+			if (selectedID > 0) {
 				$("#saleEdit").attr("href", "/demands/sale/" + selectedID);
 				$("#saleCommissionEdit").attr("href", "/sale/" + selectedID + "/commission");
 				$("#saleDelete").attr("href", "/demands/{{demand.id}}/sale/" + selectedID + "/cancel");
@@ -22,6 +37,7 @@
 				$("#saleReject").attr("href", "/demands/{{demand.id}}/sale/" + selectedID + "/reject");
 			}
 		});
+
 		$("#salePre, #saleReject").click( function(e) {
 			var self = $(this);
 			var form = self.next();
@@ -52,12 +68,17 @@
 				});
 			}
 		});
-		$("#saleTable td").attr("style","border-bottom: 1px solid; border-left: 1px solid;");
+
+		//$("#saleTable td").attr("style","border-bottom: 1px solid; border-left: 1px solid;");
+
 		$("#saleDelete").click(function (event) {
 			if (!confirm("האם אתה בטוח שברצונך לבטל את המכירה?"))
 				event.preventDefault();
 		});
-		$(".fancybox").fancybox();
+
+		$(".fancybox").fancybox({
+			type: 'iframe'
+		});
 	});
 </script>
 
@@ -133,104 +154,115 @@
 		</table>
 		<div class="clearBoth"></div>
 		<br>
-		<table class="dataTable" id="saleTable" >
-			<caption>סה"כ {{sales.count}} מכירות בדרישה</caption>
-			<th>מזהה <br>מכירה</th>
-			{% if sales.0.contract_num %}
-			<th>מס' <br>חוזה</th>
-			{% endif %}
-			<th>שם <br>הרוכשים</th>
-			<th>בניין</th>
-			<th>דירה</th>
-			<th>תאריך<br> הרשמה</th>
-			<th>תאריך<br> מכירה</th>
-			<th>מחיר <br>חוזה</th>
-			<th>מחיר חוזה<br>לעמלה</th>
-			{% if sales.0.discount %}
-			<th>מחיר כולל <br>מע"מ</th>
-			<th>% הנחה <br>ניתן</th>
-			<th>% הנחה <br>מותר</th>
-			{% endif %}
-			<th>% עמלת <br>בסיס</th>
-			<th>שווי עמלת <br>בסיס</th>
-			{% if demand.project.commissions.get.b_discount_save_precentage or demand.project.commissions.get.c_zilber %}
-			<th>% בונוס <br>חסכון</th>
-			<th>שווי בונוס <br>חסכון</th>
-			{% endif %}
-			<th>% עמלה <br>סופי</th>
-			<th>שווי עמלה <br>סופי</th>
-			<th>תיקונים</th>
-			<th>הערות</th>
-			{% for s in sales %}
-			{% if not s.is_cp_ok %}
-				<tr class="row3" objid={{s.id}}>
-			{% else %}
-				<tr class="{% cycle 'row1' 'row2' %}" objid={{s.id}}>
-			{% endif %}
-				<td><a href="/sale/{{s.id}}">{{demand.id}}-{{forloop.counter}}</a></td>
-				{% if s.contract_num %}<td>{{s.contract_num}}</td>{% endif %}
-				<td>
-					{{s.clients}}
-				</td>
-				<td>
-					<a href="/buildings/{{s.house.building.id}}/pricelist/type1">
-					{{s.house.building}}
-					</a>
-				</td>
-				<td {% if s.salehousemod.id %}style="background-color: #F69F9F;"{% endif %}>
-					<a href="/buildings/{{s.house.building.id}}/house/{{s.house.id}}/type1">
-						{{s.house}}
-					</a>
-				</td>
-				<td>{% if s.house.get_signup %} {{s.house.get_signup.date|date:"j/m/Y"}} {% endif %}</td>
-				<td>{{s.sale_date|date:"j/m/Y"}}</td>
-				<td {% if s.salepricemod.id %}style="background-color: #F69F9F;"{% endif %}>
-					{{s.price|intcomma}} ש"ח
-				</td>
-				<td>{{s.price_final|floatformat:0|intcomma}} ש"ח</td>
-				{% if demand.sales_with_discount %}
-				<td>{{s.price_taxed|floatformat:0|intcomma}}</td>
-				<td>{{s.discount|floatformat:-3}}</td>
-				<td>{{s.allowed_discount|floatformat:-3}}</td>
+
+		<!-- <div id="myButtons">
+
+		</div> -->
+
+		<table class="table table-striped table-bordered table-condensed small" id="saleTable" >
+			<thead>
+				<tr>
+					<th>מזהה <br>מכירה</th>
+					{% if sales.0.contract_num %}
+					<th>מס' <br>חוזה</th>
+					{% endif %}
+					<th>שם <br>הרוכשים</th>
+					<th>בניין</th>
+					<th>דירה</th>
+					<th>תאריך<br> הרשמה</th>
+					<th>תאריך<br> מכירה</th>
+					<th>מחיר <br>חוזה</th>
+					<th>מחיר חוזה<br>לעמלה</th>
+					{% if sales.0.discount %}
+					<th>מחיר כולל <br>מע"מ</th>
+					<th>% הנחה <br>ניתן</th>
+					<th>% הנחה <br>מותר</th>
+					{% endif %}
+					<th>% עמלת <br>בסיס</th>
+					<th>שווי עמלת <br>בסיס</th>
+					{% if demand.project.commissions.get.b_discount_save_precentage or demand.project.commissions.get.c_zilber %}
+					<th>% בונוס <br>חסכון</th>
+					<th>שווי בונוס <br>חסכון</th>
+					{% endif %}
+					<th>% עמלה <br>סופי</th>
+					<th>שווי עמלה <br>סופי</th>
+					<th>תיקונים</th>
+					<th>הערות</th>
+				</tr>
+			</thead>
+			
+			<tbody>
+				{% for s in sales %}
+				{% if not s.is_cp_ok %}
+					<tr class="warning" data-id={{s.id}}>
+				{% else %}
+					<tr data-id={{s.id}}>
 				{% endif %}
-				<td>{{s.pc_base|floatformat:-3}}</td>
-				<td>{{s.pc_base_worth|floatformat:-3|intcomma}} ש"ח</td>
-				{% if demand.project.commissions.get.b_discount_save_precentage %}
-					<td>{{s.pb_dsp|floatformat:-3}}</td>
-					<td>{% if s.pb_dsp_worth %}{{s.pb_dsp_worth|floatformat:-3|intcomma}} ש"ח{% endif %}</td>
-				{% endif %}
-				{% if demand.project.commissions.get.c_zilber %}
-					<td>---</td>
-					<td>{% if s.zdb %}{{s.zdb|floatformat:-3|intcomma}} ש"ח{% endif %}</td>
-				{% endif %}
-				<td>{{s.c_final|floatformat:-3}}</td>
-				<td><b>{{s.c_final_worth|floatformat:-3|intcomma}} ש"ח</b></td>
-				<td>
-					{% if s.salepricemod %}
-						<a href="/salepricemod/{{s.salepricemod.id}}"><img src="{% static "images/money-48.png" %}" width="20" height="20" /></a>
+					<td><a href="/sale/{{s.id}}">{{demand.id}}-{{forloop.counter}}</a></td>
+					{% if s.contract_num %}<td>{{s.contract_num}}</td>{% endif %}
+					<td>
+						{{s.clients}}
+					</td>
+					<td>
+						<a href="/buildings/{{s.house.building.id}}/pricelist/type1">
+						{{s.house.building}}
+						</a>
+					</td>
+					<td {% if s.salehousemod.id %}style="background-color: #F69F9F;"{% endif %}>
+						<a href="/buildings/{{s.house.building.id}}/house/{{s.house.id}}/type1">
+							{{s.house}}
+						</a>
+					</td>
+					<td>{% if s.house.get_signup %} {{s.house.get_signup.date|date:"j/m/Y"}} {% endif %}</td>
+					<td>{{s.sale_date|date:"j/m/Y"}}</td>
+					<td {% if s.salepricemod.id %}style="background-color: #F69F9F;"{% endif %}>
+						{{s.price|intcomma}} ש"ח
+					</td>
+					<td>{{s.price_final|floatformat:0|intcomma}} ש"ח</td>
+					{% if demand.sales_with_discount %}
+					<td>{{s.price_taxed|floatformat:0|intcomma}}</td>
+					<td>{{s.discount|floatformat:-3}}</td>
+					<td>{{s.allowed_discount|floatformat:-3}}</td>
 					{% endif %}
-					{% if s.salehousemod %}
-						<a href="/salehousemod/{{s.salehousemod.id}}"><img src="{% static "images/home-48.png" %}" width="20" height="20" /></a>
+					<td>{{s.pc_base|floatformat:-3}}</td>
+					<td>{{s.pc_base_worth|floatformat:-3|intcomma}} ש"ח</td>
+					{% if demand.project.commissions.get.b_discount_save_precentage %}
+						<td>{{s.pb_dsp|floatformat:-3}}</td>
+						<td>{% if s.pb_dsp_worth %}{{s.pb_dsp_worth|floatformat:-3|intcomma}} ש"ח{% endif %}</td>
 					{% endif %}
-					{% if s.salepre %}
-						<a href="/salepre/{{s.salepre.id}}"><img src="{% static "images/agt_forward-48.png" %}" width="20" height="20" /></a>
+					{% if demand.project.commissions.get.c_zilber %}
+						<td>---</td>
+						<td>{% if s.zdb %}{{s.zdb|floatformat:-3|intcomma}} ש"ח{% endif %}</td>
 					{% endif %}
-					{% if s.salereject %}
-						<a href="/salereject/{{s.salereject.id}}"><img src="{% static "images/agt_back-48.png" %}" width="20" height="20" /></a>
-					{% endif %}
-					{% if s.salecancel %}
-						<a href="/salecancel/{{s.salecancel.id}}"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
-					{% endif %}
-				</td>
-				<td>{{s.remarks}}</td>
-			</tr>
-			{% endfor %}
-			{% if demand.get_excluded_sales %}
+					<td>{{s.c_final|floatformat:-3}}</td>
+					<td><b>{{s.c_final_worth|floatformat:-3|intcomma}} ש"ח</b></td>
+					<td>
+						{% if s.salepricemod %}
+							<a href="/salepricemod/{{s.salepricemod.id}}"><img src="{% static "images/money-48.png" %}" width="20" height="20" /></a>
+						{% endif %}
+						{% if s.salehousemod %}
+							<a href="/salehousemod/{{s.salehousemod.id}}"><img src="{% static "images/home-48.png" %}" width="20" height="20" /></a>
+						{% endif %}
+						{% if s.salepre %}
+							<a href="/salepre/{{s.salepre.id}}"><img src="{% static "images/agt_forward-48.png" %}" width="20" height="20" /></a>
+						{% endif %}
+						{% if s.salereject %}
+							<a href="/salereject/{{s.salereject.id}}"><img src="{% static "images/agt_back-48.png" %}" width="20" height="20" /></a>
+						{% endif %}
+						{% if s.salecancel %}
+							<a href="/salecancel/{{s.salecancel.id}}"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
+						{% endif %}
+					</td>
+					<td>{{s.remarks}}</td>
+				</tr>
+				{% endfor %}
+
+				{% if demand.get_excluded_sales %}
 				<tr>
 					<td align="center" colspan="20"><b>מכירות שלא נכללות בדרישה</b></td>
 				</tr>
 				{% for s in demand.get_excluded_sales %}
-				<tr class="{% cycle 'row1' 'row2' %}" objid={{s.id}}>
+				<tr data-id={{s.id}}>
 					<td><a href="/sale/{{s.id}}">{{demand.id}}-{{forloop.counter}}</a></td>
 					{% if s.contract_num %}
 					<td>{{s.contract_num}}</td>
@@ -279,14 +311,17 @@
 				</tr>
 				{% endfor %}
 			{% endif %}
-			<tr height="40px">
-				<td colspan={% if sales.0.discount %}"7"{%else%}"6"{%endif%}></td>
-				<td><b><u>{{sales.total_price|floatformat:0|intcomma}} ש"ח</u></b></td>
-				<td><b><u>{{sales.total_price_final|floatformat:0|intcomma}} ש"ח</u></b></td>
-				<td colspan={% if sales.0.discount %}"5"{%else%}"2"{%endif%}></td>
-				<td colspan={% if demand.project.commissions.get.b_discount_save_precentage or demand.project.commissions.get.c_zilber %}"3"{%else%}"1"{%endif%}></td>
-				<td colspan="2"><b><u style="color:#1A339C;">{{demand.sales_commission|intcomma}} ש"ח</u></b></td>
-			</tr>
+			
+				<tr height="40px">
+					<td colspan={% if sales.0.discount %}"7"{%else%}"6"{%endif%}></td>
+					<td><b><u>{{sales.total_price|floatformat:0|intcomma}} ש"ח</u></b></td>
+					<td><b><u>{{sales.total_price_final|floatformat:0|intcomma}} ש"ח</u></b></td>
+					<td colspan={% if sales.0.discount %}"5"{%else%}"2"{%endif%}></td>
+					<td colspan={% if demand.project.commissions.get.b_discount_save_precentage or demand.project.commissions.get.c_zilber %}"3"{%else%}"1"{%endif%}></td>
+					<td colspan="2"><b><u style="color:#1A339C;">{{demand.sales_commission|intcomma}} ש"ח</u></b></td>
+				</tr>
+			</tbody>
+			
 		</table>
 	</div>
 </div>
