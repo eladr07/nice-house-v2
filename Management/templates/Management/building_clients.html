@@ -8,7 +8,7 @@
 	</a>
 	<div class="clearBoth"></div>
 	<br /> 		
-	<table class="dataTable" border="1">
+	<table class="table table-bordered table-striped table-condensed small">
 		<th>מס'<br>דירה</th>
 		<th>סוג<br>דירה</th>
 		<th>שטח<br>נטו</th>
@@ -29,7 +29,7 @@
 		<th>ארכיב<br>לקוח</th>
 		<th>מצב<br>חשבון</th>
 		{% for h in object.houses.all %}
-			<tr class="{% cycle 'row1' 'row2' %}" objid={{car.id}}>
+			<tr>
 				<td><a href="../house/{{h.id}}/type1">{{ h.num }}</a></td>
 				<td>{{ h.type }}</td>
 				<td>{{ h.net_size }}</td>
@@ -53,7 +53,7 @@
 				{% endwith %}
 			</tr>
 		{% endfor %}
-		<tr class="rowSum">
+		<tr class="info">
 			<td>{{object.houses.count}} סה"כ</td>
 			<td colspan="11"></td>
 			<td>{{total_sale_price|intcomma}}</td>

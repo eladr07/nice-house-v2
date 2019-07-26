@@ -31,14 +31,14 @@
 	{% for row in data %}
 		<h3 style="text-align:center; background-color:#FBFFD1;">{{row.division}}</h3>
 		<div style="float:right; width:45%;">
-			<table class="dataTable" border="1">
+			<table class="table table-bordered table-striped table-condensed">
 				<caption>הכנסות</caption>
 				<th></th>
 				<th>פרוייקט</th>
 				<th>סכום</th>
 				<th>% מההכנסות</th>
 				{% for incomeRow in row.incomes %}
-					<tr class="{% cycle 'row1' 'row2' %}">
+					<tr>
 						<td>
 							{% if incomeRow.details_link %} 
 								<a href={{incomeRow.details_link}} target="_blank"><img src="{% static "images/viewmag-48.png" %}" width="20" height="20"/></a> 
@@ -52,14 +52,14 @@
 			</table>
 		</div>
 		<div style="float:left; width:45%;">
-			<table class="dataTable" border="1">
+			<table class="table table-bordered table-striped table-condensed">
 				<caption>הוצאות</caption>
 				<th></th>
 				<th>סוג הוצאה</th>
 				<th>סכום</th>
 				<th>% מההוצאות</th>
 				{% for lossRow in row.losses %}
-					<tr class="{% cycle 'row1' 'row2' %}">
+					<tr>
 						<td>
 							{% if lossRow.details_link %} 
 								<a href={{lossRow.details_link}} target="_blank"><img src="{% static "images/viewmag-48.png" %}" width="20" height="20"/></a> 

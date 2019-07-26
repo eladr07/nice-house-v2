@@ -7,17 +7,16 @@
 {{ block.super }}
 <script>
 	var selectedID = 0;
-	var prev_class;
+	
 	$(document).ready(function() {
 		$("#demandTable tr").click(function() { 
 			var tr = $(this);
 			if (selectedID > 0)
-				$("#demandTable tr[objid='"+selectedID+"']").attr("class", prev_class);
+				$("#demandTable tr[objid='"+selectedID+"']").removeClass('active');
 			selectedID = tr.attr("objid");
 			if (!selectedID)
 				return;
-			prev_class = tr.attr("class");
-			tr.attr("class","selectedRow");
+			tr.addClass('active');
 			//sync links
 			if (selectedID > 0)
 				$("#demandEdit").attr("href", "/demands/" + selectedID);
@@ -57,8 +56,7 @@
 
 <div class="clearBoth"></div>
 <br>
-<table id="Table" class="dataTable" border="1">
-<caption>מציג סה"כ {{projects|length}} פרוייקטים</caption>
+<table id="Table" class="table table-bordered table-striped table-condensed" >
 	<tr>
 		<th>מס"ד</th>
 		<th>שם היזם</th>
@@ -73,7 +71,7 @@
 		<th>רווח</th>
 	</tr>
     {% for p in projects %}
-		<tr class="{% cycle 'row1' 'row2' %}" objid={{d.id}}>
+		<tr objid={{d.id}}>
 			<td><a href="{{p.get_absolute_url}}">{{p.id}}</a></td>
 			<td>{{ p.initiator }}</td>
 			<td>{{ p.name }}</td>
@@ -109,8 +107,8 @@
 			<td>{{ p.profit|floatformat:0|intcomma }}</td>
 		</tr>
 	{% endfor %}
-	<tr height="30px" class="rowSum">
-		<td colspan="2" align="center">סיכום</td>
+	<tr height="30px" class="info">
+		<td colspan="3" align="center">סיכום</td>
 		<td>{{total_sale_count}}</td>
 		<td>{{total_income|floatformat:0|intcomma}} ש"ח</td>
 		<td></td>
