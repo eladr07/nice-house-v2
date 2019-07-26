@@ -20,6 +20,9 @@ var config = {
     // jQuery UI
     jqueryuisrc: root + '/jquery-ui-dist/jquery-ui.min.js',
 
+    // JS Zip
+    jsZipSrc: root + '/jszip/dist/jszip.min.js',
+
     // Fancybox
     fancyboxSrc: root + '/fancybox/dist/js/jquery.fancybox.pack.js',
     fancyboxCss: root + '/fancybox/dist/css/jquery.fancybox.css',
@@ -29,7 +32,7 @@ var config = {
     dataTableSrc: [
         root + '/datatables.net/js/jquery.dataTables.js',
         root + '/datatables.net-bs/js/dataTables.bootstrap.js',
-        
+
         root + '/datatables.net-buttons/js/dataTables.buttons.js',
         root + '/datatables.net-buttons/js/buttons.html5.js',
         root + '/datatables.net-buttons/js/buttons.flash.js',
@@ -89,6 +92,11 @@ gulp.task('jquery-ui', function () {
         .pipe(gulp.dest(config.scriptsOut));
 });
 
+gulp.task('jszip', function () {
+    return gulp.src(config.jsZipSrc)
+        .pipe(gulp.dest(config.scriptsOut));
+});
+
 gulp.task('fancybox', function () {
     return gulp.src(config.fancyboxSrc)
         .pipe(gulp.dest(config.scriptsOut));
@@ -116,7 +124,7 @@ gulp.task('bootstrap-datepicker', function () {
 });
 
 // Combine and the vendor files from bower into bundles (output to the Scripts folder)
-gulp.task('vendor-scripts', gulp.series('jquery-bundle', 'jquery-ui', 'fancybox', 'datatables-bundle', 'bootstrap-bundle', 'bootstrap-datepicker'));
+gulp.task('vendor-scripts', gulp.series('jquery-bundle', 'jquery-ui', 'jszip', 'fancybox', 'datatables-bundle', 'bootstrap-bundle', 'bootstrap-datepicker'));
 
 // Synchronously delete the output style files (css / fonts)
 gulp.task('clean-styles', function (cb) {
