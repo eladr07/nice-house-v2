@@ -27,12 +27,19 @@ var config = {
 
     // DataTable
     dataTableSrc: [
-        root + '/datatables.net/js/jquery.dataTables.min.js',
-        root + '/datatables.net-buttons/js/dataTables.buttons.min.js',
-        root + '/datatables.net-bs/js/dataTables.bootstrap.min.js',
+        root + '/datatables.net/js/jquery.dataTables.js',
+        root + '/datatables.net-bs/js/dataTables.bootstrap.js',
+        
+        root + '/datatables.net-buttons/js/dataTables.buttons.js',
+        root + '/datatables.net-buttons/js/buttons.html5.js',
+        root + '/datatables.net-buttons/js/buttons.flash.js',
+        root + '/datatables.net-buttons-bs/js/buttons.bootstrap.js',
     ],
 
-    dataTableCss: root + '/datatables.net-bs/css/dataTables.bootstrap.min.css',
+    dataTableCss: [
+        root + '/datatables.net-bs/css/dataTables.bootstrap.min.css',
+        root + '/datatables.net-buttons-bs/css/buttons.bootstrap.css',
+    ],
 
     //JavaScript files that will be combined into a Bootstrap bundle
     bootstrapsrc: root + '/bootstrap/dist/js/bootstrap.min.js',
@@ -132,6 +139,10 @@ gulp.task('fancybox-images', function () {
 
 gulp.task('datatables-css', function () {
     return gulp.src(config.dataTableCss)
+        .pipe(concat('datatables-bundle.css'))
+        .pipe(gulp.dest(config.cssout))
+        .pipe(minifyCSS())
+        .pipe(concat('datatables-bundle.min.css'))
         .pipe(gulp.dest(config.cssout));
 });
 
