@@ -133,19 +133,19 @@
 	</tr>
     {% for d in demands %}
 		{% if not d.last_status %}
-			<tr class="warning" data-id={{d.id}}>
+			<tr class="row3" data-id={{d.id}}>
 		{% else %}
 			{% if d.last_status.type_id == 1 %}
 				<tr data-id={{d.id}}>
 			{% endif %}
 			{% if d.last_status.type_id == 2 %}
-				<tr class="info" data-id={{d.id}}>
+				<tr class="row4" data-id={{d.id}}>
 			{% endif %}
 			{% if d.last_status.type_id == 3 %}
-				<tr class="success" data-id={{d.id}}>
+				<tr class="row5" data-id={{d.id}}>
 			{% endif %}
 			{% if d.last_status.type_id == 4 %}
-				<tr class="success" data-id={{d.id}}>
+				<tr class="row5" data-id={{d.id}}>
 			{% endif %}
 		{% endif %}
 			<td><a href="{% url 'demand-edit' object_id=d.id %}">{{d.id}}</a></td>

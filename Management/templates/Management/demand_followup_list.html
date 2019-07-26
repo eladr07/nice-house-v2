@@ -7,20 +7,23 @@
 {{ block.super }}
 <script>
 	var selectedID = 0;
+	var prev_class;
 	
 	$(document).ready(function() {
 		$("#demandTable tr").click(function() { 
 			var tr = $(this);
 
 			if (selectedID > 0)
-				$("#demandTable tr[data-id='"+selectedID+"']").removeClass('active');
+				$("#demandTable tr[data-id='"+selectedID+"']").attr("class", prev_class);
 
 			selectedID = tr.data("id");
 
 			if (!selectedID)
 				return;
 
-			tr.addClass('active');
+			prev_class = tr.attr("class");
+
+			tr.attr("class","active");
 			
 			//sync links
 			if (selectedID > 0) {
@@ -120,7 +123,7 @@
 	</thead>
     {% for d in demands %}
 	{% if d.is_fully_paid %}
-		<tr class="success" data-id={{d.id}}>
+		<tr class="row5" data-id={{d.id}}>
 	{% else %}
 		<tr data-id={{d.id}}>
 	{% endif %}
