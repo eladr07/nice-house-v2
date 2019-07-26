@@ -2472,19 +2472,25 @@ class BuildingUpdate(PermissionRequiredMixin, UpdateView):
 
 @permission_required('Management.building_clients')
 def building_clients(request, object_id):
-    b = Building.objects.get(pk = object_id)
+    building = Building.objects \
+        .prefetch_related('houses__type','houses__parkings','houses__storages') \
+        .get(pk = object_id)
+
+    houses = building.houses.all()
+
     total_sale_price = 0
-    for h in b.houses.sold():
-        sale = h.get_sale()
+    
+    for house in houses:
+        sale = house.get_sale()
         if sale:
             total_sale_price += sale.price
         try:
-            h.price = h.versions.company().latest().price
+            house.price = house.versions.company().latest().price
         except HouseVersion.DoesNotExist:
-            h.price = None
+            house.price = None
+
     return render(request, 'Management/building_clients.html',
-                              { 'object':b, 'total_sale_price':total_sale_price},
-                              )
+        { 'object':building, 'houses':houses, 'total_sale_price':total_sale_price})
 
 @permission_required('Management.building_clients_pdf')
 def building_clients_pdf(request, object_id):

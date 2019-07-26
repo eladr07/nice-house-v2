@@ -28,7 +28,7 @@
 		<th>מועד<br>אכלוס<br>חזוי</th>
 		<th>ארכיב<br>לקוח</th>
 		<th>מצב<br>חשבון</th>
-		{% for h in object.houses.all %}
+		{% for h in houses %}
 			<tr>
 				<td><a href="../house/{{h.id}}/type1">{{ h.num }}</a></td>
 				<td>{{ h.type }}</td>
