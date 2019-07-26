@@ -8,17 +8,22 @@
 <script>
 	var selectedID = 0;
 	var prev_class;
-	var filterIndex = 0;
+
 	$(document).ready(function() {
 		$("#demandTable tr").click(function() { 
 			var tr = $(this);
+			
 			if (selectedID > 0)
-				$("#demandTable tr[objid='"+selectedID+"']").attr("class", prev_class);
-			selectedID = tr.attr("objid");
+				$("#demandTable tr[data-id='"+selectedID+"']").attr("class", prev_class);
+
+			selectedID = tr.data('id');
+			
 			if (!selectedID)
 				return;
+			
 			prev_class = tr.attr("class");
-			tr.attr("class","selectedRow");
+
+			tr.attr("class","active");
 			
 			//sync links
 			if (selectedID > 0) {
@@ -106,7 +111,7 @@
 {% endfor %}
 </p>
 <br>
-<table id="demandTable" class="dataTable" border="1">
+<table id="demandTable" class="table table-bordered table-striped table-condensed small">
 <caption>מציג סה"כ {{demands|length}} דרישות לתשלום</caption>
 	<tr>
 		<th>מס'</th>
@@ -128,19 +133,19 @@
 	</tr>
     {% for d in demands %}
 		{% if not d.last_status %}
-			<tr class="row3" objid={{d.id}}>
+			<tr class="warning" data-id={{d.id}}>
 		{% else %}
 			{% if d.last_status.type_id == 1 %}
-				<tr class="{% cycle 'row1' 'row2' %}" objid={{d.id}}>
+				<tr data-id={{d.id}}>
 			{% endif %}
 			{% if d.last_status.type_id == 2 %}
-				<tr class="row4" objid={{d.id}}>
+				<tr class="info" data-id={{d.id}}>
 			{% endif %}
 			{% if d.last_status.type_id == 3 %}
-				<tr class="row5" objid={{d.id}}>
+				<tr class="success" data-id={{d.id}}>
 			{% endif %}
 			{% if d.last_status.type_id == 4 %}
-				<tr class="row5" objid={{d.id}}>
+				<tr class="success" data-id={{d.id}}>
 			{% endif %}
 		{% endif %}
 			<td><a href="{% url 'demand-edit' object_id=d.id %}">{{d.id}}</a></td>
@@ -174,7 +179,7 @@
 			<td>{{ d.remarks|default_if_none:"" }}</td>
 		</tr>
 	{% endfor %}
-	<tr class="rowSum" height="30px">
+	<tr class="info" height="30px">
 		<td colspan="4" align="center"></td>
 		<td>{{total_sales_count}} מכירות</td>
 		<td>{{demands.total_sale_count}} מכירות</td>
