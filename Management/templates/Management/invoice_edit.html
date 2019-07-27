@@ -47,19 +47,17 @@
 		</fieldset>
 	</div>
 	<div id="rightSide">
-		<form method="POST">
+		<form method="POST" class="form-horizontal">
 			{% csrf_token %}
-			<table class="formTable">
-				{% include "Management/form_snippet.html" %}
-				<tr>
-					<td></td>
-					<td>
-						<input type="submit" value="אישור" class="button"/>
-						<input name="addanother" type="submit" value="אישור והמשך הזנה" class="button"/>
-						<input name="addpayment" type="submit" value="אישור והזנת תשלום" class="button"/>
-					</td>
-				</tr>
-			</table>
+			
+			{% include "Management/form_snippet.html" %}
+
+			<div class="form-group col-xs-6 col-xs-offset-4">
+				<input type="submit" value="אישור" class="btn btn-sm btn-primary"/>
+				<input name="addanother" type="submit" value="אישור והמשך הזנה" class="btn btn-sm btn-default"/>
+				<input name="addpayment" type="submit" value="אישור והזנת תשלום" class="btn btn-sm btn-default"/>
+			</div>
+
 		</form>
 	</div>
 	<div class="clearBoth"></div>
