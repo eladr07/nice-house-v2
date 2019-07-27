@@ -34,18 +34,10 @@
 
 {% block content %}
 	<h3 class="text-center text-danger">חשבונית חדשה</h3>
+
 	<div class="clearBoth"> </div>
-	<br /> 	
-	<div style="float:left; width:20%;">
-		<fieldset class="cardFieldset">
-			<ul>
-				<li><a href="/payments/add">הזנת צ'ק רגיל</a></li>
-				<li><a href="/splitpayment/add">הזנת צ'ק מפוצל</a></li>
-				<li><a href="invoices/offset" class="fancybox">הקלדת זיכוי לחשבונית</a></li>
-			</ul>
-		</fieldset>
-	</div>
-	<div id="rightSide">
+	
+	<div class="col-md-8">
 		<form method="POST" class="form-horizontal">
 			{% csrf_token %}
 			
@@ -61,6 +53,17 @@
 
 		</form>
 	</div>
+
+	<div style="float:left; width:20%;">
+			<fieldset class="cardFieldset">
+				<ul>
+					<li><a href="/payments/add">הזנת צ'ק רגיל</a></li>
+					<li><a href="/splitpayment/add">הזנת צ'ק מפוצל</a></li>
+					<li><a href="invoices/offset" class="fancybox">הקלדת זיכוי לחשבונית</a></li>
+				</ul>
+			</fieldset>
+		</div>
+
 	<div class="clearBoth"></div>
 	
 	{% include './demand_deals.html' %}
