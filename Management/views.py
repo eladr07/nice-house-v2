@@ -1555,8 +1555,14 @@ def demand_edit(request, object_id):
         form = DemandForm(instance = demand)
         months = MonthForm()
         
-    return render(request, 'Management/demand_edit.html', 
-        { 'form':form, 'demand':demand, 'sales':demand.sales_list, 'months':months }, )
+    context = { 
+        'form':form, 
+        'demand':demand, 
+        'sales':demand.sales_list, 
+        'months':months 
+    }
+
+    return render(request, 'Management/demand_edit.html', context)
     
 @permission_required('Management.change_demand')
 def demand_close(request, id):
