@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     
     'Indices.apps.IndicesConfig',
     'Management.apps.ManagementConfig',
+    'Checks.apps.ChecksConfig',
     'Analytics.apps.AnalyticsConfig',
     'Activity.apps.ActivityConfig',
     

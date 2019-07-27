@@ -7,7 +7,9 @@ from django.urls import reverse
 
 from Indices.models import Tax
 
-from Management.models import HireType, Sale, DivisionType, Demand, EmployeeSalary, PaymentCheck
+from Checks.models import PaymentCheck
+
+from Management.models import HireType, Sale, DivisionType, Demand, EmployeeSalary
 from Management.models import NHMonth, NHBranch, NHEmployeeSalary
 from Management.views import build_and_return_pdf
 from Management.forms import SeasonForm, NHBranchSeasonForm

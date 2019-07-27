@@ -21,6 +21,7 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('analytics/', include('Analytics.urls')),
     path('indices/', include('Indices.urls')),
+    path('checks/', include('Checks.urls')),
     path('activities/', include('Activity.urls')),
 ]
 
@@ -237,12 +238,7 @@ urlpatterns += [
     path('invoices/offset', invoice_offset),      
     path('invoiceoffset/<int:pk>', InvoiceOffsetUpdate.as_view()),
     path('invoiceoffset/<int:id>/del', invoice_offset_del),
-    
-    path('checks/', check_list),
-    path('checks/add', check_add),
-    path('checks/<int:id>', check_edit),
-    path('checks/<int:pk>/del', PaymentCheckDelete.as_view()),
-    
+   
     path('loans/', LoanListView.as_view()),
     path('loans/add', LoanCreate.as_view()),
     path('loans/<int:pk>', LoanUpdate.as_view()),
@@ -254,11 +250,6 @@ urlpatterns += [
     path('lawyers/add', LawyerCreate.as_view()),
     path('lawyers/<int:pk>', LawyerUpdate.as_view()),
     path('lawyers/<int:pk>/del', LawyerDelete.as_view()),
-         
-    path('employeechecks/', employeecheck_list),
-    path('employeechecks/add', employeecheck_add),
-    path('employeechecks/<int:id>', employeecheck_edit),
-    path('employeechecks/<int:id>/del', EmployeeCheckDelete.as_view()),
     
     path('reports/project_month/<int:project_id>/<int:year>/<int:month>', report_project_month),
     path('reports/projects_month/<int:year>/<int:month>', report_projects_month),
