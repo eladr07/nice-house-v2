@@ -116,7 +116,7 @@
 						שונה מ- 
 						{{s.salepricemod.old_price|intcomma}} 
 						ל - 
-						<b>{{s.price|intcomma}}</b>. 
+						<strong>{{s.price|intcomma}}</strong>. 
 						<a href="{{ s.salepricemod.get_absolute_url }}">פרטים</a>
 						</li>
 					{% endfor %}
@@ -128,9 +128,9 @@
 							דירה 
 						<a href="/buildings/{{s.salehousemod.old_house.building.id}}/house/{{s.salehousemod.old_house.id}}/type1">{{s.salehousemod.old_house.num}}</a>			
 							לבניין 
-						<a href="/buildings/{{s.house.building.id}}/pricelist/type1"><b>{{s.house.building.num}}</b></a>
+						<a href="/buildings/{{s.house.building.id}}/pricelist/type1"><strong>{{s.house.building.num}}</strong></a>
 							דירה 
-						<a href="/buildings/{{s.house.building.id}}/house/{{s.house.id}}/type1"><b>{{s.house.num}}</b></a>. 
+						<a href="/buildings/{{s.house.building.id}}/house/{{s.house.id}}/type1"><strong>{{s.house.num}}</strong></a>. 
 						<a href="{{ s.salehousemod.get_absolute_url }}">פרטים</a>
 						</li>
 					{% endfor %}
@@ -138,7 +138,7 @@
 						<li>מכירה מס' 
 						<a href="/sale/{{s.id}}">{{s.id}}</a> - ({{s}})
 						הוקדמה לחודש זה. העובד יקבל תשלום בחודש
-						<b>{{s.salepre.employee_pay_month}}/{{s.salepre.employee_pay_year}}</b>. 
+						<strong>{{s.salepre.employee_pay_month}}/{{s.salepre.employee_pay_year}}</strong>. 
 						<a href="{{ s.salepre.get_absolute_url }}">פרטים</a>
 						</li>
 					{% endfor %}
@@ -146,9 +146,10 @@
 						<li>מכירה מס' 
 						<a href="/sale/{{s.id}}">{{s.id}}</a> - ({{s}})
 						נדחתה לחודש
-						<b>{{s.salereject.to_month}}/{{s.salereject.to_year}}</b>
+						<strong>{{s.salereject.to_month}}/{{s.salereject.to_year}}</strong>
+						<br>
 						העובד יקבל תשלום בחודש
-						<b>{{s.salereject.employee_pay_month}}/{{s.salereject.employee_pay_year}}</b>. 
+						<strong>{{s.salereject.employee_pay_month}}/{{s.salereject.employee_pay_year}}</strong>. 
 						<a href="{{ s.salereject.get_absolute_url }}">פרטים</a>
 						</li>			
 					{% endfor %}
@@ -172,9 +173,9 @@
 				{% for i in demand.invoices.all %}
 					{{ i.num }}
 					- בתאריך
-					<b>{{i.date|date:"j/m/y"}}</b>
+					<strong>{{i.date|date:"j/m/y"}}</strong>
 					על סך
-					<b>{{i.amount|intcomma}} ש"ח</b>  				
+					<strong>{{i.amount|intcomma}} ש"ח</strong>  				
 					<a href="/demandinvoice/{{i.id}}" ><i class="fa fa-edit" title='עריכה'></i></a>
 					<a href="/invoices/{{i.id}}/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
 					{% if i.offset %}
@@ -207,9 +208,9 @@
 				{% for p in demand.payments.all %}
 					{{ p.num }}
 					- לתאריך
-					<b>{{p.payment_date|date:"j/m/y"}}</b>
+					<strong>{{p.payment_date|date:"j/m/y"}}</strong>
 					על סך
-					<b>{{p.amount|intcomma}} ש"ח</b>  				
+					<strong>{{p.amount|intcomma}} ש"ח</strong>  				
 					<a href="/demandpayment/{{p.id}}" ><i class="fa fa-edit" title='עריכה'></i></a>
 					<a href="/payments/{{p.id}}/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
 					<br>
