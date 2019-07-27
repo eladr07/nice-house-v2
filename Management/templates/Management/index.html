@@ -128,10 +128,10 @@
 			<div class="panel-heading">הוצאת צ'קים</div>
 			<div class="panel-body">
 				<ul>
-					<li><a href="checks/employeechecks">צ'קים לעובדים</a>
-					<a class="fancybox" href="checks/employeechecks/add" ><i class="fa fa-fw fa-plus-circle text-success"></i></a></li>
-					<li><a href="checks/checks">צ'קים אחרים</a>
-					<a class="fancybox" href="checks/checks/add" ><i class="fa fa-fw fa-plus-circle text-success"></i></a></li>
+					<li><a href="{% url 'employee-checks-list' %}">צ'קים לעובדים</a>
+					<a class="fancybox" href="{% url 'employee-checks-add' %}" ><i class="fa fa-fw fa-plus-circle text-success"></i></a></li>
+					<li><a href="{% url 'checks-list' %}">צ'קים אחרים</a>
+					<a class="fancybox" href="{% url 'checks-add' %}" ><i class="fa fa-fw fa-plus-circle text-success"></i></a></li>
 				</ul>
 			</div>
 		</div>
