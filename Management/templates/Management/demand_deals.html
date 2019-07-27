@@ -7,13 +7,21 @@
 	var selectedID = 0;
 	
 	$(document).ready(function() {
-		// var table = $('#saleTable').DataTable({
-		// 	buttons: [
-    //     'csv','excel']
-		// });
+		var table = $('#saleTable').DataTable({
+			searching: false,
+			ordering: false,
+			paging: false,
+			buttons: [
+				{
+					extend: 'excel',
+					text: 'ייצא לאקסל',
+					filename: 'פירוט מכירות - {{demand.project}} לחודש {{demand.month}}/{{demand.year}}'
+				}
+			]
+		});
 
-		// table.buttons().container()
-    // 	.appendTo($('#myButtons'));
+		table.buttons().container()
+    	.appendTo($('#myButtons'));
 
 		$("#saleTable tr").click(function() {
 			var tr = $(this);
@@ -141,7 +149,11 @@
 		<a href="/reports/project_month/{{demand.project.id}}/{{demand.year}}/{{demand.month}}" class="btn btn-default" role="button">
 			<i class="fa fa-fw fa-print"></i> גרסה להדפסה
 		</a>
-			
+		
+		<div id="myButtons" style="display: inline-block">
+
+		</div>
+
 		<table class="formTable" style="float:left;">
 			<tr>
 				<th>נתון שהשתנה</th>
@@ -154,10 +166,6 @@
 		</table>
 		<div class="clearBoth"></div>
 		<br>
-
-		<!-- <div id="myButtons">
-
-		</div> -->
 
 		<table class="table table-striped table-bordered table-condensed small" id="saleTable" >
 			<thead>
@@ -312,15 +320,18 @@
 				{% endfor %}
 			{% endif %}
 			
+			</tbody>
+
+			<tfoot>
 				<tr height="40px">
 					<td colspan={% if sales.0.discount %}"7"{%else%}"6"{%endif%}></td>
 					<td><b><u>{{demand.sales_total_price|floatformat:0|intcomma}} ש"ח</u></b></td>
 					<td><b><u>{{demand.sales_amount|floatformat:0|intcomma}} ש"ח</u></b></td>
 					<td colspan={% if sales.0.discount %}"5"{%else%}"2"{%endif%}></td>
 					<td colspan={% if demand.project.commissions.get.b_discount_save_precentage or demand.project.commissions.get.c_zilber %}"3"{%else%}"1"{%endif%}></td>
-					<td colspan="2"><b><u style="color:#1A339C;">{{demand.sales_commission|intcomma}} ש"ח</u></b></td>
+					<td colspan="3"><b><u style="color:#1A339C;">{{demand.sales_commission|intcomma}} ש"ח</u></b></td>
 				</tr>
-			</tbody>
+			</tfoot>
 			
 		</table>
 	</div>
