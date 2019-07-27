@@ -7,17 +7,17 @@
 {{ block.super }}
 <script>
 	var selectedID = 0;
-	var prev_class;
+	
 	$(document).ready(function() {
 		$("tr").click(function() { 
 			var tr = $(this);
 			if (selectedID > 0)
-				$("tr[objid='"+selectedID+"']").attr("class", prev_class);
-			selectedID = tr.attr("objid");
+				$("tr[data-id='"+selectedID+"']").removeClass('active');
+			selectedID = tr.data('id');
 			if (!selectedID)
 				return;
-			prev_class = tr.attr("class");
-			tr.attr("class","selectedRow");
+				
+			tr.addClass('active');
 			//sync links
 			if (selectedID > 0)
 			{
@@ -44,7 +44,7 @@
 
 	<div class="clearBoth"> </div>
 	<br /> 		
-	<table class="dataTable" border="1">
+	<table class="table table-bordered table-striped table-condensed">
 		<th>שם פרטי</th>
 		<th>שם משפחה</th>
 		<th>טלפון</th>
@@ -53,7 +53,7 @@
 		<th>כתובת</th>
 		<th>תפקיד</th>
 		{% for o in object_list %}
-		<tr class="{% cycle 'row1' 'row2' %}" objid={{o.id}}>
+		<tr data-id={{o.id}}>
 			<td>{{o.first_name}}</td>
 			<td>{{o.last_name}}</td>
 			<td>{{o.phone}}</td>

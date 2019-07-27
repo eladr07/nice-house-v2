@@ -8,16 +8,22 @@
 <script>
 	var selectedID = 0;
 	var prev_class;
+	
 	$(document).ready(function() {
 		$("#demandTable tr").click(function() { 
 			var tr = $(this);
+
 			if (selectedID > 0)
-				$("#demandTable tr[objid='"+selectedID+"']").attr("class", prev_class);
-			selectedID = tr.attr("objid");
+				$("#demandTable tr[data-id='"+selectedID+"']").attr("class", prev_class);
+
+			selectedID = tr.data("id");
+
 			if (!selectedID)
 				return;
+
 			prev_class = tr.attr("class");
-			tr.attr("class","selectedRow");
+
+			tr.attr("class","active");
 			
 			//sync links
 			if (selectedID > 0) {
@@ -87,37 +93,39 @@
 
 <div class="clearBoth"></div>
 <br>
-<table id="demandTable" class="dataTable" border="1">
+<table id="demandTable" class="table table-bordered table-striped table-condensed small">
 <caption>מציג סה"כ {{demands|length}} דרישות לתשלום לפרוייקט {{project}}</caption>
-	<tr>
-		<th colspan="5">פרטי דרישה</th>
-		<th colspan="3">פרטי חשבונית</th>
-		<th colspan="2">פרטי צ'קים</th>
-		<th colspan="6">הפרשי דרישה</th>
-	</tr>
-	<tr>
-		<th>מס'</th>
-		<th>PDF</th>
-		<th>חודש</th>
-		<th>מס'<BR>מכירות</th>
-		<th>סכום דרישה</th>
-		<th>מס'<BR>חשבונית</th>
-		<th>סכום</th>
-		<th>תאריך</th>
-		<th>סכום</th>
-		<th>תאריך</th>
-		<th>דרישה<BR>לחשבונית</th>
-		<th>צ'ק<BR>לחשבונית</th>
-		<th>זיכוי<BR>חשבונית</th>
-		<th>התאמה</th>
-		<th>תיקונים</th>
-		<th>טיפול<BR>בדרישה</th>
-	</tr>
+	<thead>
+		<tr>
+			<th colspan="5">פרטי דרישה</th>
+			<th colspan="3">פרטי חשבונית</th>
+			<th colspan="2">פרטי צ'קים</th>
+			<th colspan="6">הפרשי דרישה</th>
+		</tr>
+		<tr>
+			<th>מס'</th>
+			<th>PDF</th>
+			<th>חודש</th>
+			<th>מס'<BR>מכירות</th>
+			<th>סכום דרישה</th>
+			<th>מס'<BR>חשבונית</th>
+			<th>סכום</th>
+			<th>תאריך</th>
+			<th>סכום</th>
+			<th>תאריך</th>
+			<th>דרישה<BR>לחשבונית</th>
+			<th>צ'ק<BR>לחשבונית</th>
+			<th>זיכוי<BR>חשבונית</th>
+			<th>התאמה</th>
+			<th>תיקונים</th>
+			<th>טיפול<BR>בדרישה</th>
+		</tr>
+	</thead>
     {% for d in demands %}
 	{% if d.is_fully_paid %}
-		<tr class="rowLightGreen" objid={{d.id}}>
+		<tr class="row5" data-id={{d.id}}>
 	{% else %}
-		<tr class="{% cycle 'row1' 'row2' %}" objid={{d.id}}>
+		<tr data-id={{d.id}}>
 	{% endif %}
 			<td><a href="{% url 'demand-edit' object_id=d.id %}">{{d.id}}</a></td>
 			<td>
@@ -185,7 +193,7 @@
 			</td>
 		</tr>
 	{% endfor %}
-	<tr height="30px" class="rowSum">
+	<tr height="30px" class="text-danger">
 		<td colspan="4" align="center">סיכום</td>
 		<td>{{total_amount|intcomma}} ש"ח</td>
 		<td></td>

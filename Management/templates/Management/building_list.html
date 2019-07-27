@@ -5,17 +5,16 @@
 {% block scripts %}
 <script>
 	var selectedID = 0;
-	var prev_class;
+	
 	$(document).ready(function() {
 		$("tr").click(function() { 
 			var tr = $(this);
 			if (selectedID > 0)
-				$("tr[objid='"+selectedID+"']").attr("class", prev_class);
-			selectedID = tr.attr("objid");
+				$("tr[data-id='"+selectedID+"']").removeClass('active');
+			selectedID = tr.data('id');
 			if (!selectedID)
 				return;
-			prev_class = tr.attr("class");
-			tr.attr("class","selectedRow");
+			tr.addClass('active');
 			//sync links
 			if (selectedID > 0)
 			{
@@ -58,7 +57,7 @@
 
 	<div class="clearBoth"> </div>
 	<br /> 		
-		<table class="dataTable" border="1">
+		<table class="table table-bordered table-striped table-condensed">
 			<tr>
 				<th></th>
 				<th>מס'</th>
@@ -73,7 +72,7 @@
 				<th>מחירון מעודכן</th>
 			</tr>
 			{% for b in buildings %}
-				<tr class="{% cycle 'row1' 'row2' %}" objid={{b.id}}>
+				<tr data-id={{b.id}}>
 					<td><a href="/buildings/{{b.id}}">{{b.id}}</a></td>
 					<td>{{ b.num }}</td>
 					<td>{{ b.type }}</td>

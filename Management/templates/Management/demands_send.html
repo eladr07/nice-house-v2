@@ -4,9 +4,11 @@
 {% load humanize %}
 
 {% block content %}
-	<h3 class="text-center text-danger">אישור ושליחת דרישות במייל ובפקס לחודש {{month|date:"M Y"}}</h3>
+
+<h3 class="text-center text-danger">אישור ושליחת דרישות במייל ובפקס לחודש {{month|date:"M Y"}}</h3>
+
 <form method="GET">
-	<table class="dataTable" style="width: 30%;">
+	<table class="myDataTable" style="width: 30%;">
 		<tr class="row1">
 			<td colspan="3" style="background-color: #0065BD; color: #FFFFFF; font-weight: bold;">חיפוש</td>
 		</tr>
@@ -16,9 +18,10 @@
 		</tr>
 	</table>
 </form>
+
 <form method="post">
 	{% csrf_token %}
-	<table class="dataTable" border="1">
+	<table class="table table-bordered table-striped table-condensed small">
 		<th>מס'</th>
 		<th>PDF</th>
 		<th>שם הפרוייקט</th>
@@ -33,19 +36,19 @@
 		{% for f in forms %}
 		{% with f.instance as d %}
 			{% if not d.last_status %}
-				<tr class="row3" objid={{d.id}}>
+				<tr class="row3">
 			{% else %}
 				{% if d.last_status.type_id == 1 %}
-					<tr class="{% cycle 'row1' 'row2' %}" objid={{d.id}}>
+					<tr>
 				{% endif %}
 				{% if d.last_status.type_id == 2 %}
-					<tr class="row4" objid={{d.id}}>
+					<tr class="row4">
 				{% endif %}
 				{% if d.last_status.type_id == 3 %}
-					<tr class="row5" objid={{d.id}}>
+					<tr class="row5">
 				{% endif %}
 				{% if d.last_status.type_id == 4 %}
-					<tr class="row5" objid={{d.id}}>
+					<tr class="row5">
 				{% endif %}
 			{% endif %}
 		{% endwith %}

@@ -5,18 +5,24 @@
 {% block scripts %}
 <script>
 	var selectedID = 0;
-	var prevClass;
+	
 	$(document).ready(function () {
 		$("#remindersTable tr").click(function() {
 			var tr = $(this);
+
 			if (selectedID > 0)
-				$("#remindersTable > tr[objid='"+selectedID+"']").attr("class", prevClass);
-			selectedID = tr.attr("objid");
-			if (!selectedID) return;
-			prevClass = tr.attr("class");
-			tr.attr("class","selectedRow");
+				$("#remindersTable > tr[data-id='"+selectedID+"']").removeClass('active');
+			
+			selectedID = tr.data('id');
+			
+			if (!selectedID) 
+				return;
+			
+			tr.addClass('active');
+			
+			//sync links
 			if (selectedID > 0)
-			{//sync links
+			{
 				$("#reminderEdit").attr("href", "reminder/" + selectedID);
 				$("#reminderDelete").attr("href", "/reminder/" + selectedID + "/del");
 				$("#reminderDo").attr("href", "/reminder/" + selectedID + "/do");
@@ -57,7 +63,7 @@
 	</a>
 
 	<div class="clearBoth"> </div>
-	<table id="remindersTable" class="dataTable" border="1">
+	<table id="remindersTable" class="table table-bordered table-striped table-condensed">
 		<tr>
 			<th>מס"ד</th>
 			<th>תוכן</th>
@@ -65,7 +71,7 @@
 			<th>סטטוס</th>
 		</tr>
 		{% for r in reminders.all %}
-			<tr class="{% cycle 'row1' 'row2' %}" objid={{r.id}}>
+			<tr data-id={{r.id}}>
 				<td>{{ r.id }}</td>
 				<td>{{ r.content }}</td>
 				<td>{{ r.statuses.all.0.time }}</td>

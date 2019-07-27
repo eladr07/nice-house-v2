@@ -7,22 +7,22 @@
 {{ block.super }}
 <script>
 	var selectedID = 0;
-	var prev_class;
+	
 	$(document).ready(function() {
 		$("tr").click(function() { 
 			var tr = $(this);
 			if (selectedID > 0)
-				$("tr[objid='"+selectedID+"']").attr("class", prev_class);
-			selectedID = tr.attr("objid");
+				$("tr[data-id='"+selectedID+"']").removeClass('active');
+			selectedID = tr.data('id');
 			if (!selectedID)
 				return;
-			prev_class = tr.attr("class");
-			tr.attr("class","selectedRow");
+				
+			tr.addClass('active');
 			//sync links
 			if (selectedID > 0)
 			{
-				$("#taxEdit").attr("href", selectedID);
-				$("#taxDelete").attr("href", selectedID + "/del");
+				$("#objEdit").attr("href", selectedID);
+				$("#objDelete").attr("href", selectedID + "/del");
 			}
 		});
 	});
@@ -35,20 +35,20 @@
 	<a href="add" class="btn btn-default fancybox" role="button">
 		<i class="fa fa-fw fa-plus-circle text-success"></i> חדש
 	</a>
-	<a id="madadEdit" class="btn btn-default fancybox" role="button">
+	<a id="objEdit" class="btn btn-default fancybox" role="button">
 		<i class="fa fa-fw fa-edit"></i> שינוי
 	</a>
-	<a id="taxDelete" class="btn btn-default" role="button">
+	<a id="objDelete" class="btn btn-default" role="button">
 		<i class="fa fa-fw fa-times-circle text-danger"></i> מחיקה
 	</a>
 
 	<div class="clearBoth"> </div>
 	<br /> 		
-	<table class="dataTable" border="1">
+	<table class="table table-bordered table-striped table-condensed">
 		<th>תאריך</th>
 		<th>מדד</th>
 		{% for t in object_list %}
-			<tr class="{% cycle 'row1' 'row2' %}" objid={{t.id}}>
+			<tr data-id={{t.id}}>
 				<td>{{ t.date|date:"j/m/y" }}</td>
 				<td><a class="fancybox" href="{{t.id}}">{{ t.value }}</a></td>
 			</tr>

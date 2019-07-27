@@ -6,20 +6,26 @@
 {{ block.super }}
 <script>
 	var selectedID = 0;
-	var prev_class;
+	
 	$(document).ready(function() {
-		$("#signupTable tr").click(function() { 
+		$("tr").click(function() { 
 			var tr = $(this);
+			
 			if (selectedID > 0)
-				$("#signupTable tr[objid='"+selectedID+"']").attr("class", prev_class);
-			selectedID = tr.attr("objid");
-			prev_class = tr.attr("class");
-			tr.attr("class","selectedRow");
+				$("tr[data-id='"+selectedID+"']").removeClass('active');
+
+			selectedID = tr.data('id');
+
+			if (!selectedID)
+				return;
+				
+			tr.addClass('active');
+
 			//sync links
 			if (selectedID > 0)
 			{
-				$("#signupEdit").attr("href", selectedID);
-				$("#signupCancel").attr("href", selectedID + "/cancel");
+				$("#objEdit").attr("href", selectedID);
+				$("#objDelete").attr("href", selectedID + "/del");
 			}
 		});
 	});
@@ -35,10 +41,10 @@
 	<a href="add" class="btn btn-default fancybox" role="button">
 		<i class="fa fa-fw fa-plus-circle text-success"></i> הרשמה חדשה
 	</a>
-	<a id="signupEdit" class="btn btn-default fancybox" role="button">
+	<a id="objEdit" class="btn btn-default fancybox" role="button">
 		<i class="fa fa-fw fa-edit"></i> שינוי פרטי הרשמה
 	</a>
-	<a id="signupCancel" class="btn btn-default" role="button">
+	<a id="objCancel" class="btn btn-default" role="button">
 		<i class="fa fa-fw fa-times-circle text-danger"></i> ביטול הרשמה
 	</a>
 
@@ -58,7 +64,7 @@
 
 <div class="clearBoth"></div>	
 	
-<table id="signupTable" class="dataTable" border="1">
+<table id="signupTable" class="table table-bordered table-striped table-condensed">
 <caption>מציג סה"כ {{signups|length}} הרשמות</caption>
 	<tr>
 		<th></th>
@@ -73,7 +79,7 @@
 		<th>סיבת ביטול</th>
 	</tr>
     {% for s in signups %}
-    	<tr class="{% cycle 'row1' 'row2' %}" objid={{s.id}}>			
+    	<tr data-id={{s.id}}>			
 			<td><a href="{{s.id}}">{{s.id}}</a></td>
 			<td>{{ s.date }}</td>
 			<td>{{ s.clients }}</td>

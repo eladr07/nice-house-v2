@@ -6,16 +6,18 @@
 {{ block.super }}
 <script>
 	var selectedID = 0;
-	var prev_class;
-	var filterIndex = 0;
+
 	$(document).ready(function() {
 		$("#projectTable tr").click(function() { 
 			var tr = $(this);
+			
 			if (selectedID > 0)
-				$("#projectTable tr[objid='"+selectedID+"']").attr("class", prev_class);
-			selectedID = tr.attr("objid");
-			prev_class = tr.attr("class");
-			tr.attr("class","selectedRow");
+				$("#projectTable tr[data-id='"+selectedID+"']").removeClass('active');
+
+			selectedID = tr.data("id");
+			
+			tr.addClass('active');
+			
 			//sync links
 			if (selectedID > 0)
 			{
@@ -54,8 +56,7 @@
 
 	<div class="clearBoth"></div>
 	<br /> 
-	<table id="projectTable" class="dataTable" border="1">
-	<caption>מציג סה"כ {{object_list|length}} פרוייקטים</caption>
+	<table id="projectTable" class="table table-bordered table-striped table-condensed small">
 	<tr>
 		<th></th>
 		<th>יזם</th>
@@ -70,7 +71,7 @@
 		<th>אתר אינטרנט</th>
 	</tr>
     {% for i in object_list %}
-    	<tr class="{% cycle 'row1' 'row2' %}" objid={{i.id}}>
+    	<tr data-id={{i.id}}>
 			<td><a href="{{i.id}}">{{i.id}}</a></td>
 			<td>{{ i.initiator }}</td>
 			<td>{{ i.name }}</td>

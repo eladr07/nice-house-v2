@@ -7,17 +7,17 @@
 {{ block.super }}
 <script>
 	var selectedID = 0;
-	var prev_class;
+	
 	$(document).ready(function() {
 		$("tr").click(function() { 
 			var tr = $(this);
 			if (selectedID > 0)
-				$("tr[objid='"+selectedID+"']").attr("class", prev_class);
-			selectedID = tr.attr("objid");
+				$("tr[data-id='"+selectedID+"']").removeClass('active');
+			selectedID = tr.data('id');
 			if (!selectedID)
 				return;
-			prev_class = tr.attr("class");
-			tr.attr("class","selectedRow");
+				
+			tr.addClass('active');
 			//sync links
 			if (selectedID > 0)
 			{
@@ -47,16 +47,16 @@
 <a href="add" class="btn btn-default bigfancybox" role="button">
 	<i class="fa fa-fw fa-plus-circle text-success"></i> חדש
 </a>
-<a id="checkEdit" class="btn btn-default bigfancybox" role="button">
+<a id="objEdit" class="btn btn-default bigfancybox" role="button">
 	<i class="fa fa-fw fa-edit"></i> שינוי
 </a>
-<a id="checkDelete" class="btn btn-default" role="button">
+<a id="objDelete" class="btn btn-default" role="button">
 	<i class="fa fa-fw fa-times-circle text-danger"></i> מחיקה
 </a>
 
 <div class="clearBoth"></div>
 
-<table class="dataTable" border="1">	
+<table class="table table-bordered table-striped table-condensed">	
 	<tr>
 		<th colspan="4">פרטים כלליים</th>
 		<th colspan="3">צ'ק שהוצא</th>
@@ -85,7 +85,7 @@
 			<td colspan="10" style="text-align:center; background-color:#A9D0FF; font-weight:bold;">{{division.grouper}}</td>
 		</tr>
 		{% for c in division.list %}
-			<tr class="{% cycle 'row1' 'row2' %}" objid={{c.id}}>
+			<tr data-id={{c.id}}>
 				<td><a class="fancybox" href="{{ c.get_absolute_url }}">{{ c.id }}</td>
 				<td>{{c.division_type}}</td>
 				<td>{{c.expense_type}}</td>

@@ -6,23 +6,22 @@
 {{ block.super }}
 <script>
 	var selectedID = 0;
-	var prev_class;
-	var filterIndex = 0;
+	
 	$(document).ready(function() {
 		$("tr").click(function() { 
 			var tr = $(this);
 			if (selectedID > 0)
-				$("tr[objid='"+selectedID+"']").attr("class", prev_class);
-			selectedID = tr.attr("objid");
+				$("tr[data-id='"+selectedID+"']").removeClass('active');
+			selectedID = tr.data('id');
 			if (!selectedID)
 				return;
-			prev_class = tr.attr("class");
-			tr.attr("class","selectedRow");
+				
+			tr.addClass('active');
 			//sync links
 			if (selectedID > 0)
 			{
-				$("#contactEdit").attr("href", "/contact/" + selectedID);
-				$("#contactDelete").attr("href", "/contact/" + selectedID + "/del");
+				$("#objEdit").attr("href", selectedID);
+				$("#objDelete").attr("href", selectedID + "/del");
 			}
 		});
 	});
@@ -35,16 +34,16 @@
 	<a href="/contact/add" class="btn btn-default fancybox" role="button">
 		<i class="fa fa-fw fa-plus-circle text-success"></i> הוספה
 	</a>
-	<a id="contactEdit" class="btn btn-default fancybox" role="button">
+	<a id="objEdit" class="btn btn-default fancybox" role="button">
 		<i class="fa fa-fw fa-edit"></i> עריכה
 	</a>
-	<a id="contactDelete" class="btn btn-default" role="button">
+	<a id="objDelete" class="btn btn-default" role="button">
 		<i class="fa fa-fw fa-times-circle text-danger"></i> מחיקה
 	</a>
 
 	<div class="clearBoth"> </div>
 	<br /> 		
-	<table id="contactsTable" class="dataTable" border="1">
+	<table class="table table-bordered table-striped table-condensed">
 		<tr>
 			<th>שם פרטי</th>
 			<th>שם משפחה</th>
@@ -56,7 +55,7 @@
 			<th>הערות</th>
 		</tr>
 		{% for c in object_list %}
-			<tr class="{% cycle 'row1' 'row2' %}" objid={{c.id}}>
+			<tr data-id={{c.id}}>
 				<td>{{ c.first_name }}</td>
 				<td>{{ c.last_name }}</td>
 				<td>{{ c.phone }}</td>
