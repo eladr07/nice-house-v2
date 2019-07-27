@@ -137,7 +137,9 @@
 					{% for s in demand.get_presales %}
 						<li>מכירה מס' 
 						<a href="/sale/{{s.id}}">{{s.id}}</a> - ({{s}})
-						הוקדמה לחודש זה. העובד יקבל תשלום בחודש
+						הוקדמה לחודש זה.
+						<br>
+						העובד יקבל תשלום בחודש
 						<strong>{{s.salepre.employee_pay_month}}/{{s.salepre.employee_pay_year}}</strong>. 
 						<a href="{{ s.salepre.get_absolute_url }}">פרטים</a>
 						</li>
