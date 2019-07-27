@@ -191,7 +191,7 @@ BODY {
 }
 
 
-.myDataTable .rowSum td {
+.rowSum td {
 	color: #CF2222;
 	font-size: 12px;
 	font-weight: bold;
@@ -199,28 +199,28 @@ BODY {
 	padding: 4px 4px 4px 4px;
 }
 
-.myDataTable .rowSumGreen td {
+.rowSumGreen td {
 	color: #039E33;
 	font-size: 12px;
 	font-weight: bold;
 	font-family: Arial;
 	padding: 4px 4px 4px 4px;
 }
-.myDataTable .rowSumBlue td {
+.rowSumBlue td {
 	color: #3C79FF;
 	font-size: 12px;
 	font-weight: bold;
 	font-family: Arial;
 	padding: 4px 4px 4px 4px;
 }
-.myDataTable .rowSumRed td {
+.rowSumRed td {
 	color: #FF3C3C;
 	font-size: 12px;
 	font-weight: bold;
 	font-family: Arial;
 	padding: 4px 4px 4px 4px;
 }
-.myDataTable .rowTeal td {
+.rowTeal td {
 	color: #1C9AAD;
 	font-size: 12px;
 	font-weight: bold;
@@ -228,7 +228,7 @@ BODY {
 	padding: 4px 4px 4px 4px;
 }
 
-.myDataTable .row1 td {
+.row1 td {
 	background-color: #EFEFEF;
 	color: #000;
 	font-size: 12px;
@@ -236,7 +236,7 @@ BODY {
 	padding: 4px 4px 4px 4px;
 }
 
-.myDataTable .row2 td {
+.row2 td {
 	background-color: #FFFFFF;
 	color: #000;
 	font-size: 12px;
@@ -244,7 +244,7 @@ BODY {
 	padding: 4px 4px 4px 4px;
 }
 
-.myDataTable .row3 td {
+.row3 td {
 	background-color: #F7E1AF;
 	color: #000;
 	font-size: 12px;
@@ -252,42 +252,42 @@ BODY {
 	padding: 4px 4px 4px 4px;
 }
 
-.myDataTable .row4 td {
+.row4 td {
 	background-color: #B1CDFF;
 	color: #000;
 	font-size: 12px;
 	font-family: Arial;
 	padding: 4px 4px 4px 4px;
 }
-.myDataTable .row5 td {
+.row5 td {
 	background-color: #9EE9C3;
 	color: #000;
 	font-size: 12px;
 	font-family: Arial;
 	padding: 4px 4px 4px 4px;
 }
-.myDataTable .rowLightGreen td {
+.rowLightGreen td {
 	background-color: #98FFCE;
 	color: #000;
 	font-size: 12px;
 	font-family: Arial;
 	padding: 4px 4px 4px 4px;
 }
-.myDataTable .rowLightBlue td {
+.rowLightBlue td {
 	background-color: #BED1F3;
 	color: #000;
 	font-size: 12px;
 	font-family: Arial;
 	padding: 4px 4px 4px 4px;
 }
-.myDataTable .rowMediumBlue td {
+.rowMediumBlue td {
 	background-color: #A5BEEC;
 	color: #000;
 	font-size: 12px;
 	font-family: Arial;
 	padding: 4px 4px 4px 4px;
 }
-.myDataTable .rowBlue td {
+.rowBlue td {
 	background-color: #739DE6;
 	color: #000;
 	font-size: 12px;
@@ -295,7 +295,7 @@ BODY {
 	padding: 4px 4px 4px 4px;
 }
 
-.myDataTable .selectedRow td {
+.selectedRow td {
 	background-color: #BCD9FF;
 	color: #000;
 	font-size: 12px;
@@ -303,7 +303,7 @@ BODY {
 	padding: 4px 4px 4px 4px;
 }
 
-.myDataTable .deletedRow td {
+.deletedRow td {
 	background-color: #FAA99E;
 	color: #000;
 	font-size: 12px;
