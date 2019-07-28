@@ -58,7 +58,7 @@
 			
 			//sync links
 			if (selectedID > 0) {
-				$("#saleEdit").attr("href", "/demands/sale/" + selectedID);
+				$("#saleEdit").attr("href", "/sale/" + selectedID);
 				$("#saleCommissionEdit").attr("href", "/sale/" + selectedID + "/commission");
 				$("#saleDelete").attr("href", "/demands/{{demand.id}}/sale/" + selectedID + "/cancel");
 				$("#salePre").attr("href", "/demands/{{demand.id}}/sale/" + selectedID + "/pre");
