@@ -16,7 +16,23 @@
 				{
 					extend: 'excel',
 					text: 'ייצא לאקסל',
-					filename: 'פירוט מכירות - {{demand.project}} לחודש {{demand.month}}/{{demand.year}}'
+					title: null,
+					filename: 'פירוט מכירות - {{demand.project}} לחודש {{demand.month}}/{{demand.year}}',
+					createEmptyCells: true,
+					footer: true,
+					autoFilter: true,
+					customize: function( xlsx ) {
+						var sheet = xlsx.xl.worksheets['sheet1.xml'];
+
+						// Add Bold, green background, thin black border to the first row (headers)
+						$('row:first c', sheet).attr( 's', '42' );
+
+						// Add borders to all other rows
+						$('row:gt(0) c', sheet).attr( 's', '25' );
+
+						// Add Bold to last row (footer)
+						$('row:last c', sheet).attr( 's', '2' );
+					}
 				}
 			]
 		});
@@ -330,7 +346,8 @@
 					<td><b><u>{{demand.sales_amount|floatformat:0|intcomma}} ש"ח</u></b></td>
 					<td colspan={% if sales.0.discount %}"5"{%else%}"2"{%endif%}></td>
 					<td colspan={% if demand.project.commissions.get.b_discount_save_precentage or demand.project.commissions.get.c_zilber %}"3"{%else%}"1"{%endif%}></td>
-					<td colspan="3"><b><u style="color:#1A339C;">{{demand.sales_commission|intcomma}} ש"ח</u></b></td>
+					<td colspan="1"><b><u style="color:#1A339C;">{{demand.sales_commission|intcomma}} ש"ח</u></b></td>
+					<td colspan="2"></td>
 				</tr>
 			</tfoot>
 			
