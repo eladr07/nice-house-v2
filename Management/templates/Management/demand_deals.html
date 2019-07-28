@@ -340,13 +340,13 @@
 			</tbody>
 
 			<tfoot>
-				<tr height="40px">
-					<td colspan={% if sales.0.discount %}"7"{%else%}"6"{%endif%}></td>
-					<td><b><u>{{demand.sales_total_price|floatformat:0|intcomma}} ש"ח</u></b></td>
-					<td><b><u>{{demand.sales_amount|floatformat:0|intcomma}} ש"ח</u></b></td>
+				<tr class="font-weight-bold" height="40px">
+					<td colspan={% if sales.0.discount %}"7"{%else%}"6"{%endif%}>סה"כ</td>
+					<td>{{demand.sales_total_price|floatformat:0|intcomma}} ש"ח</td>
+					<td>{{demand.sales_amount|floatformat:0|intcomma}} ש"ח</td>
 					<td colspan={% if sales.0.discount %}"5"{%else%}"2"{%endif%}></td>
 					<td colspan={% if demand.project.commissions.get.b_discount_save_precentage or demand.project.commissions.get.c_zilber %}"3"{%else%}"1"{%endif%}></td>
-					<td colspan="1"><b><u style="color:#1A339C;">{{demand.sales_commission|intcomma}} ש"ח</u></b></td>
+					<td colspan="1">{{demand.sales_commission|intcomma}} ש"ח</td>
 					<td colspan="2"></td>
 				</tr>
 			</tfoot>
