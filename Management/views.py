@@ -1335,6 +1335,9 @@ def demand_edit(request, object_id):
         form = DemandForm(instance = demand)
         months = MonthForm()
         
+    # set sales_commission_base: summary of pc_base for each sale
+    demand.sales_commission_base = sum(map(lambda sale: sale.pc_base, demand.sales_list))
+
     context = { 
         'form':form, 
         'demand':demand, 

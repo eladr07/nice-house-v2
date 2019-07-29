@@ -252,17 +252,17 @@
 					<td>{{s.discount|floatformat:-3}}</td>
 					<td>{{s.allowed_discount|floatformat:-3}}</td>
 					{% endif %}
-					<td>{{s.pc_base|floatformat:-3}}</td>
+					<td>{{s.pc_base|floatformat:-3}}%</td>
 					<td>{{s.pc_base_worth|floatformat:-3|intcomma}} ש"ח</td>
 					{% if demand.project.commissions.get.b_discount_save_precentage %}
-						<td>{{s.pb_dsp|floatformat:-3}}</td>
+						<td>{{s.pb_dsp|floatformat:-3}}%</td>
 						<td>{% if s.pb_dsp_worth %}{{s.pb_dsp_worth|floatformat:-3|intcomma}} ש"ח{% endif %}</td>
 					{% endif %}
 					{% if demand.project.commissions.get.c_zilber %}
 						<td>---</td>
 						<td>{% if s.zdb %}{{s.zdb|floatformat:-3|intcomma}} ש"ח{% endif %}</td>
 					{% endif %}
-					<td>{{s.c_final|floatformat:-3}}</td>
+					<td>{{s.c_final|floatformat:-3}}%</td>
 					<td><b>{{s.c_final_worth|floatformat:-3|intcomma}} ש"ח</b></td>
 					<td>
 						{% if s.salepricemod %}
@@ -348,9 +348,10 @@
 					<td><strong>סה"כ</strong></td>
 					<td><strong>{{demand.sales_total_price|floatformat:0|intcomma}} ש"ח</strong></td>
 					<td><strong>{{demand.sales_amount|floatformat:0|intcomma}} ש"ח</strong></td>
-					<td colspan={% if sales.0.discount %}"5"{%else%}"2"{%endif%}></td>
+					<td colspan={% if sales.0.discount %}"4"{%else%}"1"{%endif%}></td>
+					<td><strong>{{demand.sales_commission_base|intcomma}} ש"ח</strong></td>
 					<td colspan={% if demand.project.commissions.get.b_discount_save_precentage or demand.project.commissions.get.c_zilber %}"3"{%else%}"1"{%endif%}></td>
-					<td colspan="1"><strong>{{demand.sales_commission|intcomma}} ש"ח</strong></td>
+					<td><strong>{{demand.sales_commission|intcomma}} ש"ח</strong></td>
 					<td colspan="2"></td>
 				</tr>
 			</tfoot>
