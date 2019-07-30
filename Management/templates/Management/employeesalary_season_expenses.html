@@ -11,20 +11,26 @@
 	$(document).ready(function() {
 		$("#salaryTable tr").click(function() { 
 			var tr = $(this);
+			
 			if (selectedID > 0)
-				$("#salaryTable tr[employeeid='"+selectedID+"']").attr("class", prev_class);
-			selectedID = tr.attr("employeeid");
+				$("#salaryTable tr[data-employee-id='"+selectedID+"']").attr("class", prev_class);
+
+			selectedID = tr.data("employee-id");
+			salaryId = tr.data('id')
+
 			if (!selectedID)
 				return;
+
 			prev_class = tr.attr("class");
 			tr.attr("class","selectedRow");
+
 			//sync links
 			if (selectedID > 0) {
 				$("#loanPay").attr("href", "/employees/" + selectedID + "/loanpay");
 				$("#loanAdd").attr("href", "/employees/" + selectedID + "/addloan");
-				$("#calcSalary").attr("href", "/salaries/" + tr.attr("objid") + "/calc");
-				$("#approve").attr("href", "/salaries/" + tr.attr("objid") + "/approve");
-				$("#edit").attr("href",  "/salaries/" + tr.attr("objid"));
+				$("#calcSalary").attr("href", "/salaries/" + salaryId + "/calc");
+				$("#approve").attr("href", "/salaries/" + salaryId + "/approve");
+				$("#edit").attr("href",  "/salaries/" + salaryId);
 			}
 		});
 			
@@ -100,100 +106,111 @@
 <div class="clearBoth"></div>
 <br>
 {% if salaries %}
-<table id="salaryTable" class="myDataTable" border="1">
+<table id="salaryTable" class="table table-bordered table-striped table-condensed small">
 <caption>מציג סה"כ {{salaries|length}} משכורות לעובד {{employee}}</caption>
-	<tr>
-		<th colspan="4">כללי</th>
-		<th colspan="3">תשלום נטו</th>
-		<th colspan="7">מיסי עובד לתשלום והפרשות</th>
-		<th colspan="4">הוצאות מעביד</th>
-		<th colspan="4">אסמכתאות ואישור</th>
-	</tr>
-	<tr>
-		<th>חודש</th>
-		<th>סוג <BR>העסקה</th>
-		<th>פרוייקט</th>
-		<th>מס'<BR>עסקאות</th>
-		<th>תלוש<BR>נטו</th>
-		<th>החזר<BR>הלוואה</th>
-		<th>שווי<BR>צ'ק</th>
-		<th>מס<BR>הכנסה</th>
-		<th>ביטוח<BR>לאומי</th>
-		<th>בריאות</th>
-		<th>ביטוח<BR>פנסיה</th>
-		<th>חופשה</th>
-		<th>דמי<BR>הבראה</th>
-		<th>סה"כ<BR>ברוטו<BR>לעובד</th>
-		<th>ביטוח<BR>לאומי<BR>מעביד</th>
-		<th>גמל<BR>מעביד</th>
-		<th>הפרשה<BR>לפיצויים</th>
-		<th>ברוטו<BR>כולל<BR>מעביד</th>
-		<th>נכוי מס<br>במקור</th>
-		<th>שווי<br>חשבונית</th>
-		<th>אישור</th>
-	</tr>
-	{% for s in salaries %}
-		{% if s.approved_date %}
-			<tr class="row5" objid={{s.id}} employeeid={{s.employee.id}}>
-		{% else %}
-			<tr class="{% cycle 'row1' 'row2' %}" objid={{s.id}} employeeid={{s.employee.id}}>
-		{% endif %}
-			<td>{{ s.month }}/{{ s.year }}</td>
-			<td>{{s.employee.employment_terms.hire_type}}</td>
-			<td>
-				{% for p in s.sales %}
-					<a href="{{p.get_absolute_url}}" target="_blank">{{p}}</a>
-					<a href="/reports/project_month/{{p.id}}/{{s.year}}/{{s.month}}">
-						<img src="{% static "images/PDF-48.png" %}" width="15" height="15"/>
-					</a>
-					<br>
-				{% endfor %}
-			</td>
-			<td>
-				{% for p,sales in s.sales.items %}
-					{{p}} - {{sales|length}}<br>
-				{% endfor %}
-				{% if s.sales|length %}
-					<a class="fancybox" href="{{s.employee.get_absolute_url}}/sales/{{s.year}}/{{s.month}}">פירוט</a>
-				{% endif %}
-			</td>
-			<td><a href="{{s.get_absolute_url}}/totaldetails" class="fancybox">{{s.neto|default_if_none:""|intcomma}}</a></td>
-			<td>{{s.loan_pay|intcomma}}</td>
-			<td><a href="{{s.get_absolute_url}}/checkdetails" class="fancybox">{{s.check_amount|default_if_none:""|intcomma}}</a></td>
-			{% with s.expenses as e %}
-				<td>{{e.income_tax}}</td>
-				<td>{{e.national_insurance}}</td>
-				<td>{{e.health}}</td>
-				<td>{{e.pension_insurance}}</td>
-				<td>{{e.vacation}}</td>
-				<td>{{e.convalescence_pay}}</td>
-				<td style="background-color:#2990FF;">{{s.bruto|intcomma|default_if_none:""}}</td>
-				<td>{{e.employer_national_insurance}}</td>
-				<td>{{e.employer_benefit}}</td>
-				<td>{{e.compensation_allocation}}</td>
-				<td style="background-color:#2990FF;">{{s.bruto_with_employer|intcomma}}</td>
-				<td></td>
-				<td></td>
+
+	<thead>
+		<tr>
+			<th colspan="4">כללי</th>
+			<th colspan="3">תשלום נטו</th>
+			<th colspan="7">מיסי עובד לתשלום והפרשות</th>
+			<th colspan="4">הוצאות מעביד</th>
+			<th colspan="4">אסמכתאות ואישור</th>
+		</tr>
+		<tr>
+			<th>חודש</th>
+			<th>סוג <BR>העסקה</th>
+			<th>פרוייקט</th>
+			<th>מס'<BR>עסקאות</th>
+			<th>תלוש<BR>נטו</th>
+			<th>החזר<BR>הלוואה</th>
+			<th>שווי<BR>צ'ק</th>
+			<th>מס<BR>הכנסה</th>
+			<th>ביטוח<BR>לאומי</th>
+			<th>בריאות</th>
+			<th>ביטוח<BR>פנסיה</th>
+			<th>חופשה</th>
+			<th>דמי<BR>הבראה</th>
+			<th>סה"כ<BR>ברוטו<BR>לעובד</th>
+			<th>ביטוח<BR>לאומי<BR>מעביד</th>
+			<th>גמל<BR>מעביד</th>
+			<th>הפרשה<BR>לפיצויים</th>
+			<th>ברוטו<BR>כולל<BR>מעביד</th>
+			<th>נכוי מס<br>במקור</th>
+			<th>שווי<br>חשבונית</th>
+			<th>אישור</th>
+		</tr>
+	</thead>
+
+	<tbody>
+		{% for s in salaries %}
+			{% if s.approved_date %}
+				<tr class="row5" data-id={{s.id}} data-employee-id={{s.employee_id}}>
+			{% else %}
+				<tr class="{% cycle 'row1' 'row2' %}" data-id={{s.id}} data-employee-id={{s.employee_id}}>
+			{% endif %}
+				<td>{{ s.month }}/{{ s.year }}</td>
+				<td>{{s.employee.employment_terms.hire_type}}</td>
 				<td>
-					{% if e.approved_date %}
-						{{e.approved_date}}
-					{% else %}
-						<a href="{{e.id}}/approve">אשר</a>
+					{% for p in s.sales %}
+						<a href="{{p.get_absolute_url}}" target="_blank">{{p}}</a>
+						<a href="/reports/project_month/{{p.id}}/{{s.year}}/{{s.month}}">
+							<img src="{% static "images/PDF-48.png" %}" width="15" height="15"/>
+						</a>
+						<br>
+					{% endfor %}
+				</td>
+				<td>
+					{% for p,sales in s.sales.items %}
+						{{p}} - {{sales|length}}<br>
+					{% endfor %}
+					{% if s.sales|length %}
+						<a class="fancybox" href="{{s.employee.get_absolute_url}}/sales/{{s.year}}/{{s.month}}">פירוט</a>
 					{% endif %}
 				</td>
-			{% endwith %}
-		</tr>
+				<td><a href="{{s.get_absolute_url}}/totaldetails" class="fancybox">{{s.neto|default_if_none:""|intcomma}}</a></td>
+				<td>{{s.loan_pay|intcomma}}</td>
+				<td><a href="{{s.get_absolute_url}}/checkdetails" class="fancybox">{{s.check_amount|default_if_none:""|intcomma}}</a></td>
+				{% with s.expenses as e %}
+					<td>{{e.income_tax}}</td>
+					<td>{{e.national_insurance}}</td>
+					<td>{{e.health}}</td>
+					<td>{{e.pension_insurance}}</td>
+					<td>{{e.vacation}}</td>
+					<td>{{e.convalescence_pay}}</td>
+					<td style="background-color:#2990FF;">{{s.bruto|default_if_none:""|intcomma}}</td>
+					<td>{{e.employer_national_insurance}}</td>
+					<td>{{e.employer_benefit}}</td>
+					<td>{{e.compensation_allocation}}</td>
+					<td style="background-color:#2990FF;">{{s.bruto_with_employer|intcomma}}</td>
+					<td></td>
+					<td></td>
+					<td>
+						{% if e.approved_date %}
+							{{e.approved_date}}
+						{% else %}
+							<a href="{{e.id}}/approve">אשר</a>
+						{% endif %}
+					</td>
+				{% endwith %}
+			</tr>
 	{% endfor %}
-		<tr class="rowSum" height="30px">
-			<td colspan="4"></td>
-			<td>{{total_neto|intcomma}}</td>
-			<td>{{total_loan_pay|intcomma}}</td>
-			<td>{{total_check_amount|intcomma}}</td>
-			<td colspan="6"></td>
-			<td>{{total_bruto|intcomma}}</td>
+	</tbody>
+
+	<tfoot>
+		<tr height="30px">
 			<td colspan="3"></td>
-			<td>{{total_bruto_employer|intcomma}}</td>
+			<td><strong>סה"כ</strong></td>
+			<td><strong>{{total_neto|intcomma}}</strong></td>
+			<td><strong>{{total_loan_pay|intcomma}}</strong></td>
+			<td><strong>{{total_check_amount|intcomma}}</strong></td>
+			<td colspan="6"></td>
+			<td><strong>{{total_bruto|intcomma}}</strong></td>
+			<td colspan="3"></td>
+			<td><strong>{{total_bruto_employer|intcomma}}</strong></td>
 		</tr>
+	</tfoot>
+
 </table>
 {% endif %}
 {% endblock content %}
