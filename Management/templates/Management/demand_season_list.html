@@ -34,11 +34,6 @@
 			if (!confirm("האם אתה בטוח שברצונך לחשב את העמלות מחדש ?"))
 				event.preventDefault();
 		});
-		//add filters
-		var filterSelect = $("#filterSelect");
-		$("#demandTable th").each(function (index, elem) {
-			filterSelect.append("<option value='" + index + "'>" + $(elem).text() + "</option>");
-		});
 	});
 </script>
 {% endblock scripts %}
@@ -162,6 +157,6 @@
 			<td><strong>{{total_amount|intcomma}} ש"ח</strong></td>
 		</tr>
 	</tfoot>
-	
+
 </table>
 {% endblock content %}
