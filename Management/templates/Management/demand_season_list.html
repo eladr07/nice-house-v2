@@ -10,6 +10,43 @@
 	var prev_class;
 
 	$(document).ready(function() {
+
+		var table = $('#demandTable').DataTable({
+			searching: false,
+			ordering: false,
+			paging: false,
+			info: false,
+			buttons: [
+				{
+					extend: 'excel',
+					text: 'ייצא לאקסל',
+					title: 'ריכוז דרישות תקופתי לפרויקט - {{project}}',
+					filename: 'ריכוז דרישות תקופתי לפרויקט - {{project}}',
+					createEmptyCells: true,
+					footer: true,
+					autoFilter: true,
+					customize: function( xlsx ) {
+						var sheet = xlsx.xl.worksheets['sheet1.xml'];
+
+						// Add Bold, green background, thin black border to the first row (headers)
+						$('row:nth-child(2) c', sheet).attr( 's', '42' );
+
+						// Add borders to all other rows
+						$('row:gt(2) c', sheet).attr( 's', '25' );
+
+						// Add Centered text to the first row (title)
+						$('row:first c', sheet).attr( 's', '51' );
+
+						// Add Bold, thin black border to last row (footer)
+						$('row:last c', sheet).attr( 's', '27' );
+					}
+				}
+			]
+		});
+
+		table.buttons().container()
+    	.appendTo($('#myButtons'));
+
 		$("#demandTable tr").click(function() { 
 			var tr = $(this);
 
@@ -66,6 +103,10 @@
 <a href="/reports/project_season/{{project.id}}/{{start.year}}/{{start.month}}/{{end.year}}/{{end.month}}" class="btn btn-default" role="button">
 	<i class="fa fa-fw fa-print"></i> גרסה להדפסה
 </a>
+		
+<div id="myButtons" style="display: inline-block">
+
+</div>
 
 <div class="clearBoth"></div>
 
