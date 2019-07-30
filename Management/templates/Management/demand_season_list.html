@@ -77,80 +77,91 @@
 <br>
 <table id="demandTable" class="table table-bordered table-striped table-condensed small">
 <caption>מציג סה"כ {{demands|length}} דרישות לתשלום לפרוייקט {{project}}</caption>
-	<tr>
-		<th>מס'</th>
-		<th>PDF</th>
-		<th>חודש</th>
-		<th>מס' מכירות</th>
-		<th>מס' מכירות צפוי</th>
-		<th>סה"כ מכירות כולל מע"מ</th>
-		<th>עמלה מחושב בגין שיווק</th>
-		<th>תוספת קבועה</th>
-		<th>תוספת משתנה</th>
-		<th>בונוס</th>
-		<th>קיזוז</th>
-		<th>סה"כ תשלום לחברה</th>
-		<th>תיקון</th>
-		<th>תזכורות</th>
-		<th>הערות</th>
-	</tr>
-    {% for d in demands %}
-	{% if not d.last_status %}
-    	<tr class="row3" data-id={{d.id}}>
-	{% else %}
-		{% if d.last_status.type_id == 1 %}
-			<tr data-id={{d.id}}>
-		{% endif %}
-		{% if d.last_status.type_id == 2 %}
-			<tr class="row4" data-id={{d.id}}>
-		{% endif %}
-		{% if d.last_status.type_id == 3 %}
-			<tr class="row5" data-id={{d.id}}>
-		{% endif %}
-		{% if d.last_status.type_id == 4 %}
-			<tr class="row5" data-id={{d.id}}>
-		{% endif %}
-	{% endif %}
-			<td><a href="{% url 'demand-edit' object_id=d.id %}">{{d.id}}</a></td>
-			<td>
-				<a href="/reports/project_month/{{d.project.id}}/{{d.year}}/{{d.month}}">
-				<img src="{% static "images/PDF-48.png" %}" width="15" height="15"/>
-				</a>
-			</td>
-			<td>{{ d.month }}/{{d.year}}</td>
-			<td><a href="/demandsales/?demand_id={{d.id}}" class="bigfancybox">{{ d.sales_count|default:"אין מכירות" }}</a></td>
-			<td>{{d.sale_count}}</td>
-			<td>{% if d.sales_amount %} {{ d.sales_amount|intcomma }} ש"ח {% else %}----{% endif %}</td>
-			<td>{% if d.sales_commission %} {{ d.sales_commission|intcomma }} ש"ח {% else %}----{% endif %}</td>
-			<td style="color:#08A600;">{% if d.fixed_diff %} {{ d.fixed_diff.amount }} ש"ח {% endif %}</td>
-			<td style="color:#08A600;">{% if d.var_diff %} {{ d.var_diff.amount }} ש"ח - {{ d.var_diff.reason }} {% endif %}</td>
-			<td style="color:#08A600; width:150px;">{% if d.bonus_diff %} {{ d.bonus_diff.amount }} ש"ח - {{ d.bonus_diff.reason }} {% endif %}</td>
-			<td style="color:#D50808;">{% if d.fee_diff %} {{ d.fee_diff.amount }} ש"ח - {{ d.fee_diff.reason }} {% endif %}</td>
-			<td><b>{% if d.total_amount %} {{ d.total_amount|intcomma }} ש"ח {% else %}----{% endif %}</b></td>
-			<td>
-			{% if d.is_fixed %}
-			 <i class="fa fa-fw fa-exclamation-triangle text-warning"></i>
-			{% endif %}
-			</td>
-			<td>
-			{% if d.open_reminders|length %}
-				<a href="/demands/{{d.id}}/reminders" class="fancybox">{{d.open_reminders|length}} תזכורות</a>
-			{% endif %}
-				<a href="/demands/{{d.id}}/addreminder" class="fancybox">
-					<i class="fa fa-fw fa-plus-circle text-success"></i>
-				</a>
-			</td>
-			<td>{{ d.remarks|default_if_none:"" }}</td>
+
+	<thead>
+		<tr>
+			<th>מס'</th>
+			<th>PDF</th>
+			<th>חודש</th>
+			<th>מס' מכירות</th>
+			<th>מס' מכירות צפוי</th>
+			<th>סה"כ מכירות כולל מע"מ</th>
+			<th>עמלה מחושב בגין שיווק</th>
+			<th>תוספת קבועה</th>
+			<th>תוספת משתנה</th>
+			<th>בונוס</th>
+			<th>קיזוז</th>
+			<th>סה"כ תשלום לחברה</th>
+			<th>תיקון</th>
+			<th>תזכורות</th>
+			<th>הערות</th>
 		</tr>
-	{% endfor %}
-	<tr height="30px" class="text-danger">
-		<td colspan="3" align="center">סיכום</td>
-		<td>{{total_sales_count}} מכירות</td>
-		<td></td>
-		<td>{{total_sales_amount|intcomma}} ש"ח</td>
-		<td>{{demands.total_sales_commission|intcomma|intcomma}} ש"ח</td>
-		<td colspan="4"></td>
-		<td>{{total_amount|intcomma}} ש"ח</td>
-	</tr>
+	</thead>
+
+	<tbody>
+    {% for d in demands %}
+		{% if not d.last_status %}
+				<tr class="row3" data-id={{d.id}}>
+		{% else %}
+			{% if d.last_status.type_id == 1 %}
+				<tr data-id={{d.id}}>
+			{% endif %}
+			{% if d.last_status.type_id == 2 %}
+				<tr class="row4" data-id={{d.id}}>
+			{% endif %}
+			{% if d.last_status.type_id == 3 %}
+				<tr class="row5" data-id={{d.id}}>
+			{% endif %}
+			{% if d.last_status.type_id == 4 %}
+				<tr class="row5" data-id={{d.id}}>
+			{% endif %}
+		{% endif %}
+				<td><a href="{% url 'demand-edit' object_id=d.id %}">{{d.id}}</a></td>
+				<td>
+					<a href="/reports/project_month/{{d.project.id}}/{{d.year}}/{{d.month}}">
+					<img src="{% static "images/PDF-48.png" %}" width="15" height="15"/>
+					</a>
+				</td>
+				<td>{{ d.month }}/{{d.year}}</td>
+				<td><a href="/demandsales/?demand_id={{d.id}}" class="bigfancybox">{{ d.sales_count|default:"אין מכירות" }}</a></td>
+				<td>{{d.sale_count}}</td>
+				<td>{% if d.sales_amount %} {{ d.sales_amount|intcomma }} ש"ח {% else %}----{% endif %}</td>
+				<td>{% if d.sales_commission %} {{ d.sales_commission|intcomma }} ש"ח {% else %}----{% endif %}</td>
+				<td style="color:#08A600;">{% if d.fixed_diff %} {{ d.fixed_diff.amount }} ש"ח {% endif %}</td>
+				<td style="color:#08A600;">{% if d.var_diff %} {{ d.var_diff.amount }} ש"ח - {{ d.var_diff.reason }} {% endif %}</td>
+				<td style="color:#08A600; width:150px;">{% if d.bonus_diff %} {{ d.bonus_diff.amount }} ש"ח - {{ d.bonus_diff.reason }} {% endif %}</td>
+				<td style="color:#D50808;">{% if d.fee_diff %} {{ d.fee_diff.amount }} ש"ח - {{ d.fee_diff.reason }} {% endif %}</td>
+				<td><b>{% if d.total_amount %} {{ d.total_amount|intcomma }} ש"ח {% else %}----{% endif %}</b></td>
+				<td>
+				{% if d.is_fixed %}
+				<i class="fa fa-fw fa-exclamation-triangle text-warning"></i>
+				{% endif %}
+				</td>
+				<td>
+				{% if d.open_reminders|length %}
+					<a href="/demands/{{d.id}}/reminders" class="fancybox">{{d.open_reminders|length}} תזכורות</a>
+				{% endif %}
+					<a href="/demands/{{d.id}}/addreminder" class="fancybox">
+						<i class="fa fa-fw fa-plus-circle text-success"></i>
+					</a>
+				</td>
+				<td>{{ d.remarks|default_if_none:"" }}</td>
+			</tr>
+		{% endfor %}
+	</tbody>
+
+	<tfoot>
+		<tr height="30px">
+			<td colspan="2"></td>
+			<td><strong>סה"כ</strong></td>
+			<td><strong>{{total_sales_count}} מכירות</strong></td>
+			<td></td>
+			<td><strong>{{total_sales_amount|intcomma}} ש"ח</strong></td>
+			<td><strong>{{demands.total_sales_commission|intcomma|intcomma}} ש"ח</strong></td>
+			<td colspan="4"></td>
+			<td><strong>{{total_amount|intcomma}} ש"ח</strong></td>
+		</tr>
+	</tfoot>
+	
 </table>
 {% endblock content %}
