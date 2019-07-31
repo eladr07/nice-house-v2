@@ -144,7 +144,7 @@
 			<td>{{ d.project.initiator }}</td>
 			<td><a href="/projects/{{d.project.id}}">{{ d.project.name }}</a></td>
 			<td>{{ d.project.city }}</td>
-			<td>{{ d.last_status }}</td>
+			<td>{{ d.last_status|default_if_none:"" }}</td>
 			<td><a href="/demandsales/?demand_id={{d.id}}" class="bigfancybox">{{ d.sales_count }}</a></td>
 			<td><a href="{{d.get_absolute_url}}/salecount" class="fancybox">{{d.sale_count}}</a></td>
 			<td>{% if d.sales_amount %}{{ d.sales_amount|intcomma }} ש"ח {% endif %}</td>

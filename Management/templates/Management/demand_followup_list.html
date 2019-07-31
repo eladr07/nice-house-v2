@@ -135,7 +135,7 @@
 				</a>
 			</td>
 			<td>{{ d.month }}/{{d.year}}</td>
-			<td>{{ d.last_status }}</td>
+			<td>{{ d.last_status|default_if_none:"" }}</td>
 			<td><a href="/demandsales/?demand_id={{d.id}}" class="bigfancybox">{{ d.sales_count|default:"אין מכירות" }}</a></td>
 			<td><b>{% if d.total_amount %} {{ d.total_amount|intcomma }} ש"ח {% else %}----{% endif %}</b></td>
 			<td>

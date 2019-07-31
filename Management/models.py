@@ -1793,8 +1793,10 @@ class DemandStatusType(models.Model):
     Feed, Closed, Sent, Finished = range(1,5)
     
     name = models.CharField(max_length=20)
+
     def __str__(self):
         return str(self.name)  
+    
     class Meta:
         db_table = 'DemandStatusType'
 
@@ -1802,8 +1804,10 @@ class DemandStatus(models.Model):
     demand = models.ForeignKey('Demand', on_delete=models.PROTECT, related_name='statuses')
     date = models.DateTimeField(auto_now_add=True)
     type = models.ForeignKey('DemandStatusType', on_delete=models.PROTECT)
+    
     def __str__(self):
-        return u'%s - %s' % (self.type, self.date.strftime('%d/%m/%Y %H:%M'))
+        return self.type.name
+
     class Meta:
         db_table = 'DemandStatus'
         get_latest_by = 'date'
