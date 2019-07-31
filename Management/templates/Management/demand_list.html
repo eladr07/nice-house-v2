@@ -116,6 +116,7 @@
 		<th>יזם</th>
 		<th>שם פרוייקט</th>
 		<th>עיר</th>
+		<th>סטטוס</th>
 		<th>מס' מכירות</th>
 		<th>מס' מכירות צפוי</th>
 		<th>מכירות כולל מע"מ</th>
@@ -143,6 +144,7 @@
 			<td>{{ d.project.initiator }}</td>
 			<td><a href="/projects/{{d.project.id}}">{{ d.project.name }}</a></td>
 			<td>{{ d.project.city }}</td>
+			<td>{{ d.last_status }}</td>
 			<td><a href="/demandsales/?demand_id={{d.id}}" class="bigfancybox">{{ d.sales_count }}</a></td>
 			<td><a href="{{d.get_absolute_url}}/salecount" class="fancybox">{{d.sale_count}}</a></td>
 			<td>{% if d.sales_amount %}{{ d.sales_amount|intcomma }} ש"ח {% endif %}</td>
@@ -175,7 +177,7 @@
 		</tr>
 	{% endfor %}
 		<tr class="text-danger" height="30px">
-			<td colspan="5"></td>
+			<td colspan="6"></td>
 			<td>{{sales_count}} מכירות</td>
 			<td>{{expected_sales_count}} מכירות</td>
 			<td>{{sales_amount|intcomma}} ש"ח</td>

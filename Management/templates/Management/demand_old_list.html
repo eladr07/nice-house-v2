@@ -118,6 +118,7 @@
 		<th>PDF</th>
 		<th>יזם</th>
 		<th>שם פרוייקט</th>
+		<th>סטטוס</th>
 		<th>מס' מכירות</th>
 		<th>מס' מכירות צפוי</th>
 		<th>סה"כ מכירות כולל מע"מ</th>
@@ -156,6 +157,7 @@
 			</td>
 			<td>{{ d.project.initiator }}</td>
 			<td><a href="/projects/{{d.project.id}}">{{ d.project.name }}</a></td>
+			<td>{{ d.last_status }}</td>
 			<td><a href="/demandsales/?demand_id={{d.id}}" class="bigfancybox">{{ d.sales_count|default:"אין מכירות" }}</a></td>
 			<td>{{d.sale_count}}</td>
 			<td>{% if d.sales_amount %} {{ d.sales_amount|intcomma }} ש"ח {% else %}----{% endif %}</td>
@@ -180,7 +182,7 @@
 		</tr>
 	{% endfor %}
 	<tr class="text-danger" height="30px">
-		<td colspan="4" align="center"></td>
+		<td colspan="5" align="center"></td>
 		<td>{{total_sales_count}} מכירות</td>
 		<td>{{demands.total_sale_count}} מכירות</td>
 		<td>{{total_sales_amount|intcomma}} ש"ח</td>

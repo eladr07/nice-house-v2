@@ -81,6 +81,7 @@
 			<th>מס'</th>
 			<th>PDF</th>
 			<th>חודש</th>
+			<th>סטטוס</th>
 			<th>מס' מכירות</th>
 			<th>מס' מכירות צפוי</th>
 			<th>סה"כ מכירות כולל מע"מ</th>
@@ -121,6 +122,7 @@
 					</a>
 				</td>
 				<td>{{ d.month }}/{{d.year}}</td>
+				<td>{{ d.last_status }}</td>
 				<td><a href="/demandsales/?demand_id={{d.id}}" class="bigfancybox">{{ d.sales_count|default:"אין מכירות" }}</a></td>
 				<td>{{d.sale_count}}</td>
 				<td>{% if d.sales_amount %} {{ d.sales_amount|intcomma }} ש"ח {% else %}----{% endif %}</td>
@@ -150,7 +152,7 @@
 
 	<tfoot>
 		<tr height="30px">
-			<td colspan="2"></td>
+			<td colspan="3"></td>
 			<td><strong>סה"כ</strong></td>
 			<td><strong>{{total_sales_count}} מכירות</strong></td>
 			<td></td>
