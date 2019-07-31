@@ -4,7 +4,7 @@ from datetime import datetime, date
 import django.core.paginator
 from django.db.models import Count, Sum, Q
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError, FileResponse
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest, HttpResponseServerError, FileResponse
 from django.forms.models import inlineformset_factory
 from django.forms.formsets import formset_factory
 from django.core import serializers
@@ -3722,6 +3722,173 @@ def demand_season_list(request):
     }
 
     return render(request, 'Management/demand_season_list.html', context)
+
+def demand_season_list_export(request):
+
+    if not len(request.GET):
+        return HttpResponseBadRequest()
+
+    form = ProjectSeasonForm(request.GET)
+
+    if not form.is_valid():
+        return HttpResponseBadRequest()
+
+    project = form.cleaned_data['project']
+
+    from_year, from_month = form.cleaned_data['from_year'], form.cleaned_data['from_month']
+    to_year, to_month = form.cleaned_data['to_year'], form.cleaned_data['to_month']
+
+    from_date = date(from_year, from_month, 1)
+    to_date = date(to_year, to_month, 1)
+    
+    ds = Demand.objects \
+        .range(from_year, from_month, to_year, to_month) \
+        .filter(project = project) \
+        .prefetch_related('reminders__statuses') \
+        .select_related('project')
+
+    set_demand_sale_fields(ds, from_year, from_month, to_year, to_month)
+    set_demand_diff_fields(ds)
+    # set_demand_last_status(ds)
+    # set_demand_is_fixed(ds)
+
+    title = u'ריכוז דרישות - {project_name}'.format(project_name=project.name)
+
+    columns = [
+        ExcelColumn("מס'"), 
+        ExcelColumn('חודש'), 
+        ExcelColumn("מס' מכירות", showSum=True), 
+        ExcelColumn('סה"כ מכירות כולל מע"מ', 'currency', showSum=True),
+        ExcelColumn('עמלה מחושב בגין שיווק', 'currency'),
+        ExcelColumn('תוספת קבועה', 'currency'),
+        ExcelColumn('תוספת משתנה', 'currency'),
+        ExcelColumn('בונוס', 'currency'),
+        ExcelColumn('קיזוז', 'currency'),
+        ExcelColumn('סה"כ תשלום לחברה', 'currency', showSum=True),
+    ]
+
+    total_sales_count,total_sales_amount, total_amount = 0,0,0
+
+    rows = []
+
+    # Iterate through all demands
+    for demand in ds:
+        # Define the data for each cell in the row 
+        row = [
+            demand.id,
+            '{month}/{year}'.format(month=demand.month, year=demand.year),
+            demand.sale_count,
+            demand.sales_amount,
+            demand.sales_commission,
+            getattr(demand, 'fixed_diff', None),
+            getattr(demand, 'var_diff', None),
+            getattr(demand, 'bonus_diff', None),
+            getattr(demand, 'fee_diff', None),
+            demand.total_amount
+        ]
+        
+        rows.append(row)
+
+        total_sales_count += demand.sales_count
+        total_sales_amount += demand.sales_amount
+        total_amount += demand.total_amount
+
+    return generate_excel(title, columns, rows, None)
+
+class ExcelColumn:
+    def __init__(self, title, style=None, showSum=False):
+        self.title = title
+        self.style = style
+        self.showSum = showSum
+
+def generate_excel(title, columns, data_rows, sum_row):
+    
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, Alignment
+    from openpyxl.styles.borders import Border, Side
+    from openpyxl.worksheet.table import Table, TableStyleInfo
+
+    thin_border = Border(left=Side(style='thin'), 
+                        right=Side(style='thin'), 
+                        top=Side(style='thin'), 
+                        bottom=Side(style='thin'))
+
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    )
+    response['Content-Disposition'] = 'attachment; filename={title}.xlsx'.format(
+        title=title,
+    )
+
+    workbook = Workbook()
+    
+    # Get active worksheet/tab
+    worksheet = workbook.active
+
+    # Create the (merged) title cell
+    title_cell = worksheet.cell(row=1, column=1)
+    title_cell.value = title
+    title_cell.style = 'Headline 1'
+    title_cell.alignment = Alignment(horizontal="center", vertical="center")
+
+    worksheet.merge_cells(
+        start_row=1,
+        start_column=1,
+        end_row=1,
+        end_column=len(columns))
+
+    row_num = 2
+
+    # Assign the titles for each cell of the header
+    for col_num, column in enumerate(columns, 1):
+        cell = worksheet.cell(row=row_num, column=col_num)
+        cell.value = column.title
+
+        cell.style = 'Accent3'
+        cell.border = thin_border
+
+    sum_row = [0 if col.showSum else '' for col in columns]
+    # override first cell
+    sum_row[0] = 'סה"כ'
+
+    for row in data_rows:
+        row_num += 1
+
+        # Assign the data for each cell of the row 
+        for col_num, cell_value in enumerate(row, 1):
+            cell = worksheet.cell(row=row_num, column=col_num)
+            cell.value = cell_value or ''
+
+            col = columns[col_num - 1]
+
+            if col.style == 'currency':
+                cell.style = 'Currency'
+                cell.number_format = '#,##0 ₪'
+
+            cell.border = thin_border
+
+            if col.showSum:
+                sum_row[col_num - 1] += cell_value
+
+    # write summary row
+    row_num += 1
+
+    for col_num, cell_value in enumerate(sum_row, 1):
+        cell = worksheet.cell(row=row_num, column=col_num)
+        cell.value = cell_value or ''
+
+        col = columns[col_num - 1]
+
+        if col.style == 'currency':
+            cell.style = 'Currency'
+            cell.number_format = '#,##0 ₪'
+
+        cell.font = Font(bold=True)
+        cell.border = thin_border
+
+    workbook.save(response)
+
+    return response
 
 @permission_required('Management.demand_pay_balance')
 def demand_pay_balance_list(request):
