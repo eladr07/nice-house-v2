@@ -3922,6 +3922,9 @@ def generate_excel(title, columns, data_rows):
     # Get active worksheet/tab
     worksheet = workbook.active
 
+    # set RTL
+    worksheet.sheet_view.rightToLeft = True
+
     # size columns
     for col_num, col in enumerate(columns):
         if col.width == None:
