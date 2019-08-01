@@ -289,6 +289,7 @@ urlpatterns += [
     path('demandsales/', demand_sale_list),
     
     path('demands/', demand_list, name='demand-list'),
+    path('demands/<int:id>/sales/export', demand_sales_export, name='demand-sales-export'),
     path('demands/<int:id>/calc', demand_calc),
     path('demands/<int:id>/returntocalc', demand_return_to_calc),
     path('demands/old/', demand_old_list, name='demand-old'),

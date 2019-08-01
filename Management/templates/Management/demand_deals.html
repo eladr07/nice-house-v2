@@ -7,41 +7,6 @@
 	var selectedID = 0;
 	
 	$(document).ready(function() {
-		var table = $('#saleTable').DataTable({
-			searching: false,
-			ordering: false,
-			paging: false,
-			info: false,
-			buttons: [
-				{
-					extend: 'excel',
-					text: 'ייצא לאקסל',
-					title: 'פירוט מכירות - {{demand.project}} לחודש {{demand.month}}/{{demand.year}}',
-					filename: 'פירוט מכירות - {{demand.project}} לחודש {{demand.month}}/{{demand.year}}',
-					createEmptyCells: true,
-					footer: true,
-					autoFilter: true,
-					customize: function( xlsx ) {
-						var sheet = xlsx.xl.worksheets['sheet1.xml'];
-
-						// Add Bold, green background, thin black border to the first row (headers)
-						$('row:nth-child(2) c', sheet).attr( 's', '42' );
-
-						// Add borders to all other rows
-						$('row:gt(2) c', sheet).attr( 's', '25' );
-
-						// Add Centered text to the first row (title)
-						$('row:first c', sheet).attr( 's', '51' );
-
-						// Add Bold, thin black border to last row (footer)
-						$('row:last c', sheet).attr( 's', '27' );
-					}
-				}
-			]
-		});
-
-		table.buttons().container()
-    	.appendTo($('#myButtons'));
 
 		$("#saleTable tr").click(function() {
 			var tr = $(this);
@@ -169,10 +134,10 @@
 		<a href="/reports/project_month/{{demand.project.id}}/{{demand.year}}/{{demand.month}}" class="btn btn-default" role="button">
 			<i class="fa fa-fw fa-print"></i> גרסה להדפסה
 		</a>
-		
-		<div id="myButtons" style="display: inline-block">
-			<!-- DataTable buttons will be inserted here -->
-		</div>
+
+		<a href="{% url 'demand-sales-export' id=demand.id %}" class="btn btn-default" role="button">
+			<i class="fa fa-fw fa-table"></i> ייצא לאקסל
+		</a>
 
 		<table class="formTable" style="float:left;">
 			<tr>
@@ -197,8 +162,8 @@
 					<th>שם <br>הרוכשים</th>
 					<th>בניין</th>
 					<th>דירה</th>
-					<th>תאריך<br> הרשמה</th>
-					<th>תאריך<br> מכירה</th>
+					<th>ת. הרשמה</th>
+					<th>ת. מכירה</th>
 					<th>מחיר <br>חוזה</th>
 					<th>מחיר חוזה<br>לעמלה</th>
 					{% if sales.0.discount %}

@@ -1347,6 +1347,108 @@ def demand_edit(request, object_id):
 
     return render(request, 'Management/demand_edit.html', context)
     
+def demand_sales_export(request, id):
+    demand = Demand.objects \
+        .prefetch_related('diffs','invoices','payments') \
+        .select_related('project') \
+        .get(pk=id)
+
+    year, month = demand.year, demand.month
+
+    set_demand_sale_fields([demand], year, month, year, month)
+
+    sales = demand.sales_list
+    commissions = demand.project.commissions.get()
+
+    discount_cols = sales[0].discount != None
+    bonus_cols = commissions.b_discount_save_precentage != None
+    zilber_cols = commissions.c_zilber != None
+
+    columns = [
+        ExcelColumn('מזהה מכירה'),
+        ExcelColumn('שם הרוכשים', width=20),
+        ExcelColumn('בניין'),
+        ExcelColumn('דירה'),
+        ExcelColumn('ת. הרשמה', width=15),
+        ExcelColumn('ת. מכירה', width=15),
+        ExcelColumn('מחיר חוזה', 'currency', showSum=True, width=20),
+        ExcelColumn('מחיר חוזה לעמלה', 'currency', showSum=True, width=20),
+    ]
+
+    if discount_cols:
+        columns += [
+            ExcelColumn('מחיר כולל מע"מ', 'currency', showSum=True),
+            ExcelColumn('% הנחה ניתן', 'percent'),
+            ExcelColumn('% הנחה מותר', 'percent'),
+        ]
+        
+    columns += [
+        ExcelColumn('% עמלת בסיס', 'percent', width=15),
+        ExcelColumn('שווי עמלת בסיס', 'currency', showSum=True, width=20),
+    ]
+    
+    if bonus_cols or zilber_cols:
+        columns += [
+            ExcelColumn('% בונוס חיסכון', 'percent'),
+            ExcelColumn('שווי בונוס חיסכון', 'currency', showSum=True),
+        ]
+
+    columns += [
+        ExcelColumn('% עמלה סופי', 'percent', width=15),
+        ExcelColumn('שווי עמלה סופי', 'currency', showSum=True, width=20),
+    ]
+
+    rows = []
+
+    for counter, sale in enumerate(sales, 1):
+        signup = sale.house.get_signup()
+
+        row = [
+            '{demand_id}-{counter}'.format(demand_id=id, counter=counter),
+            sale.clients,
+            sale.house.building.num,
+            sale.house.num,
+            signup.date if signup != None else '',
+            sale.sale_date,
+            sale.price,
+            sale.price_final
+        ]
+
+        if discount_cols:
+            row += [
+                sale.price_taxed,
+                sale.discount,
+                sale.allowed_discount
+            ]
+        
+        row += [
+            sale.pc_base,
+            sale.pc_base_worth
+        ]
+
+        if bonus_cols:
+            row += [
+                sale.pb_dsp,
+                sale.pb_dsp_worth
+            ]
+        elif zilber_cols:
+            row += [
+                '',
+                sale.zdb
+            ]
+
+        row += [
+            sale.c_final,
+            sale.c_final_worth
+        ]
+
+        rows.append(row)
+    
+    title = u'פירוט מכירות - {project} לחודש {month}/{year}'.format(
+        project=demand.project.name, month=month, year=year)
+
+    return generate_excel(title, columns, rows)
+
 @permission_required('Management.change_demand')
 def demand_close(request, id):
     demand = Demand.objects.get(pk=id)
@@ -3758,16 +3860,14 @@ def demand_season_list_export(request):
         ExcelColumn("מס'"), 
         ExcelColumn('חודש'), 
         ExcelColumn("מס' מכירות", showSum=True), 
-        ExcelColumn('סה"כ מכירות כולל מע"מ', 'currency', showSum=True),
-        ExcelColumn('עמלה מחושב בגין שיווק', 'currency'),
+        ExcelColumn('סה"כ מכירות כולל מע"מ', 'currency', showSum=True, width=20),
+        ExcelColumn('עמלה מחושב בגין שיווק', 'currency', width=20),
         ExcelColumn('תוספת קבועה', 'currency'),
         ExcelColumn('תוספת משתנה', 'currency'),
         ExcelColumn('בונוס', 'currency'),
         ExcelColumn('קיזוז', 'currency'),
-        ExcelColumn('סה"כ תשלום לחברה', 'currency', showSum=True),
+        ExcelColumn('סה"כ תשלום לחברה', 'currency', showSum=True, width=20),
     ]
-
-    total_sales_count,total_sales_amount, total_amount = 0,0,0
 
     rows = []
 
@@ -3789,19 +3889,16 @@ def demand_season_list_export(request):
         
         rows.append(row)
 
-        total_sales_count += demand.sales_count
-        total_sales_amount += demand.sales_amount
-        total_amount += demand.total_amount
-
-    return generate_excel(title, columns, rows, None)
+    return generate_excel(title, columns, rows)
 
 class ExcelColumn:
-    def __init__(self, title, style=None, showSum=False):
+    def __init__(self, title, style=None, showSum=False, width=None):
         self.title = title
         self.style = style
         self.showSum = showSum
+        self.width = width
 
-def generate_excel(title, columns, data_rows, sum_row):
+def generate_excel(title, columns, data_rows):
     
     from openpyxl import Workbook
     from openpyxl.styles import Font, Alignment
@@ -3824,6 +3921,16 @@ def generate_excel(title, columns, data_rows, sum_row):
     
     # Get active worksheet/tab
     worksheet = workbook.active
+
+    # size columns
+    for col_num, col in enumerate(columns):
+        if col.width == None:
+            continue
+        
+        col_letter_ascii = ord('A') + col_num
+        col_letter = chr(col_letter_ascii)
+
+        worksheet.column_dimensions[col_letter].width = col.width
 
     # Create the (merged) title cell
     title_cell = worksheet.cell(row=1, column=1)
@@ -3857,13 +3964,17 @@ def generate_excel(title, columns, data_rows, sum_row):
         # Assign the data for each cell of the row 
         for col_num, cell_value in enumerate(row, 1):
             cell = worksheet.cell(row=row_num, column=col_num)
-            cell.value = cell_value or ''
+            cell.value = cell_value if cell_value != None else ''
 
             col = columns[col_num - 1]
 
             if col.style == 'currency':
                 cell.style = 'Currency'
                 cell.number_format = '#,##0 ₪'
+            elif col.style == 'percent':
+                cell.style = 'Percent'
+                # scale cell_value
+                cell.value = cell_value / 100 if cell_value else ''
 
             cell.border = thin_border
 
