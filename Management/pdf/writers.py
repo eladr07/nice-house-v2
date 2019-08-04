@@ -1458,29 +1458,46 @@ class DemandFollowupWriter(DocumentBase):
     def demandFlows(self):
         headers_names = [u"מס'", u"חודש", u"מכירות\nמס'", u"דרישה\nסכום'", u"חשבונית\nמס'", u"סכום", u"תאריך", u"סכום",  u"תאריך", u"לחשבונית\nדרישה", u"לחשבונית\nצ'ק", u"חשבונית\nזיכוי"]
         groups_names = [u"פרטי דרישה", None, None, None, u"פרטי חשבונית", None, None,  u"פרטי צ'קים", None, u"הפרשי דרישה", None, None]
-        groups_names = [u"הפרשי דרישה", None, None, u"פרטי צ'קים", None, u"פרטי חשבונית", None, None, u"פרטי דרישה"]
+        colWidths = [None, None, 30, None, 35, None, 60, None, 60, None, None, 30]
+        
+        # reverse lists
+        headers_names.reverse()
+        groups_names.reverse()
+        colWidths.reverse()
+
+        # reverse names
         headers = [log2vis(name) for name in headers_names]
         groups = [name and log2vis(name) for name in groups_names]
-        colWidths = [None, None, 30, None, 35, None, 60, None, 60, None, None, 30]
+        
         rows = []
         
         total_sales_count, total_amount, total_invoices, total_payments, total_diff_invoice, total_diff_invoice_payment = 0,0,0,0,0,0
         
-        headers.reverse()
-        colWidths.reverse()
-        
         for demand in self.demands:
-            invoices = demand.invoices.all()
-            invoice_num_str = '<br/>'.join([str(invoice.num) for invoice in invoices])
-            invoice_amount_str = '<br/>'.join([commaise(invoice.amount) for invoice in invoices])
-            invoice_date_str = '<br/>'.join([invoice.date.strftime('%d/%m/%Y') for invoice in invoices])
+
+            invoice_nums = []
+            invoice_amounts = []
+            invoice_dates = []
+            offset_amounts = []
+
+            for invoice in demand.invoices.all():
+                invoice_nums.append(str(invoice.num))
+                invoice_amounts.append(commaise(invoice.amount))
+                invoice_dates.append(invoice.date.strftime('%d/%m/%Y'))
+
+                offset = invoice.offset
+                if offset:
+                    offset_amounts.append(offset.amount)
+
+            invoice_num_str = '<br/>'.join(invoice_nums)
+            invoice_amount_str = '<br/>'.join(invoice_amounts)
+            invoice_date_str = '<br/>'.join(invoice_dates)
 
             payments = demand.payments.all()
             payment_amount_str = '<br/>'.join([commaise(payment.amount) for payment in payments])
             payment_date_str = '<br/>'.join([payment.payment_date.strftime('%d/%m/%Y') for payment in payments])
             
-            offsets = [invoice.offset for invoice in invoices if invoice.offset]
-            offset_amount_str = '<br/>'.join([offset.amount for offset in offsets])
+            offset_amount_str = '<br/>'.join(offset_amounts)
             
             sales_count = demand.sales_count
             
