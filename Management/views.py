@@ -4026,7 +4026,7 @@ class ExcelGenerator:
             else:
                 has_sub_columns = True
                 for sub_column in column.columns:
-                    create_header_cell(row_num + 1, col_num, sub_column.title)
+                    self._create_header_cell(row_num + 1, col_num, sub_column.title)
                     actual_columns.append(sub_column)
                     col_num += 1
 
