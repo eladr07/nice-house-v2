@@ -1447,7 +1447,7 @@ def demand_sales_export(request, id):
     title = u'פירוט מכירות - {project} לחודש {month}/{year}'.format(
         project=demand.project.name, month=month, year=year)
 
-    return generate_excel(title, columns, rows)
+    return ExcelGenerator().generate(title, columns, rows)
 
 @permission_required('Management.change_demand')
 def demand_close(request, id):
@@ -3889,7 +3889,7 @@ def demand_season_list_export(request):
 
     title = 'ריכוז דרישות - {project_name}'.format(project_name=project.name)
 
-    return generate_excel(title, columns, rows)
+    return ExcelGenerator().generate(title, columns, rows)
 
 def demand_followup_export(request):
     if not len(request.GET):
@@ -3912,7 +3912,7 @@ def demand_followup_export(request):
         .prefetch_related('invoices','payments') \
         .select_related('project') \
         .range(from_year, from_month, to_year, to_month) \
-        .filter(project__id = project_id)
+        .filter(project__id = project.id)
 
     set_demand_sale_fields(demands, from_year, from_month, to_year, to_month)
     set_demand_diff_fields(demands)
@@ -3945,7 +3945,7 @@ def demand_followup_export(request):
 
     title = 'מעקב דרישות - {project_name}'.format(project_name=project.name)
 
-    return generate_excel(title, columns, rows)
+    return ExcelGenerator().generate(title, columns, rows)
 
 class ExcelColumn:
     def __init__(self, title, style=None, showSum=False, width=None, columns=None):
@@ -3955,127 +3955,159 @@ class ExcelColumn:
         self.width = width
         self.columns = columns
 
-def generate_excel(title, columns, data_rows):
-    
-    from openpyxl import Workbook
-    from openpyxl.styles import Font, Alignment
-    from openpyxl.styles.borders import Border, Side
-    from openpyxl.worksheet.table import Table, TableStyleInfo
+from openpyxl import Workbook
+from openpyxl.styles import Font, Alignment
+from openpyxl.styles.borders import Border, Side
+from openpyxl.worksheet.table import Table, TableStyleInfo
 
-    thin_border = Border(left=Side(style='thin'), 
-                        right=Side(style='thin'), 
-                        top=Side(style='thin'), 
-                        bottom=Side(style='thin'))
+class ExcelGenerator:
 
-    response = HttpResponse(
-        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    )
-    response['Content-Disposition'] = 'attachment; filename={title}.xlsx'.format(
-        title=title,
-    )
+    def __init__(self):
 
-    workbook = Workbook()
-    
-    # Get active worksheet/tab
-    worksheet = workbook.active
+        self.thin_border = Border(
+            left=Side(style='thin'), 
+            right=Side(style='thin'), 
+            top=Side(style='thin'), 
+            bottom=Side(style='thin'))
 
-    # set RTL
-    worksheet.sheet_view.rightToLeft = True
-
-    # size columns
-    for col_num, col in enumerate(columns):
-        if col.width == None:
-            continue
+    def _create_workbook(self):
+        workbook = Workbook()
+        # Get active worksheet/tab
+        worksheet = workbook.active
+        # set RTL
+        worksheet.sheet_view.rightToLeft = True
         
-        col_letter_ascii = ord('A') + col_num
-        col_letter = chr(col_letter_ascii)
+        self.workbook = workbook
+        self.worksheet = worksheet
 
-        worksheet.column_dimensions[col_letter].width = col.width
+    def _size_columns(self, columns):
 
-    # Create the (merged) title cell
-    title_cell = worksheet.cell(row=1, column=1)
-    title_cell.value = title
-    title_cell.style = 'Headline 1'
-    title_cell.alignment = Alignment(horizontal="center", vertical="center")
+        for col_num, col in enumerate(columns):
+            if col.width == None:
+                continue
+            
+            col_letter_ascii = ord('A') + col_num
+            col_letter = chr(col_letter_ascii)
 
-    worksheet.merge_cells(
-        start_row=1,
-        start_column=1,
-        end_row=1,
-        end_column=len(columns))
+            self.worksheet.column_dimensions[col_letter].width = col.width
 
-    row_num = 2
+    def _create_title(self, title, columns):
+        title_cell = self.worksheet.cell(row=1, column=1)
+        title_cell.value = title
+        title_cell.style = 'Headline 1'
+        title_cell.alignment = Alignment(horizontal="center", vertical="center")
 
-    # Assign the titles for each cell of the header
-    col_num = 1
-    has_sub_columns = False
+        self.worksheet.merge_cells(
+            start_row=1,
+            start_column=1,
+            end_row=1,
+            end_column=len(columns))
 
-    def create_header_cell(row, column, value):
-        cell = worksheet.cell(row=row, column=col)
+    def _create_header_cell(self, row, column, value):
+        cell = self.worksheet.cell(row=row, column=column)
         cell.value = value
 
         cell.style = 'Accent3'
-        cell.border = thin_border
+        cell.border = self.thin_border
 
-    for column in columns:
-        create_header_cell(row_num, col_num, column.title)
+    def _create_table_headers(self, columns):
+        row_num = 2
+        col_num = 1
+        has_sub_columns = False
 
-        if column.columns == None:
-            col_num += 1
-        else:
-            has_sub_columns = True
-            for sub_column in column.columns:
-                create_header_cell(row_num + 1, col_num, sub_column.title)
+        actual_columns = []
 
-    if has_sub_columns:
-        row_num += 1
+        for column in columns:
+            self._create_header_cell(row_num, col_num, column.title)
 
-    sum_row = [0 if col.showSum else '' for col in columns]
-    # override first cell
-    sum_row[0] = 'סה"כ'
+            if column.columns == None:
+                actual_columns.append(column)
+                col_num += 1
+            else:
+                has_sub_columns = True
+                for sub_column in column.columns:
+                    create_header_cell(row_num + 1, col_num, sub_column.title)
+                    actual_columns.append(sub_column)
+                    col_num += 1
 
-    for row in data_rows:
-        row_num += 1
+        # set row_num
+        self.row_num = 3 if has_sub_columns else 2
+        self._columns = actual_columns
 
-        # Assign the data for each cell of the row 
-        for col_num, cell_value in enumerate(row, 1):
-            cell = worksheet.cell(row=row_num, column=col_num)
-            cell.value = cell_value if cell_value != None else ''
+    def _create_table_rows(self, data_rows):
+        sum_row = [0 if col.showSum else '' for col in self._columns]
+        # override first cell
+        sum_row[0] = 'סה"כ'
 
-            col = columns[col_num - 1]
+        for row in data_rows:
+            self.row_num += 1
+
+            # Assign the data for each cell of the row 
+            for col_num, cell_value in enumerate(row, 1):
+                cell = self.worksheet.cell(row=self.row_num, column=col_num)
+                cell.value = cell_value if cell_value != None else ''
+
+                col = self._columns[col_num - 1]
+
+                if col.style == 'currency':
+                    cell.style = 'Currency'
+                    cell.number_format = '#,##0 ₪'
+                elif col.style == 'percent':
+                    cell.style = 'Percent'
+                    # scale cell_value
+                    cell.value = cell_value / 100 if cell_value else ''
+
+                cell.border = self.thin_border
+
+                if col.showSum:
+                    sum_row[col_num - 1] += cell_value
+
+        self.sum_row = sum_row
+
+    def _create_summary_row(self):
+        row_num = self.row_num + 1
+
+        for col_num, cell_value in enumerate(self.sum_row, 1):
+            cell = self.worksheet.cell(row=row_num, column=col_num)
+            cell.value = cell_value or ''
+
+            col = self._columns[col_num - 1]
 
             if col.style == 'currency':
                 cell.style = 'Currency'
                 cell.number_format = '#,##0 ₪'
-            elif col.style == 'percent':
-                cell.style = 'Percent'
-                # scale cell_value
-                cell.value = cell_value / 100 if cell_value else ''
 
-            cell.border = thin_border
+            cell.font = Font(bold=True)
+            cell.border = self.thin_border
 
-            if col.showSum:
-                sum_row[col_num - 1] += cell_value
 
-    # write summary row
-    row_num += 1
+    def generate(self, title, columns, data_rows):
+        self.title = title
+        self.columns = columns
+        self.data_rows = data_rows
 
-    for col_num, cell_value in enumerate(sum_row, 1):
-        cell = worksheet.cell(row=row_num, column=col_num)
-        cell.value = cell_value or ''
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        )
+        response['Content-Disposition'] = 'attachment; filename={title}.xlsx'.format(
+            title=title,
+        )
 
-        col = columns[col_num - 1]
+        self._create_workbook()
 
-        if col.style == 'currency':
-            cell.style = 'Currency'
-            cell.number_format = '#,##0 ₪'
+        self._size_columns(columns)
 
-        cell.font = Font(bold=True)
-        cell.border = thin_border
+        self._create_title(title, columns)
 
-    workbook.save(response)
+        self._create_table_headers(columns)
 
-    return response
+        self._create_table_rows(data_rows)
+
+        self._create_summary_row()
+
+        self.workbook.save(response)
+
+        return response
 
 @permission_required('Management.demand_pay_balance')
 def demand_pay_balance_list(request):
