@@ -296,6 +296,7 @@ urlpatterns += [
     path('demands/season/', demand_season_list, name='demand-season'),
     path('demands/season/export', demand_season_list_export, name='demand-season-export'),
     path('demands/followup/', demand_followup_list, name='demand-followup'),
+    path('demands/followup/export', demand_followup_export, name='demand-followup-export'),
     path('demands/pay-balance/', demand_pay_balance_list, name='demand-pay-balance'),
     path('demands/closeall', demand_closeall),
     path('demands/sendall', demands_send),

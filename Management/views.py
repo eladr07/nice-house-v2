@@ -3854,8 +3854,6 @@ def demand_season_list_export(request):
     # set_demand_last_status(ds)
     # set_demand_is_fixed(ds)
 
-    title = u'ריכוז דרישות - {project_name}'.format(project_name=project.name)
-
     columns = [
         ExcelColumn("מס'"), 
         ExcelColumn('חודש'), 
@@ -3889,14 +3887,73 @@ def demand_season_list_export(request):
         
         rows.append(row)
 
+    title = 'ריכוז דרישות - {project_name}'.format(project_name=project.name)
+
+    return generate_excel(title, columns, rows)
+
+def demand_followup_export(request):
+    if not len(request.GET):
+        return HttpResponseBadRequest()
+
+    form = ProjectSeasonForm(request.GET)
+
+    if not form.is_valid():
+        return HttpResponseBadRequest()
+
+    project = form.cleaned_data['project']
+
+    from_year, from_month = form.cleaned_data['from_year'], form.cleaned_data['from_month']
+    to_year, to_month = form.cleaned_data['to_year'], form.cleaned_data['to_month']
+
+    from_date = date(from_year, from_month, 1)
+    to_date = date(to_year, to_month, 1)
+    
+    demands = Demand.objects \
+        .prefetch_related('invoices','payments') \
+        .select_related('project') \
+        .range(from_year, from_month, to_year, to_month) \
+        .filter(project__id = project_id)
+
+    set_demand_sale_fields(demands, from_year, from_month, to_year, to_month)
+    set_demand_diff_fields(demands)
+    set_demand_invoice_payment_fields(demands)
+
+    columns = [
+        ExcelColumn('פרטי דרישה', columns=[
+            ExcelColumn('חודש'),
+            ExcelColumn('סטטוס'),
+            ExcelColumn("מס' מכירות"),
+            ExcelColumn('סכום דרישה', 'currency', showSum=True)
+        ]),
+        ExcelColumn('פרטי חשבונית', columns=[
+            ExcelColumn("מס' חשבונית"),
+            ExcelColumn('סכום'),
+            ExcelColumn('תאריך')
+        ]),
+        ExcelColumn('פרטי שיקים', columns=[
+            ExcelColumn('סכום'),
+            ExcelColumn('תאריך')
+        ]),
+        ExcelColumn('הפרשי דרישה', columns=[
+            ExcelColumn('דרישה לחשבונית', 'currency', showSum=True),
+            ExcelColumn('שיק לחשבונית', 'currency', showSum=True),
+            ExcelColumn('זיכוי חשבונית')
+        ])
+    ]
+
+    rows = []
+
+    title = 'מעקב דרישות - {project_name}'.format(project_name=project.name)
+
     return generate_excel(title, columns, rows)
 
 class ExcelColumn:
-    def __init__(self, title, style=None, showSum=False, width=None):
+    def __init__(self, title, style=None, showSum=False, width=None, columns=None):
         self.title = title
         self.style = style
         self.showSum = showSum
         self.width = width
+        self.columns = columns
 
 def generate_excel(title, columns, data_rows):
     
@@ -3950,12 +4007,28 @@ def generate_excel(title, columns, data_rows):
     row_num = 2
 
     # Assign the titles for each cell of the header
-    for col_num, column in enumerate(columns, 1):
-        cell = worksheet.cell(row=row_num, column=col_num)
-        cell.value = column.title
+    col_num = 1
+    has_sub_columns = False
+
+    def create_header_cell(row, column, value):
+        cell = worksheet.cell(row=row, column=col)
+        cell.value = value
 
         cell.style = 'Accent3'
         cell.border = thin_border
+
+    for column in columns:
+        create_header_cell(row_num, col_num, column.title)
+
+        if column.columns == None:
+            col_num += 1
+        else:
+            has_sub_columns = True
+            for sub_column in column.columns:
+                create_header_cell(row_num + 1, col_num, sub_column.title)
+
+    if has_sub_columns:
+        row_num += 1
 
     sum_row = [0 if col.showSum else '' for col in columns]
     # override first cell
