@@ -3991,17 +3991,19 @@ class ExcelGenerator:
 
             self.worksheet.column_dimensions[col_letter].width = col.width
 
-    def _create_title(self, title, columns):
+    def _create_title(self, title):
         title_cell = self.worksheet.cell(row=1, column=1)
         title_cell.value = title
         title_cell.style = 'Headline 1'
         title_cell.alignment = Alignment(horizontal="center", vertical="center")
 
+        col_span = len(self._columns)
+
         self.worksheet.merge_cells(
             start_row=1,
             start_column=1,
             end_row=1,
-            end_column=len(columns))
+            end_column=col_span)
 
     def _create_header_cell(self, row, column, value):
         cell = self.worksheet.cell(row=row, column=column)
@@ -4025,10 +4027,25 @@ class ExcelGenerator:
                 col_num += 1
             else:
                 has_sub_columns = True
-                for sub_column in column.columns:
-                    self._create_header_cell(row_num + 1, col_num, sub_column.title)
-                    actual_columns.append(sub_column)
-                    col_num += 1
+
+                for sub_col_num, sub_col in enumerate(column.columns):
+                    self._create_header_cell(
+                        row_num + 1, 
+                        col_num + sub_col_num, 
+                        sub_col.title)
+
+                    actual_columns.append(sub_col)
+
+                end_column = col_num + len(column.columns) - 1
+
+                # merge parent column
+                self.worksheet.merge_cells(
+                    start_row=row_num,
+                    start_column=col_num,
+                    end_row=row_num,
+                    end_column=end_column)
+
+                col_num = end_column + 1
 
         # set row_num
         self.row_num = 3 if has_sub_columns else 2
@@ -4097,9 +4114,9 @@ class ExcelGenerator:
 
         self._size_columns(columns)
 
-        self._create_title(title, columns)
-
         self._create_table_headers(columns)
+
+        self._create_title(title)
 
         self._create_table_rows(data_rows)
 
