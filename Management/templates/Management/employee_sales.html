@@ -18,6 +18,7 @@
 		<th>מס' בניין</th>
 		<th>מס' דירה</th>
 		<th>מחיר חוזה</th>
+		<th>מע"מ</th>
 		<th>עו"ד</th>
 		{% for sales in es.sales.values %}
 			{% for sale in sales %}
@@ -31,6 +32,7 @@
 					<td><a target="_parent" href="{{sale.house.get_absolute_url}}/type1">{{sale.house.num}}</a></td>
 					{% endwith %}
 					<td>{{sale.price|intcomma}}</td>
+					<td>{{sale.include_tax|yesno:"כולל, לא כולל"}}</td>
 					<td>{{sale.price_include_lawyer|yesno:"כולל, לא כולל"}}</td>
 				</tr>
 			{% endfor %}
