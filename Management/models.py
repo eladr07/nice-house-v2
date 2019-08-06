@@ -1123,7 +1123,7 @@ class EPCommission(models.Model):
                     amount = precentages[sale] * sale.employee_price(self.employee) / 100
                     
                     # update commission detail
-                    scd = sale.commission_details.get_or_create(employee_salary=salary, commission=c)
+                    scd, new = sale.commission_details.get_or_create(employee_salary=salary, commission=c)
                     scd.value = amount
                     scd.save()
 
