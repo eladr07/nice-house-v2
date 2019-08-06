@@ -188,7 +188,7 @@
 			</td>
 			<td>{{s.bruto|default_if_none:""|intcomma}}</td>
 			<td></td>
-			<td>{{s.invoice_amount|default_if_none:""|intcomma}}</td>
+			<td>{{s.invoice_amount|default_if_none:""|floatformat:"0"|intcomma}}</td>
 			<td>{% if s.refund %}{{s.refund}} - {{s.refund_type}} {% endif %}</td>
 			<td></td>
 			<td>{{s.remarks|default_if_none:""}}</td>
