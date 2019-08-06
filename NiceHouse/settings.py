@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'b1&^9&3e48hs#1p+mtypy^8-ho)r%-3^inrp0d9haz0$-xml0o'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
@@ -96,8 +96,8 @@ DATABASES = {
         'NAME': 'Management',
         'HOST': '127.0.0.1',
         'PORT': '3306',
-        'USER': 'elad',
-        'PASSWORD': '1234',
+        'USER': 'root',
+        'PASSWORD': "T'z7*L^KKfB7KP8M",
         'ATOMIC_REQUESTS': True
     }
 }
@@ -140,7 +140,7 @@ USE_I18N = True
 
 USE_L10N = False
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)

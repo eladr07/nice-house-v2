@@ -1053,8 +1053,8 @@ class EPCommission(models.Model):
     def calc(self, sales, salary):
         try:
             logger = logging.getLogger('salary')
-            logger.info('starting to calculate commission for employee %(employee)s project %(project)s. %(sale_count)s sales.', 
-                        {'employee':self.employee, 'project':self.project,'sale_count':len(sales)})
+            logger.info('starting to calculate commission for employee #%(employee)d project #%(project)d. %(sale_count)d sales.', 
+                        {'employee':self.employee_id, 'project':self.project_id,'sale_count':len(sales)})
             
             restore_date = date(salary.year, salary.month , 1)
             logger.debug('restore_date: %s' % restore_date)
@@ -1086,7 +1086,8 @@ class EPCommission(models.Model):
                         logger.warning('sale #%s has 0 commission!' % sale.id)
 
                     # update commission detail
-                    scd = sale.commission_details.get_or_create(employee_salary=salary, commission=c)
+                    scd, new = sale.commission_details.get_or_create(employee_salary=salary, commission=c)
+
                     scd.value = amount
                     scd.save()
 
