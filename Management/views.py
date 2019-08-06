@@ -4014,16 +4014,30 @@ class ExcelGenerator:
         self.workbook = workbook
         self.worksheet = worksheet
 
+    def _set_col_width(self, col_num, width):
+        col_letter_ascii = ord('A') + col_num
+        col_letter = chr(col_letter_ascii)
+
+        self.worksheet.column_dimensions[col_letter].width = width
+
     def _size_columns(self, columns):
 
-        for col_num, col in enumerate(columns):
-            if col.width == None:
-                continue
-            
-            col_letter_ascii = ord('A') + col_num
-            col_letter = chr(col_letter_ascii)
+        col_num = 0
 
-            self.worksheet.column_dimensions[col_letter].width = col.width
+        for col in columns:
+            sub_columns = col.columns
+
+            if sub_columns == None:
+                if col.width != None:
+                    self._set_col_width(col_num, col.width)
+
+                col_num += 1
+            else:
+                for sub_col in sub_columns:
+                    if sub_col.width != None:
+                        self._set_col_width(col_num, sub_col.width)
+                    
+                    col_num += 1
 
     def _create_title(self, title):
         title_cell = self.worksheet.cell(row=1, column=1)
