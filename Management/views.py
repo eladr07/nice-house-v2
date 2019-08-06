@@ -3905,25 +3905,13 @@ def demand_followup_export(request):
     from_year, from_month = form.cleaned_data['from_year'], form.cleaned_data['from_month']
     to_year, to_month = form.cleaned_data['to_year'], form.cleaned_data['to_month']
 
-    from_date = date(from_year, from_month, 1)
-    to_date = date(to_year, to_month, 1)
-    
-    demands = Demand.objects \
-        .prefetch_related('invoices','payments') \
-        .select_related('project') \
-        .range(from_year, from_month, to_year, to_month) \
-        .filter(project__id = project.id)
-
-    set_demand_sale_fields(demands, from_year, from_month, to_year, to_month)
-    set_demand_diff_fields(demands)
-    set_demand_invoice_payment_fields(demands)
-
     columns = [
         ExcelColumn('פרטי דרישה', columns=[
+            ExcelColumn("מס'"),
             ExcelColumn('חודש'),
-            ExcelColumn('סטטוס'),
+            #ExcelColumn('סטטוס'),
             ExcelColumn("מס' מכירות"),
-            ExcelColumn('סכום דרישה', 'currency', showSum=True)
+            ExcelColumn('סכום דרישה', 'currency', showSum=True, width=20)
         ]),
         ExcelColumn('פרטי חשבונית', columns=[
             ExcelColumn("מס' חשבונית"),
@@ -3935,13 +3923,59 @@ def demand_followup_export(request):
             ExcelColumn('תאריך')
         ]),
         ExcelColumn('הפרשי דרישה', columns=[
-            ExcelColumn('דרישה לחשבונית', 'currency', showSum=True),
+            ExcelColumn('דרישה לחשבונית', 'currency', showSum=True, width=20),
             ExcelColumn('שיק לחשבונית', 'currency', showSum=True),
             ExcelColumn('זיכוי חשבונית')
         ])
     ]
 
+    demands = Demand.objects \
+        .prefetch_related('invoices','payments') \
+        .select_related('project') \
+        .range(from_year, from_month, to_year, to_month) \
+        .filter(project__id = project.id)
+
+    set_demand_sale_fields(demands, from_year, from_month, to_year, to_month)
+    set_demand_diff_fields(demands)
+    set_demand_invoice_payment_fields(demands)
+
+    # build data rows (copied from DemandFollowupWriter)
     rows = []
+
+    for demand in demands:
+
+        invoice_nums = []
+        invoice_amounts = []
+        invoice_dates = []
+        offset_amounts = []
+
+        for invoice in demand.invoices.all():
+            invoice_nums.append(str(invoice.num))
+            invoice_amounts.append(commaise(invoice.amount))
+            invoice_dates.append(invoice.date.strftime('%d/%m/%Y'))
+
+            offset = invoice.offset
+            if offset:
+                offset_amounts.append(offset.amount)
+
+        invoice_num_str = '<br/>'.join(invoice_nums)
+        invoice_amount_str = '<br/>'.join(invoice_amounts)
+        invoice_date_str = '<br/>'.join(invoice_dates)
+
+        payments = demand.payments.all()
+        payment_amount_str = '<br/>'.join([commaise(payment.amount) for payment in payments])
+        payment_date_str = '<br/>'.join([payment.payment_date.strftime('%d/%m/%Y') for payment in payments])
+        
+        offset_amount_str = '<br/>'.join(offset_amounts)
+        
+        row = [
+            demand.id, '%s/%s' % (demand.month, demand.year), demand.sales_count, demand.total_amount,
+            invoice_num_str, invoice_amount_str, invoice_date_str,
+            payment_amount_str, payment_date_str, 
+            demand.diff_invoice, demand.diff_invoice_payment, offset_amount_str
+        ]
+        
+        rows.append(row)
 
     title = 'מעקב דרישות - {project_name}'.format(project_name=project.name)
 
