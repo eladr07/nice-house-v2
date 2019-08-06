@@ -1153,7 +1153,7 @@ class EPCommission(models.Model):
                              {'employee':self.employee_id, 'project':self.project_id})
             return 0
         else:
-            logger.info('finished to calculate commission for employee #%(employee)s project #%(project)s. %(sale_count)s sales.', 
+            logger.info('finished to calculate commission for employee #%(employee)d project #%(project)d. %(sale_count)s sales.', 
                         {'employee':self.employee_id, 'project':self.project_id,'sale_count':len(sales)})
         
     def get_absolute_url(self):
