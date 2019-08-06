@@ -3860,10 +3860,10 @@ def demand_season_list_export(request):
         ExcelColumn("מס' מכירות", showSum=True), 
         ExcelColumn('סה"כ מכירות כולל מע"מ', 'currency', showSum=True, width=20),
         ExcelColumn('עמלה מחושב בגין שיווק', 'currency', width=20),
-        ExcelColumn('תוספת קבועה', 'currency'),
-        ExcelColumn('תוספת משתנה', 'currency'),
-        ExcelColumn('בונוס', 'currency'),
-        ExcelColumn('קיזוז', 'currency'),
+        ExcelColumn('תוספת קבועה', 'currency', width=15),
+        ExcelColumn('תוספת משתנה', 'currency', width=15),
+        ExcelColumn('בונוס', 'currency', width=15),
+        ExcelColumn('קיזוז', 'currency', width=15),
         ExcelColumn('סה"כ תשלום לחברה', 'currency', showSum=True, width=20),
     ]
 
@@ -3878,10 +3878,10 @@ def demand_season_list_export(request):
             demand.sale_count,
             demand.sales_amount,
             demand.sales_commission,
-            getattr(demand, 'fixed_diff', None),
-            getattr(demand, 'var_diff', None),
-            getattr(demand, 'bonus_diff', None),
-            getattr(demand, 'fee_diff', None),
+            hasattr(demand, 'fixed_diff') and demand.fixed_diff.amount or None,
+            hasattr(demand, 'var_diff') and demand.var_diff.amount or None,
+            hasattr(demand, 'bonus_diff') and demand.bonus_diff.amount or None,
+            hasattr(demand, 'fee_diff') and demand.fee_diff.amount or None,
             demand.total_amount
         ]
         
