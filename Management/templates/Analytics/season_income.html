@@ -77,7 +77,7 @@
 				</a>
 			</td>
 			<td>
-				<a href="/reports/project_season/{{p.id}}/{{start.year}}/{{start.month}}/{{end.year}}/{{end.month}}">
+				<a href="{% url 'demand-season-pdf' %}?project={{p.id}}&from_year={{start.year}}&from_month={{start.month}}&to_year={{end.year}}&to_month={{end.month}}">
 				<img src="{% static "images/PDF-48.png" %}" width="15" height="15"/>
 				</a>
 			</td>

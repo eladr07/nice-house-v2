@@ -3733,23 +3733,29 @@ def report_projects_month(request, year, month):
     return build_and_return_pdf(writer)
 
 @permission_required('demand_season_pdf')
-def report_project_season(request, project_id=None, 
-    from_year=common.current_month().year, from_month=common.current_month().month, 
-    to_year=common.current_month().year, to_month=common.current_month().month):
-
-    from_date = date(int(from_year), int(from_month), 1)
-    to_date = date(int(to_year), int(to_month), 1)
+def report_project_season(request):
     
+    if not len(request.GET):
+        return HttpResponseBadRequest()
+
+    form = ProjectSeasonForm(request.GET)
+
+    if not form.is_valid():
+        return HttpResponseBadRequest()
+
+    project = form.cleaned_data['project']
+
+    from_year, from_month = form.cleaned_data['from_year'], form.cleaned_data['from_month']
+    to_year, to_month = form.cleaned_data['to_year'], form.cleaned_data['to_month']
+
     demands = Demand.objects \
         .prefetch_related('invoices','payments') \
         .select_related('project') \
         .range(from_year, from_month, to_year, to_month) \
-        .filter(project__id = project_id)
+        .filter(project__id = project.id)
 
     set_demand_sale_fields(demands, from_year, from_month, to_year, to_month)
     set_demand_diff_fields(demands)
-
-    project = Project.objects.get(pk=project_id)
 
     title = u'ריכוז דרישות תקופתי לפרוייקט %s' % project
 
@@ -3758,11 +3764,20 @@ def report_project_season(request, project_id=None,
     return build_and_return_pdf(writer)
 
 @permission_required('demand_followup_pdf')
-def report_project_followup(request, project_id=None, 
-    from_year=common.current_month().year, from_month=common.current_month().month, 
-    to_year=common.current_month().year, to_month=common.current_month().month):
+def report_project_followup(request):
     
-    project = Project.objects.get(pk = project_id)
+    if not len(request.GET):
+        return HttpResponseBadRequest()
+
+    form = ProjectSeasonForm(request.GET)
+
+    if not form.is_valid():
+        return HttpResponseBadRequest()
+
+    project = form.cleaned_data['project']
+
+    from_year, from_month = form.cleaned_data['from_year'], form.cleaned_data['from_month']
+    to_year, to_month = form.cleaned_data['to_year'], form.cleaned_data['to_month']
     
     demands = Demand.objects \
         .prefetch_related('invoices','payments') \

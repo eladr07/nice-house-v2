@@ -253,8 +253,8 @@ urlpatterns += [
     
     path('reports/project_month/<int:project_id>/<int:year>/<int:month>', report_project_month),
     path('reports/projects_month/<int:year>/<int:month>', report_projects_month),
-    path('reports/project_season/<int:project_id>/<int:from_year>/<int:from_month>/<int:to_year>/<int:to_month>', report_project_season),
-    path('reports/project_followup/<int:project_id>/<int:from_year>/<int:from_month>/<int:to_year>/<int:to_month>', report_project_followup),
+    path('reports/demand-season', report_project_season, name='demand-season-pdf'),
+    path('reports/demand-followup', report_project_followup, name='demand-followup-pdf'),
     path('reports/employeesales', report_employee_sales),
     
     path('salepricemod/<int:pk>', SalePriceModUpdate.as_view()),
