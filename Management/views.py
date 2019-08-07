@@ -3839,9 +3839,6 @@ def demand_season_list_export(request):
 
     from_year, from_month = form.cleaned_data['from_year'], form.cleaned_data['from_month']
     to_year, to_month = form.cleaned_data['to_year'], form.cleaned_data['to_month']
-
-    from_date = date(from_year, from_month, 1)
-    to_date = date(to_year, to_month, 1)
     
     ds = Demand.objects \
         .range(from_year, from_month, to_year, to_month) \
