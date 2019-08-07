@@ -3783,7 +3783,7 @@ def report_project_followup(request):
         .prefetch_related('invoices','payments') \
         .select_related('project') \
         .range(from_year, from_month, to_year, to_month) \
-        .filter(project__id = project_id)
+        .filter(project__id = project.id)
 
     set_demand_sale_fields(demands, from_year, from_month, to_year, to_month)
     set_demand_diff_fields(demands)
