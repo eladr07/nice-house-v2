@@ -1437,9 +1437,9 @@ class CZilber(models.Model):
             set_demand_sale_fields([d], month.year, month.month, month.year, month.month)
             set_demand_diff_fields([d])
 
-            if d.var_diff: 
+            if getattr(d, 'var_diff', None) != None: 
                 d.var_diff.delete()
-            if d.bonus_diff: 
+            if getattr(d, 'bonus_diff', None) != None: 
                 d.bonus_diff.delete()
             
             sales = d.sales_list
