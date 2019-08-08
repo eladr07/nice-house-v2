@@ -404,7 +404,7 @@ def demand_calc(request, id):
         set_demand_last_status(demands)
 
         # exclude all demands that were already sent! to include them you must manually change their status!!!!!
-        demands = [demand for demand in demands if demand.last_status and \
+        demands = [demand for demand in demands if not demand.last_status or \
             demand.last_status.type_id not in (DemandStatusType.Sent, DemandStatusType.Finished)]
             
         # delete all commissions and sale commission details before re-calculating
