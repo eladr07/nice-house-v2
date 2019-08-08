@@ -413,7 +413,7 @@ def demand_calc(request, id):
             set_demand_sale_fields([demand], year, month, year, month)
 
             # delete demand statuses
-            for status in demand.statuses:
+            for status in demand.statuses.all():
                 status.delete()
 
         for d2 in demands:
