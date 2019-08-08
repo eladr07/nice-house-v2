@@ -1478,8 +1478,8 @@ class CZilber(models.Model):
             # enrich all demands in cycle
             set_demand_sale_fields(
                 demands,
-                demands[-1].year, demand[-1].month,
-                demands[0].year, demand[0].month)
+                demands[-1].year, demands[-1].month,
+                demands[0].year, demands[0].month)
 
             cycle_sales = []
             for demand in demands:
