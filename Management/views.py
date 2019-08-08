@@ -413,7 +413,8 @@ def demand_calc(request, id):
             set_demand_sale_fields([demand], year, month, year, month)
 
             # delete demand statuses
-            demand.statuses.delete()
+            for status in demand.statuses:
+                status.delete()
 
         for d2 in demands:
             d2.calc_sales_commission()
