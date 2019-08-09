@@ -4387,54 +4387,56 @@ def employeesalary_season_list(request):
 
 @permission_required('Management.season_salaryexpenses')
 def employeesalary_season_expenses(request):
-    salaries = []
-    total_neto, total_check_amount, total_loan_pay, total_bruto, total_bruto_employer, total_refund = 0,0,0,0,0,0
-    total_sale_count = 0
-    from_date, to_date, employee_base = None,None,None
+    
+    from_year, from_month, to_year, to_month = None,None,None,None
+    employee_base = None
     
     if len(request.GET):
         form = EmployeeSeasonForm(request.GET)
         if form.is_valid():
             employee_base = form.cleaned_data['employee']
-            from_date = date(form.cleaned_data['from_year'], form.cleaned_data['from_month'], 1)
-            to_date = date(form.cleaned_data['to_year'], form.cleaned_data['to_month'], 1)
+            from_year, from_month = form.cleaned_data['from_year'], form.cleaned_data['from_month']
+            to_year, to_month = form.cleaned_data['to_year'], form.cleaned_data['to_month']
 
             employee = employee_base.derived
 
             if isinstance(employee, Employee):
                 salaries = EmployeeSalary.objects.nondeleted() \
-                    .range(from_date.year, from_date.month, to_date.year, to_date.month) \
+                    .range(from_year, from_month, to_year, to_month) \
                     .select_related('employee__employment_terms__hire_type') \
                     .filter(employee_id = employee_base.id)
                 
                 enrich_employee_salaries(
                     salaries, 
                     {employee_base.id: employee},
-                    from_date.year, from_date.month, to_date.year, to_date.month)
+                    from_year, from_month, to_year, to_month)
                 
                 template = 'Management/employeesalary_season_expenses.html'
             elif isinstance(employee, NHEmployee):
-                salaries = NHEmployeeSalary.objects.nondeleted().range(from_date.year, from_date.month, to_date.year, to_date.month).filter(nhemployee__id = employee_base.id)
+                salaries = NHEmployeeSalary.objects.nondeleted() \
+                    .range(from_year, from_month, to_year, to_month) \
+                    .filter(nhemployee__id = employee_base.id)
 
                 enrich_nh_employee_salaries(
                     salaries, 
                     {employee_base.id: employee},
-                    from_date.year, from_date.month, to_date.year, to_date.month)
+                    from_year, from_month, to_year, to_month)
 
                 template = 'Management/nhemployeesalary_season_expenses.html'
 
-            for salary in salaries:
-                total_neto += salary.neto or 0
-                total_check_amount += salary.check_amount or 0
-                total_loan_pay += salary.loan_pay or 0
-                total_bruto += salary.bruto or 0
-                total_bruto_employer += salary.bruto_employer_expense or 0
+            total_neto = sum([salary.neto or 0 for salary in salaries])
+            total_check_amount = sum([salary.check_amount or 0 for salary in salaries])
+            total_loan_pay = sum([salary.loan_pay or 0 for salary in salaries])
+            total_bruto = sum([salary.bruto or 0 for salary in salaries])
+            total_bruto_employer = sum([salary.bruto_employer_expense or 0 for salary in salaries])
     else:
         template = 'Management/employeesalary_season_expenses.html'
         form = EmployeeSeasonForm()
+        salaries = []
+        total_neto, total_check_amount, total_loan_pay, total_bruto, total_bruto_employer, total_refund = 0,0,0,0,0,0
         
     context = { 
-        'salaries':salaries, 'start':from_date, 'end':to_date,
+        'salaries':salaries, 'start':date(from_year, from_month, 1), 'end':date(to_year, to_month, 1),
         'employee': employee_base, 'filterForm':form,
         'total_neto':total_neto,'total_check_amount':total_check_amount,
         'total_loan_pay':total_loan_pay,'total_bruto':total_bruto,'total_bruto_employer':total_bruto_employer
