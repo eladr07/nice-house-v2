@@ -193,6 +193,7 @@ urlpatterns += [
     path('salaries/season/', employeesalary_season_list, name='salary-season'),
     path('salaries/season/total-expenses/', employeesalary_season_total_expenses, name='salary-season-total-expenses'),
     path('salaries/season/expenses/', employeesalary_season_expenses, name='salary-season-expenses'),
+    path('salaries/season/expenses/export', employeesalary_season_expenses_export, name='salary-season-expenses-export'),
 
     path('salaries/<int:year>/<int:month>/pdf', employee_salary_pdf),
     path('salaries/<int:pk>', EmployeeSalaryUpdate.as_view()),

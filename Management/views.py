@@ -4433,12 +4433,17 @@ def employeesalary_season_expenses(request):
         template = 'Management/employeesalary_season_expenses.html'
         form = EmployeeSeasonForm()
         
-    return render(request, template, 
-                              { 'salaries':salaries, 'start':from_date, 'end':to_date,
-                                'employee': employee_base, 'filterForm':form,
-                                'total_neto':total_neto,'total_check_amount':total_check_amount,
-                                'total_loan_pay':total_loan_pay,'total_bruto':total_bruto,'total_bruto_employer':total_bruto_employer},
-                              )
+    context = { 
+        'salaries':salaries, 'start':from_date, 'end':to_date,
+        'employee': employee_base, 'filterForm':form,
+        'total_neto':total_neto,'total_check_amount':total_check_amount,
+        'total_loan_pay':total_loan_pay,'total_bruto':total_bruto,'total_bruto_employer':total_bruto_employer
+    }
+
+    return render(request, template, context)
+
+def employeesalary_season_expenses_export(request):
+    pass
 
 @permission_required('Management.season_total_salaryexpenses')
 def employeesalary_season_total_expenses(request):
