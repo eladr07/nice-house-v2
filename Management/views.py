@@ -4324,9 +4324,6 @@ def employeesalary_season_list(request):
     from_year, from_month, to_year, to_month = None,None,None,None
     employee_base = None
     
-    total_attrs = ['neto', 'check_amount', 'loan_pay', 'bruto', 'refund']
-    totals = {'total_' + attr: 0 for attr in total_attrs}
-    
     if len(request.GET):
         form = EmployeeSeasonForm(request.GET)
         if form.is_valid():
@@ -4366,18 +4363,13 @@ def employeesalary_season_list(request):
                     {employee_base.id: employee},
                     from_year, from_month, to_year, to_month)
             
-            if 'list' in request.GET:    
-                # aggregate to get total values
-                for attr in total_attrs:
-                    attr_list = [getattr(salary, attr) or 0 for salary in salaries]
-                    totals['total_' + attr] = sum(attr_list)
-            elif 'pdf' in request.GET:
+            if 'pdf' in request.GET:
                 title = u'ריכוז שכר תקופתי לעובד - %s' % employee_base
                 writer = EmployeeSalariesWriter(salaries, title, show_month=True, show_employee=False)
                 return build_and_return_pdf(writer)
     else:
         form = EmployeeSeasonForm()
-    
+
     context = { 
         'salaries':salaries, 
         'start':date(from_year, from_month, 1), 
@@ -4385,10 +4377,24 @@ def employeesalary_season_list(request):
         'employee':employee_base, 
         'filterForm':form 
     }
+    
+    total = sum_attrs(
+        salaries,
+        ['neto', 'check_amount', 'loan_pay', 'bruto', 'refund']
+    )
 
     context.update(totals)
     
     return render(request, 'Management/employeesalary_season_list.html', context, )
+
+def sum_attrs(iterable, attrs):
+    totals = {}
+
+    for attr in attrs:
+        attr_list = [getattr(item, attr) or 0 for item in iterable]
+        totals['total_' + attr] = sum(attr_list)
+
+    return totals
 
 @permission_required('Management.season_salaryexpenses')
 def employeesalary_season_expenses(request):
@@ -4396,9 +4402,6 @@ def employeesalary_season_expenses(request):
     
     from_year, from_month, to_year, to_month = None,None,None,None
     employee_base = None
-
-    total_attrs = ['neto', 'check_amount', 'loan_pay', 'bruto', 'bruto_employer_expense']
-    totals = {'total_' + attr: 0 for attr in total_attrs}
     
     if len(request.GET):
         form = EmployeeSeasonForm(request.GET)
@@ -4432,10 +4435,6 @@ def employeesalary_season_expenses(request):
                     from_year, from_month, to_year, to_month)
 
                 template = 'Management/nhemployeesalary_season_expenses.html'
-
-            for attr in total_attrs:
-                attr_list = [getattr(salary, attr) or 0 for salary in salaries]
-                totals['total_' + attr] = sum(attr_list)
     else:
         template = 'Management/employeesalary_season_expenses.html'
         form = EmployeeSeasonForm()
@@ -4446,6 +4445,11 @@ def employeesalary_season_expenses(request):
         'total_neto':total_neto,'total_check_amount':total_check_amount,
         'total_loan_pay':total_loan_pay,'total_bruto':total_bruto,'total_bruto_employer':total_bruto_employer
     }
+
+    totals = sum_attrs(
+        salaries,
+        ['neto', 'check_amount', 'loan_pay', 'bruto', 'bruto_employer_expense']
+    )
 
     context.update(totals)
 
