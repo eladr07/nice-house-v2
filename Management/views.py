@@ -4441,9 +4441,7 @@ def employeesalary_season_expenses(request):
         
     context = { 
         'salaries':salaries, 'start':date(from_year, from_month, 1), 'end':date(to_year, to_month, 1),
-        'employee': employee_base, 'filterForm':form,
-        'total_neto':total_neto,'total_check_amount':total_check_amount,
-        'total_loan_pay':total_loan_pay,'total_bruto':total_bruto,'total_bruto_employer':total_bruto_employer
+        'employee': employee_base, 'filterForm':form
     }
 
     totals = sum_attrs(
