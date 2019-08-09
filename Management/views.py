@@ -4440,7 +4440,9 @@ def employeesalary_season_expenses(request):
         form = EmployeeSeasonForm()
         
     context = { 
-        'salaries':salaries, 'start':date(from_year, from_month, 1), 'end':date(to_year, to_month, 1),
+        'salaries':salaries, 
+        'from_year':from_year, 'from_month':from_month, 
+        'to_year':to_year, 'to_month':to_month,
         'employee': employee_base, 'filterForm':form
     }
 
