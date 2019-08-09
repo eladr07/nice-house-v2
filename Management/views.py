@@ -4320,10 +4320,12 @@ def demand_followup_list(request):
 @permission_required('Management.season_employeesalary')
 def employeesalary_season_list(request):
     salaries = []
-    from_date, to_date, employee_base = None,None,None
+
+    from_year, from_month, to_year, to_month = None,None,None,None
+    employee_base = None
     
     total_attrs = ['neto', 'check_amount', 'loan_pay', 'bruto', 'refund']
-    totals = dict([('total_' + attr, 0) for attr in total_attrs])
+    totals = {'total_' + attr: 0 for attr in total_attrs}
     
     if len(request.GET):
         form = EmployeeSeasonForm(request.GET)
@@ -4332,9 +4334,6 @@ def employeesalary_season_list(request):
 
             from_year, from_month = form.cleaned_data['from_year'], form.cleaned_data['from_month']
             to_year, to_month = form.cleaned_data['to_year'], form.cleaned_data['to_month']
-
-            from_date = date(from_year, from_month, 1)
-            to_date = date(to_year, to_month, 1)
 
             # set to Employee or NHEmployee
             employee = employee_base.derived
@@ -4369,10 +4368,9 @@ def employeesalary_season_list(request):
             
             if 'list' in request.GET:    
                 # aggregate to get total values
-                for salary in salaries:
-                    for attr in total_attrs:
-                        attr_value = getattr(salary, attr)
-                        totals['total_' + attr] += attr_value or 0
+                for attr in total_attrs:
+                    attr_list = [getattr(salary, attr) or 0 for salary in salaries]
+                    totals['total_' + attr] = sum(attr_list)
             elif 'pdf' in request.GET:
                 title = u'ריכוז שכר תקופתי לעובד - %s' % employee_base
                 writer = EmployeeSalariesWriter(salaries, title, show_month=True, show_employee=False)
@@ -4380,16 +4378,27 @@ def employeesalary_season_list(request):
     else:
         form = EmployeeSeasonForm()
     
-    context = { 'salaries':salaries, 'start':from_date, 'end':to_date, 'employee':employee_base, 'filterForm':form }
+    context = { 
+        'salaries':salaries, 
+        'start':date(from_year, from_month, 1), 
+        'end':date(to_year, to_month, 1), 
+        'employee':employee_base, 
+        'filterForm':form 
+    }
+
     context.update(totals)
     
     return render(request, 'Management/employeesalary_season_list.html', context, )
 
 @permission_required('Management.season_salaryexpenses')
 def employeesalary_season_expenses(request):
+    salaries = []
     
     from_year, from_month, to_year, to_month = None,None,None,None
     employee_base = None
+
+    total_attrs = ['neto', 'check_amount', 'loan_pay', 'bruto', 'bruto_employer_expense']
+    totals = {'total_' + attr: 0 for attr in total_attrs}
     
     if len(request.GET):
         form = EmployeeSeasonForm(request.GET)
@@ -4424,16 +4433,12 @@ def employeesalary_season_expenses(request):
 
                 template = 'Management/nhemployeesalary_season_expenses.html'
 
-            total_neto = sum([salary.neto or 0 for salary in salaries])
-            total_check_amount = sum([salary.check_amount or 0 for salary in salaries])
-            total_loan_pay = sum([salary.loan_pay or 0 for salary in salaries])
-            total_bruto = sum([salary.bruto or 0 for salary in salaries])
-            total_bruto_employer = sum([salary.bruto_employer_expense or 0 for salary in salaries])
+            for attr in total_attrs:
+                attr_list = [getattr(salary, attr) or 0 for salary in salaries]
+                totals['total_' + attr] = sum(attr_list)
     else:
         template = 'Management/employeesalary_season_expenses.html'
         form = EmployeeSeasonForm()
-        salaries = []
-        total_neto, total_check_amount, total_loan_pay, total_bruto, total_bruto_employer, total_refund = 0,0,0,0,0,0
         
     context = { 
         'salaries':salaries, 'start':date(from_year, from_month, 1), 'end':date(to_year, to_month, 1),
@@ -4441,6 +4446,8 @@ def employeesalary_season_expenses(request):
         'total_neto':total_neto,'total_check_amount':total_check_amount,
         'total_loan_pay':total_loan_pay,'total_bruto':total_bruto,'total_bruto_employer':total_bruto_employer
     }
+
+    context.update(totals)
 
     return render(request, template, context)
 
