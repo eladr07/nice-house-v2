@@ -132,7 +132,7 @@
 <table id="demandTable" class="myDataTable" border="1">
 <caption>מציג סה"כ {{project_demands|length}} פרוייקטים</caption>
 	<tr>
-		<th colspan="5">פרטי דרישה</th>
+		<th colspan="6">פרטי דרישה</th>
 		<th colspan="3">פרטי חשבונית</th>
 		<th colspan="2">פרטי צ'קים</th>
 		<th colspan="6">הפרשי דרישה</th>
@@ -252,7 +252,7 @@
 			</tr>
 		{% endfor %}
 		<tr height="30px" class="rowSum">
-			<td colspan="6" align="center">סיכום</td>
+			<td colspan="5" align="center">סיכום</td>
 			<td>{{project.total_amount|intcomma}} ש"ח</td>
 			<td></td>
 			<td>{{project.total_invoices|intcomma}}</td>
