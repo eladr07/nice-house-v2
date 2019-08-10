@@ -137,7 +137,7 @@
 	{% endif %}
 			<td>{{d.id}}</td>
 			<td>
-				<a href="/reports/project_month/{{d.project.id}}/{{d.year}}/{{d.month}}">
+				<a href="{% url 'project-month-pdf' project_id=d.project_id year=d.year month=d.month %}">
 				<img src="{% static "images/PDF-48.png" %}" width="15" height="15"/>
 				</a>
 			</td>

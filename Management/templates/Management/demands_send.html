@@ -56,7 +56,7 @@
 					<a href="{{f.instance.get_absolute_url}}" target="_blank">{{f.instance.id}}</a>
 				</td>
 				<td>
-					<a href="/reports/project_month/{{f.instance.project.id}}/{{f.instance.year}}/{{f.instance.month}}">
+					<a href="{% url 'project-month-pdf' project_id=f.instance.project.id year=f.instance.year month=f.instance.month %}">
 					<img src="{% static "images/PDF-48.png" %}" width="15" height="15"/>
 					</a>
 				</td>

@@ -225,7 +225,7 @@
 				</ul>
 				<ul>
 					<li><a href="">דו"ח מכירות לסוכן</a></li>
-					<form method="GET" action="reports/employeesales" class="form-inline">
+					<form method="GET" action="{% url 'employee-sales-pdf' %}" class="form-inline">
 						{% for field in employeeSalesForm %}
 							{{ field|add_class:'form-control input-sm' }}
 						{% endfor%}

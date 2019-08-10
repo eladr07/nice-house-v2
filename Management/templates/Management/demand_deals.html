@@ -131,7 +131,7 @@
 			<i class="fa fa-fw fa-times-circle text-danger"></i> ביטול מכירה
 		</a>
 
-		<a href="/reports/project_month/{{demand.project.id}}/{{demand.year}}/{{demand.month}}" class="btn btn-default" role="button">
+		<a href="{% url 'project-month-pdf' project_id=demand.project_id year=demand.year month=demand.month %}" class="btn btn-default" role="button">
 			<i class="fa fa-fw fa-print"></i> גרסה להדפסה
 		</a>
 

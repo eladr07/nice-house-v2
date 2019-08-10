@@ -159,7 +159,7 @@
 				<td>
 					{% for p in s.sales %}
 						<a href="{{p.get_absolute_url}}" target="_blank">{{p}}</a>
-						<a href="/reports/project_month/{{p.id}}/{{s.year}}/{{s.month}}">
+						<a href="{% url 'project-month-pdf' project_id=p.id year=s.year month=s.month %}">
 							<img src="{% static "images/PDF-48.png" %}" width="15" height="15"/>
 						</a>
 						<br>

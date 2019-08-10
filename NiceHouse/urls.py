@@ -252,11 +252,11 @@ urlpatterns += [
     path('lawyers/<int:pk>', LawyerUpdate.as_view()),
     path('lawyers/<int:pk>/del', LawyerDelete.as_view()),
     
-    path('reports/project_month/<int:project_id>/<int:year>/<int:month>', report_project_month),
-    path('reports/projects_month/<int:year>/<int:month>', report_projects_month),
-    path('reports/demand-season', report_project_season, name='demand-season-pdf'),
-    path('reports/demand-followup', report_project_followup, name='demand-followup-pdf'),
-    path('reports/employeesales', report_employee_sales),
+    path('/reports/project_month/<int:project_id>/<int:year>/<int:month>', report_project_month, name='project-month-pdf'),
+    path('/reports/projects_month/<int:year>/<int:month>', report_projects_month, name='projects-month-pdf'),
+    path('/reports/demand-season', report_project_season, name='demand-season-pdf'),
+    path('/reports/demand-followup', report_project_followup, name='demand-followup-pdf'),
+    path('/reports/employeesales', report_employee_sales, name='employee-sales-pdf'),
     
     path('salepricemod/<int:pk>', SalePriceModUpdate.as_view()),
     path('salehousemod/<int:pk>', SaleHouseModUpdate.as_view()),

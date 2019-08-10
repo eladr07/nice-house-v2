@@ -149,7 +149,7 @@
 				{% for demand in s.demands %}
 				<a href="{{demand.project.get_absolute_url}}" target="_blank">{{demand.project}}</a>
 				<br>
-				<a href="/reports/project_month/{{demand.project_id}}/{{demand.year}}/{{demand.month}}">
+				<a href="{% url 'project-month-pdf' project_id=demand.project_id year=demand.year month=demand.month %}">
 					<img src="{% static "images/PDF-48.png" %}" width="15" height="15"/>
 				</a>
 				<a href="{{demand.get_absolute_url}}">
