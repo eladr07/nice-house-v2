@@ -4218,7 +4218,7 @@ def demand_pay_balance_list(request):
 
             set_demand_sale_fields(all_demands, from_year, from_month, to_year, to_month)
             set_demand_diff_fields(all_demands)
-            set_demand_last_status(ds)
+            set_demand_last_status(all_demands)
             set_demand_invoice_payment_fields(all_demands)
             set_demand_open_reminders(all_demands)
 
