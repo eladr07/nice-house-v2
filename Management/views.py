@@ -679,10 +679,10 @@ def employee_salary_export(request):
             #ExcelColumn('חופש ומחלה')
         ]),
         ExcelColumn('הערות ושליחה', columns=[
-            ExcelColumn('הערות'),
-            ExcelColumn('ת. אישור'),
-            ExcelColumn('ת. שליחה להנה"ח'),
-            ExcelColumn('ת. שליחה לשיקים')
+            ExcelColumn('הערות', width=30),
+            ExcelColumn('ת. אישור', width=30),
+            ExcelColumn('ת. שליחה להנה"ח', width=30),
+            ExcelColumn('ת. שליחה לשיקים', width=30)
         ])
     ]
 
