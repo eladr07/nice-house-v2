@@ -660,22 +660,22 @@ def employee_salary_export(request):
             ExcelColumn("מס' עסקאות", showSum=True)
         ]),
         ExcelColumn('חישוב שכר נטו', columns=[
-            ExcelColumn('שכר בסיס', 'currency', showSum=True),
-            ExcelColumn('עמלות', 'currency', showSum=True),
-            ExcelColumn('רשת ביטחון', 'currency', showSum=True),
-            ExcelColumn('תוספת משתנה', 'currency', showSum=True),
-            ExcelColumn('קיזוז שכר', 'currency', showSum=True),
-            ExcelColumn('סה"כ שווי תלוש', 'currency', showSum=True),
-            ExcelColumn('החזר הלוואה', 'currency', showSum=True),
-            ExcelColumn('שווי שיק', 'currency', showSum=True)
+            ExcelColumn('שכר בסיס', 'currency', showSum=True, width=15),
+            ExcelColumn('עמלות', 'currency', showSum=True, width=15),
+            ExcelColumn('רשת ביטחון', 'currency', showSum=True, width=15),
+            ExcelColumn('תוספת משתנה', 'currency', showSum=True, width=15),
+            ExcelColumn('קיזוז שכר', 'currency', showSum=True, width=15),
+            ExcelColumn('סה"כ שווי תלוש', 'currency', showSum=True, width=15),
+            ExcelColumn('החזר הלוואה', 'currency', showSum=True, width=15),
+            ExcelColumn('שווי שיק', 'currency', showSum=True, width=15)
         ]),
         ExcelColumn('אסמכתאות', columns=[
-            ExcelColumn('ברוטו לחישוב', 'currency', showSum=True),
+            ExcelColumn('ברוטו לחישוב', 'currency', showSum=True, width=15),
             #ExcelColumn('ניכוי מס במקור'),
-            ExcelColumn('שווי חשבונית', 'currency', showSum=True)
+            ExcelColumn('שווי חשבונית', 'currency', showSum=True, width=15)
         ]),
         ExcelColumn('נלווה לשכר', columns=[
-            ExcelColumn('החזר הוצאות', 'currency', showSum=True),
+            ExcelColumn('החזר הוצאות', 'currency', showSum=True, width=15),
             #ExcelColumn('חופש ומחלה')
         ]),
         ExcelColumn('הערות ושליחה', columns=[
