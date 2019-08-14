@@ -621,6 +621,111 @@ def employee_salary_list(request):
     
     return render(request, 'Management/employee_salaries.html', context)
 
+def employee_salary_export(request):
+    year = int(request.GET['year'])
+    month = int(request.GET['month'])
+
+    employees = Employee.objects \
+        .select_related('employment_terms__hire_type','rank') \
+        .prefetch_related('projects') \
+        .filter(employment_terms__isnull=False)
+
+    current_employee_ids = []
+
+    for e in employees:
+        # do not include employees who did not start working by the month selected
+        if year < e.work_start.year or (year == e.work_start.year and month < e.work_start.month):
+            continue
+        # do not include employees who finished working by the month selected
+        if e.work_end and (year > e.work_end.year or (year == e.work_end.year and month > e.work_end.month)):
+            continue
+
+        current_employee_ids.append(e.id)
+
+    salaries = EmployeeSalary.objects.filter(
+        year=year, month=month, employee_id__in=current_employee_ids)
+
+    employee_by_id = {employee.id:employee for employee in employees}
+
+    enrich_employee_salaries(salaries, employee_by_id, year, month, year, month)
+
+    set_loan_fields(employees)
+
+    columns = [
+        ExcelColumn('כללי', columns=[
+            ExcelColumn('שם העובד'),
+            ExcelColumn('פרוייקט'),
+            ExcelColumn('חטיבה'),
+            ExcelColumn('סוג העסקה'),
+            ExcelColumn("מס' עסקאות", showSum=True)
+        ]),
+        ExcelColumn('חישוב שכר נטו', columns=[
+            ExcelColumn('שכר בסיס', 'currency', showSum=True),
+            ExcelColumn('עמלות', 'currency', showSum=True),
+            ExcelColumn('רשת ביטחון', 'currency', showSum=True),
+            ExcelColumn('תוספת משתנה', 'currency', showSum=True),
+            ExcelColumn('קיזוז שכר', 'currency', showSum=True),
+            ExcelColumn('סה"כ שווי תלוש', 'currency', showSum=True),
+            ExcelColumn('החזר הלוואה', 'currency', showSum=True),
+            ExcelColumn('שווי שיק', 'currency', showSum=True)
+        ]),
+        ExcelColumn('אסמכתאות', columns=[
+            ExcelColumn('ברוטו לחישוב', 'currency', showSum=True),
+            #ExcelColumn('ניכוי מס במקור'),
+            ExcelColumn('שווי חשבונית', 'currency', showSum=True)
+        ]),
+        ExcelColumn('נלווה לשכר', columns=[
+            ExcelColumn('החזר הוצאות', 'currency', showSum=True),
+            #ExcelColumn('חופש ומחלה')
+        ]),
+        ExcelColumn('הערות ושליחה', columns=[
+            ExcelColumn('הערות'),
+            ExcelColumn('ת. אישור'),
+            ExcelColumn('ת. שליחה להנה"ח'),
+            ExcelColumn('ת. שליחה לשיקים')
+        ])
+    ]
+
+    rows = []
+
+    for salary in salaries:
+        employee = salary.employee
+        terms = employee.employment_terms
+
+        row = [
+            str(employee),
+            ', '.join([demand.project.name for demand in salary.demands]),
+            employee.rank.name,
+            terms.hire_type.name,
+            salary.sales_count,
+
+            salary.base,
+            salary.commissions,
+            salary.safety_net,
+            salary.var_pay,
+            salary.deduction,
+            salary.neto,
+            salary.loan_pay,
+            salary.check_amount if terms.salary_net != None else None,
+
+            salary.bruto,
+            salary.invoice_amount,
+
+            salary.refund,
+
+            salary.remarks,
+            salary.approved_date,
+            salary.sent_to_bookkeeping_date,
+            salary.sent_to_checks_date
+        ]
+
+        rows.append(row)
+
+    title = u'ריכוז שכר עובדים לחודש {month}/{year}'.format(
+        month=month, year=year)
+
+    return ExcelGenerator().generate(title, columns, rows)
+
 class SalaryExpensesListView(PermissionRequiredMixin, ListView):
     model = EmployeeSalary
     template_name = 'Management/salaries_expenses.html'
@@ -4138,7 +4243,7 @@ class ExcelGenerator:
 
                 cell.border = self.thin_border
 
-                if col.showSum:
+                if col.showSum and cell_value != None:
                     sum_row[col_num - 1] += cell_value
 
         self.sum_row = sum_row
