@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponseBadRequest
 
 from Management.models import Demand, Employee, EmployeeSalary
 from Management.forms import ProjectSeasonForm
