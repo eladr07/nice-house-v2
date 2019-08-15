@@ -3871,7 +3871,9 @@ def demand_followup_list(request):
 def employeesalary_season_list(request):
     salaries = []
 
-    from_year, from_month, to_year, to_month = None,None,None,None
+    month = common.current_month()
+
+    from_year, from_month, to_year, to_month = month.year, month.month, month.year, month.month
     employee_base = None
     
     if len(request.GET):
