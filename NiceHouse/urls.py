@@ -27,7 +27,8 @@ urlpatterns = [
 
 from Management.models import *
 from Management.views import *
-import Management.forms
+
+import Management.export.views as views_export
 
 urlpatterns += [
     path('', index),
@@ -190,11 +191,11 @@ urlpatterns += [
      path('salary/<int:salary_id>/expenses', employee_salary_expenses),
      
     path('salaries/', employee_salary_list, name='salary-list'),
-    path('salaries/export', employee_salary_export, name='salary-list-export'),
+    path('salaries/export', views_export.employee_salary_export, name='salary-list-export'),
     path('salaries/season/', employeesalary_season_list, name='salary-season'),
     path('salaries/season/total-expenses/', employeesalary_season_total_expenses, name='salary-season-total-expenses'),
     path('salaries/season/expenses/', employeesalary_season_expenses, name='salary-season-expenses'),
-    path('salaries/season/expenses/export', employeesalary_season_expenses_export, name='salary-season-expenses-export'),
+    path('salaries/season/expenses/export', views_export.employeesalary_season_expenses_export, name='salary-season-expenses-export'),
 
     path('salaries/<int:year>/<int:month>/pdf', employee_salary_pdf),
     path('salaries/<int:pk>', EmployeeSalaryUpdate.as_view()),
@@ -291,14 +292,14 @@ urlpatterns += [
     path('demandsales/', demand_sale_list),
     
     path('demands/', demand_list, name='demand-list'),
-    path('demands/<int:id>/sales/export', demand_sales_export, name='demand-sales-export'),
+    path('demands/<int:id>/sales/export', views_export.demand_sales_export, name='demand-sales-export'),
     path('demands/<int:id>/calc', demand_calc),
     path('demands/<int:id>/returntocalc', demand_return_to_calc),
     path('demands/old/', demand_old_list, name='demand-old'),
     path('demands/season/', demand_season_list, name='demand-season'),
-    path('demands/season/export', demand_season_list_export, name='demand-season-export'),
+    path('demands/season/export', views_export.demand_season_list_export, name='demand-season-export'),
     path('demands/followup/', demand_followup_list, name='demand-followup'),
-    path('demands/followup/export', demand_followup_export, name='demand-followup-export'),
+    path('demands/followup/export', views_export.demand_followup_export, name='demand-followup-export'),
     path('demands/pay-balance/', demand_pay_balance_list, name='demand-pay-balance'),
     path('demands/closeall', demand_closeall),
     path('demands/sendall', demands_send),
