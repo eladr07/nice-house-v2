@@ -295,6 +295,9 @@ def employee_salary_export(request):
 
     set_loan_fields(employees)
 
+    return _generate_salary_export(year, month, salaries)
+
+def _generate_salary_export(year, month, salaries):
     columns = [
         ExcelColumn('כללי', columns=[
             ExcelColumn('שם העובד'),
