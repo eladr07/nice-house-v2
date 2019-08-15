@@ -307,7 +307,7 @@ def employee_salary_season_export(request):
     to_year = int(request.GET['to_year'])
     to_month = int(request.GET['to_month'])
 
-    employee_base = EmployeeBase.get(pk=employee_id)
+    employee_base = EmployeeBase.objects.get(pk=employee_id)
 
     # set to Employee or NHEmployee
     employee = employee_base.derived
@@ -351,8 +351,9 @@ def employee_salary_season_export(request):
 def _generate_salary_export(title, salaries):
     columns = [
         ExcelColumn('כללי', columns=[
-            ExcelColumn('שם העובד'),
-            ExcelColumn('פרוייקט'),
+            ExcelColumn('חודש'),
+            ExcelColumn('שם העובד', width=15),
+            ExcelColumn('פרוייקט', width=15),
             ExcelColumn('חטיבה'),
             ExcelColumn('סוג העסקה'),
             ExcelColumn("מס' עסקאות", showSum=True)
@@ -391,6 +392,7 @@ def _generate_salary_export(title, salaries):
         terms = employee.employment_terms
 
         row = [
+            '%d/%d' % (salary.month, salary.year),
             str(employee),
             ', '.join([demand.project.name for demand in salary.demands]),
             employee.rank.name,
