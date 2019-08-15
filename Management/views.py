@@ -3930,7 +3930,7 @@ def employeesalary_season_list(request):
         'filterForm':form 
     }
     
-    total = sum_attrs(
+    totals = sum_attrs(
         salaries,
         ['neto', 'check_amount', 'loan_pay', 'bruto', 'refund']
     )
