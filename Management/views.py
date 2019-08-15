@@ -3904,7 +3904,10 @@ def employeesalary_season_list(request):
                     from_year, from_month, to_year, to_month)
 
             elif isinstance(employee, NHEmployee):
-                salaries = NHEmployeeSalary.objects.nondeleted().range(from_year, from_month, to_year, to_month).filter(nhemployee__id = employee_base.id)
+                salaries = NHEmployeeSalary.objects \
+                    .nondeleted() \
+                    .range(from_year, from_month, to_year, to_month) \
+                    .filter(nhemployee__id = employee_base.id)
                 
                 # set the same employee instance for all salaries
                 for s in salaries:
