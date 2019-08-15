@@ -193,6 +193,7 @@ urlpatterns += [
     path('salaries/', employee_salary_list, name='salary-list'),
     path('salaries/export', views_export.employee_salary_export, name='salary-list-export'),
     path('salaries/season/', employeesalary_season_list, name='salary-season'),
+    path('salaries/season/export', views_export.employee_salary_season_export, name='salary-season-export'),
     path('salaries/season/total-expenses/', employeesalary_season_total_expenses, name='salary-season-total-expenses'),
     path('salaries/season/expenses/', employeesalary_season_expenses, name='salary-season-expenses'),
     path('salaries/season/expenses/export', views_export.employeesalary_season_expenses_export, name='salary-season-expenses-export'),

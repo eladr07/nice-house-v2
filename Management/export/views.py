@@ -1,9 +1,9 @@
 from django.http import HttpResponseBadRequest
 
-from Management.models import Demand, Employee, EmployeeSalary
+from Management.models import Demand, EmployeeBase, Employee, NHEmployee, EmployeeSalary, NHEmployeeSalary
 from Management.forms import ProjectSeasonForm
 from Management.enrichers.demand import set_demand_sale_fields, set_demand_diff_fields, set_demand_invoice_payment_fields
-from Management.enrichers.salary import enrich_employee_salaries, set_loan_fields
+from Management.enrichers.salary import enrich_employee_salaries, enrich_nh_employee_salaries, set_loan_fields
 
 from Management.export.generator import ExcelColumn, ExcelGenerator
 
@@ -295,9 +295,60 @@ def employee_salary_export(request):
 
     set_loan_fields(employees)
 
-    return _generate_salary_export(year, month, salaries)
+    title = u'ריכוז שכר עובדים לחודש {month}/{year}'.format(
+        month=month, year=year)
 
-def _generate_salary_export(year, month, salaries):
+    return _generate_salary_export(title, salaries)
+
+def employee_salary_season_export(request):
+    employee_id = int(request.GET['employee_id'])
+    from_year = int(request.GET['from_year'])
+    from_month = int(request.GET['from_month'])
+    to_year = int(request.GET['to_year'])
+    to_month = int(request.GET['to_month'])
+
+    employee_base = EmployeeBase.get(pk=employee_id)
+
+    # set to Employee or NHEmployee
+    employee = employee_base.derived
+
+    set_loan_fields([employee])
+
+    if isinstance(employee, Employee):
+        salaries = EmployeeSalary.objects.nondeleted() \
+            .range(from_year, from_month, to_year, to_month) \
+            .filter(employee_id = employee_base.id)
+        
+        # set the same employee instance for all salaries
+        for s in salaries:
+            s.employee = employee
+
+        enrich_employee_salaries(
+            salaries, 
+            {employee_base.id: employee},
+            from_year, from_month, to_year, to_month)
+
+    elif isinstance(employee, NHEmployee):
+        salaries = NHEmployeeSalary.objects \
+            .nondeleted() \
+            .range(from_year, from_month, to_year, to_month) \
+            .filter(nhemployee__id = employee_base.id)
+        
+        # set the same employee instance for all salaries
+        for s in salaries:
+            s.nhemployee = employee
+
+        enrich_nh_employee_salaries(
+            salaries, 
+            {employee_base.id: employee},
+            from_year, from_month, to_year, to_month)
+    
+    title = u'ריכוז שכ"ע לפי תקופה - ' + str(employee_base)
+
+    return _generate_salary_export(title, salaries)
+
+
+def _generate_salary_export(title, salaries):
     columns = [
         ExcelColumn('כללי', columns=[
             ExcelColumn('שם העובד'),
@@ -367,9 +418,6 @@ def _generate_salary_export(year, month, salaries):
         ]
 
         rows.append(row)
-
-    title = u'ריכוז שכר עובדים לחודש {month}/{year}'.format(
-        month=month, year=year)
 
     return ExcelGenerator().generate(title, columns, rows)
 
