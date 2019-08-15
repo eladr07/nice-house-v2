@@ -5,7 +5,7 @@ from Management.forms import ProjectSeasonForm
 from Management.enrichers.demand import set_demand_sale_fields, set_demand_diff_fields, set_demand_invoice_payment_fields
 from Management.enrichers.salary import enrich_employee_salaries, set_loan_fields
 
-from generator import ExcelColumn, ExcelGenerator
+from Management.generator import ExcelColumn, ExcelGenerator
 
 from Management.templatetags.management_extras import commaise
 
