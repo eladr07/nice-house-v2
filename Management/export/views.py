@@ -1,6 +1,6 @@
 from django.http import HttpResponseBadRequest
 
-from Management.models import Demand, EmployeeBase, Employee, NHEmployee, EmployeeSalary, NHEmployeeSalary
+from Management.models import Demand, EmployeeBase, Employee, NHEmployee, EmployeeSalary, NHEmployeeSalary, SalaryExpenses
 from Management.forms import ProjectSeasonForm
 from Management.enrichers.demand import set_demand_sale_fields, set_demand_diff_fields, set_demand_invoice_payment_fields
 from Management.enrichers.salary import enrich_employee_salaries, enrich_nh_employee_salaries, set_loan_fields
@@ -424,5 +424,110 @@ def _generate_salary_export(title, salaries):
     return ExcelGenerator().generate(title, columns, rows)
 
 def employeesalary_season_expenses_export(request):
-    pass
+    salaries = []
+    
+    employee_id = int(request.GET['employee_id'])
+    from_year = int(request.GET['from_year'])
+    from_month = int(request.GET['from_month'])
+    to_year = int(request.GET['to_year'])
+    to_month = int(request.GET['to_month'])
 
+    employee_base = EmployeeBase.objects.get(pk=employee_id)
+    employee = employee_base.derived
+
+    if isinstance(employee, Employee):
+        salaries = EmployeeSalary.objects.nondeleted() \
+            .range(from_year, from_month, to_year, to_month) \
+            .select_related('employee__employment_terms__hire_type') \
+            .filter(employee_id = employee_base.id)
+        
+        enrich_employee_salaries(
+            salaries, 
+            {employee_base.id: employee},
+            from_year, from_month, to_year, to_month)
+    else:
+        # TODO
+        pass
+
+    # create a map of salary expenses
+    expenses = SalaryExpenses.objects \
+        .range(from_year, from_month, to_year, to_month) \
+        .filter(employee_id=employee_id)
+
+    expenses_map = {(e.employee_id, e.year, e.month):e for e in expenses}
+
+    columns = [
+        ExcelColumn('כללי', columns=[
+            ExcelColumn('חודש'),
+            ExcelColumn('שם העובד', width=15),
+            ExcelColumn('פרוייקט', width=15),
+            ExcelColumn('חטיבה'),
+            ExcelColumn('סוג העסקה'),
+            ExcelColumn("מס' עסקאות", showSum=True)
+        ]),
+        ExcelColumn('חישוב שכר נטו', columns=[
+            ExcelColumn('סה"כ שווי תלוש', 'currency', showSum=True, width=15),
+            ExcelColumn('החזר הלוואה', 'currency', showSum=True, width=15),
+            ExcelColumn('שווי שיק', 'currency', showSum=True, width=15)
+        ]),
+        ExcelColumn('מיסי עובד לתשלום והפרשות', columns=[
+            ExcelColumn('מס הכנסה', 'currency'), 
+            ExcelColumn('ביטוח לאומי', 'currency'), 
+            ExcelColumn('בריאות', 'currency'), 
+            ExcelColumn('ביטוח פנסיה', 'currency'), 
+            ExcelColumn('חופשה'), 
+            ExcelColumn('דמי הבראה', 'currency'), 
+            ExcelColumn('סה"כ ברוטו לעובד', 'currency')
+        ]),
+         ExcelColumn('הוצאות מעביד', columns=[
+            ExcelColumn('ביטוח לאומי', 'currency'),  
+            ExcelColumn('גמל', 'currency'),  
+            ExcelColumn('הפרשה לפיצויים', 'currency'),  
+            ExcelColumn('ברוטו כולל מעביד', 'currency')
+        ]),
+        ExcelColumn('אסמכתאות', columns=[
+            ExcelColumn('שווי חשבונית', 'currency', showSum=True, width=15)
+        ])
+    ]
+
+    rows = []
+
+    for salary in salaries:
+        key = (salary.employee_id, salary.year, salary.month)
+        salary_expenses = expenses_map.get(key)
+        employee = salary.employee
+        terms = employee.employment_terms
+
+        row = [
+            '%d/%d' % (salary.month, salary.year),
+            str(employee),
+            ', '.join([demand.project.name for demand in salary.demands]),
+            employee.rank.name,
+            terms.hire_type.name,
+            salary.sales_count,
+
+            salary.neto,
+            salary.loan_pay,
+            salary.check_amount if terms.salary_net != None else None,
+
+            salary_expenses and salary_expenses.income_tax,
+            salary_expenses and salary_expenses.national_insurance,
+            salary_expenses and salary_expenses.health,
+            salary_expenses and salary_expenses.pension_insurance,
+            salary_expenses and salary_expenses.vacation,
+            salary_expenses and salary_expenses.convalescence_pay,
+            salary_expenses and salary_expenses.bruto,
+
+            salary_expenses and salary_expenses.employer_national_insurance,
+            salary_expenses and salary_expenses.employer_benefit,
+            salary_expenses and salary_expenses.compensation_allocation,
+            salary_expenses and salary_expenses.bruto_with_employer,
+
+            salary.invoice_amount
+        ]
+
+        rows.append(row)
+
+    title = 'ריכוז שכר לעובד כולל הוצאות מעביד תקופתי - ' + str(employee)
+
+    return ExcelGenerator().generate(title, columns, rows)

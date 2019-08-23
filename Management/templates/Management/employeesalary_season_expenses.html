@@ -105,7 +105,7 @@
 <a href="/reports/employeesalary_season/{{employee.id}}/{{from_year}}/{{from_month}}/{{to_year}}/{{to_month}}" class="btn btn-default" role="button">
 	<i class="fa fa-fw fa-print"></i> גרסה להדפסה
 </a>
-<a href="{% url 'salary-season-expenses-export' %}?employee={{employee.id}}&from_year={{from_year}}&from_month={{from_month}}&to_year={{to_year}}&to_month={{to_month}}" class="btn btn-default" role="button">
+<a href="{% url 'salary-season-expenses-export' %}?employee_id={{employee.id}}&from_year={{from_year}}&from_month={{from_month}}&to_year={{to_year}}&to_month={{to_month}}" class="btn btn-default" role="button">
 	<i class="fa fa-fw fa-table"></i> ייצא לאקסל
 </a>
 
