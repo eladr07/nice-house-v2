@@ -5,7 +5,7 @@
 
 {% block content %}
 <h3 class="text-center text-danger"> 
-	ריכוז שכר לעובדים כולל הוצאות מעביד תקופתי<br>{{start|date:"m/y"}} - {{end|date:"m/y"}}
+	ריכוז שכר לעובדים כולל הוצאות מעביד תקופתי<br>{{from_month}}/{{from_year}} - {{to_month}}/{{to_year}}
 </h3>
 
 <div class="clearBoth"></div>
@@ -26,6 +26,9 @@
 
 <a href="#" class="btn btn-default" role="button">
 	<i class="fa fa-fw fa-print"></i> גרסת הדפסה
+</a>
+<a href="export?division_type={{division_type.id}}&from_month={{from_month}}&from_year={{from_year}}&to_month={{to_month}}&to_year={{to_year}}" class="btn btn-default" role="button">
+	<i class="fa fa-fw fa-table"></i> ייצא לאקסל
 </a>
 
 <div class="clearBoth"></div>
@@ -70,6 +73,7 @@
 			<td>{{ employee.total_neto|floatformat:"0"|intcomma }}</td>
 			<td>{{ employee.total_loan_pay|intcomma }}</td>
 			<td>{{ employee.total_check_amount|floatformat:"0"|intcomma }}</td>
+			
 			<td>{{ employee.total_income_tax|intcomma }}</td>
 			<td>{{ employee.total_national_insurance|intcomma }}</td>
 			<td>{{ employee.total_health|intcomma }}</td>
@@ -77,10 +81,12 @@
 			<td>{{ employee.total_vacation|intcomma }}</td>
 			<td>{{ employee.total_convalescence_pay|intcomma }}</td>
 			<td>{{ employee.total_bruto|floatformat:"0"|intcomma }}</td>
+			
 			<td>{{ employee.total_employer_national_insurance|intcomma }}</td>
 			<td>{{ employee.total_employer_benefit|intcomma }}</td>
 			<td>{{ employee.total_compensation_allocation|intcomma }}</td>
 			<td>{{ employee.total_bruto_with_employer|intcomma }}</td>
+			
 			<td></td>
 			<td></td>
 		</tr>

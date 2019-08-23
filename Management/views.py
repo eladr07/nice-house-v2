@@ -4013,7 +4013,11 @@ def employeesalary_season_expenses(request):
 @permission_required('Management.season_total_salaryexpenses')
 def employeesalary_season_total_expenses(request):
     employees = []
-    to_date, from_date = None, None
+    
+    division_type = None
+
+    from_year, from_month = None, None
+    to_year, to_month = None, None
     
     if len(request.GET):
         form = DivisionTypeSeasonForm(request.GET)
@@ -4033,6 +4037,7 @@ def employeesalary_season_total_expenses(request):
                     .exclude(work_end__isnull = False, work_end__lt = from_date))
 
                 employee_by_id = {e.id:e for e in employees}
+
                 salaries = EmployeeSalary.objects \
                     .select_related('employee__employment_terms') \
                     .range(from_year, from_month, to_year, to_month) \
@@ -4056,6 +4061,7 @@ def employeesalary_season_total_expenses(request):
 
                 employees = [x.nhemployee for x in query]
                 employee_by_id = {e.id:e for e in employees}
+
                 salaries = NHEmployeeSalary.objects \
                     .range(from_year, from_month, to_year, to_month) \
                     .order_by('nhemployee_id')
@@ -4069,12 +4075,11 @@ def employeesalary_season_total_expenses(request):
                      'vacation', 'convalescence_pay', 'bruto', 'employer_national_insurance', 'employer_benefit',
                      'compensation_allocation', 'bruto_with_employer']
             
-            for employee_id, employee_salaries in itertools.groupby(salaries, lambda salary: salary.get_employee().id):
-                # get the employee object
-                employee = employee_by_id[employee_id]
-                
-                # evaluate and store the iterator
-                employee_salaries_list = list(employee_salaries)
+            salaries_by_employee_id = {employee_id:list(salaries) for employee_id, salaries in itertools.groupby(salaries, lambda salary: salary.get_employee().id)}
+
+            for employee in employees:
+                # get the salary list, or empty list if no salaries exist for employee
+                employee_salaries_list = salaries_by_employee_id.get(employee.id, [])
 
                 for attr in attrs:
                     # extract 'attr' from each salary
@@ -4089,8 +4094,13 @@ def employeesalary_season_total_expenses(request):
             
     context = { 
         'employees':employees, 
-        'start':from_date, 
-        'end':to_date, 
+        
+        'division_type': division_type,
+        'from_month': from_month,
+        'from_year': from_year,
+        'to_month': to_month,
+        'to_year': to_year,
+
         'filterForm':form 
     }
 

@@ -1,9 +1,13 @@
+import itertools
+from datetime import date
+
 from django.http import HttpResponseBadRequest
 
-from Management.models import Demand, EmployeeBase, Employee, NHEmployee, EmployeeSalary, NHEmployeeSalary, SalaryExpenses
+from Management.models import Demand, EmployeeBase, Employee, EmployeeSalary, SalaryExpenses, DivisionType
+from Management.models import NHEmployee, NHEmployeeSalary, NHBranch, NHBranchEmployee
 from Management.forms import ProjectSeasonForm
 from Management.enrichers.demand import set_demand_sale_fields, set_demand_diff_fields, set_demand_invoice_payment_fields
-from Management.enrichers.salary import enrich_employee_salaries, enrich_nh_employee_salaries, set_loan_fields
+from Management.enrichers.salary import enrich_employee_salaries, enrich_nh_employee_salaries, set_loan_fields, set_salary_base_fields
 
 from Management.export.generator import ExcelColumn, ExcelGenerator
 
@@ -529,5 +533,131 @@ def employeesalary_season_expenses_export(request):
         rows.append(row)
 
     title = 'ריכוז שכר לעובד כולל הוצאות מעביד תקופתי - ' + str(employee)
+
+    return ExcelGenerator().generate(title, columns, rows)
+
+def employeesalary_season_total_expenses_export(request):
+    salaries = []
+    
+    division_type = int(request.GET['division_type'])
+    from_year = int(request.GET['from_year'])
+    from_month = int(request.GET['from_month'])
+    to_year = int(request.GET['to_year'])
+    to_month = int(request.GET['to_month'])
+
+    from_date = date(from_year, from_month, 1)
+    to_date = date(to_year, to_month, 1)
+
+    if division_type == DivisionType.Marketing:
+        employees = list(Employee.objects \
+            .select_related('employment_terms') \
+            .exclude(work_end__isnull = False, work_end__lt = from_date))
+
+        employee_by_id = {e.id:e for e in employees}
+        
+        salaries = EmployeeSalary.objects \
+            .select_related('employee__employment_terms') \
+            .range(from_year, from_month, to_year, to_month) \
+            .order_by('employee_id')
+    else:
+        # NiceHouse division
+
+        # map DivisionType to NHBranch
+        division_to_branch = {
+            DivisionType.NHShoham: NHBranch.Shoham,
+            DivisionType.NHModiin: NHBranch.Modiin,
+            DivisionType.NHNesZiona: NHBranch.NesZiona,
+        }
+
+        branch_id = division_to_branch[division_type]
+        
+        query = NHBranchEmployee.objects \
+            .select_related('nhemployee__employment_terms') \
+            .filter(nhbranch__id = branch_id) \
+            .exclude(end_date__isnull=False, end_date__lt = from_date)
+
+        employees = [x.nhemployee for x in query]
+        employee_by_id = {e.id:e for e in employees}
+
+        salaries = NHEmployeeSalary.objects \
+            .range(from_year, from_month, to_year, to_month) \
+            .order_by('nhemployee_id')
+
+    set_salary_base_fields(
+        salaries,
+        employee_by_id,
+        from_year, from_month, to_year, to_month)
+
+    attrs = ['neto', 'loan_pay', 'check_amount', 'income_tax', 'national_insurance', 'health', 'pension_insurance', 
+            'vacation', 'convalescence_pay', 'bruto', 'employer_national_insurance', 'employer_benefit',
+            'compensation_allocation', 'bruto_with_employer']
+            
+    salaries_by_employee_id = {employee_id:list(salaries) for employee_id, salaries in itertools.groupby(salaries, lambda salary: salary.get_employee().id)}
+
+    for employee in employees:
+        # get the salary list, or empty list if no salaries exist for employee
+        employee_salaries_list = salaries_by_employee_id.get(employee.id, [])
+        
+        for attr in attrs:
+            # extract 'attr' from each salary
+            attr_list = [getattr(salary, attr, 0) or 0 for salary in employee_salaries_list]
+            # sum 'attr' over employee_salaries
+            attr_sum = sum(attr_list)
+            # set 'total_' attribute on employee object
+            setattr(employee, 'total_' + attr, attr_sum)
+
+    columns = [
+        ExcelColumn('כללי', columns=[
+            ExcelColumn('שם העובד', width=15)            
+        ]),
+        ExcelColumn('תשלום נטו', columns=[
+            ExcelColumn('תלוש נטו', 'currency', showSum=True, width=15),
+            ExcelColumn('החזר הלוואה', 'currency', showSum=True, width=15),
+            ExcelColumn('שווי שיק', 'currency', showSum=True, width=15)
+        ]),
+        ExcelColumn('מיסי עובד לתשלום והפרשות', columns=[
+            ExcelColumn('מס הכנסה', 'currency'), 
+            ExcelColumn('ביטוח לאומי', 'currency'), 
+            ExcelColumn('בריאות', 'currency'), 
+            ExcelColumn('ביטוח פנסיה', 'currency'), 
+            ExcelColumn('חופשה'), 
+            ExcelColumn('דמי הבראה', 'currency'), 
+            ExcelColumn('סה"כ ברוטו לעובד', 'currency', width=15)
+        ]),
+         ExcelColumn('הוצאות מעביד', columns=[
+            ExcelColumn('ביטוח לאומי', 'currency'),  
+            ExcelColumn('גמל', 'currency'),  
+            ExcelColumn('הפרשה לפיצויים', 'currency'),  
+            ExcelColumn('ברוטו כולל מעביד', 'currency')
+        ])
+    ]
+
+    rows = []
+
+    for employee in employees:
+        row = [
+            str(employee),
+
+            employee.total_neto,
+            employee.total_loan_pay,
+            employee.total_check_amount,
+
+            employee.total_income_tax,
+            employee.total_national_insurance,
+            employee.total_health,
+            employee.total_pension_insurance,
+            employee.total_vacation,
+            employee.total_convalescence_pay,
+            employee.total_bruto,
+
+            employee.total_employer_national_insurance,
+            employee.total_employer_benefit,
+            employee.total_compensation_allocation,
+            employee.total_bruto_with_employer
+        ]
+
+        rows.append(row)
+
+    title = 'ריכוז שכר לעובדים כולל הוצאות מעביד תקופתי - %d/%d-%d/%d' % (from_month, from_year, to_month, to_year)
 
     return ExcelGenerator().generate(title, columns, rows)
