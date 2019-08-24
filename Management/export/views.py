@@ -699,3 +699,51 @@ def employeesalary_season_total_expenses_export(request):
     title = 'ריכוז שכר לעובדים כולל הוצאות מעביד תקופתי - %d/%d-%d/%d' % (from_month, from_year, to_month, to_year)
 
     return ExcelGenerator().generate(title, columns, rows)
+
+def employee_loans_export(request, object_id):
+    employee_base = EmployeeBase.objects.get(pk=object_id)
+
+    # set to Employee or NHEmployee
+    employee = employee_base.derived
+
+    set_loan_fields([employee])
+
+    columns = [
+        ExcelColumn('תאריך'),
+        ExcelColumn('פעולה'),
+        ExcelColumn('סך הלוואה', 'currency'),
+        ExcelColumn('סך החזר', 'currency'),
+        ExcelColumn('יתרה', 'currency'),
+        ExcelColumn('מקוזז מהשכר'),
+        ExcelColumn('הערות')
+    ]
+
+    rows = []
+
+    for item in employee.loans_and_pays:
+        deduct_from_salary = getattr(item, 'deduct_from_salary', None)
+
+        deduct_from_salary_str = ''
+
+        if deduct_from_salary == True:
+            deduct_from_salary_str = 'כן'
+        elif deduct_from_salary == False:
+            deduct_from_salary_str = 'לא'
+
+        is_loan = hasattr(item, 'pay_num')
+
+        row = [
+            '%d/%d' % (item.month, item.year),
+            'הלוואה' if is_loan else 'החזר',
+            item.amount if is_loan else 0,
+            item.amount if not is_loan else 0,
+            item.left,
+            deduct_from_salary_str,
+            item.remarks
+        ]
+
+        rows.append(row)
+
+    title = 'פירוט הלוואות - ' + str(employee)
+
+    return ExcelGenerator().generate(title, columns, rows)

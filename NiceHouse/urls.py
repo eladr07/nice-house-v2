@@ -107,9 +107,13 @@ urlpatterns += [
      {'model':Employee}),
     path('employees/<int:obj_id>/reminders', obj_reminders,
      {'model': Employee}),
+
     path('employees/<int:object_id>/loans', employee_loans),
+    path('employees/<int:object_id>/loans/pdf', employee_loans_pdf, name='employee-loans-pdf'),
+    path('employees/<int:object_id>/loans/export', views_export.employee_loans_export, name='employee-loans-export'),
     path('employees/<int:employee_id>/addloan', employee_addloan),
     path('employees/<int:employee_id>/loanpay', employee_loanpay),
+
     path('employees/<int:employee_id>/<commission>/project/<int:project_id>', employee_commission_add),
     path('employees/<int:employee_id>/<commission>/project/<int:project_id>/del', employee_commission_del),    
     path('employees/<int:employee_id>/addproject', employee_project_add),

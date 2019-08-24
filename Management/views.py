@@ -104,7 +104,6 @@ def locate_demand(request):
     
 @login_required
 def employee_loans(request, object_id):
-
     employee_base = EmployeeBase.objects.get(pk=object_id)
 
     # set to Employee or NHEmployee
@@ -112,11 +111,20 @@ def employee_loans(request, object_id):
 
     set_loan_fields([employee])
 
-    if request.GET.get('t') == 'pdf' :
-        writer = EmployeesLoans(employee)
-        return build_and_return_pdf(writer)
-    else:
-        return render(request, 'Management/employee_loans.html', {'employee':employee})
+    return render(request, 'Management/employee_loans.html', {'employee':employee})
+
+@login_required
+def employee_loans_pdf(request, object_id):
+    employee_base = EmployeeBase.objects.get(pk=object_id)
+
+    # set to Employee or NHEmployee
+    employee = employee_base.derived
+
+    set_loan_fields([employee])
+
+    writer = EmployeesLoans(employee)
+
+    return build_and_return_pdf(writer)
 
 @login_required
 def limited_update_object(request, permission=None, *args, **kwargs):
