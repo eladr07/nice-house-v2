@@ -189,7 +189,7 @@
 					<a href="{{s.id}}/checkdetails" class="fancybox">{{s.check_amount|default_if_none:""|floatformat:"0"|intcomma}}</a>
 				{% endif %}
 			</td>
-			<td>{{s.bruto|default_if_none:""|intcomma}}</td>
+			<td>{{s.bruto|default_if_none:""|floatformat:"0"|intcomma}}</td>
 			<td></td>
 			<td>{{s.invoice_amount|default_if_none:""|floatformat:"0"|intcomma}}</td>
 			<td>{% if s.refund %}{{s.refund}} - {{s.refund_type}} {% endif %}</td>
