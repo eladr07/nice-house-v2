@@ -178,7 +178,7 @@
 					<strong>{{i.date|date:"j/m/y"}}</strong>
 					על סך
 					<strong>{{i.amount|intcomma}} ש"ח</strong>  				
-					<a href="/demandinvoice/{{i.id}}" ><i class="fa fa-edit" title='עריכה'></i></a>
+					<a href="{% url 'demand-invoice' id=i.id %}" ><i class="fa fa-edit" title='עריכה'></i></a>
 					<a href="/invoices/{{i.id}}/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
 					{% if i.offset %}
 						בתאריך 
@@ -213,7 +213,7 @@
 					<strong>{{p.payment_date|date:"j/m/y"}}</strong>
 					על סך
 					<strong>{{p.amount|intcomma}} ש"ח</strong>  				
-					<a href="/demandpayment/{{p.id}}" ><i class="fa fa-edit" title='עריכה'></i></a>
+					<a href="{% url 'demand-payment' id=p.id %}" ><i class="fa fa-edit" title='עריכה'></i></a>
 					<a href="/payments/{{p.id}}/del"><i class="fa fa-fw fa-times-circle text-danger"></i></a>
 					<br>
 				{% endfor %}

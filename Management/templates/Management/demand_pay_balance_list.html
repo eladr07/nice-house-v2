@@ -201,7 +201,7 @@
 				</td>
 				<td>
 					{% for i in d.invoices.all %}
-						<a href="/demandinvoice/{{i.id}}">{{i.amount|intcomma}}</a><br>
+						<a href="{% url 'demand-invoice' id=i.id %}">{{i.amount|intcomma}}</a><br>
 					{% endfor %}
 				</td>
 				<td>
@@ -211,7 +211,7 @@
 				</td>
 				<td>
 					{% for p in d.payments.all %}
-						<a href="/demandpayment/{{p.id}}">{{p.amount|intcomma}}</a><br>
+						<a href="{% url 'demand-payment' id=p.id %}">{{p.amount|intcomma}}</a><br>
 					{% endfor %}
 				</td>
 				<td>

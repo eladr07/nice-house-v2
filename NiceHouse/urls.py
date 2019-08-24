@@ -303,27 +303,33 @@ urlpatterns += [
     path('demands/followup/', demand_followup_list, name='demand-followup'),
     path('demands/followup/export', views_export.demand_followup_export, name='demand-followup-export'),
     path('demands/pay-balance/', demand_pay_balance_list, name='demand-pay-balance'),
+
     path('demands/closeall', demand_closeall),
     path('demands/sendall', demands_send),
+
     path('demands/<int:demand_id>/sale/add', sale_add),
     path('demands/<int:demand_id>/sale/<int:id>/del', demand_sale_del),
     path('demands/<int:demand_id>/sale/<int:id>/reject', demand_sale_reject),
     path('demands/<int:demand_id>/sale/<int:id>/pre', demand_sale_pre),
     path('demands/<int:demand_id>/sale/<int:id>/cancel', demand_sale_cancel),
+    
     path('demands/<int:id>/invoice/add', demand_invoice_add),
     path('demands/<int:id>/payment/add', demand_payment_add),
-    path('demandinvoice/<int:id>', demand_invoice_edit),
-    path('demandpayment/<int:id>', demand_payment_edit),
+    
     path('demands/<int:id>/close', demand_close),
     path('demands/<int:pk>/remarks', DemandRemarksUpdate.as_view()),
     path('demands/<int:pk>/salecount', DemandSaleCountUpdate.as_view()),
     path('demands/<int:object_id>/adddiff', demand_adddiff),
     path('demands/<int:object_id>/adddiffadjust', demand_adddiff_adjust),
+
     path('demanddiff/<int:pk>', DemandDiffUpdate.as_view()),
     path('demanddiff/<int:pk>/del', demanddiff_del),
           
     path('demandinvoices/', demand_invoice_list),
+    path('demandinvoices/<int:id>', demand_invoice_edit, name='demand-invoice'),
+
     path('demandpayments/', demand_payment_list),
+    path('demandpayments/<int:id>', demand_payment_edit, name='demand-payment'),
     
     path('demands/<int:obj_id>/attachment/add', obj_add_attachment,
      {'model':Demand}),
