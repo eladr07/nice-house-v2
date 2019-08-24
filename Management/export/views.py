@@ -115,7 +115,6 @@ def demand_sales_export(request, id):
 
     return ExcelGenerator().generate(title, columns, rows)
 
-
 def demand_season_list_export(request):
 
     if not len(request.GET):
@@ -193,6 +192,16 @@ def demand_followup_export(request):
     from_year, from_month = form.cleaned_data['from_year'], form.cleaned_data['from_month']
     to_year, to_month = form.cleaned_data['to_year'], form.cleaned_data['to_month']
 
+    demands = Demand.objects \
+        .prefetch_related('invoices','payments') \
+        .select_related('project') \
+        .range(from_year, from_month, to_year, to_month) \
+        .filter(project__id = project.id)
+
+    set_demand_sale_fields(demands, from_year, from_month, to_year, to_month)
+    set_demand_diff_fields(demands)
+    set_demand_invoice_payment_fields(demands)
+
     columns = [
         ExcelColumn('פרטי דרישה', columns=[
             ExcelColumn("מס'"),
@@ -216,16 +225,6 @@ def demand_followup_export(request):
             ExcelColumn('זיכוי חשבונית')
         ])
     ]
-
-    demands = Demand.objects \
-        .prefetch_related('invoices','payments') \
-        .select_related('project') \
-        .range(from_year, from_month, to_year, to_month) \
-        .filter(project__id = project.id)
-
-    set_demand_sale_fields(demands, from_year, from_month, to_year, to_month)
-    set_demand_diff_fields(demands)
-    set_demand_invoice_payment_fields(demands)
 
     # build data rows (copied from DemandFollowupWriter)
     rows = []
