@@ -298,6 +298,7 @@ urlpatterns += [
     path('demands/<int:id>/calc', demand_calc),
     path('demands/<int:id>/returntocalc', demand_return_to_calc),
     path('demands/old/', demand_old_list, name='demand-old'),
+    path('demands/old/export', views_export.demand_old_list_export, name='demand-old-export'),
     path('demands/season/', demand_season_list, name='demand-season'),
     path('demands/season/export', views_export.demand_season_list_export, name='demand-season-export'),
     path('demands/followup/', demand_followup_list, name='demand-followup'),

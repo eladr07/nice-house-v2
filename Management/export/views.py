@@ -2,11 +2,12 @@ import itertools
 from datetime import date
 
 from django.http import HttpResponseBadRequest
+from django.db.models import Count
 
 from Management.models import Demand, EmployeeBase, Employee, EmployeeSalary, SalaryExpenses, DivisionType
 from Management.models import NHEmployee, NHEmployeeSalary, NHBranch, NHBranchEmployee
 from Management.forms import ProjectSeasonForm
-from Management.enrichers.demand import set_demand_sale_fields, set_demand_diff_fields, set_demand_invoice_payment_fields
+from Management.enrichers.demand import set_demand_sale_fields, set_demand_diff_fields, set_demand_invoice_payment_fields, set_demand_last_status, set_demand_is_fixed
 from Management.enrichers.salary import enrich_employee_salaries, enrich_nh_employee_salaries, set_loan_fields, set_salary_base_fields
 
 from Management.export.generator import ExcelColumn, ExcelGenerator
@@ -115,6 +116,28 @@ def demand_sales_export(request, id):
 
     return ExcelGenerator().generate(title, columns, rows)
 
+def demand_old_list_export(request):
+
+    year = int(request.GET.get('year', 0))
+    month = int(request.GET.get('month', 0))
+
+    if not year or not month:
+        return HttpResponseBadRequest()
+
+    ds = Demand.objects \
+        .filter(year = year, month = month) \
+        .annotate(Count('statuses')) \
+        .select_related('project')
+
+    set_demand_sale_fields(ds, year, month, year, month)
+    set_demand_diff_fields(ds)
+    set_demand_is_fixed(ds)
+    set_demand_last_status(ds)
+
+    title = 'ריכוז דרישות לתשלום לחודש %d/%d' % (month, year)
+
+    return _generate_demand_export(title, ds)
+
 def demand_season_list_export(request):
 
     if not len(request.GET):
@@ -133,48 +156,64 @@ def demand_season_list_export(request):
     ds = Demand.objects \
         .range(from_year, from_month, to_year, to_month) \
         .filter(project = project) \
-        .prefetch_related('reminders__statuses') \
         .select_related('project')
 
     set_demand_sale_fields(ds, from_year, from_month, to_year, to_month)
     set_demand_diff_fields(ds)
-    # set_demand_last_status(ds)
-    # set_demand_is_fixed(ds)
 
+    title = 'ריכוז דרישות - {project_name}'.format(project_name=project.name)
+
+    return _generate_demand_export(title, ds)
+
+def _generate_demand_export(title, demands):
     columns = [
         ExcelColumn("מס'"), 
+        ExcelColumn('יזם', width=15), 
+        ExcelColumn('שם פרוייקט', width=20), 
         ExcelColumn('חודש'), 
+
         ExcelColumn("מס' מכירות", showSum=True), 
+        ExcelColumn("מס' מכירות צפוי", showSum=True), 
+        
         ExcelColumn('סה"כ מכירות כולל מע"מ', 'currency', showSum=True, width=20),
         ExcelColumn('עמלה מחושב בגין שיווק', 'currency', width=20),
+        
         ExcelColumn('תוספת קבועה', 'currency', width=15),
         ExcelColumn('תוספת משתנה', 'currency', width=15),
         ExcelColumn('בונוס', 'currency', width=15),
         ExcelColumn('קיזוז', 'currency', width=15),
+        
         ExcelColumn('סה"כ תשלום לחברה', 'currency', showSum=True, width=20),
     ]
 
     rows = []
 
     # Iterate through all demands
-    for demand in ds:
+    for demand in demands:
+        project = demand.project
+
         # Define the data for each cell in the row 
         row = [
             demand.id,
+            project.initiator,
+            project.name,
             '{month}/{year}'.format(month=demand.month, year=demand.year),
+            
+            demand.sales_count,
             demand.sale_count,
+            
             demand.sales_amount,
             demand.sales_commission,
+            
             hasattr(demand, 'fixed_diff') and demand.fixed_diff.amount or None,
             hasattr(demand, 'var_diff') and demand.var_diff.amount or None,
             hasattr(demand, 'bonus_diff') and demand.bonus_diff.amount or None,
             hasattr(demand, 'fee_diff') and demand.fee_diff.amount or None,
+            
             demand.total_amount
         ]
         
         rows.append(row)
-
-    title = 'ריכוז דרישות - {project_name}'.format(project_name=project.name)
 
     return ExcelGenerator().generate(title, columns, rows)
 
