@@ -176,12 +176,12 @@ def _generate_demand_export(title, demands):
         ExcelColumn("מס' מכירות צפוי", showSum=True), 
         
         ExcelColumn('סה"כ מכירות כולל מע"מ', 'currency', showSum=True, width=20),
-        ExcelColumn('עמלה מחושב בגין שיווק', 'currency', width=20),
+        ExcelColumn('עמלה מחושב בגין שיווק', 'currency', showSum=True, width=20),
         
-        ExcelColumn('תוספת קבועה', 'currency', width=15),
-        ExcelColumn('תוספת משתנה', 'currency', width=15),
-        ExcelColumn('בונוס', 'currency', width=15),
-        ExcelColumn('קיזוז', 'currency', width=15),
+        ExcelColumn('תוספת קבועה', 'currency', showSum=True, width=15),
+        ExcelColumn('תוספת משתנה', 'currency', showSum=True, width=15),
+        ExcelColumn('בונוס', 'currency', showSum=True, width=15),
+        ExcelColumn('קיזוז', 'currency', showSum=True, width=15),
         
         ExcelColumn('סה"כ תשלום לחברה', 'currency', showSum=True, width=20),
     ]
@@ -519,7 +519,7 @@ def employeesalary_season_expenses_export(request):
             ExcelColumn('ביטוח פנסיה', 'currency'), 
             ExcelColumn('חופשה'), 
             ExcelColumn('דמי הבראה', 'currency'), 
-            ExcelColumn('סה"כ ברוטו לעובד', 'currency')
+            ExcelColumn('סה"כ ברוטו לעובד', 'currency', showSum=True)
         ]),
          ExcelColumn('הוצאות מעביד', columns=[
             ExcelColumn('ביטוח לאומי', 'currency'),  
@@ -660,7 +660,7 @@ def employeesalary_season_total_expenses_export(request):
             ExcelColumn('ביטוח פנסיה', 'currency'), 
             ExcelColumn('חופשה'), 
             ExcelColumn('דמי הבראה', 'currency'), 
-            ExcelColumn('סה"כ ברוטו לעובד', 'currency', width=15)
+            ExcelColumn('סה"כ ברוטו לעובד', 'currency', showSum=True, width=15)
         ]),
          ExcelColumn('הוצאות מעביד', columns=[
             ExcelColumn('ביטוח לאומי', 'currency'),  
