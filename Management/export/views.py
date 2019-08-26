@@ -711,11 +711,11 @@ def employee_loans_export(request, object_id):
     columns = [
         ExcelColumn('תאריך'),
         ExcelColumn('פעולה'),
-        ExcelColumn('סך הלוואה', 'currency'),
-        ExcelColumn('סך החזר', 'currency'),
-        ExcelColumn('יתרה', 'currency'),
+        ExcelColumn('סך הלוואה', 'currency', width=15),
+        ExcelColumn('סך החזר', 'currency', width=15),
+        ExcelColumn('יתרה', 'currency', width=15),
         ExcelColumn('מקוזז מהשכר'),
-        ExcelColumn('הערות')
+        ExcelColumn('הערות', width=40)
     ]
 
     rows = []
