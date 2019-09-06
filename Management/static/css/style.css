@@ -190,125 +190,70 @@ BODY {
 	border-bottom: 1px solid #9F9F9F;
 }
 
+.myDataTable tr td {
+	font-size: 14px;
+	font-family: Arial;
+	padding: 4px 4px 4px 4px;
+	color: #000;
+}
 
 .rowSum td {
 	color: #CF2222;
-	font-size: 14px;
 	font-weight: bold;
-	font-family: Arial;
-	padding: 4px 4px 4px 4px;
 }
 
 .rowSumGreen td {
 	color: #039E33;
-	font-size: 14px;
 	font-weight: bold;
-	font-family: Arial;
-	padding: 4px 4px 4px 4px;
 }
 .rowSumBlue td {
 	color: #3C79FF;
-	font-size: 14px;
 	font-weight: bold;
-	font-family: Arial;
-	padding: 4px 4px 4px 4px;
 }
 .rowSumRed td {
 	color: #FF3C3C;
-	font-size: 14px;
 	font-weight: bold;
-	font-family: Arial;
-	padding: 4px 4px 4px 4px;
 }
 .rowTeal td {
 	color: #1C9AAD;
-	font-size: 14px;
 	font-weight: bold;
-	font-family: Arial;
-	padding: 4px 4px 4px 4px;
 }
 
 .row1 td {
 	background-color: #EFEFEF;
-	color: #000;
-	font-size: 14px;
-	font-family: Arial;
-	padding: 4px 4px 4px 4px;
 }
-
 .row2 td {
 	background-color: #FFFFFF;
-	color: #000;
-	font-size: 14px;
-	font-family: Arial;
-	padding: 4px 4px 4px 4px;
 }
-
 .row3 td {
 	background-color: #F7E1AF;
-	color: #000;
-	font-size: 14px;
-	font-family: Arial;
-	padding: 4px 4px 4px 4px;
 }
-
 .row4 td {
 	background-color: #B1CDFF;
-	color: #000;
-	font-size: 14px;
-	font-family: Arial;
-	padding: 4px 4px 4px 4px;
 }
 .row5 td {
 	background-color: #9EE9C3;
-	color: #000;
-	font-size: 14px;
-	font-family: Arial;
-	padding: 4px 4px 4px 4px;
 }
+
 .rowLightGreen td {
 	background-color: #98FFCE;
-	color: #000;
-	font-size: 14px;
-	font-family: Arial;
-	padding: 4px 4px 4px 4px;
 }
 .rowLightBlue td {
 	background-color: #BED1F3;
-	color: #000;
-	font-size: 14px;
-	font-family: Arial;
-	padding: 4px 4px 4px 4px;
 }
 .rowMediumBlue td {
 	background-color: #A5BEEC;
-	color: #000;
-	font-size: 14px;
-	font-family: Arial;
-	padding: 4px 4px 4px 4px;
 }
 .rowBlue td {
 	background-color: #739DE6;
-	color: #000;
-	font-size: 14px;
-	font-family: Arial;
-	padding: 4px 4px 4px 4px;
 }
 
 .selectedRow td {
 	background-color: #BCD9FF;
-	color: #000;
-	font-size: 14px;
-	font-family: Arial;
-	padding: 4px 4px 4px 4px;
 }
 
 .deletedRow td {
 	background-color: #FAA99E;
-	color: #000;
-	font-size: 14px;
-	font-family: Arial;
-	padding: 4px 4px 4px 4px;
 }
 
 .someIcon {
