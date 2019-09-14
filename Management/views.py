@@ -3762,11 +3762,13 @@ def demand_pay_balance_list(request):
                 cleaned_data['to_month'], \
                 cleaned_data['all_times']
             
-            if project:
-                query = Demand.objects.filter(project = project)
-            else:
-                query = Demand.objects.all()
-            if from_year and from_month and to_year and to_month and not all_times:
+            query = Demand.objects.filter(project = project) if project else Demand.objects.all()
+
+            if all_times:
+                month = common.current_month()
+                from_year, from_month = (2000, 1)
+                to_year, to_month = month.year, month.month 
+            elif from_year and from_month and to_year and to_month:
                 query = query.range(from_year, from_month, to_year, to_month)
 
             all_demands = query \
