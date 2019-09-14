@@ -7,17 +7,6 @@ from django.db import models
 from .common import current_month
 from .querysets import *
 
-def nhemployee_sort(nhemployee1, nhemployee2):
-    query1 = nhemployee1.nhbranchemployee_set.all()
-    query2 = nhemployee2.nhbranchemployee_set.all()
-    if query1.count() == 0 and query2.count() == 0:
-        return 0
-    elif query1.count() == 0:
-        return 1
-    elif query2.count() == 0:
-        return -1
-    return 1 if query1.latest().nhbranch.id > query2.latest().nhbranch.id else -1
-
 class SeasonManager(models.Manager):
     def range(self, from_year, from_month, to_year, to_month):
         return self.get_queryset().range(from_year, from_month, to_year, to_month)
@@ -103,13 +92,19 @@ class NHBranchEmployeeManager(models.Manager):
         return self.filter(q)
 
 class NHEmployeeManager(models.Manager):
+    def _get_key(self, nhemployee):
+        query = nhemployee.nhbranchemployee_set.all()
+        if query.count() == 0:
+            return 0
+        else:
+            return query.latest().nhbranch_id
     def active(self):
         query = self.filter(work_end = None)
         nhemployees = list(query)
-        nhemployees.sort(nhemployee_sort)
+        nhemployees.sort(self._get_key)
         return nhemployees
     def archive(self):
         query = self.exclude(work_end = None)
         nhemployees = list(query)
-        nhemployees.sort(nhemployee_sort)
+        nhemployees.sort(self._get_key)
         return nhemployees
