@@ -130,7 +130,7 @@ class Project(models.Model):
     office_address = models.CharField(gettext('office address'), max_length=30)
     phone = models.CharField(gettext('project phone'), max_length=15)
     cell_phone = models.CharField(gettext('project cell phone'), max_length=15)
-    fax = models.CharField(gettext('project fax'), max_length=15);
+    fax = models.CharField(gettext('project fax'), max_length=15)
     mail = models.EmailField(gettext('mail'), null=True, blank=True)
     is_marketing = models.BooleanField(gettext('is_marketing'), choices=Boolean)
     start_date = models.DateField(gettext('startdate'))
