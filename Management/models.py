@@ -1584,7 +1584,7 @@ class ProjectCommission(models.Model):
                                                         (False, 'לא'),
                                                         (True, 'כן'))
                                              )
-    commission_by_signups = models.BooleanField(gettext('commission_by_signups'), blank=True)
+    commission_by_signups = models.BooleanField(gettext('commission_by_signups'), blank=True, default=False)
     max = models.FloatField(gettext('max_commission'), null=True, blank=True)
     agreement = models.FileField(gettext('agreement'), upload_to='files', null=True, blank=True)
     remarks = models.TextField(gettext('commission_remarks'), null=True, blank=True)
