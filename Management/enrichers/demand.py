@@ -1,4 +1,5 @@
 import itertools
+from datetime import date
 
 from django.db.models import Count
 
@@ -166,7 +167,7 @@ def set_demand_sale_fields(
         commissions = project_commissions_map.get(demand.project_id)
 
         if commissions and commissions.commission_by_signups:
-            sales_list.sort(key=lambda sale: sale.house.get_signup() and sale.house.get_signup().date)
+            sales_list.sort(key=lambda sale: sale.house.get_signup() and sale.house.get_signup().date or date.min)
 
         demand.sales_list = sales_list
         demand.sales_with_discount = [sale for sale in sales_list if sale.discount != None]
