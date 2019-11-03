@@ -29,6 +29,7 @@ from Management.models import *
 from Management.views import *
 
 import Management.export.views as views_export
+#import Management.importers.views as views_import
 
 urlpatterns += [
     path('', index),
@@ -195,6 +196,7 @@ urlpatterns += [
      path('salary/<int:salary_id>/expenses', employee_salary_expenses),
      
     path('salaries/', employee_salary_list, name='salary-list'),
+    path('salaries/calc', employee_salary_calc_month, name='salary-month-calc'),
     path('salaries/export', views_export.employee_salary_export, name='salary-list-export'),
     path('salaries/season/', employeesalary_season_list, name='salary-season'),
     path('salaries/season/export', views_export.employee_salary_season_export, name='salary-season-export'),
@@ -283,6 +285,8 @@ urlpatterns += [
     path('nhsaleside/<int:object_id>/invoice/add', nhsaleside_invoice_add),
     
     path('mail', send_mail),
+
+    #path('import/project/<int:project_id>/sales', views_import.project_sales)
 ]
 
 urlpatterns += [

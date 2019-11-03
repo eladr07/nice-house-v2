@@ -835,6 +835,28 @@ def employee_salary_pdf(request, year, month):
 
     return build_and_return_pdf(writer)
 
+def employee_salary_calc_month(request):
+    year = request.GET.get('year')
+    month = request.GET.get('month')
+
+    salaries = EmployeeSalary.objects.filter(year=year, month=month)
+
+    employees = [salary.employee for salary in salaries]
+
+    set_employee_sales(
+        salaries,
+        {employee.id:employee for employee in employees},
+        {employee.id:list(employee.projects.all()) for employee in employees},
+        year, month, year, month)
+    
+    for salary in salaries:
+        salary.calculate()
+        salary.save()
+    
+    url = reverse('salary-list') + '?year=%s&month=%s' % (year, month)
+
+    return HttpResponseRedirect(url)
+
 def employee_salary_calc(request, model, id):
     salary = model.objects.get(pk=id)
     

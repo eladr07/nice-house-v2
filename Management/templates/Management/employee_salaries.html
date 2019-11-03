@@ -88,6 +88,9 @@
 	<a id="calcSalary" class="btn btn-default" role="button">
 		<i class="fa fa-fw fa-calculator"></i> חישוב עמלות מחדש
 	</a>
+	<a href="{% url 'salary-month-calc' %}?year={{month.year}}&month={{month.month}}" class="btn btn-default" role="button">
+		<i class="fa fa-fw fa-calculator"></i> חישוב עמלות מחדש לחודש
+	</a>
 	<a id="approve" class="btn btn-default" role="button">
 		<i class="fa fa-fw fa-check"></i> אישור שכר לתשלום
 	</a>
