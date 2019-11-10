@@ -489,9 +489,18 @@ class MonthDemandWriter(DocumentBase):
             
             sale_add = diff_pc_base * s.price_final / 100
             
-            row = [log2vis('%s/%s' % (s.actual_demand.month, s.actual_demand.year)), clientsPara(s.clients), 
-                   '%s/%s' % (str(s.house.building), str(s.house)), s.sale_date.strftime('%d/%m/%y'), 
-                   commaise(s.price), commaise(s.price_final), orig_pc_base, current_pc_base, diff_pc_base, commaise(sale_add)]
+            row = [
+                log2vis('%d/%d' % (s.actual_demand.month, s.actual_demand.year)), 
+                clientsPara(s.clients), 
+                '%s/%s' % (str(s.house.building), str(s.house)), 
+                s.sale_date.strftime('%d/%m/%y'), 
+                commaise(s.price), 
+                commaise(s.price_final), 
+                round(orig_pc_base, 3), 
+                round(current_pc_base, 3), 
+                diff_pc_base, 
+                commaise(sale_add)
+            ]
 
             row.reverse()
             rows.append(row)
