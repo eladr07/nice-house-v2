@@ -609,7 +609,7 @@ class DemandPaymentForm(PaymentBaseForm):
             self.fields['month'].initial = demand.month
     class Meta:
         model = Payment
-        exclude = ('creation_date','amount')
+        exclude = ('creation_date')
 
     field_order = ['project','year','month','num','support_num','bank','branch_num',
         'payment_type','payment_date','amount','remarks']
