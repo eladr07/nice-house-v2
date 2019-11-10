@@ -127,7 +127,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-SESSION_COOKIE_AGE = 60 * 60 # 1 Hour
+SESSION_COOKIE_AGE = 8 * 60 * 60 # 8 Hours
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
