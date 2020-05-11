@@ -5,13 +5,13 @@ from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email import encoders
 
-from NiceHouse.settings import EMAIL_HOST_USER
+gmail_user = "nevehair@gmail.com"
 
 def mail(to, cc='', bcc='', subject='', contents='', attachments = ()):
     email = EmailMessage(
         subject,
         '',
-        EMAIL_HOST_USER,
+        gmail_user,
         to,
         bcc,
         cc=cc)
