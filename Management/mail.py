@@ -1,23 +1,18 @@
-import smtplib
+from django.core.mail import EmailMessage
+
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email import encoders
-import os
-
-gmail_user = "nevehair@gmail.com"
-gmail_pwd = "8Z%!z\rV~?!bfG})"
 
 def mail(to, cc='', bcc='', subject='', contents='', attachments = ()):
-    msg = MIMEMultipart()
-
-    msg['From'] = gmail_user
-    msg['To'] = to
-    msg['Cc'] = cc
-    msg['Bcc'] = bcc
-    msg['Subject'] = subject
-
-    msg.attach(MIMEText(contents))
+    email = EmailMessage(
+        subject,
+        '',
+        gmail_user,
+        to,
+        bcc,
+        cc=cc)
     
     for attachment in attachments:
         part = MIMEBase('application', 'octet-stream')
@@ -32,13 +27,6 @@ def mail(to, cc='', bcc='', subject='', contents='', attachments = ()):
         part.set_payload(payload)
         encoders.encode_base64(part)
         part.add_header(u'Content-Disposition', 'attachment; filename="%s"' % filename)
-        msg.attach(part)
+        email.attach(part)
 
-    mailServer = smtplib.SMTP("smtp.gmail.com", 25)
-    mailServer.ehlo()
-    mailServer.starttls()
-    mailServer.ehlo()
-    mailServer.login(gmail_user, gmail_pwd)
-    mailServer.sendmail(gmail_user, to, msg.as_string())
-    # Should be mailServer.quit(), but that crashes...
-    mailServer.close()
+    email.send()
