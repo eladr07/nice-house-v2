@@ -6,7 +6,7 @@ from email import encoders
 import os
 
 gmail_user = "nevehair@gmail.com"
-gmail_pwd = "nevehair123"
+gmail_pwd = "8Z%!z\rV~?!bfG})"
 
 def mail(to, cc='', bcc='', subject='', contents='', attachments = ()):
     msg = MIMEMultipart()
