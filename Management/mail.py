@@ -12,9 +12,9 @@ def mail(to, cc='', bcc='', subject='', contents='', attachments = ()):
         subject,
         '',
         gmail_user,
-        to,
-        bcc,
-        cc=cc)
+        to=(to,),
+        bcc=(bcc,),
+        cc=(cc,))
     
     for attachment in attachments:
         part = MIMEBase('application', 'octet-stream')
