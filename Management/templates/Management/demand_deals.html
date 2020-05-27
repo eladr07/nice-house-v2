@@ -44,21 +44,23 @@
 					}
 				}
 
-				form.fadeToggle(150, function() {
-					$(this).find('form').attr( 'action', self.attr('href') );
+				form.submit();
 
-					if( form.is(':visible') ) {
-						$(document).bind('click.sale_update', function( event ) {
-							if( form.has(event.target).length === 0 ) {
-								form.hide();
-								$(document).unbind('click.sale_update');
-							}
-						});
-					}
-					else {
-						$(document).unbind('click.sale_update');
-					}
-				});
+				// form.fadeToggle(150, function() {
+				// 	$(this).find('form').attr( 'action', self.attr('href') );
+
+				// 	if( form.is(':visible') ) {
+				// 		$(document).bind('click.sale_update', function( event ) {
+				// 			if( form.has(event.target).length === 0 ) {
+				// 				form.hide();
+				// 				$(document).unbind('click.sale_update');
+				// 			}
+				// 		});
+				// 	}
+				// 	else {
+				// 		$(document).unbind('click.sale_update');
+				// 	}
+				// });
 			}
 		});
 
