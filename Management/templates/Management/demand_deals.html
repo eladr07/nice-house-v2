@@ -26,12 +26,12 @@
 				$("#saleEdit").attr("href", "/sale/" + selectedID);
 				$("#saleCommissionEdit").attr("href", "/sale/" + selectedID + "/commission");
 				$("#saleDelete").attr("href", "/demands/{{demand.id}}/sale/" + selectedID + "/cancel");
-				$("#salePre").attr("href", "/demands/{{demand.id}}/sale/" + selectedID + "/pre");
-				$("#saleReject").attr("href", "/demands/{{demand.id}}/sale/" + selectedID + "/reject");
+				$("#salePre").attr("action", "/demands/{{demand.id}}/sale/" + selectedID + "/pre");
+				$("#saleReject").attr("action", "/demands/{{demand.id}}/sale/" + selectedID + "/reject");
 			}
 		});
 
-		$("#salePre, #saleReject").click( function(e) {
+		$("#salePre > input[type='submit'], #saleReject > input[type='submit']").click( function(e) {
 			var self = $(this);
 			var form = self.next();
 
@@ -94,9 +94,9 @@
 
 		<div class="someIcon" style="width:100px;">
 			<img src="{% static "images/agt_forward-48.png" %}" width="20" height="20" alt="הקדמה" border="0" />
-			<a id="salePre">הקדמת מכירה</a>
+			<a>הקדמת מכירה</a>
 			<div class='sale-update'>
-				<form method="GET" class="formTable">
+				<form id="salePre" method="GET" class="formTable">
 					<table class="formTable" >
 					{% for field in months %}
 						<tr>
@@ -111,9 +111,9 @@
 		</div>
 		<div class="someIcon" style="width:100px;">
 			<img src="{% static "images/agt_back-48.png" %}" width="20" height="20" alt="דחייה" border="0" />
-			<a id="saleReject">דחיית מכירה</a>
+			<a>דחיית מכירה</a>
 			<div class='sale-update'>
-				<form method="GET" class="formTable">
+				<form id="saleReject" method="GET" class="formTable">
 					<table class="formTable" >
 					{% for field in months %}
 						<tr>
