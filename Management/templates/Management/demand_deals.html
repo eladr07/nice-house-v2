@@ -33,7 +33,7 @@
 
 		$("#salePre > input[type='button'], #saleReject > input[type='button']").click( function(e) {
 			var self = $(this);
-			var form = self.next();
+			var form = self.parent();
 
 			e.preventDefault();
 
