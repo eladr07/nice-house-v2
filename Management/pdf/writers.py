@@ -1393,6 +1393,9 @@ class DemandPayBalanceWriter(DocumentBase):
                 
             fields.reverse()
             
+            # filter demands with zero sales
+            demands_with_sales = [demand for demand in demands if demand.sales_count > 0]
+
             builder = Builder(demands, fields)
             table = builder.build()
             
