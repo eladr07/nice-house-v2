@@ -44,7 +44,7 @@
 			<table class="formTable">
 			<form method="POST">
 				{% csrf_token %}
-				
+
 				{% include "Management/form_snippet.html" %}
 
 				<div class="form-group">
@@ -54,6 +54,7 @@
 						<input name="addpayment" type="submit" value="אישור והזנת תשלום" class="btn btn-sm btn-default"/>
 					</div>
 				</div>
+				
 			</form>
 			</table>
 		</fieldset>

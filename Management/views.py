@@ -1516,6 +1516,7 @@ def salepaymod_edit(request, model, object_id):
     if request.method == 'POST':
         form = form_class(request.POST, instance = object)
         if form.is_valid():
+            form.save()
             demands_to_calc = []
             salaries_to_calc = []
             to_year, to_month = form.cleaned_data['to_year'], form.cleaned_data['to_month']
